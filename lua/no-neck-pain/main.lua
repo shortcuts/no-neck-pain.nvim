@@ -114,15 +114,27 @@ function M.enable()
             createWin()
         end,
         group = "NoNeckPain",
-        desc = "Resizes side windows after resize",
+        desc = "Resizes side windows after shell has been resized",
     })
 
     vim.api.nvim_create_autocmd({ "WinClosed" }, {
         callback = function()
             vim.schedule(function()
-                -- if main window is closed, disable
+                -- disable NNP if the current window is closed
                 if M.state.enabled and vim.api.nvim_get_current_win() ~= M.state.win.curr then
                     M.disable()
+                end
+            end)
+        end,
+        group = "NoNeckPain",
+        desc = "Disables NoNeckPain when main window is closed",
+    })
+
+    vim.api.nvim_create_autocmd({ "WinEnter" }, {
+        callback = function()
+            vim.schedule(function()
+                if not M.state.enabled and cfg.enableOnWinEnter then
+                    M.enable()
                 end
             end)
         end,
@@ -150,7 +162,7 @@ function M.enable()
 
                 local padding = 0
 
-                -- when opening a new buffer as current, keep its padding and resize everything (e.g. side tree)
+                -- when opening a new buffer as current, store its padding and resize everything (e.g. side tree)
                 if vim.api.nvim_get_current_win() ~= M.state.win.curr then
                     padding = vim.api.nvim_win_get_width(0)
                 end
@@ -171,7 +183,7 @@ function M.enable()
             end)
         end,
         group = "NoNeckPain",
-        desc = "Resize to apply on Enter/Closed callbacks",
+        desc = "Resize to apply on WinEnter/Closed",
     })
 
     M.state.enabled = true
