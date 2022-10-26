@@ -2,7 +2,6 @@ local config = {}
 
 config.options = {
     width = 100,
-    enableOnWinEnter = false, -- enable NNP if it's currently disabled on WinEnter
 }
 
 function config.setup(opts)

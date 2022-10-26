@@ -26,12 +26,25 @@ Plug 'shortcuts/no-neck-pain.nvim'
 
 ## Getting started
 
-### Lua
-
 ```lua
 -- values below are the default
 require("no-neck-pain").setup({
     width = 100, -- the size of the main buffer
-    enableOnWinEnter = false, --  enables NNP on WinEnter event if it's not the case
+})
+```
+
+### Toggle on WinEnter
+
+The snippet below will start NNP on WinEnter event
+
+```lua
+-- enables NNP on WinEnter if it's not the case yet
+vim.api.nvim_create_augroup("OnWinEnter", { clear = true })
+vim.api.nvim_create_autocmd({ "WinEnter" }, {
+	group = "OnWinEnter",
+	pattern = "*",
+	callback = function()
+        require("no-neck-pain").start()
+	end,
 })
 ```

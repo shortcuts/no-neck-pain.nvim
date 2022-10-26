@@ -125,19 +125,6 @@ function M.enable()
         desc = "Disables NoNeckPain when main window is closed",
     })
 
-    vim.api.nvim_create_autocmd({ "WinEnter" }, {
-        callback = function()
-            vim.schedule(function()
-                -- enables NNP when it's not and cfg.enableOnWinEnter is set
-                if not M.state.enabled and cfg.enableOnWinEnter then
-                    M.enable()
-                end
-            end)
-        end,
-        group = "NoNeckPain",
-        desc = "Disables NoNeckPain when main window is closed",
-    })
-
     vim.api.nvim_create_autocmd({ "WinEnter", "WinClosed" }, {
         callback = function()
             vim.schedule(function()
