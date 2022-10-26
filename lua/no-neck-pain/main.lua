@@ -44,6 +44,7 @@ function M.toggle()
     end
 end
 
+-- gets the padding to size the side windows, based on the cfg.width and the current window size
 local function getPadding()
     local width = vim.api.nvim_list_uis()[1].width
 
@@ -51,16 +52,10 @@ local function getPadding()
         return 1
     end
 
-    local curr_width = cfg.width * 3
-    if curr_width > width then
-        local available_space = width - cfg.width
-        return (available_space % 2 > 0 and ((available_space - 1) / 2) or available_space / 2)
-    end
-
-    return cfg.width
+    return math.floor((width - cfg.width) / 2)
 end
 
--- Creates a buffer for the given padding, at the given direction
+-- creates a buffer for the given padding, at the given direction
 local function createBuf(cmd, padding, moveTo)
     vim.cmd(cmd)
 
@@ -133,6 +128,7 @@ function M.enable()
     vim.api.nvim_create_autocmd({ "WinEnter" }, {
         callback = function()
             vim.schedule(function()
+                -- enables NNP when it's not and cfg.enableOnWinEnter is set
                 if not M.state.enabled and cfg.enableOnWinEnter then
                     M.enable()
                 end

@@ -32,5 +32,6 @@ Plug 'shortcuts/no-neck-pain.nvim'
 -- values below are the default
 require("no-neck-pain").setup({
     width = 100, -- the size of the main buffer
+    enableOnWinEnter = false, --  enables NNP on WinEnter event if it's not the case
 })
 ```
