@@ -30,21 +30,23 @@ Plug 'shortcuts/no-neck-pain.nvim'
 -- values below are the default
 require("no-neck-pain").setup({
     width = 100, -- the size of the main buffer
+    debug = false, -- prints some debugging logs on events when switching buffers/windows
 })
 ```
 
-### Toggle on WinEnter
+### Toggle on VimEnter
 
-The snippet below will start NNP on WinEnter event
+The snippet below will start NNP when opening neovim
 
 ```lua
--- enables NNP on WinEnter if it's not the case yet
-vim.api.nvim_create_augroup("OnWinEnter", { clear = true })
-vim.api.nvim_create_autocmd({ "WinEnter" }, {
-	group = "OnWinEnter",
+vim.api.nvim_create_augroup("OnVimEnter", { clear = true })
+vim.api.nvim_create_autocmd({ "VimEnter" }, {
+	group = "OnVimEnter",
 	pattern = "*",
 	callback = function()
-        require("no-neck-pain").start()
+		vim.schedule(function()
+			require("no-neck-pain").start()
+		end)
 	end,
 })
 ```
