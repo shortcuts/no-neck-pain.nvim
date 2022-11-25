@@ -1,13 +1,15 @@
 local cfg = require("no-neck-pain.config").options
 local M = {}
 
+-- print only if debug is true
 function M.print(...)
     if cfg.debug then
         print("[debug] " .. os.time() .. ": " .. ...)
     end
 end
 
-function M.tprint(map, indent)
+-- print table only if debug is true
+function M.tprint(table, indent)
     if not cfg.debug then
         return
     end
@@ -15,7 +17,8 @@ function M.tprint(map, indent)
     if not indent then
         indent = 0
     end
-    for k, v in pairs(map) do
+
+    for k, v in pairs(table) do
         local formatting = string.rep("  ", indent) .. k .. ": "
         if type(v) == "table" then
             print(formatting)
@@ -28,6 +31,7 @@ function M.tprint(map, indent)
     end
 end
 
+-- returns size of a map
 function M.tsize(map)
     local count = 0
 
