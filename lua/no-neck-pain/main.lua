@@ -123,10 +123,6 @@ function M.enable()
             vim.schedule(function()
                 util.print("BufWinEnter event")
 
-                if not M.state.enabled then
-                    return
-                end
-
                 -- early exit on split view
                 if M.state.win.split ~= nil then
                     util.print("exit because of split view")
@@ -135,11 +131,12 @@ function M.enable()
 
                 local buffers = vim.api.nvim_list_wins()
 
+                -- we might only have curr + side
                 if util.tsize(buffers) <= 3 then
                     return
                 end
 
-                -- -- close side buffers to keep space for the split
+                -- close side buffers to keep space for the split
                 for _, buffer in ipairs(buffers) do
                     if M.state.win.left == buffer then
                         vim.api.nvim_win_close(buffer, true)
@@ -147,6 +144,7 @@ function M.enable()
                     elseif M.state.win.right == buffer then
                         vim.api.nvim_win_close(buffer, true)
                         M.state.win.right = nil
+                    -- one of the last buffer is not curr, so its the split
                     elseif buffer ~= M.state.win.curr then
                         M.state.win.split = buffer
                     end
@@ -154,7 +152,7 @@ function M.enable()
             end)
         end,
         group = "NoNeckPain",
-        desc = "Resize to apply on WinEnter/Closed",
+        desc = "Tries to detect when a split buf opens",
     })
 
     vim.api.nvim_create_autocmd({ "WinEnter", "WinClosed" }, {
@@ -162,25 +160,25 @@ function M.enable()
             vim.schedule(function()
                 util.print("WinClosed event")
 
-                -- we are in split, checking if we go back to NNP
+                -- we have a split open, checking if we go back to NNP
                 if M.state.win.split ~= nil then
                     local buffers = vim.api.nvim_list_wins()
 
-                    -- we have nothing to do here
+                    -- shouldn't happen but why not
                     if util.tsize(buffers) > 1 then
                         return
                     end
 
                     local lastActiveBuffer = nil
 
-                    -- check if split buffer is still active
+                    -- determine which buffer to set as new curr
                     for _, buffer in ipairs(buffers) do
                         if M.state.win.split == buffer then
                             lastActiveBuffer = M.state.win.split
                         elseif M.state.win.curr == buffer then
                             lastActiveBuffer = M.state.win.curr
                         else
-                            -- idk for now but it's not the problem here
+                            util.print("returned trying to determine which buffer is the last one")
                             return
                         end
 
@@ -200,7 +198,7 @@ function M.enable()
             end)
         end,
         group = "NoNeckPain",
-        desc = "Logic for WinClosed split",
+        desc = "Aims at restoring NNP enable state after closing a split view",
     })
 
     vim.api.nvim_create_autocmd({ "WinEnter", "WinClosed" }, {
