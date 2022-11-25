@@ -2,6 +2,7 @@ local config = {}
 
 config.options = {
     width = 100,
+    debug = false,
 }
 
 function config.setup(opts)
