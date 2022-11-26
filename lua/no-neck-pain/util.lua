@@ -4,7 +4,7 @@ local M = {}
 -- print only if debug is true
 function M.print(...)
     if cfg.debug then
-        print("[debug] " .. os.time() .. ": " .. ...)
+        print("[" .. os.time() .. "] --> ", ...)
     end
 end
 

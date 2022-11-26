@@ -77,6 +77,8 @@ end
 
 -- creates a NNP focused buffer when called with `init`. Resizes sides on `resize`
 local function createWin(action)
+    util.print("CreateWin: ", action)
+
     local padding = getPadding()
 
     if action == "init" then
@@ -110,7 +112,7 @@ function M.enable()
 
     vim.api.nvim_create_autocmd({ "VimResized" }, {
         callback = function()
-            util.print("VimResized event")
+            util.print("VimResized")
 
             createWin()
         end,
@@ -121,22 +123,26 @@ function M.enable()
     vim.api.nvim_create_autocmd({ "BufWinEnter" }, {
         callback = function()
             vim.schedule(function()
-                util.print("BufWinEnter event")
-
-                -- early exit on split view
                 if M.state.win.split ~= nil then
-                    util.print("exit because of split view")
-                    return
+                    return util.print("BufWinEnter: already int split, exiting")
                 end
 
                 local buffers = vim.api.nvim_list_wins()
+                local nbBuffers = util.tsize(buffers)
 
-                -- we might only have curr + side
-                if util.tsize(buffers) <= 3 then
-                    return
+                if nbBuffers <= 3 then
+                    return util.print("BufWinEnter: we only have 3 buffers, no need to trigger")
+                elseif nbBuffers == 4 then
+                    for _, id in ipairs(buffers) do
+                        if vim.api.nvim_win_get_config(id).relative ~= "" then
+                            return util.print(
+                                "BufWinEnter: 4 buffers including a relative one, most likely diagnostic or telescope, skipping"
+                            )
+                        end
+                    end
                 end
 
-                -- close side buffers to keep space for the split
+                -- we can now assume we have to handle the vsplit
                 for _, buffer in ipairs(buffers) do
                     if M.state.win.left == buffer then
                         vim.api.nvim_win_close(buffer, true)
@@ -155,45 +161,45 @@ function M.enable()
         desc = "Tries to detect when a split buf opens",
     })
 
-    vim.api.nvim_create_autocmd({ "WinEnter", "WinClosed" }, {
+    vim.api.nvim_create_autocmd({ "WinClosed" }, {
         callback = function()
             vim.schedule(function()
-                util.print("WinClosed event")
+                -- resize if it's not a split, just to be sure
+                if M.state.win.split == nil then
+                    return createWin()
+                end
 
-                -- we have a split open, checking if we go back to NNP
-                if M.state.win.split ~= nil then
-                    local buffers = vim.api.nvim_list_wins()
+                local buffers = vim.api.nvim_list_wins()
 
-                    -- shouldn't happen but why not
-                    if util.tsize(buffers) > 1 then
-                        return
+                if util.tsize(buffers) > 1 then
+                    return util.print("WinClosed: only one buffer, nothing to do")
+                end
+
+                local lastActiveBuffer = nil
+
+                -- determine which buffer to set as new curr
+                for _, buffer in ipairs(buffers) do
+                    if M.state.win.split == buffer then
+                        lastActiveBuffer = M.state.win.split
+                    elseif M.state.win.curr == buffer then
+                        lastActiveBuffer = M.state.win.curr
+                    else
+                        return util.print(
+                            "Winclosed: unable to determine which buffer is the last one"
+                        )
                     end
 
-                    local lastActiveBuffer = nil
+                    -- set last active as the curr, reset split anyway
+                    M.state.win.curr = lastActiveBuffer
+                    M.state.win.split = nil
 
-                    -- determine which buffer to set as new curr
-                    for _, buffer in ipairs(buffers) do
-                        if M.state.win.split == buffer then
-                            lastActiveBuffer = M.state.win.split
-                        elseif M.state.win.curr == buffer then
-                            lastActiveBuffer = M.state.win.curr
-                        else
-                            util.print("returned trying to determine which buffer is the last one")
-                            return
-                        end
+                    -- focus curr
+                    vim.fn.win_gotoid(M.state.win.curr)
 
-                        -- set last active as the curr, reset split anyway
-                        M.state.win.curr = lastActiveBuffer
-                        M.state.win.split = nil
+                    -- recreate everything
+                    createWin("init")
 
-                        -- focus curr
-                        vim.fn.win_gotoid(M.state.win.curr)
-
-                        -- recreate everything
-                        createWin("init")
-
-                        return
-                    end
+                    return
                 end
             end)
         end,
@@ -204,24 +210,25 @@ function M.enable()
     vim.api.nvim_create_autocmd({ "WinEnter", "WinClosed" }, {
         callback = function()
             vim.schedule(function()
-                util.print("WinEnter, WinClosed event")
-
                 -- early exit on split view
                 if M.state.win.split ~= nil then
-                    return
-                end
-
-                -- trigger on float window (e.g. telescope)
-                if vim.api.nvim_win_get_config(0).relative ~= "" then
-                    util.print("float window detected, resizing")
-                    return createWin()
+                    return util.print("WinEnter, WinClosed: stop because of split view")
                 end
 
                 local focusedWin = vim.api.nvim_get_current_win()
 
+                -- trigger on float window (e.g. telescope)
+                if
+                    vim.api.nvim_win_get_config(0).relative ~= ""
+                    or vim.api.nvim_win_get_config(focusedWin).relative == ""
+                then
+                    return util.print("WinEnter, WinClosed: float window detected")
+                    -- return createWin()
+                end
+
                 -- skip if the newly focused window is a side buffer
                 if focusedWin == M.state.win.left or focusedWin == M.state.win.right then
-                    return util.print("focus on side buffer, skipped resize")
+                    return util.print("WinEnter, WinClosed: focus on side buffer, skipped resize")
                 end
 
                 local padding = 0
@@ -229,20 +236,13 @@ function M.enable()
                 -- when opening a new buffer as current, store its padding and resize everything (e.g. side tree)
                 if focusedWin ~= M.state.win.curr then
                     padding = vim.api.nvim_win_get_width(focusedWin)
-                    util.print("new current buffer found, resizing:", padding)
+                    util.print("WinEnter, WinClosed: new current buffer found, resizing:", padding)
                 end
 
                 local width = vim.api.nvim_list_uis()[1].width
                 local totalSideSizes = (width - padding) - cfg.width
 
-                util.print(
-                    "resizing side buffers, width:",
-                    width,
-                    "padding:",
-                    padding,
-                    "cfg.width:",
-                    cfg.width
-                )
+                util.print("WinEnter, WinClosed: resizing side buffers")
 
                 for _, side in ipairs(SIDES) do
                     if M.state.win[side] ~= nil then
