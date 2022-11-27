@@ -9,7 +9,7 @@ on:
 jobs:
   lint:
     runs-on: ubuntu-latest
-    name: Lint
+    name: lint
     steps:
       - uses: actions/checkout@v3
 
@@ -18,3 +18,31 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           version: latest
           args: --check .
+
+  tests:
+    needs: lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        neovim_version: ['v0.6.1', 'v0.7.2', 'v0.8.1', 'nightly']
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - run: date +%F > todays-date
+
+      - name: restore cache for today's nightly.
+        uses: actions/cache@v3
+        with:
+          path: _neovim
+          key: ${{ runner.os }}-x64-${{ hashFiles('todays-date') }}
+
+      - name: setup neovim
+        uses: rhysd/action-setup-vim@v1
+        with:
+          neovim: true
+          version: ${{ matrix.neovim_version }}
+
+      - name: run tests
+        run: make test
