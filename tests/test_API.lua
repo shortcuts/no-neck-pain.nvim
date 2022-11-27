@@ -2,8 +2,8 @@
 local helpers = dofile("tests/helpers.lua")
 
 local child = helpers.new_child_neovim()
-local expect, eq = helpers.expect, helpers.expect.equality
-local new_set, finally = MiniTest.new_set, MiniTest.finally
+local _, eq = helpers.expect, helpers.expect.equality
+local new_set, _ = MiniTest.new_set, MiniTest.finally
 
 -- Define main test set of this file
 local T = new_set({
@@ -24,13 +24,26 @@ local T = new_set({
 -- Test set fields define nested structure
 T["setup()"] = new_set()
 
-T["setup()"]["sets global vars and functions"] = function()
-    -- Global variable
-    eq(child.lua_get("type(vim.g.noNeckPain)"), "boolean")
-
-    -- Functions
-    expect.match(child.cmd_capture("NoNeckPain"), "string")
+T["setup()"]["sets global variable"] = function()
+    eq(child.lua_get("type(_G.noNeckPainLoaded)"), "boolean")
 end
 
--- Return test set which will be collected and execute inside `MiniTest.run()`
+T["setup()"]["check exposed fields"] = function()
+    eq(child.lua_get("type(_G.NoNeckPain)"), "table")
+
+    -- exposed fns
+    eq(child.lua_get("type(_G.NoNeckPain.start)"), "function")
+    eq(child.lua_get("type(_G.NoNeckPain.setup)"), "function")
+
+    -- config
+    eq(child.lua_get("type(_G.NoNeckPain.config)"), "table")
+
+    local expect_config = function(field, value)
+        eq(child.lua_get("_G.NoNeckPain.config." .. field), value)
+    end
+
+    expect_config("width", 100)
+    expect_config("debug", false)
+end
+
 return T

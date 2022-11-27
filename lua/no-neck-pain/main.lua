@@ -1,4 +1,4 @@
-local cfg = require("no-neck-pain.config").options
+local cfg = require("no-neck-pain.config")
 local util = require("no-neck-pain.util")
 local SIDES = { "left", "right" }
 
