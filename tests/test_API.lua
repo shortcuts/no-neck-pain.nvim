@@ -1,13 +1,10 @@
--- plugin also test 'mini.test'.
 local helpers = dofile("tests/helpers.lua")
 
 local child = helpers.new_child_neovim()
 local _, eq = helpers.expect, helpers.expect.equality
 local new_set, _ = MiniTest.new_set, MiniTest.finally
 
--- Define main test set of this file
 local T = new_set({
-    -- Register hooks
     hooks = {
         -- This will be executed before every (even nested) case
         pre_case = function()
@@ -21,7 +18,6 @@ local T = new_set({
     },
 })
 
--- Test set fields define nested structure
 T["setup()"] = new_set()
 
 T["setup()"]["sets global variable"] = function()
