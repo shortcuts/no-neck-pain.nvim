@@ -1,4 +1,4 @@
-local cfg = require("no-neck-pain.config").options
+local cfg = require("no-neck-pain.config")
 local M = {}
 
 -- print only if debug is true
