@@ -36,8 +36,6 @@ require("no-neck-pain").setup({
 
 ### Toggle on VimEnter
 
-The snippet below will start NNP when opening neovim
-
 ```lua
 vim.api.nvim_create_augroup("OnVimEnter", { clear = true })
 vim.api.nvim_create_autocmd({ "VimEnter" }, {
