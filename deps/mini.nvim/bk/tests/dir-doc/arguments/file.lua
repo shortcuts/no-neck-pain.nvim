@@ -1,3 +1,0 @@
--- This file should be used to generate output help file.
--- It also should respect `--` as annotation prefix (as test for respecting
--- `config` argument).

@@ -49,4 +49,4 @@ jobs:
           version: ${{ matrix.neovim_version }}
 
       - name: run tests
-        run: make test
+        run: make test-ci

@@ -1,1 +1,0 @@
---- File 'default-collation/after/file02.lua'
