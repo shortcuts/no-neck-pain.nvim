@@ -1,4 +1,4 @@
-local cfg = require("no-neck-pain.config")
+local options = require("no-neck-pain.config").options
 local util = require("no-neck-pain.util")
 local SIDES = { "left", "right" }
 
@@ -46,15 +46,15 @@ function M.toggle()
     end
 end
 
--- gets the padding to size the side windows, based on the cfg.width and the current window size
+-- gets the padding to size the side windows, based on the options.width and the current window size
 local function getPadding()
     local width = vim.api.nvim_list_uis()[1].width
 
-    if cfg.width >= width then
+    if options.width >= width then
         return 1
     end
 
-    return math.floor((width - cfg.width) / 2)
+    return math.floor((width - options.width) / 2)
 end
 
 -- creates a buffer for the given padding, at the given direction
@@ -240,7 +240,7 @@ function M.enable()
                 end
 
                 local width = vim.api.nvim_list_uis()[1].width
-                local totalSideSizes = (width - padding) - cfg.width
+                local totalSideSizes = (width - padding) - options.width
 
                 util.print("WinEnter, WinClosed: resizing side buffers")
 
