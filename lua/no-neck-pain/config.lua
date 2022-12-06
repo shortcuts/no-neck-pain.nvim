@@ -1,12 +1,14 @@
-local cfg = {}
-
-cfg = {
-    width = 100,
-    debug = false,
+local C = {
+    options = {
+        width = 100,
+        debug = false,
+    },
 }
 
-function cfg.setup(opts)
-    cfg = vim.tbl_deep_extend("keep", opts or {}, cfg)
+function C.setup(opts)
+    C.options = vim.tbl_deep_extend("keep", opts or {}, C.options)
+
+    return C.options
 end
 
-return cfg
+return C

@@ -1,16 +1,16 @@
-local cfg = require("no-neck-pain.config")
+local options = require("no-neck-pain.config").options
 local M = {}
 
 -- print only if debug is true
 function M.print(...)
-    if cfg.debug then
+    if options.debug then
         print("[" .. os.time() .. "] --> ", ...)
     end
 end
 
 -- print table only if debug is true
 function M.tprint(table, indent)
-    if not cfg.debug then
+    if not options.debug then
         return
     end
 
