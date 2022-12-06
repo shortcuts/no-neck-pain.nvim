@@ -26,7 +26,6 @@ function NNP.setup(opts)
     }
 end
 
-
 _G.NoNeckPain = NNP
 
 return NNP
