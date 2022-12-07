@@ -127,6 +127,14 @@ function M.enable()
                     return util.print("BufWinEnter: already int split, exiting")
                 end
 
+                if
+                    vim.api.nvim_win_get_config(0).relative ~= ""
+                    or vim.api.nvim_win_get_config(vim.api.nvim_get_current_win()).relative
+                        ~= ""
+                then
+                    return util.print("BufWinEnter: float window detected")
+                end
+
                 local buffers = vim.api.nvim_list_wins()
                 local nbBuffers = util.tsize(buffers)
 
@@ -220,10 +228,9 @@ function M.enable()
                 -- trigger on float window (e.g. telescope)
                 if
                     vim.api.nvim_win_get_config(0).relative ~= ""
-                    or vim.api.nvim_win_get_config(focusedWin).relative == ""
+                    or vim.api.nvim_win_get_config(focusedWin).relative ~= ""
                 then
                     return util.print("WinEnter, WinClosed: float window detected")
-                    -- return createWin()
                 end
 
                 -- skip if the newly focused window is a side buffer
