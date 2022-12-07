@@ -1,10 +1,6 @@
-local util = require("no-neck-pain.util")
-
 local NNP = {}
 
 function NNP.start()
-    util.print("calling `start`")
-
     local main = require("no-neck-pain.main")
 
     NNP.state = main.state
@@ -18,9 +14,6 @@ function NNP.start()
 end
 
 function NNP.setup(opts)
-    util.print("calling `setup` with opts")
-    util.tprint(opts)
-
     NNP.config = {
         options = require("no-neck-pain.config").setup(opts),
     }
