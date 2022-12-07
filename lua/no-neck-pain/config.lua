@@ -1,6 +1,5 @@
 local C = {}
 
-
 C.options = {
     width = 100,
     debug = false,
