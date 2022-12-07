@@ -1,8 +1,9 @@
-local C = {
-    options = {
-        width = 100,
-        debug = false,
-    },
+local C = {}
+
+
+C.options = {
+    width = 100,
+    debug = false,
 }
 
 function C.setup(opts)
