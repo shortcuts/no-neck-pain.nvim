@@ -99,7 +99,7 @@ local function createWin(action)
 
     -- resize
     for _, side in ipairs(SIDES) do
-        if vim.api.nvim_win_is_valid(M.state.win[side]) then
+        if M.state.win[side] ~= nil and vim.api.nvim_win_is_valid(M.state.win[side]) then
             vim.api.nvim_win_set_width(M.state.win[side], padding)
         end
     end
@@ -112,9 +112,7 @@ function M.enable()
 
     vim.api.nvim_create_autocmd({ "VimResized" }, {
         callback = function()
-            util.print("VimResized")
-
-            createWin()
+            createWin("VimResized")
         end,
         group = "NoNeckPain",
         desc = "Resizes side windows after shell has been resized",
@@ -124,45 +122,45 @@ function M.enable()
         callback = function()
             vim.schedule(function()
                 if M.state.win.split ~= nil then
-                    return util.print("BufWinEnter: already int split, exiting")
+                    return util.print("BufWinEnter: stop because of split view")
                 end
 
-                if
-                    vim.api.nvim_win_get_config(0).relative ~= ""
-                    or vim.api.nvim_win_get_config(vim.api.nvim_get_current_win()).relative
-                        ~= ""
-                then
-                    return util.print("BufWinEnter: float window detected")
+                if util.isRelativeWindow("BufWinEnter") then
+                    return
                 end
 
                 local buffers = vim.api.nvim_list_wins()
-                local nbBuffers = util.tsize(buffers)
+                local validBuffers = {}
 
-                if nbBuffers <= 3 then
-                    return util.print("BufWinEnter: we only have 3 buffers, no need to trigger")
-                elseif nbBuffers == 4 then
-                    for _, id in ipairs(buffers) do
-                        if vim.api.nvim_win_get_config(id).relative ~= "" then
-                            return util.print(
-                                "BufWinEnter: 4 buffers including a relative one, most likely diagnostic or telescope, skipping"
-                            )
-                        end
-                    end
-                end
-
-                -- we can now assume we have to handle the vsplit
+                -- only consider valid buffers
                 for _, buffer in ipairs(buffers) do
-                    if M.state.win.left == buffer then
-                        vim.api.nvim_win_close(buffer, true)
-                        M.state.win.left = nil
-                    elseif M.state.win.right == buffer then
-                        vim.api.nvim_win_close(buffer, true)
-                        M.state.win.right = nil
-                    -- one of the last buffer is not curr, so its the split
-                    elseif buffer ~= M.state.win.curr then
-                        M.state.win.split = buffer
+                    if
+                        not util.isRelativeWindow("BufWinEnter", buffer)
+                        and buffer ~= M.state.win.left
+                        and buffer ~= M.state.win.right
+                        and buffer ~= M.state.win.curr
+                    then
+                        table.insert(validBuffers, buffer)
                     end
                 end
+
+                local nbBuffers = util.tsize(validBuffers)
+
+                if nbBuffers == 0 then
+                    return util.print("BufWinEnter: no valid buffers to handle")
+                end
+
+                util.print("BufWinEnter: remaining valid buffers", nbBuffers)
+
+                vim.api.nvim_win_close(M.state.win.left, true)
+                M.state.win.left = nil
+
+                vim.api.nvim_win_close(M.state.win.right, true)
+                M.state.win.right = nil
+
+                -- assume first one is the split for now
+                -- TODO: set currently focused one maybe?
+                M.state.win.split = validBuffers[0]
             end)
         end,
         group = "NoNeckPain",
@@ -172,9 +170,8 @@ function M.enable()
     vim.api.nvim_create_autocmd({ "WinClosed" }, {
         callback = function()
             vim.schedule(function()
-                -- resize if it's not a split, just to be sure
-                if M.state.win.split == nil then
-                    return createWin()
+                if util.isRelativeWindow("WinClosed") then
+                    return
                 end
 
                 local buffers = vim.api.nvim_list_wins()
@@ -185,7 +182,7 @@ function M.enable()
 
                 local lastActiveBuffer = nil
 
-                -- determine which buffer to set as new curr
+                -- determine which buffer left out of the two curr/split
                 for _, buffer in ipairs(buffers) do
                     if M.state.win.split == buffer then
                         lastActiveBuffer = M.state.win.split
@@ -218,20 +215,15 @@ function M.enable()
     vim.api.nvim_create_autocmd({ "WinEnter", "WinClosed" }, {
         callback = function()
             vim.schedule(function()
-                -- early exit on split view
                 if M.state.win.split ~= nil then
                     return util.print("WinEnter, WinClosed: stop because of split view")
                 end
 
-                local focusedWin = vim.api.nvim_get_current_win()
-
-                -- trigger on float window (e.g. telescope)
-                if
-                    vim.api.nvim_win_get_config(0).relative ~= ""
-                    or vim.api.nvim_win_get_config(focusedWin).relative ~= ""
-                then
-                    return util.print("WinEnter, WinClosed: float window detected")
+                if util.isRelativeWindow("WinEnter, WinClosed") then
+                    return
                 end
+
+                local focusedWin = vim.api.nvim_get_current_win()
 
                 -- skip if the newly focused window is a side buffer
                 if focusedWin == M.state.win.left or focusedWin == M.state.win.right then
@@ -250,7 +242,6 @@ function M.enable()
                 local totalSideSizes = (width - padding) - options.width
 
                 util.print("WinEnter, WinClosed: resizing side buffers")
-
                 for _, side in ipairs(SIDES) do
                     if M.state.win[side] ~= nil then
                         if vim.api.nvim_win_is_valid(M.state.win[side]) then
