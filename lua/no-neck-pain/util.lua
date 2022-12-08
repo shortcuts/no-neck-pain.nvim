@@ -42,4 +42,17 @@ function M.tsize(map)
     return count
 end
 
+function M.isRelativeWindow(scope, win)
+    win = win or vim.api.nvim_get_current_win()
+
+    if
+        vim.api.nvim_win_get_config(0).relative ~= ""
+        or vim.api.nvim_win_get_config(win).relative ~= ""
+    then
+        M.print(scope, "float window detected")
+
+        return true
+    end
+end
+
 return M
