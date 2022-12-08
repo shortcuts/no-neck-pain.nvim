@@ -89,8 +89,11 @@ local function createWin(action)
             opts = M.state.win.opts,
             curr = vim.api.nvim_get_current_win(),
             left = createBuf("leftabove vnew", padding, "wincmd l"),
-            right = createBuf("vnew", padding, "wincmd h"),
         }
+
+        if not options.leftPaddingOnly then
+            M.state.win.right = createBuf("vnew", padding, "wincmd h")
+        end
 
         vim.o.splitbelow, vim.o.splitright = splitbelow, splitright
 
@@ -152,11 +155,15 @@ function M.enable()
 
                 util.print("BufWinEnter: remaining valid buffers", nbBuffers)
 
-                vim.api.nvim_win_close(M.state.win.left, true)
-                M.state.win.left = nil
+                if M.state.win.left ~= nil then
+                    vim.api.nvim_win_close(M.state.win.left, true)
+                    M.state.win.left = nil
+                end
 
-                vim.api.nvim_win_close(M.state.win.right, true)
-                M.state.win.right = nil
+                if M.state.win.right ~= nil then
+                    vim.api.nvim_win_close(M.state.win.right, true)
+                    M.state.win.right = nil
+                end
 
                 -- assume first one is the split for now
                 -- TODO: set currently focused one maybe?

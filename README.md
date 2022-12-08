@@ -29,8 +29,14 @@ Plug 'shortcuts/no-neck-pain.nvim'
 ```lua
 -- values below are the default
 require("no-neck-pain").setup({
-    width = 100, -- the size of the main buffer
-    debug = false, -- prints some debugging logs on events when switching buffers/windows
+    -- the width of the current buffer. If the available screen size is less than `width`,
+    -- the buffer will take the whole screen.
+    width = 100,
+    -- prints useful logs about what event are triggered, and reasons actions are executed.
+    debug = false,
+    -- only add a left buffer as "padding", which leave all the current buffer expand
+    -- to the right of the screen.
+    leftPaddingOnly = false,
 })
 ```
 
