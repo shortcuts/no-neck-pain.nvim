@@ -48,10 +48,11 @@ T["setup()"]["sets exposed methods and config"] = function()
 
     expect_config("width", 100)
     expect_config("debug", false)
+    expect_config("leftPaddingOnly", false)
 end
 
 T["setup()"]["overrides default values"] = function()
-    child.lua([[M = require('no-neck-pain').setup({width=42,debug=true})]])
+    child.lua([[M = require('no-neck-pain').setup({width=42,debug=true,leftPaddingOnly=true})]])
 
     local expect_config = function(field, value)
         eq(child.lua_get("_G.NoNeckPain.config.options." .. field), value)
@@ -59,6 +60,7 @@ T["setup()"]["overrides default values"] = function()
 
     expect_config("width", 42)
     expect_config("debug", true)
+    expect_config("leftPaddingOnly", true)
 end
 
 ----------------- start
