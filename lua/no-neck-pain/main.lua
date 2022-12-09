@@ -202,7 +202,10 @@ function M.enable()
                     and (
                         not util.contains(buffers, M.state.win.curr)
                         or not util.contains(buffers, M.state.win.left)
-                        or not util.contains(buffers, M.state.win.right)
+                        or (
+                            not options.leftPaddingOnly
+                            and not util.contains(buffers, M.state.win.right)
+                        )
                     )
                 then
                     util.print("WinClosed: one of the NNP main buffers have been closed")
