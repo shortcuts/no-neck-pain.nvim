@@ -40,10 +40,10 @@ vim.api.nvim_create_augroup("NoNeckPain", {
 -- toggle plugin and restart states
 function M.toggle()
     if M.state.enabled then
-        M.disable()
-    else
-        M.enable()
+        return M.disable()
     end
+
+    M.enable()
 end
 
 -- gets the padding to size the side windows, based on the options.width and the current window size
@@ -72,10 +72,11 @@ local function createBuf(cmd, padding, moveTo)
     end
 
     vim.cmd(moveTo)
+
     return id
 end
 
--- creates a NNP focused buffer when called with `init`. Resizes sides on `resize`
+-- creates a NNP focused buffer when called with `init`. Resizes sides on any other cases.
 local function createWin(action)
     util.print("CreateWin: ", action)
 
@@ -108,7 +109,12 @@ local function createWin(action)
     end
 end
 
+-- initializes NNP and sets event listeners.
 function M.enable()
+    if M.state.enabled then
+        return util.print("enable: tried to enable already enabled NNP")
+    end
+
     util.print("enabling NNP")
 
     createWin("init")
@@ -125,9 +131,10 @@ function M.enable()
         callback = function()
             vim.schedule(function()
                 if M.state.win.split ~= nil then
-                    return util.print("BufWinEnter: stop because of split view")
+                    return util.print("BufWinEnter: already in split view, nothing more to do")
                 end
 
+                -- we don't want close action on float window to impact NNP
                 if util.isRelativeWindow("BufWinEnter") then
                     return
                 end
@@ -135,7 +142,7 @@ function M.enable()
                 local buffers = vim.api.nvim_list_wins()
                 local validBuffers = {}
 
-                -- only consider valid buffers
+                -- store buffers that are not part of NNP to see if we have opened a split
                 for _, buffer in ipairs(buffers) do
                     if
                         not util.isRelativeWindow("BufWinEnter", buffer)
@@ -148,43 +155,65 @@ function M.enable()
                 end
 
                 local nbBuffers = util.tsize(validBuffers)
+                local focusedWin = vim.api.nvim_get_current_win()
 
-                if nbBuffers == 0 then
-                    return util.print("BufWinEnter: no valid buffers to handle")
+                if nbBuffers == 0 or not util.contains(validBuffers, focusedWin) then
+                    return util.print("BufWinEnter: no valid buffers to handle, no split to handle")
                 end
 
-                util.print("BufWinEnter: remaining valid buffers", nbBuffers)
+                util.print("BufWinEnter: found ", nbBuffers, " remaining valid buffers")
+
+                -- start by saving the split, because steps below will trigger `WinClosed`
+                M.state.win.split = focusedWin
 
                 if M.state.win.left ~= nil then
+                    util.print("BufWinEnter: killing left side buffer")
+
                     vim.api.nvim_win_close(M.state.win.left, true)
                     M.state.win.left = nil
                 end
 
                 if M.state.win.right ~= nil then
+                    util.print("BufWinEnter: killing right side buffer")
+
                     vim.api.nvim_win_close(M.state.win.right, true)
                     M.state.win.right = nil
                 end
-
-                -- assume first one is the split for now
-                -- TODO: set currently focused one maybe?
-                M.state.win.split = validBuffers[0]
             end)
         end,
         group = "NoNeckPain",
-        desc = "Tries to detect when a split buf opens",
+        desc = "Tries to detect when a split/vsplit buf opens",
     })
 
     vim.api.nvim_create_autocmd({ "WinClosed" }, {
         callback = function()
             vim.schedule(function()
+                -- we don't want close action on float window to impact NNP
                 if util.isRelativeWindow("WinClosed") then
                     return
                 end
 
                 local buffers = vim.api.nvim_list_wins()
 
+                -- if we are not in split view, ensure we killed one of the main buffers (curr, left, right)
+                -- TODO: make killed side buffer decision configurable, we can re-create it
+                if
+                    M.state.win.split == nil
+                    and (
+                        not util.contains(buffers, M.state.win.curr)
+                        or not util.contains(buffers, M.state.win.left)
+                        or not util.contains(buffers, M.state.win.right)
+                    )
+                then
+                    util.print("WinClosed: one of the NNP main buffers have been closed")
+
+                    return M.disable()
+                end
+
                 if util.tsize(buffers) > 1 then
-                    return util.print("WinClosed: only one buffer, nothing to do")
+                    return util.print(
+                        "WinClosed: more than one buffer left, no killed split to handle"
+                    )
                 end
 
                 local lastActiveBuffer = nil
@@ -200,19 +229,17 @@ function M.enable()
                             "Winclosed: unable to determine which buffer is the last one"
                         )
                     end
-
-                    -- set last active as the curr, reset split anyway
-                    M.state.win.curr = lastActiveBuffer
-                    M.state.win.split = nil
-
-                    -- focus curr
-                    vim.fn.win_gotoid(M.state.win.curr)
-
-                    -- recreate everything
-                    createWin("init")
-
-                    return
                 end
+
+                -- set last active as the curr, reset split anyway
+                M.state.win.curr = lastActiveBuffer
+                M.state.win.split = nil
+
+                -- focus curr
+                vim.fn.win_gotoid(M.state.win.curr)
+
+                -- recreate everything
+                createWin("init")
             end)
         end,
         group = "NoNeckPain",
@@ -269,17 +296,23 @@ function M.enable()
 end
 
 function M.disable()
+    if not M.state.enabled then
+        return util.print("disable: tried to disable non-enabled NNP")
+    end
+
     util.print("disabling NNP")
 
     vim.api.nvim_create_augroup("NoNeckPain", {
         clear = true,
     })
 
-    -- when disabling, if current isn't NNP curr, focus it
-    if vim.api.nvim_win_is_valid(M.state.win.curr) then
-        if M.state.win.curr ~= vim.api.nvim_get_current_win() then
-            vim.fn.win_gotoid(M.state.win.curr)
-        end
+    -- shutdowns gracefully by focusing the stored `curr` buffer, if possible
+    if
+        M.state.win.curr ~= nil
+        and vim.api.nvim_win_is_valid(M.state.win.curr)
+        and M.state.win.curr ~= vim.api.nvim_get_current_win()
+    then
+        vim.fn.win_gotoid(M.state.win.curr)
     end
 
     vim.cmd("only")

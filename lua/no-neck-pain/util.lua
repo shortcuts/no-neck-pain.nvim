@@ -1,14 +1,14 @@
 local options = require("no-neck-pain.config").options
 local M = {}
 
--- print only if debug is true
+-- prints only if debug is true.
 function M.print(...)
     if options.debug then
         print("[" .. os.time() .. "] --> ", ...)
     end
 end
 
--- print table only if debug is true
+-- prints table only if debug is true.
 function M.tprint(table, indent)
     if not options.debug then
         return
@@ -31,7 +31,7 @@ function M.tprint(table, indent)
     end
 end
 
--- returns size of a map
+-- returns the size of a given `map`.
 function M.tsize(map)
     local count = 0
 
@@ -42,6 +42,18 @@ function M.tsize(map)
     return count
 end
 
+-- returns true if the given `map` contains the element.
+function M.contains(map, el)
+    for _, v in pairs(map) do
+        if v == el then
+            return true
+        end
+    end
+
+    return false
+end
+
+-- returns true if the index 0 window or the current window is relative.
 function M.isRelativeWindow(scope, win)
     win = win or vim.api.nvim_get_current_win()
 
