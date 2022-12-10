@@ -2,15 +2,15 @@
 
 Dead simple plugin to center the currently focused buffer to the middle of the screen.
 
-![Preview](https://imgur.com/J7AVlBP)
+![Preview](https://i.imgur.com/gOSvAdh.gif)
 
 ## Introduction
 
 The plugin creates evenly sized empty buffers on each side of your focused buffer, which acts as padding for your nvim window.
 
-| Before                | After                 |
-|-----------------------|-----------------------|
-|`|current             `|`|empty|current|empty|`|
+| Before                    | After                     |
+|---------------------------|---------------------------|
+|`\|current--------------\|`|`\|empty\|current\|empty\|`|
 
 > thanks to @BerkeleyTrue for the drawing
 
