@@ -55,7 +55,7 @@ require("no-neck-pain").setup({
 ### Enable on `VimEnter`
 
 > **Warning**
-> If you use [`dashboard-nvim`](https://github.com/glepnir/dashboard-nvim) or a similar plugin, make sure to use [the following snippet instead](https://github.com/glepnir/dashboard-nvim)
+> If you use [`dashboard-nvim`](https://github.com/glepnir/dashboard-nvim) or a similar plugin, make sure to use [the following snippet instead](#enable-on-vimenter-or-bufwinenter)
 
 ```lua
 vim.api.nvim_create_augroup("OnVimEnter", { clear = true })
