@@ -1,30 +1,34 @@
 # no-neck-pain.nvim
 
+Dead simple plugin to center the currently focused buffer to the middle of the screen.
+
+![Preview](https://imgur.com/J7AVlBP)
+
 ## Introduction
 
-Dead simple plugin to center the current buffer to the middle of the screen.
+The plugin creates evenly sized empty buffers on each side of your focused buffer, which acts as padding for your nvim window.
 
-## Why an other focus-zen-center-buffer plugin?
+| Before                | After                 |
+|-----------------------|-----------------------|
+|`|current             `|`|empty|current|empty|`|
 
-While there's many other (amazing!) plugins that does similar stuff, they all require some configuration or alter your NeoVim workflow.
-
-In my case, I only wanted a plugin that: **center the current buffer**.
+> thanks to @BerkeleyTrue for the drawing
 
 ## Installation
 
-### packer.nvim
+### Using [packer.nvim](https://github.com/wbthomason/packer.nvim)
 
 ```lua
 use {'shortcuts/no-neck-pain.nvim'}
 ```
 
-### vim-plug
+### Using [vim-plug](https://github.com/junegunn/vim-plug)
 
 ```lua
 Plug 'shortcuts/no-neck-pain.nvim'
 ```
 
-## Getting started
+## Setup
 
 ```lua
 -- values below are the default
@@ -40,7 +44,15 @@ require("no-neck-pain").setup({
 })
 ```
 
-### Toggle on VimEnter
+## Commands
+
+|   Command   |         Description        |
+|-------------|----------------------------|
+|`:NoNeckPain`| Toggle the `enabled` state.|
+
+### Enable on VimEnter
+
+> The following snippet will start the plugin after entering NeoVim.
 
 ```lua
 vim.api.nvim_create_augroup("OnVimEnter", { clear = true })
@@ -54,3 +66,13 @@ vim.api.nvim_create_autocmd({ "VimEnter" }, {
 	end,
 })
 ```
+
+## Contributing
+
+PRs and issues are always welcome. Make sure to provide as much context as possible when opening one.
+
+## Motivations
+
+While there's many other (amazing!) plugins that does similar stuff, they all require some configuration or alter your NeoVim workflow.
+
+In my case, I only wanted a plugin that: **center the current buffer**.
