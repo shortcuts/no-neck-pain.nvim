@@ -1,9 +1,9 @@
-if _G.noNeckPainLoaded then
+if _G.NoNeckPainLoaded then
     return
 end
 
-_G.noNeckPainLoaded = true
+_G.NoNeckPainLoaded = true
 
 vim.api.nvim_create_user_command("NoNeckPain", function()
-    require("no-neck-pain").start()
+    require("no-neck-pain").toggle()
 end, {})

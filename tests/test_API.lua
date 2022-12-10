@@ -23,7 +23,7 @@ local T = new_set({
 T["require()"] = new_set()
 
 T["require()"]["sets global loaded variable"] = function()
-    eq(child.lua_get("type(_G.noNeckPainLoaded)"), "boolean")
+    eq(child.lua_get("type(_G.NoNeckPainLoaded)"), "boolean")
 end
 
 ----------------- setup
@@ -36,7 +36,8 @@ T["setup()"]["sets exposed methods and config"] = function()
     eq(child.lua_get("type(_G.NoNeckPain)"), "table")
 
     -- public methods
-    eq(child.lua_get("type(_G.NoNeckPain.start)"), "function")
+    eq(child.lua_get("type(_G.NoNeckPain.toggle)"), "function")
+    eq(child.lua_get("type(_G.NoNeckPain.enable)"), "function")
     eq(child.lua_get("type(_G.NoNeckPain.setup)"), "function")
 
     -- config
@@ -63,12 +64,12 @@ T["setup()"]["overrides default values"] = function()
     expect_config("leftPaddingOnly", true)
 end
 
------------------ start
+----------------- enable
 
-T["start()"] = new_set()
+T["enable()"] = new_set()
 
-T["start()"]["sets state and internal methods"] = function()
-    child.lua([[M = require('no-neck-pain').start()]])
+T["enable()"]["sets state and internal methods"] = function()
+    child.lua([[M = require('no-neck-pain').enable()]])
 
     -- internal methods
     eq(child.lua_get("type(_G.NoNeckPain.internal.toggle)"), "function")
@@ -103,6 +104,77 @@ T["start()"]["sets state and internal methods"] = function()
     expect_state("win.curr", 1000)
     expect_state("win.left", 1001)
     expect_state("win.right", 1002)
+    expect_state("win.split", vim.NIL)
+end
+
+----------------- toggle
+
+T["toggle()"] = new_set()
+
+T["toggle()"]["sets state and internal methods"] = function()
+    child.lua([[M = require('no-neck-pain').toggle()]])
+
+    -- internal methods
+    eq(child.lua_get("type(_G.NoNeckPain.internal.toggle)"), "function")
+    eq(child.lua_get("type(_G.NoNeckPain.internal.enable)"), "function")
+    eq(child.lua_get("type(_G.NoNeckPain.internal.disable)"), "function")
+
+    -- state
+    eq(child.lua_get("type(_G.NoNeckPain.state)"), "table")
+
+    local expect_state = function(field, value)
+        eq(child.lua_get("_G.NoNeckPain.state." .. field), value)
+    end
+
+    -- status
+    expect_state("enabled", true)
+
+    -- opts for side buffers
+    expect_state("win.opts.bo.buftype", "nofile")
+    expect_state("win.opts.bo.bufhidden", "hide")
+    expect_state("win.opts.bo.modifiable", false)
+    expect_state("win.opts.bo.buflisted", false)
+    expect_state("win.opts.bo.swapfile", false)
+
+    expect_state("win.opts.wo.cursorline", false)
+    expect_state("win.opts.wo.cursorcolumn", false)
+    expect_state("win.opts.wo.number", false)
+    expect_state("win.opts.wo.relativenumber", false)
+    expect_state("win.opts.wo.foldenable", false)
+    expect_state("win.opts.wo.list", false)
+
+    -- stored window ids
+    expect_state("win.curr", 1000)
+    expect_state("win.left", 1001)
+    expect_state("win.right", 1002)
+    expect_state("win.split", vim.NIL)
+end
+
+T["toggle()"]["resets everything once toggled again"] = function()
+    child.lua([[M = require('no-neck-pain').toggle()]])
+
+    local expect_state = function(field, value)
+        eq(child.lua_get("_G.NoNeckPain.state." .. field), value)
+    end
+
+    -- status
+    expect_state("enabled", true)
+
+    -- stored window ids
+    expect_state("win.curr", 1000)
+    expect_state("win.left", 1001)
+    expect_state("win.right", 1002)
+    expect_state("win.split", vim.NIL)
+
+    child.lua([[require('no-neck-pain').toggle()]])
+
+    -- status
+    expect_state("enabled", false)
+
+    -- stored window ids
+    expect_state("win.curr", vim.NIL)
+    expect_state("win.left", vim.NIL)
+    expect_state("win.right", vim.NIL)
     expect_state("win.split", vim.NIL)
 end
 

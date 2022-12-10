@@ -50,9 +50,12 @@ require("no-neck-pain").setup({
 |-------------|----------------------------|
 |`:NoNeckPain`| Toggle the `enabled` state.|
 
-### Enable on VimEnter
+## Automate NNP startup
 
-> The following snippet will start the plugin after entering NeoVim.
+### Enable on `VimEnter`
+
+> **Warning**
+> If you use [`dashboard-nvim`](https://github.com/glepnir/dashboard-nvim) or a similar plugin, make sure to use [the following snippet instead](#enable-on-vimenter-or-bufwinenter)
 
 ```lua
 vim.api.nvim_create_augroup("OnVimEnter", { clear = true })
@@ -61,7 +64,47 @@ vim.api.nvim_create_autocmd({ "VimEnter" }, {
 	pattern = "*",
 	callback = function()
 		vim.schedule(function()
-			require("no-neck-pain").start()
+			require("no-neck-pain").enable()
+		end)
+	end,
+})
+```
+
+### Enable on `VimEnter` **or** `BufWinEnter`
+
+```lua
+vim.api.nvim_create_augroup("OnVimEnter", { clear = true })
+vim.api.nvim_create_autocmd({ "VimEnter" }, {
+	group = "OnVimEnter",
+	pattern = "*",
+	callback = function()
+		vim.schedule(function()
+			-- do not trigger when opening dashboard (e.g. dashboard-nvim)
+			if vim.bo.filetype == "dashboard" then
+				return
+			end
+
+			-- enable NNP on VimEnter
+			require("no-neck-pain").enable()
+		end)
+	end,
+})
+
+vim.api.nvim_create_augroup("OnBufWinEnter", { clear = true })
+vim.api.nvim_create_autocmd({ "BufWinEnter" }, {
+	group = "OnBufWinEnter",
+	pattern = "*",
+	callback = function()
+		vim.schedule(function()
+			-- do not trigger when opening dashboard (e.g. dashboard-nvim)
+			if vim.bo.filetype == "dashboard" then
+				return
+			end
+
+			-- ensure NNP is loaded and not already started
+			if _G.NoNeckPainLoaded and _G.NoNeckPain.state == nil then
+				require("no-neck-pain").enable()
+			end
 		end)
 	end,
 })
