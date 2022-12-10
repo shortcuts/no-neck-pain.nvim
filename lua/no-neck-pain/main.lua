@@ -185,11 +185,11 @@ function M.enable()
         desc = "Tries to detect when a split/vsplit buf opens",
     })
 
-    vim.api.nvim_create_autocmd({ "WinClosed" }, {
+    vim.api.nvim_create_autocmd({ "WinClosed", "BufDelete" }, {
         callback = function()
             vim.schedule(function()
                 -- we don't want close action on float window to impact NNP
-                if util.isRelativeWindow("WinClosed") then
+                if util.isRelativeWindow("WinClosed, BufDelete") then
                     return
                 end
 
@@ -208,14 +208,14 @@ function M.enable()
                         )
                     )
                 then
-                    util.print("WinClosed: one of the NNP main buffers have been closed")
+                    util.print("WinClosed, BufDelete: one of the NNP main buffers have been closed")
 
                     return M.disable()
                 end
 
                 if util.tsize(buffers) > 1 then
                     return util.print(
-                        "WinClosed: more than one buffer left, no killed split to handle"
+                        "WinClosed, BufDelete: more than one buffer left, no killed split to handle"
                     )
                 end
 
@@ -229,7 +229,7 @@ function M.enable()
                         lastActiveBuffer = M.state.win.curr
                     else
                         return util.print(
-                            "Winclosed: unable to determine which buffer is the last one"
+                            "WinClosed, BufDelete: unable to determine which buffer is the last one"
                         )
                     end
                 end
