@@ -1,0 +1,30 @@
+style: github
+template: template.md
+info:
+  title: CHANGELOG
+  repository_url: https://github.com/shortcuts/no-neck-pain.nvim
+options:
+  commits:
+    filters:
+      Type:
+        - feat
+        - fix
+        - refactor
+        - chore
+        - docs
+  commit_groups:
+    title_order:
+      - feat
+      - fix
+      - refactor
+      - chore
+      - docs
+  header:
+    pattern: "^(\\w*)(?:\\(([\\w\\$\\.\\-\\*\\s]*)\\))?\\:\\s(.*)$"
+    pattern_maps:
+      - Type
+      - Scope
+      - Subject
+  notes:
+    keywords:
+      - BREAKING CHANGE

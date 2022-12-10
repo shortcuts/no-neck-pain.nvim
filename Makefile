@@ -20,3 +20,6 @@ documentation:
 
 lint:
 	stylua .
+
+changelog:
+	git-chglog -o CHANGELOG.md -no-case
