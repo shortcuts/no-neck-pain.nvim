@@ -16,7 +16,7 @@ test-ci: deps/mini.nvim
 		-c "lua MiniTest.run()"
 
 documentation:
-	$(NVIM_EXEC) --headless --noplugin -u ./scripts/minimal_init.lua -c "lua require('mini.doc').generate()" -c "qa!"
+	nvim --headless --noplugin -u ./scripts/minimal_init.lua -c "lua require('mini.doc').generate()" -c "qa!"
 
 lint:
 	stylua .

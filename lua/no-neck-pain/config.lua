@@ -1,6 +1,10 @@
-local C = {}
+local NoNeckPain = {}
 
-C.options = {
+--- Plugin config
+---
+--- Default values:
+---@eval return MiniDoc.afterlines_to_code(MiniDoc.current.eval_section)
+NoNeckPain.options = {
     -- the width of the focused buffer when enabling NNP.
     -- If the available window size is less than `width`, the buffer will take the whole screen.
     width = 100,
@@ -14,6 +18,7 @@ C.options = {
         right = true,
         -- the buffer options when creating the buffer
         options = {
+            -- vim.bo buffer scoped options
             bo = {
                 filetype = "no-neck-pain",
                 buftype = "nofile",
@@ -22,6 +27,7 @@ C.options = {
                 buflisted = false,
                 swapfile = false,
             },
+            -- vim.wo window scoped options
             wo = {
                 cursorline = false,
                 cursorcolumn = false,
@@ -34,10 +40,15 @@ C.options = {
     },
 }
 
-function C.setup(opts)
-    C.options = vim.tbl_deep_extend("keep", opts or {}, C.options)
+--- Define your no-neck-pain setup.
+---
+---@param config table Module config table. See |NoNeckPain.config|.
+---
+---@usage `require("no-neck-pain").setup()` (add `{}` with your `config` table)
+function NoNeckPain.setup(config)
+    NoNeckPain.options = vim.tbl_deep_extend("keep", config or {}, NoNeckPain.options)
 
-    return C.options
+    return NoNeckPain.options
 end
 
-return C
+return NoNeckPain
