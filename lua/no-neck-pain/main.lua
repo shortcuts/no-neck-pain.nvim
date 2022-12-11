@@ -7,24 +7,6 @@ local M = {
     state = {
         enabled = false,
         win = {
-            -- side buffer/windows options
-            opts = {
-                bo = {
-                    buftype = "nofile",
-                    bufhidden = "hide",
-                    modifiable = false,
-                    buflisted = false,
-                    swapfile = false,
-                },
-                wo = {
-                    cursorline = false,
-                    cursorcolumn = false,
-                    number = false,
-                    relativenumber = false,
-                    foldenable = false,
-                    list = false,
-                },
-            },
             curr = nil,
             left = nil,
             right = nil,
@@ -65,8 +47,8 @@ local function createBuf(cmd, padding, moveTo)
 
     vim.api.nvim_win_set_width(0, padding)
 
-    for scope, _ in pairs(M.state.win.opts) do
-        for name, value in pairs(M.state.win.opts[scope]) do
+    for scope, _ in pairs(options.buffers.options) do
+        for name, value in pairs(options.buffers.options[scope]) do
             vim[scope][name] = value
         end
     end
@@ -87,12 +69,14 @@ local function createWin(action)
         vim.o.splitbelow, vim.o.splitright = true, true
 
         M.state.win = {
-            opts = M.state.win.opts,
             curr = vim.api.nvim_get_current_win(),
-            left = createBuf("leftabove vnew", padding, "wincmd l"),
         }
 
-        if not options.leftPaddingOnly then
+        if options.buffers.left then
+            M.state.win.left = createBuf("leftabove vnew", padding, "wincmd l")
+        end
+
+        if options.buffers.right then
             M.state.win.right = createBuf("vnew", padding, "wincmd h")
         end
 
@@ -201,11 +185,8 @@ function M.enable()
                     M.state.win.split == nil
                     and (
                         not util.contains(buffers, M.state.win.curr)
-                        or not util.contains(buffers, M.state.win.left)
-                        or (
-                            not options.leftPaddingOnly
-                            and not util.contains(buffers, M.state.win.right)
-                        )
+                        or (options.buffers.left and not util.contains(buffers, M.state.win.left))
+                        or (options.buffers.right and not util.contains(buffers, M.state.win.right))
                     )
                 then
                     util.print("WinClosed, BufDelete: one of the NNP main buffers have been closed")
@@ -323,7 +304,6 @@ function M.disable()
     M.state = {
         enabled = false,
         win = {
-            opts = M.state.win.opts,
             curr = nil,
             left = nil,
             right = nil,
