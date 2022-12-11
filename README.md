@@ -20,16 +20,20 @@ The plugin creates evenly sized empty buffers on each side of your focused buffe
 
 ```lua
 -- install latest stable version (recommended)
-use {'shortcuts/no-neck-pain.nvim', tag = "*" }
+use {"shortcuts/no-neck-pain.nvim", tag = "*" }
 
 -- install unreleased version
-use {'shortcuts/no-neck-pain.nvim'}
+use {"shortcuts/no-neck-pain.nvim"}
 ```
 
 ### Using [vim-plug](https://github.com/junegunn/vim-plug)
 
 ```lua
-Plug 'shortcuts/no-neck-pain.nvim'
+-- install latest stable version (recommended)
+Plug "shortcuts/no-neck-pain.nvim" , { "tag": "*" }
+
+-- install unreleased version
+Plug "shortcuts/no-neck-pain.nvim"
 ```
 
 ## Setup
