@@ -1,7 +1,21 @@
 
-<a name="0.0.1"></a>
-## 0.0.1 - 2022-12-10
+<a name="0.1.0"></a>
+## [0.1.0] - 2022-12-11
 ### Chore
+- release 0.1.0
+
+### Feat
+- **api:** make API extensible ([#27](https://github.com/shortcuts/no-neck-pain.nvim/issues/27))
+
+### BREAKING CHANGE
+
+exposed API and configuration have changed
+
+
+<a name="0.0.1"></a>
+## 0.0.1 - 2022-12-11
+### Chore
+- release 0.0.1
 - better snippets for dashboard support ([#24](https://github.com/shortcuts/no-neck-pain.nvim/issues/24))
 - update README.md ([#9](https://github.com/shortcuts/no-neck-pain.nvim/issues/9))
 - add submodules
@@ -35,4 +49,5 @@
 - some padding wrongly toggling
 
 
-[Unreleased]: https://github.com/shortcuts/no-neck-pain.nvim/compare/0.0.1...HEAD
+[Unreleased]: https://github.com/shortcuts/no-neck-pain.nvim/compare/0.1.0...HEAD
+[0.1.0]: https://github.com/shortcuts/no-neck-pain.nvim/compare/0.0.1...0.1.0
