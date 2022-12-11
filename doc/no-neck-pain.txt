@@ -1,1 +1,76 @@
+==============================================================================
+------------------------------------------------------------------------------
+                                                            *NoNeckPain.options*
+                              `NoNeckPain.options`
+Plugin config
+
+Default values:
+>
+  NoNeckPain.options = {
+      -- the width of the focused buffer when enabling NNP.
+      -- If the available window size is less than `width`, the buffer will take the whole screen.
+      width = 100,
+      -- prints useful logs about what event are triggered, and reasons actions are executed.
+      debug = false,
+      -- options related to the side buffers
+      buffers = {
+          -- if set to `false`, the `left` padding buffer won't be created.
+          left = true,
+          -- if set to `false`, the `right` padding buffer won't be created.
+          right = true,
+          -- the buffer options when creating the buffer
+          options = {
+              -- vim.bo buffer scoped options
+              bo = {
+                  filetype = "no-neck-pain",
+                  buftype = "nofile",
+                  bufhidden = "hide",
+                  modifiable = false,
+                  buflisted = false,
+                  swapfile = false,
+              },
+              -- vim.wo window scoped options
+              wo = {
+                  cursorline = false,
+                  cursorcolumn = false,
+                  number = false,
+                  relativenumber = false,
+                  foldenable = false,
+                  list = false,
+              },
+          },
+      },
+  }
+
+<
+
+------------------------------------------------------------------------------
+                                                            *NoNeckPain.setup()*
+                          `NoNeckPain.setup`({config})
+Define your no-neck-pain setup.
+
+Parameters~
+{config} `(table)` Module config table. See |NoNeckPain.config|.
+
+Usage~
+`require("no-neck-pain").setup()` (add `{}` with your `config` table)
+
+
+==============================================================================
+------------------------------------------------------------------------------
+                                                           *NoNeckPain.toggle()*
+                             `NoNeckPain.toggle`()
+Toggle the plugin by calling the `enable`/`disable` methods respectively.
+
+------------------------------------------------------------------------------
+                                                           *NoNeckPain.enable()*
+                             `NoNeckPain.enable`()
+Initializes NNP and sets event listeners.
+
+------------------------------------------------------------------------------
+                                                          *NoNeckPain.disable()*
+                             `NoNeckPain.disable`()
+Disable NNP and reset windows, leaving the `curr` focused window as focused.
+
+
  vim:tw=78:ts=8:noet:ft=help:norl:
