@@ -18,15 +18,11 @@ local T = new_set({
     },
 })
 
------------------ require
-
 T["require()"] = new_set()
 
 T["require()"]["sets global loaded variable"] = function()
     eq(child.lua_get("type(_G.NoNeckPainLoaded)"), "boolean")
 end
-
------------------ setup
 
 T["setup()"] = new_set()
 
@@ -53,6 +49,7 @@ T["setup()"]["sets exposed methods and config"] = function()
     expect_config("debug", false)
     expect_config("buffers.left", true)
     expect_config("buffers.right", true)
+    expect_config("buffers.showNames", false)
 
     expect_config("buffers.options.bo.filetype", "no-neck-pain")
     expect_config("buffers.options.bo.buftype", "nofile")
@@ -74,7 +71,9 @@ T["setup()"]["overrides default values"] = function()
         width = 42,
         debug = true,
         buffers = {
+            left = false,
             right = false,
+            showNames = true,
             options = {
                 bo = {
                     filetype = "my-file-type",
@@ -102,8 +101,9 @@ T["setup()"]["overrides default values"] = function()
 
     expect_config("width", 42)
     expect_config("debug", true)
-    expect_config("buffers.left", true)
+    expect_config("buffers.left", false)
     expect_config("buffers.right", false)
+    expect_config("buffers.showNames", true)
 
     expect_config("buffers.options.bo.filetype", "my-file-type")
     expect_config("buffers.options.bo.buftype", "help")
@@ -119,8 +119,6 @@ T["setup()"]["overrides default values"] = function()
     expect_config("buffers.options.wo.foldenable", true)
     expect_config("buffers.options.wo.list", true)
 end
-
------------------ enable
 
 T["enable()"] = new_set()
 
@@ -148,8 +146,6 @@ T["enable()"]["sets state and internal methods"] = function()
     expect_state("win.right", 1002)
     expect_state("win.split", vim.NIL)
 end
-
------------------ toggle
 
 T["toggle()"] = new_set()
 
