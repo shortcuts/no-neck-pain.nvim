@@ -42,6 +42,8 @@ T["setup()"]["sets exposed methods and config"] = function()
 
     -- config
     eq(child.lua_get("type(_G.NoNeckPain.config)"), "table")
+    eq(child.lua_get("type(_G.NoNeckPain.config.options)"), "table")
+    eq(child.lua_get("type(_G.NoNeckPain.config.options.buffers)"), "table")
 
     local expect_config = function(field, value)
         eq(child.lua_get("_G.NoNeckPain.config.options." .. field), value)
@@ -49,11 +51,50 @@ T["setup()"]["sets exposed methods and config"] = function()
 
     expect_config("width", 100)
     expect_config("debug", false)
-    expect_config("leftPaddingOnly", false)
+    expect_config("buffers.left", true)
+    expect_config("buffers.right", true)
+
+    expect_config("buffers.options.bo.filetype", "no-neck-pain")
+    expect_config("buffers.options.bo.buftype", "nofile")
+    expect_config("buffers.options.bo.bufhidden", "hide")
+    expect_config("buffers.options.bo.modifiable", false)
+    expect_config("buffers.options.bo.buflisted", false)
+    expect_config("buffers.options.bo.swapfile", false)
+
+    expect_config("buffers.options.wo.cursorline", false)
+    expect_config("buffers.options.wo.cursorcolumn", false)
+    expect_config("buffers.options.wo.number", false)
+    expect_config("buffers.options.wo.relativenumber", false)
+    expect_config("buffers.options.wo.foldenable", false)
+    expect_config("buffers.options.wo.list", false)
 end
 
 T["setup()"]["overrides default values"] = function()
-    child.lua([[M = require('no-neck-pain').setup({width=42,debug=true,leftPaddingOnly=true})]])
+    child.lua([[M = require('no-neck-pain').setup({
+        width = 42,
+        debug = true,
+        buffers = {
+            right = false,
+            options = {
+                bo = {
+                    filetype = "my-file-type",
+                    buftype = "help",
+                    bufhidden = "",
+                    modifiable = true,
+                    buflisted = true,
+                    swapfile = true,
+                },
+                wo = {
+                    cursorline = true,
+                    cursorcolumn = true,
+                    number = true,
+                    relativenumber = true,
+                    foldenable = true,
+                    list = true,
+                },
+            },
+        },
+    })]])
 
     local expect_config = function(field, value)
         eq(child.lua_get("_G.NoNeckPain.config.options." .. field), value)
@@ -61,7 +102,22 @@ T["setup()"]["overrides default values"] = function()
 
     expect_config("width", 42)
     expect_config("debug", true)
-    expect_config("leftPaddingOnly", true)
+    expect_config("buffers.left", true)
+    expect_config("buffers.right", false)
+
+    expect_config("buffers.options.bo.filetype", "my-file-type")
+    expect_config("buffers.options.bo.buftype", "help")
+    expect_config("buffers.options.bo.bufhidden", "")
+    expect_config("buffers.options.bo.modifiable", true)
+    expect_config("buffers.options.bo.buflisted", true)
+    expect_config("buffers.options.bo.swapfile", true)
+
+    expect_config("buffers.options.wo.cursorline", true)
+    expect_config("buffers.options.wo.cursorcolumn", true)
+    expect_config("buffers.options.wo.number", true)
+    expect_config("buffers.options.wo.relativenumber", true)
+    expect_config("buffers.options.wo.foldenable", true)
+    expect_config("buffers.options.wo.list", true)
 end
 
 ----------------- enable
@@ -85,20 +141,6 @@ T["enable()"]["sets state and internal methods"] = function()
 
     -- status
     expect_state("enabled", true)
-
-    -- opts for side buffers
-    expect_state("win.opts.bo.buftype", "nofile")
-    expect_state("win.opts.bo.bufhidden", "hide")
-    expect_state("win.opts.bo.modifiable", false)
-    expect_state("win.opts.bo.buflisted", false)
-    expect_state("win.opts.bo.swapfile", false)
-
-    expect_state("win.opts.wo.cursorline", false)
-    expect_state("win.opts.wo.cursorcolumn", false)
-    expect_state("win.opts.wo.number", false)
-    expect_state("win.opts.wo.relativenumber", false)
-    expect_state("win.opts.wo.foldenable", false)
-    expect_state("win.opts.wo.list", false)
 
     -- stored window ids
     expect_state("win.curr", 1000)
@@ -128,20 +170,6 @@ T["toggle()"]["sets state and internal methods"] = function()
 
     -- status
     expect_state("enabled", true)
-
-    -- opts for side buffers
-    expect_state("win.opts.bo.buftype", "nofile")
-    expect_state("win.opts.bo.bufhidden", "hide")
-    expect_state("win.opts.bo.modifiable", false)
-    expect_state("win.opts.bo.buflisted", false)
-    expect_state("win.opts.bo.swapfile", false)
-
-    expect_state("win.opts.wo.cursorline", false)
-    expect_state("win.opts.wo.cursorcolumn", false)
-    expect_state("win.opts.wo.number", false)
-    expect_state("win.opts.wo.relativenumber", false)
-    expect_state("win.opts.wo.foldenable", false)
-    expect_state("win.opts.wo.list", false)
 
     -- stored window ids
     expect_state("win.curr", 1000)
