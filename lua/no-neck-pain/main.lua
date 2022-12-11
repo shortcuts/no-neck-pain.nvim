@@ -41,19 +41,24 @@ end
 -- Creates a buffer for the given "padding" (width), at the given `moveTo` direction.
 -- Options from `options.buffer.options` are applied to the created buffer.
 --
+--@param name string: the name of the buffer, `no-neck-pain-` will be prepended.
 --@param cmd string: the command to execute when creating the buffer
 --@param padding number: the "padding" (width) of the buffer
 --@param moveTo string: the command to execute to place the buffer at the correct spot.
-local function createBuf(cmd, padding, moveTo)
+local function createBuf(name, cmd, padding, moveTo)
     vim.cmd(cmd)
 
     local id = vim.api.nvim_get_current_win()
 
     vim.api.nvim_win_set_width(0, padding)
 
+    if options.buffers.showName then
+        vim.api.nvim_buf_set_name(0, "no-neck-pain-" .. name)
+    end
+
     for scope, _ in pairs(options.buffers.options) do
-        for name, value in pairs(options.buffers.options[scope]) do
-            vim[scope][name] = value
+        for key, value in pairs(options.buffers.options[scope]) do
+            vim[scope][key] = value
         end
     end
 
@@ -79,11 +84,11 @@ local function createWin(action)
         }
 
         if options.buffers.left then
-            NoNeckPain.state.win.left = createBuf("leftabove vnew", padding, "wincmd l")
+            NoNeckPain.state.win.left = createBuf("left", "leftabove vnew", padding, "wincmd l")
         end
 
         if options.buffers.right then
-            NoNeckPain.state.win.right = createBuf("vnew", padding, "wincmd h")
+            NoNeckPain.state.win.right = createBuf("right", "vnew", padding, "wincmd h")
         end
 
         vim.o.splitbelow, vim.o.splitright = splitbelow, splitright

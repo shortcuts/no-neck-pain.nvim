@@ -52,6 +52,8 @@ require("no-neck-pain").setup({
         left = true,
         -- if set to `false`, the `right` padding buffer won't be created.
         right = true,
+        -- if set to `true`, the side buffers will be named `no-neck-pain-left` and `no-neck-pain-right` respectively.
+        showNames = false,
         -- the buffer options when creating the buffer
         options = {
             bo = {
