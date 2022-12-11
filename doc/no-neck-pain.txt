@@ -60,7 +60,7 @@ Usage~
 ------------------------------------------------------------------------------
                                                            *NoNeckPain.toggle()*
                              `NoNeckPain.toggle`()
-Toggle the plugin by calling the `enable`/disable` methods respectively.
+Toggle the plugin by calling the `enable`/`disable` methods respectively.
 
 ------------------------------------------------------------------------------
                                                            *NoNeckPain.enable()*

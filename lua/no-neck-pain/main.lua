@@ -18,7 +18,7 @@ vim.api.nvim_create_augroup("NoNeckPain", {
     clear = true,
 })
 
---- Toggle the plugin by calling the `enable`/disable` methods respectively.
+--- Toggle the plugin by calling the `enable`/`disable` methods respectively.
 function NoNeckPain.toggle()
     if NoNeckPain.state.enabled then
         return NoNeckPain.disable()
