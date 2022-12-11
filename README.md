@@ -19,6 +19,10 @@ The plugin creates evenly sized empty buffers on each side of your focused buffe
 ### Using [packer.nvim](https://github.com/wbthomason/packer.nvim)
 
 ```lua
+-- install latest stable version (recommended)
+use {'shortcuts/no-neck-pain.nvim', tag = "*" }
+
+-- install unreleased version
 use {'shortcuts/no-neck-pain.nvim'}
 ```
 
