@@ -42,6 +42,24 @@ function Util.tsize(map)
     return count
 end
 
+-- returns the number of buffers without the NNP one.
+function Util.nbBuffersWithoutNNP(nnpBuffers)
+    local buffers = vim.api.nvim_list_wins()
+    local size = 0
+
+    for _, buffer in pairs(buffers) do
+        if
+            buffer ~= nnpBuffers.curr
+            and buffer ~= nnpBuffers.left
+            and buffer ~= nnpBuffers.right
+        then
+            size = size + 1
+        end
+    end
+
+    return size
+end
+
 -- returns true if the given `map` contains the element.
 function Util.contains(map, el)
     for _, v in pairs(map) do

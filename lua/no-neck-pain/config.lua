@@ -10,6 +10,8 @@ NoNeckPain.options = {
     width = 100,
     -- prints useful logs about what event are triggered, and reasons actions are executed.
     debug = false,
+    -- disable NNP if the last valid buffer in the list has been closed.
+    disableOnLastBuffer = false,
     -- options related to the side buffers
     buffers = {
         -- if set to `false`, the `left` padding buffer won't be created.
