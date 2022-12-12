@@ -49,7 +49,7 @@ T["setup()"]["sets exposed methods and config"] = function()
     expect_config("debug", false)
     expect_config("buffers.left", true)
     expect_config("buffers.right", true)
-    expect_config("buffers.showNames", false)
+    expect_config("buffers.showName", false)
 
     expect_config("buffers.options.bo.filetype", "no-neck-pain")
     expect_config("buffers.options.bo.buftype", "nofile")
@@ -73,7 +73,7 @@ T["setup()"]["overrides default values"] = function()
         buffers = {
             left = false,
             right = false,
-            showNames = true,
+            showName = true,
             options = {
                 bo = {
                     filetype = "my-file-type",
@@ -103,7 +103,7 @@ T["setup()"]["overrides default values"] = function()
     expect_config("debug", true)
     expect_config("buffers.left", false)
     expect_config("buffers.right", false)
-    expect_config("buffers.showNames", true)
+    expect_config("buffers.showName", true)
 
     expect_config("buffers.options.bo.filetype", "my-file-type")
     expect_config("buffers.options.bo.buftype", "help")
