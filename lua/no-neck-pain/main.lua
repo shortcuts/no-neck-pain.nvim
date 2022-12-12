@@ -214,7 +214,21 @@ function NoNeckPain.enable()
                     return NoNeckPain.disable()
                 end
 
-                if util.tsize(buffers) > 1 then
+                local size = util.nbBuffersWithoutNNP(NoNeckPain.state.win)
+
+                if
+                    options.disableOnLastBuffer
+                    and size == 0
+                    and vim.api.nvim_buf_get_option(0, "buftype") == ""
+                    and vim.api.nvim_buf_get_option(0, "filetype") == ""
+                    and vim.api.nvim_buf_get_option(0, "bufhidden") == "wipe"
+                then
+                    util.print(
+                        "WinClosed, BufDelete: found last `wipe` buffer in list, disabling..."
+                    )
+
+                    return NoNeckPain.disable()
+                elseif util.tsize(buffers) > 1 then
                     return util.print(
                         "WinClosed, BufDelete: more than one buffer left, no killed split to handle"
                     )
