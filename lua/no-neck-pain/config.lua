@@ -20,7 +20,7 @@ NoNeckPain.options = {
         showName = false,
         -- the buffer options when creating the buffer
         options = {
-            -- vim.bo buffer scoped options
+            -- buffer-scoped options, below are the default values, but any `vim.bo` options are valid.
             bo = {
                 filetype = "no-neck-pain",
                 buftype = "nofile",
@@ -29,7 +29,7 @@ NoNeckPain.options = {
                 buflisted = false,
                 swapfile = false,
             },
-            -- vim.wo window scoped options
+            -- window-scoped options, below are the default values, but any `vim.wo` options are valid.
             wo = {
                 cursorline = false,
                 cursorcolumn = false,
