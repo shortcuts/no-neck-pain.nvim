@@ -128,38 +128,25 @@ function NoNeckPain.enable()
     vim.api.nvim_create_autocmd({ "BufWinEnter" }, {
         callback = function()
             vim.schedule(function()
-                if NoNeckPain.state.win.split ~= nil then
-                    return util.print("BufWinEnter: already in split view, nothing more to do")
+                if
+                    NoNeckPain.state.win.split ~= nil
+                    -- we don't want close action on float window to impact NNP
+                    or util.isRelativeWindow("BufWinEnter")
+                then
+                    return util.print(
+                        "BufWinEnter: already in split view or float window detected, nothing more to do"
+                    )
                 end
 
-                -- we don't want close action on float window to impact NNP
-                if util.isRelativeWindow("BufWinEnter") then
-                    return
-                end
-
-                local buffers = vim.api.nvim_list_wins()
-                local validBuffers = {}
-
-                -- store buffers that are not part of NNP to see if we have opened a split
-                for _, buffer in ipairs(buffers) do
-                    if
-                        not util.isRelativeWindow("BufWinEnter", buffer)
-                        and buffer ~= NoNeckPain.state.win.left
-                        and buffer ~= NoNeckPain.state.win.right
-                        and buffer ~= NoNeckPain.state.win.curr
-                    then
-                        table.insert(validBuffers, buffer)
-                    end
-                end
-
-                local nbBuffers = util.tsize(validBuffers)
+                local buffers, total =
+                    util.bufferListWithoutNNP("BufWinEnter", NoNeckPain.state.win)
                 local focusedWin = vim.api.nvim_get_current_win()
 
-                if nbBuffers == 0 or not util.contains(validBuffers, focusedWin) then
+                if total == 0 or not util.contains(buffers, focusedWin) then
                     return util.print("BufWinEnter: no valid buffers to handle, no split to handle")
                 end
 
-                util.print("BufWinEnter: found ", nbBuffers, " remaining valid buffers")
+                util.print("BufWinEnter: found ", total, " remaining valid buffers")
 
                 -- start by saving the split, because steps below will trigger `WinClosed`
                 NoNeckPain.state.win.split = focusedWin
@@ -180,7 +167,7 @@ function NoNeckPain.enable()
             end)
         end,
         group = "NoNeckPain",
-        desc = "Tries to detect when a split/vsplit buf opens",
+        desc = "BufWinEnter covers the split/vsplit management",
     })
 
     vim.api.nvim_create_autocmd({ "WinClosed", "BufDelete" }, {
@@ -193,32 +180,25 @@ function NoNeckPain.enable()
 
                 local buffers = vim.api.nvim_list_wins()
 
-                -- if we are not in split view, ensure we killed one of the main buffers (curr, left, right)
+                -- if we are not in split view, we check if we killed one of the main buffers (curr, left, right) to disable NNP
                 -- TODO: make killed side buffer decision configurable, we can re-create it
                 if
                     NoNeckPain.state.win.split == nil
-                    and (
-                        not util.contains(buffers, NoNeckPain.state.win.curr)
-                        or (options.buffers.left and not util.contains(
-                            buffers,
-                            NoNeckPain.state.win.left
-                        ))
-                        or (
-                            options.buffers.right
-                            and not util.contains(buffers, NoNeckPain.state.win.right)
-                        )
-                    )
+                    and not util.every(buffers, NoNeckPain.state.win)
                 then
-                    util.print("WinClosed, BufDelete: one of the NNP main buffers have been closed")
+                    util.print(
+                        "WinClosed, BufDelete: one of the NNP main buffers have been closed, disabling..."
+                    )
 
                     return NoNeckPain.disable()
                 end
 
-                local size = util.nbBuffersWithoutNNP(NoNeckPain.state.win)
+                local _, total =
+                    util.bufferListWithoutNNP("WinClosed, BufDelete", NoNeckPain.state.win)
 
                 if
                     options.disableOnLastBuffer
-                    and size == 0
+                    and total == 0
                     and vim.api.nvim_buf_get_option(0, "buftype") == ""
                     and vim.api.nvim_buf_get_option(0, "filetype") == ""
                     and vim.api.nvim_buf_get_option(0, "bufhidden") == "wipe"
@@ -234,23 +214,7 @@ function NoNeckPain.enable()
                     )
                 end
 
-                local lastActiveBuffer = nil
-
-                -- determine which buffer left out of the two curr/split
-                for _, buffer in ipairs(buffers) do
-                    if NoNeckPain.state.win.split == buffer then
-                        lastActiveBuffer = NoNeckPain.state.win.split
-                    elseif NoNeckPain.state.win.curr == buffer then
-                        lastActiveBuffer = NoNeckPain.state.win.curr
-                    else
-                        return util.print(
-                            "WinClosed, BufDelete: unable to determine which buffer is the last one"
-                        )
-                    end
-                end
-
-                -- set last active as the curr, reset split anyway
-                NoNeckPain.state.win.curr = lastActiveBuffer
+                NoNeckPain.state.win.curr = buffers[0]
                 NoNeckPain.state.win.split = nil
 
                 -- focus curr
@@ -261,18 +225,14 @@ function NoNeckPain.enable()
             end)
         end,
         group = "NoNeckPain",
-        desc = "Aims at restoring NNP enable state after closing a split view",
+        desc = "Aims at restoring NNP enable state after closing a split/vsplit buffer or a main buffer",
     })
 
     vim.api.nvim_create_autocmd({ "WinEnter", "WinClosed" }, {
         callback = function()
             vim.schedule(function()
-                if NoNeckPain.state.win.split ~= nil then
-                    return util.print("WinEnter, WinClosed: stop because of split view")
-                end
-
-                if util.isRelativeWindow("WinEnter, WinClosed") then
-                    return
+                if NoNeckPain.state.win.split ~= nil or util.isRelativeWindow("WinEnter") then
+                    return util.print("WinEnter: stop because of split view or float window")
                 end
 
                 local focusedWin = vim.api.nvim_get_current_win()
@@ -289,8 +249,14 @@ function NoNeckPain.enable()
 
                 -- when opening a new buffer as current, store its padding and resize everything (e.g. side tree)
                 if focusedWin ~= NoNeckPain.state.win.curr then
+                    util.print(
+                        "WinEnter, WinClosed: new current buffer found",
+                        focusedWin,
+                        "resizing:",
+                        padding
+                    )
+
                     padding = vim.api.nvim_win_get_width(focusedWin)
-                    util.print("WinEnter, WinClosed: new current buffer found, resizing:", padding)
                 end
 
                 local width = vim.api.nvim_list_uis()[1].width
