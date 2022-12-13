@@ -303,7 +303,9 @@ function NoNeckPain.disable()
         vim.fn.win_gotoid(NoNeckPain.state.win.curr)
     end
 
-    vim.cmd("only")
+    if options.killAllBuffersOnDisable then
+        vim.cmd("only")
+    end
 
     NoNeckPain.state = {
         enabled = false,
