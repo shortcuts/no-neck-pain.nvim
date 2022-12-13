@@ -5,24 +5,26 @@ local NoNeckPain = {}
 --- Default values:
 ---@eval return MiniDoc.afterlines_to_code(MiniDoc.current.eval_section)
 NoNeckPain.options = {
-    -- the width of the focused buffer when enabling NNP.
+    -- The width of the focused buffer when enabling NNP.
     -- If the available window size is less than `width`, the buffer will take the whole screen.
     width = 100,
-    -- prints useful logs about what event are triggered, and reasons actions are executed.
+    -- Prints useful logs about what event are triggered, and reasons actions are executed.
     debug = false,
-    -- disable NNP if the last valid buffer in the list has been closed.
+    -- Disables NNP if the last valid buffer in the list has been closed.
     disableOnLastBuffer = false,
-    -- options related to the side buffers
+    -- When `true`, disabling NNP kills every split/vsplit buffers except the main NNP buffer.
+    killAllBuffersOnDisable = false,
+    -- Options related to the side buffers
     buffers = {
-        -- if set to `false`, the `left` padding buffer won't be created.
+        -- When `false`, the `left` padding buffer won't be created.
         left = true,
-        -- if set to `false`, the `right` padding buffer won't be created.
+        -- When `false`, the `right` padding buffer won't be created.
         right = true,
-        -- if set to `true`, the side buffers will be named `no-neck-pain-left` and `no-neck-pain-right` respectively.
+        -- When `true`, the side buffers will be named `no-neck-pain-left` and `no-neck-pain-right` respectively.
         showName = false,
-        -- the buffer options when creating the buffer
+        -- The buffer options when creating the buffer
         options = {
-            -- buffer-scoped options, below are the default values, but any `vim.bo` options are valid.
+            -- Buffer-scoped options, below are the default values, but any `vim.bo` options are valid and will be forwarded to the buffer creation.
             bo = {
                 filetype = "no-neck-pain",
                 buftype = "nofile",
@@ -31,7 +33,7 @@ NoNeckPain.options = {
                 buflisted = false,
                 swapfile = false,
             },
-            -- window-scoped options, below are the default values, but any `vim.wo` options are valid.
+            -- Window-scoped options, below are the default values, but any `vim.wo` options are valid and will be forwarded to the buffer creation.
             wo = {
                 cursorline = false,
                 cursorcolumn = false,

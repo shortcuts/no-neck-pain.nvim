@@ -48,6 +48,7 @@ T["setup()"]["sets exposed methods and config"] = function()
     expect_config("width", 100)
     expect_config("debug", false)
     expect_config("disableOnLastBuffer", false)
+    expect_config("killAllBuffersOnDisable", false)
     expect_config("buffers.left", true)
     expect_config("buffers.right", true)
     expect_config("buffers.showName", false)
@@ -72,6 +73,7 @@ T["setup()"]["overrides default values"] = function()
         width = 42,
         debug = true,
         disableOnLastBuffer = true,
+        killAllBuffersOnDisable = true,
         buffers = {
             left = false,
             right = false,
@@ -104,6 +106,7 @@ T["setup()"]["overrides default values"] = function()
     expect_config("width", 42)
     expect_config("debug", true)
     expect_config("disableOnLastBuffer", true)
+    expect_config("killAllBuffersOnDisable", true)
     expect_config("buffers.left", false)
     expect_config("buffers.right", false)
     expect_config("buffers.showName", true)
