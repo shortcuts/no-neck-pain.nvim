@@ -42,9 +42,10 @@ function Util.tsize(map)
     return count
 end
 
--- returns the number of buffers without the NNP one.
-function Util.nbBuffersWithoutNNP(nnpBuffers)
+-- returns the buffers without the NNP ones, and their number.
+function Util.bufferListWithoutNNP(scope, nnpBuffers)
     local buffers = vim.api.nvim_list_wins()
+    local validBuffers = {}
     local size = 0
 
     for _, buffer in pairs(buffers) do
@@ -52,23 +53,42 @@ function Util.nbBuffersWithoutNNP(nnpBuffers)
             buffer ~= nnpBuffers.curr
             and buffer ~= nnpBuffers.left
             and buffer ~= nnpBuffers.right
+            and not Util.isRelativeWindow(scope, buffer)
         then
+            table.insert(validBuffers, buffer)
             size = size + 1
         end
     end
 
-    return size
+    return validBuffers, size
 end
 
--- returns true if the given `map` contains the element.
-function Util.contains(map, el)
+-- returns true if the given `map` contains the `element`.
+function Util.contains(map, element)
     for _, v in pairs(map) do
-        if v == el then
+        if v == element then
             return true
         end
     end
 
     return false
+end
+
+-- returns true if the given `map` contains every `elements`.
+function Util.every(map, ...)
+    local nbElements = Util.tsize(...)
+    local count = 0
+
+    for _, v in pairs(map) do
+        for _, el in pairs(...) do
+            if v == el then
+                count = count + 1
+                break
+            end
+        end
+    end
+
+    return count == nbElements
 end
 
 -- returns true if the index 0 window or the current window is relative.
