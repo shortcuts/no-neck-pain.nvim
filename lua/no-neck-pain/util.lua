@@ -105,4 +105,11 @@ function Util.isRelativeWindow(scope, win)
     end
 end
 
+-- closes a window if it exists and is valid.
+function Util.close(win)
+    if win ~= nil and vim.api.nvim_win_is_valid(win) then
+        vim.api.nvim_win_close(win, true)
+    end
+end
+
 return Util

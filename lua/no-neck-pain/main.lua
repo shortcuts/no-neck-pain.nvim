@@ -294,6 +294,11 @@ function NoNeckPain.disable()
         clear = true,
     })
 
+    if not options.killAllBuffersOnDisable then
+        util.close(NoNeckPain.state.win.left)
+        util.close(NoNeckPain.state.win.right)
+    end
+
     -- shutdowns gracefully by focusing the stored `curr` buffer, if possible
     if
         NoNeckPain.state.win.curr ~= nil
