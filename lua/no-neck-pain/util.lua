@@ -108,7 +108,7 @@ end
 -- closes a window if it exists and is valid.
 function Util.close(win)
     if win ~= nil and vim.api.nvim_win_is_valid(win) then
-        vim.api.nvim_win_close(win, true)
+        vim.api.nvim_win_close(win, false)
     end
 end
 
