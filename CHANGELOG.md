@@ -1,4 +1,29 @@
 
+<a name="0.1.1"></a>
+## [0.1.1] - 2022-12-15
+### Chore
+- release 0.1.1
+- document simpler usage ([#45](https://github.com/shortcuts/no-neck-pain.nvim/issues/45))
+- make README usage more straight forward ([#34](https://github.com/shortcuts/no-neck-pain.nvim/issues/34))
+- recommend latest stable tag for `vim-plug` ([#29](https://github.com/shortcuts/no-neck-pain.nvim/issues/29))
+- recommend latest stable tag for `packer` ([#28](https://github.com/shortcuts/no-neck-pain.nvim/issues/28))
+- release 0.1.0
+
+### Docs
+- generate documentation ([#31](https://github.com/shortcuts/no-neck-pain.nvim/issues/31))
+- **README:** misspelled api ([#33](https://github.com/shortcuts/no-neck-pain.nvim/issues/33))
+
+### Feat
+- add `killAllBuffersOnDisable` option ([#41](https://github.com/shortcuts/no-neck-pain.nvim/issues/41))
+- add `disableOnLastBuffer` option ([#37](https://github.com/shortcuts/no-neck-pain.nvim/issues/37))
+- named side buffer ([#32](https://github.com/shortcuts/no-neck-pain.nvim/issues/32))
+
+### Fix
+- prevent force close window ([#47](https://github.com/shortcuts/no-neck-pain.nvim/issues/47))
+- side buffers not closing when `killAllBuffersOnDisable` is false ([#44](https://github.com/shortcuts/no-neck-pain.nvim/issues/44))
+- remove event redundancy ([#40](https://github.com/shortcuts/no-neck-pain.nvim/issues/40))
+
+
 <a name="0.1.0"></a>
 ## [0.1.0] - 2022-12-11
 ### Chore
@@ -49,5 +74,6 @@ exposed API and configuration have changed
 - some padding wrongly toggling
 
 
-[Unreleased]: https://github.com/shortcuts/no-neck-pain.nvim/compare/0.1.0...HEAD
+[Unreleased]: https://github.com/shortcuts/no-neck-pain.nvim/compare/0.1.1...HEAD
+[0.1.1]: https://github.com/shortcuts/no-neck-pain.nvim/compare/0.1.0...0.1.1
 [0.1.0]: https://github.com/shortcuts/no-neck-pain.nvim/compare/0.0.1...0.1.0
