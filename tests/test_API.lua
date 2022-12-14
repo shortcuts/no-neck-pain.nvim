@@ -10,18 +10,20 @@ local T = new_set({
         pre_case = function()
             -- Restart child process with custom 'init.lua' script
             child.restart({ "-u", "scripts/minimal_init.lua" })
-            -- Load tested plugin
-            child.lua([[M = require('no-neck-pain')]])
         end,
         -- This will be executed one after all tests from this set are finished
         post_once = child.stop,
     },
 })
 
-T["require()"] = new_set()
+T["install"] = new_set()
 
-T["require()"]["sets global loaded variable"] = function()
+T["install"]["sets global loaded variable and toggle command"] = function()
     eq(child.lua_get("type(_G.NoNeckPainLoaded)"), "boolean")
+
+    eq(child.lua_get("_G.NoNeckPain"), vim.NIL)
+    child.cmd("NoNeckPain")
+    eq(child.lua_get("_G.NoNeckPain.state.enabled"), true)
 end
 
 T["setup()"] = new_set()
