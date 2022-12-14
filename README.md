@@ -16,7 +16,7 @@ The plugin creates evenly sized empty buffers on each side of your focused buffe
 
 ## Installation
 
-All you need is to install it! After that you can call `:NoNeckPain` to toggle it.
+This is all you need! Call `:NoNeckPain` once installed to toggle it.
 
 ### Using [packer.nvim](https://github.com/wbthomason/packer.nvim)
 
@@ -32,17 +32,17 @@ use {"shortcuts/no-neck-pain.nvim"}
 
 ```lua
 -- install latest stable version (recommended)
-Plug "shortcuts/no-neck-pain.nvim" , { "tag": "*" }
+Plug "shortcuts/no-neck-pain.nvim", { "tag": "*" }
 
 -- install unreleased version
 Plug "shortcuts/no-neck-pain.nvim"
 ```
 
-If you wish to toggle the plugin on Neovim start, [-> take a look at the guide <-](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Automate-no-neck-pain-enabling)
+If you wish to enable the plugin on Neovim start: [-> take a look at the guide <-](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Automate-no-neck-pain-enabling)
 
 ## Configuration
 
-> The following steps are not required. If you wish to tweak the plugin, either call `:h NoNeckPain.options` from Neovim, or [head over the wiki!](https://github.com/shortcuts/no-neck-pain.nvim/blob/main/doc/no-neck-pain.txt#L4)
+> To see the available options, either call `:h NoNeckPain.options` from Neovim, or [head to the wiki!](https://github.com/shortcuts/no-neck-pain.nvim/blob/main/doc/no-neck-pain.txt#L4)
 
 ```lua
 require("no-neck-pain").setup({
