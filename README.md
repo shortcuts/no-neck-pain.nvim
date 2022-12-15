@@ -1,24 +1,28 @@
-# no-neck-pain.nvim
+<p align="center">
+  <h1 align="center">no-neck-pain.nvim</h2>
+</p>
 
-Dead simple plugin to center the currently focused buffer to the middle of the screen.
+<p align="center">
+	Dead simple plugin to center the currently focused buffer to the middle of the screen.
+</p>
 
-![Preview](https://i.imgur.com/gOSvAdh.gif)
+<div align="center">
+  <video src="https://user-images.githubusercontent.com/20689156/207925631-deb043f4-4263-4a29-9851-f90558eea228.mp4"/>
+</div>
 
 ## Introduction
 
 The plugin creates evenly sized empty buffers on each side of your focused buffer, which acts as padding for your nvim window.
 
 | Before                    | After                     |
-|---------------------------|---------------------------|
+|:---------------------------|:---------------------------:|
 |`\|current--------------\|`|`\|empty\|current\|empty\|`|
 
 > thanks to @BerkeleyTrue for the drawing
 
 ## Installation
 
-This is all you need! Call `:NoNeckPain` once installed to toggle it.
-
-### Using [packer.nvim](https://github.com/wbthomason/packer.nvim)
+### Using [wbthomason/packer.nvim](https://github.com/wbthomason/packer.nvim)
 
 ```lua
 -- install latest stable version (recommended)
@@ -28,7 +32,7 @@ use {"shortcuts/no-neck-pain.nvim", tag = "*" }
 use {"shortcuts/no-neck-pain.nvim"}
 ```
 
-### Using [vim-plug](https://github.com/junegunn/vim-plug)
+### Using [junegunn/vim-plug](https://github.com/junegunn/vim-plug)
 
 ```lua
 -- install latest stable version (recommended)
@@ -37,6 +41,8 @@ Plug "shortcuts/no-neck-pain.nvim", { "tag": "*" }
 -- install unreleased version
 Plug "shortcuts/no-neck-pain.nvim"
 ```
+
+This is all you need! Call `:NoNeckPain` once installed to toggle it.
 
 If you wish to enable the plugin on Neovim start: [-> take a look at the guide <-](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Automate-no-neck-pain-enabling)
 
