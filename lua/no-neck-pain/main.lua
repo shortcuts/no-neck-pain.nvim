@@ -5,6 +5,7 @@ local SIDES = { "left", "right" }
 local NoNeckPain = {
     state = {
         enabled = false,
+        augroup = nil,
         win = {
             curr = nil,
             left = nil,
@@ -13,10 +14,6 @@ local NoNeckPain = {
         },
     },
 }
-
-vim.api.nvim_create_augroup("NoNeckPain", {
-    clear = true,
-})
 
 --- Toggle the plugin by calling the `enable`/`disable` methods respectively.
 function NoNeckPain.toggle()
@@ -110,10 +107,14 @@ end
 --- Initializes NNP and sets event listeners.
 function NoNeckPain.enable()
     if NoNeckPain.state.enabled then
-        return util.print("enable: tried to enable already enabled NNP")
+        return util.print("Enable: tried to enable already enabled NNP")
     end
 
     util.print("enabling NNP")
+
+    NoNeckPain.state.augroup = vim.api.nvim_create_augroup("NoNeckPain", {
+        clear = true,
+    })
 
     createWin("init")
 
@@ -151,17 +152,13 @@ function NoNeckPain.enable()
                 -- start by saving the split, because steps below will trigger `WinClosed`
                 NoNeckPain.state.win.split = focusedWin
 
-                if NoNeckPain.state.win.left ~= nil then
-                    util.print("BufWinEnter: killing left side buffer")
-
-                    vim.api.nvim_win_close(NoNeckPain.state.win.left, true)
+                local ok = util.close("BufWinEnter", NoNeckPain.state.win.left)
+                if ok then
                     NoNeckPain.state.win.left = nil
                 end
 
-                if NoNeckPain.state.win.right ~= nil then
-                    util.print("BufWinEnter: killing right side buffer")
-
-                    vim.api.nvim_win_close(NoNeckPain.state.win.right, true)
+                ok = util.close("BufWinEnter", NoNeckPain.state.win.right)
+                if ok then
                     NoNeckPain.state.win.right = nil
                 end
             end)
@@ -285,18 +282,16 @@ end
 --- Disable NNP and reset windows, leaving the `curr` focused window as focused.
 function NoNeckPain.disable()
     if not NoNeckPain.state.enabled then
-        return util.print("disable: tried to disable non-enabled NNP")
+        return util.print("Disable: tried to disable non-enabled NNP")
     end
 
     util.print("disabling NNP")
 
-    vim.api.nvim_create_augroup("NoNeckPain", {
-        clear = true,
-    })
+    vim.api.nvim_del_augroup_by_id(NoNeckPain.state.augroup)
 
     if not options.killAllBuffersOnDisable then
-        util.close(NoNeckPain.state.win.left)
-        util.close(NoNeckPain.state.win.right)
+        util.close("Disable left", NoNeckPain.state.win.left)
+        util.close("Disable right", NoNeckPain.state.win.right)
     end
 
     -- shutdowns gracefully by focusing the stored `curr` buffer, if possible

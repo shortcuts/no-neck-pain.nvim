@@ -147,6 +147,7 @@ T["enable()"]["sets state and internal methods"] = function()
 
     -- status
     expect_state("enabled", true)
+    expect_state("augroup", 15)
 
     -- stored window ids
     expect_state("win.curr", 1000)
@@ -174,6 +175,7 @@ T["toggle()"]["sets state and internal methods"] = function()
 
     -- status
     expect_state("enabled", true)
+    expect_state("augroup", 15)
 
     -- stored window ids
     expect_state("win.curr", 1000)
@@ -191,6 +193,7 @@ T["toggle()"]["resets everything once toggled again"] = function()
 
     -- status
     expect_state("enabled", true)
+    expect_state("augroup", 15)
 
     -- stored window ids
     expect_state("win.curr", 1000)
@@ -202,6 +205,7 @@ T["toggle()"]["resets everything once toggled again"] = function()
 
     -- status
     expect_state("enabled", false)
+    expect_state("augroup", vim.NIL)
 
     -- stored window ids
     expect_state("win.curr", vim.NIL)
