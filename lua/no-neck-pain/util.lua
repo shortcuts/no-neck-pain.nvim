@@ -3,9 +3,18 @@ local Util = {}
 
 -- prints only if debug is true.
 function Util.print(...)
-    if options.debug then
-        print("[" .. os.time() .. "] --> ", ...)
+    if not options.debug then
+        return
     end
+
+    local info = debug.getinfo(2, "Sl")
+    local line = ""
+
+    if info then
+        line = " L" .. info.currentline
+    end
+
+    print("[no-neck-pain:" .. os.date("%H:%M:%S") .. line .. "] --> ", ...)
 end
 
 -- prints table only if debug is true.
@@ -106,10 +115,28 @@ function Util.isRelativeWindow(scope, win)
 end
 
 -- closes a window if it exists and is valid.
-function Util.close(win)
-    if win ~= nil and vim.api.nvim_win_is_valid(win) then
-        vim.api.nvim_win_close(win, false)
+function Util.close(scope, win)
+    if win == nil then
+        return false
     end
+
+    local buffers = vim.api.nvim_list_wins()
+
+    if Util.tsize(buffers) == 1 then
+        Util.print(scope .. ": last window is " .. win .. " can't kill it")
+
+        return false
+    end
+
+    Util.print(scope .. ": killing window " .. win)
+
+    if vim.api.nvim_win_is_valid(win) then
+        vim.api.nvim_win_close(win, false)
+
+        return true
+    end
+
+    return false
 end
 
 return Util
