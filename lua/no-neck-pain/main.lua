@@ -1,5 +1,7 @@
 local options = require("no-neck-pain.config").options
-local util = require("no-neck-pain.util")
+local D = require("no-neck-pain.util.debug")
+local W = require("no-neck-pain.util.win")
+local M = require("no-neck-pain.util.map")
 local SIDES = { "left", "right" }
 
 local NoNeckPain = {
@@ -68,7 +70,7 @@ end
 --
 --@param action string: when called with `init`, creates NNP buffers. Resizes side buffers on any other cases.
 local function createWin(action)
-    util.print("CreateWin: ", action)
+    D.print("CreateWin: ", action)
 
     local padding = getPadding()
 
@@ -107,10 +109,10 @@ end
 --- Initializes NNP and sets event listeners.
 function NoNeckPain.enable()
     if NoNeckPain.state.enabled then
-        return util.print("Enable: tried to enable already enabled NNP")
+        return D.print("Enable: tried to enable already enabled NNP")
     end
 
-    util.print("enabling NNP")
+    D.print("enabling NNP")
 
     NoNeckPain.state.augroup = vim.api.nvim_create_augroup("NoNeckPain", {
         clear = true,
@@ -132,32 +134,31 @@ function NoNeckPain.enable()
                 if
                     NoNeckPain.state.win.split ~= nil
                     -- we don't want close action on float window to impact NNP
-                    or util.isRelativeWindow("BufWinEnter")
+                    or W.isRelativeWindow("BufWinEnter")
                 then
-                    return util.print(
+                    return D.print(
                         "BufWinEnter: already in split view or float window detected, nothing more to do"
                     )
                 end
 
-                local buffers, total =
-                    util.bufferListWithoutNNP("BufWinEnter", NoNeckPain.state.win)
+                local buffers, total = W.bufferListWithoutNNP("BufWinEnter", NoNeckPain.state.win)
                 local focusedWin = vim.api.nvim_get_current_win()
 
-                if total == 0 or not util.contains(buffers, focusedWin) then
-                    return util.print("BufWinEnter: no valid buffers to handle, no split to handle")
+                if total == 0 or not M.contains(buffers, focusedWin) then
+                    return D.print("BufWinEnter: no valid buffers to handle, no split to handle")
                 end
 
-                util.print("BufWinEnter: found ", total, " remaining valid buffers")
+                D.print("BufWinEnter: found ", total, " remaining valid buffers")
 
                 -- start by saving the split, because steps below will trigger `WinClosed`
                 NoNeckPain.state.win.split = focusedWin
 
-                local ok = util.close("BufWinEnter", NoNeckPain.state.win.left)
+                local ok = W.close("BufWinEnter", NoNeckPain.state.win.left)
                 if ok then
                     NoNeckPain.state.win.left = nil
                 end
 
-                ok = util.close("BufWinEnter", NoNeckPain.state.win.right)
+                ok = W.close("BufWinEnter", NoNeckPain.state.win.right)
                 if ok then
                     NoNeckPain.state.win.right = nil
                 end
@@ -171,7 +172,7 @@ function NoNeckPain.enable()
         callback = function()
             vim.schedule(function()
                 -- we don't want close action on float window to impact NNP
-                if util.isRelativeWindow("WinClosed, BufDelete") then
+                if W.isRelativeWindow("WinClosed, BufDelete") then
                     return
                 end
 
@@ -181,9 +182,9 @@ function NoNeckPain.enable()
                 -- TODO: make killed side buffer decision configurable, we can re-create it
                 if
                     NoNeckPain.state.win.split == nil
-                    and not util.every(buffers, NoNeckPain.state.win)
+                    and not M.every(buffers, NoNeckPain.state.win)
                 then
-                    util.print(
+                    D.print(
                         "WinClosed, BufDelete: one of the NNP main buffers have been closed, disabling..."
                     )
 
@@ -191,7 +192,7 @@ function NoNeckPain.enable()
                 end
 
                 local _, total =
-                    util.bufferListWithoutNNP("WinClosed, BufDelete", NoNeckPain.state.win)
+                    W.bufferListWithoutNNP("WinClosed, BufDelete", NoNeckPain.state.win)
 
                 if
                     options.disableOnLastBuffer
@@ -200,13 +201,11 @@ function NoNeckPain.enable()
                     and vim.api.nvim_buf_get_option(0, "filetype") == ""
                     and vim.api.nvim_buf_get_option(0, "bufhidden") == "wipe"
                 then
-                    util.print(
-                        "WinClosed, BufDelete: found last `wipe` buffer in list, disabling..."
-                    )
+                    D.print("WinClosed, BufDelete: found last `wipe` buffer in list, disabling...")
 
                     return NoNeckPain.disable()
-                elseif util.tsize(buffers) > 1 then
-                    return util.print(
+                elseif M.tsize(buffers) > 1 then
+                    return D.print(
                         "WinClosed, BufDelete: more than one buffer left, no killed split to handle"
                     )
                 end
@@ -228,8 +227,8 @@ function NoNeckPain.enable()
     vim.api.nvim_create_autocmd({ "WinEnter", "WinClosed" }, {
         callback = function()
             vim.schedule(function()
-                if NoNeckPain.state.win.split ~= nil or util.isRelativeWindow("WinEnter") then
-                    return util.print("WinEnter: stop because of split view or float window")
+                if NoNeckPain.state.win.split ~= nil or W.isRelativeWindow("WinEnter") then
+                    return D.print("WinEnter: stop because of split view or float window")
                 end
 
                 local focusedWin = vim.api.nvim_get_current_win()
@@ -239,14 +238,14 @@ function NoNeckPain.enable()
                     focusedWin == NoNeckPain.state.win.left
                     or focusedWin == NoNeckPain.state.win.right
                 then
-                    return util.print("WinEnter, WinClosed: focus on side buffer, skipped resize")
+                    return D.print("WinEnter, WinClosed: focus on side buffer, skipped resize")
                 end
 
                 local padding = 0
 
                 -- when opening a new buffer as current, store its padding and resize everything (e.g. side tree)
                 if focusedWin ~= NoNeckPain.state.win.curr then
-                    util.print(
+                    D.print(
                         "WinEnter, WinClosed: new current buffer found",
                         focusedWin,
                         "resizing:",
@@ -259,7 +258,7 @@ function NoNeckPain.enable()
                 local width = vim.api.nvim_list_uis()[1].width
                 local totalSideSizes = (width - padding) - options.width
 
-                util.print("WinEnter, WinClosed: resizing side buffers")
+                D.print("WinEnter, WinClosed: resizing side buffers")
                 for _, side in ipairs(SIDES) do
                     if NoNeckPain.state.win[side] ~= nil then
                         if vim.api.nvim_win_is_valid(NoNeckPain.state.win[side]) then
@@ -282,16 +281,18 @@ end
 --- Disable NNP and reset windows, leaving the `curr` focused window as focused.
 function NoNeckPain.disable()
     if not NoNeckPain.state.enabled then
-        return util.print("Disable: tried to disable non-enabled NNP")
+        return D.print("Disable: tried to disable non-enabled NNP")
     end
 
-    util.print("disabling NNP")
+    D.print("disabling NNP")
+
+    D.print(NoNeckPain.state.augroup)
 
     vim.api.nvim_del_augroup_by_id(NoNeckPain.state.augroup)
 
     if not options.killAllBuffersOnDisable then
-        util.close("Disable left", NoNeckPain.state.win.left)
-        util.close("Disable right", NoNeckPain.state.win.right)
+        W.close("Disable left", NoNeckPain.state.win.left)
+        W.close("Disable right", NoNeckPain.state.win.right)
     end
 
     -- shutdowns gracefully by focusing the stored `curr` buffer, if possible
