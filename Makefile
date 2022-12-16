@@ -1,4 +1,6 @@
-all: test documentation
+.SUFFIXES:
+
+all:
 
 test:
 	nvim --version | head -n 1 && echo ''
