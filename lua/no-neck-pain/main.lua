@@ -128,44 +128,44 @@ function NoNeckPain.enable()
         desc = "Resizes side windows after shell has been resized",
     })
 
-    vim.api.nvim_create_autocmd({ "BufWinEnter" }, {
+    vim.api.nvim_create_autocmd({ "WinEnter" }, {
         callback = function()
             vim.schedule(function()
                 if
                     NoNeckPain.state.win.split ~= nil
                     -- we don't want close action on float window to impact NNP
-                    or W.isRelativeWindow("BufWinEnter")
+                    or W.isRelativeWindow("WinEnter")
                 then
                     return D.print(
-                        "BufWinEnter: already in split view or float window detected, nothing more to do"
+                        "WinEnter: already in split view or float window detected, nothing more to do"
                     )
                 end
 
-                local buffers, total = W.bufferListWithoutNNP("BufWinEnter", NoNeckPain.state.win)
+                local buffers, total = W.bufferListWithoutNNP("WinEnter", NoNeckPain.state.win)
                 local focusedWin = vim.api.nvim_get_current_win()
 
                 if total == 0 or not M.contains(buffers, focusedWin) then
-                    return D.print("BufWinEnter: no valid buffers to handle, no split to handle")
+                    return D.print("WinEnter: no valid buffers to handle, no split to handle")
                 end
 
-                D.print("BufWinEnter: found ", total, " remaining valid buffers")
+                D.print("WinEnter: found ", total, " remaining valid buffers")
 
                 -- start by saving the split, because steps below will trigger `WinClosed`
                 NoNeckPain.state.win.split = focusedWin
 
-                local ok = W.close("BufWinEnter", NoNeckPain.state.win.left)
+                local ok = W.close("WinEnter", NoNeckPain.state.win.left)
                 if ok then
                     NoNeckPain.state.win.left = nil
                 end
 
-                ok = W.close("BufWinEnter", NoNeckPain.state.win.right)
+                ok = W.close("WinEnter", NoNeckPain.state.win.right)
                 if ok then
                     NoNeckPain.state.win.right = nil
                 end
             end)
         end,
         group = "NoNeckPain",
-        desc = "BufWinEnter covers the split/vsplit management",
+        desc = "WinEnter covers the split/vsplit management",
     })
 
     vim.api.nvim_create_autocmd({ "WinClosed", "BufDelete" }, {

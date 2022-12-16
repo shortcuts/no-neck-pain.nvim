@@ -42,4 +42,60 @@ T["curr buffer"]["have the default width from the config"] = function()
     eq(child.lua_get("vim.api.nvim_win_get_width(_G.NoNeckPain.state.win.curr)"), 48)
 end
 
+T["auto command"] = new_set()
+
+T["auto command"]["hides side buffers after split"] = function()
+    child.lua([[
+        M = require('no-neck-pain').enable()
+    ]])
+
+    local expect_state = function(field, value)
+        eq(child.lua_get("_G.NoNeckPain.state." .. field), value)
+    end
+
+    -- At start 1 win automatically sorrounded with side buffers
+    eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1000, 1002 })
+    expect_state("win.left", 1001)
+    expect_state("win.right", 1002)
+
+    -- Opening split hides side buffers
+    child.cmd("split")
+    eq(child.lua_get("vim.api.nvim_list_wins()"), { 1003, 1000 })
+    expect_state("win.left", vim.NIL)
+    expect_state("win.right", vim.NIL)
+
+    -- Closing split and returning to last window opens side buffers again
+    child.cmd("close")
+    eq(child.lua_get("vim.api.nvim_list_wins()"), { 1004, 1000, 1005 })
+    expect_state("win.left", 1004)
+    expect_state("win.right", 1005)
+end
+
+T["auto command"]["hides side buffers after vsplit"] = function()
+    child.lua([[
+        M = require('no-neck-pain').enable()
+    ]])
+
+    local expect_state = function(field, value)
+        eq(child.lua_get("_G.NoNeckPain.state." .. field), value)
+    end
+
+    -- At start 1 win automatically sorrounded with side buffers
+    eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1000, 1002 })
+    expect_state("win.left", 1001)
+    expect_state("win.right", 1002)
+
+    -- Opening vsplit hides side buffers
+    child.cmd("vsplit")
+    eq(child.lua_get("vim.api.nvim_list_wins()"), { 1003, 1000 })
+    expect_state("win.left", vim.NIL)
+    expect_state("win.right", vim.NIL)
+
+    -- Closing vsplit and returning to last window opens side buffers again
+    child.cmd("close")
+    eq(child.lua_get("vim.api.nvim_list_wins()"), { 1004, 1000, 1005 })
+    expect_state("win.left", 1004)
+    expect_state("win.right", 1005)
+end
+
 return T
