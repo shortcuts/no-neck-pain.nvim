@@ -1,13 +1,15 @@
 local options = require("no-neck-pain.config").options
+local C = require("no-neck-pain.util.color")
 local D = require("no-neck-pain.util.debug")
-local W = require("no-neck-pain.util.win")
 local M = require("no-neck-pain.util.map")
+local W = require("no-neck-pain.util.win")
 local SIDES = { "left", "right" }
 
 local NoNeckPain = {
     state = {
         enabled = false,
         augroup = nil,
+        namespaceID = nil,
         win = {
             curr = nil,
             left = nil,
@@ -91,6 +93,18 @@ local function createWin(action)
         end
 
         vim.o.splitbelow, vim.o.splitright = splitbelow, splitright
+
+        if options.buffers.background.colorCode ~= nil then
+            NoNeckPain.state.namespaceID = C.init(options.buffers.background.colorCode)
+
+            if NoNeckPain.state.win.left ~= nil then
+                vim.api.nvim_win_set_hl_ns(NoNeckPain.state.win.left, NoNeckPain.state.namespaceID)
+            end
+
+            if NoNeckPain.state.win.right ~= nil then
+                vim.api.nvim_win_set_hl_ns(NoNeckPain.state.win.right, NoNeckPain.state.namespaceID)
+            end
+        end
 
         return
     end
