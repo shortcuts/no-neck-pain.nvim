@@ -46,7 +46,12 @@ function C.init(win, colorCode)
         win,
         "winhl",
         string.format(
-            "Normal:%s,NormalNC:%s,NonText:%s,EndOfBuffer:%s,WinSeparator:%s,VertSplit:%s",
+            "Normal:%s,NormalNC:%s,CursorColumn:%s,CursorColumnNr:%s,SignColumn:%s,Cursor:%sLineNr:%s,NonText:%s,EndOfBuffer:%s,WinSeparator:%s,VertSplit:%s",
+            groupName,
+            groupName,
+            groupName,
+            groupName,
+            groupName,
             groupName,
             groupName,
             groupName,
