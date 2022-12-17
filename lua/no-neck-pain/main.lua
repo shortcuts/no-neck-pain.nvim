@@ -65,7 +65,7 @@ local function createBuf(name, cmd, padding, moveTo)
     vim.cmd(moveTo)
 
     if options.buffers.background.colorCode ~= nil then
-        D.print("CreateWin: setting `colorCode` for side buffers")
+        D.print("CreateWin: setting `colorCode` for buffer"..id)
 
         C.init(id, options.buffers.background.colorCode)
     end
