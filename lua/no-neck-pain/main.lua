@@ -100,33 +100,11 @@ local function createWin(action)
             NoNeckPain.state.namespaceID = C.init(options.buffers.background.colorCode)
 
             if NoNeckPain.state.win.left ~= nil then
-                if vim.fn.has("nvim-0.8") then
-                    vim.api.nvim_win_set_hl_ns(
-                        NoNeckPain.state.win.left,
-                        NoNeckPain.state.namespaceID
-                    )
-                else
-                    vim.api.nvim_win_set_option(
-                        NoNeckPain.state.win.left,
-                        "winhl",
-                        "VertSplit:NoNeckPain,WinSeparator:NoNeckPain,EndOfBuffer:NoNeckPain,NormalNC:NoNeckPain,Normal:NoNeckPain"
-                    )
-                end
+                vim.api.nvim_win_set_hl_ns(NoNeckPain.state.win.left, NoNeckPain.state.namespaceID)
             end
 
             if NoNeckPain.state.win.right ~= nil then
-                if vim.fn.has("nvim-0.7") then
-                    vim.api.nvim_win_set_hl_ns(
-                        NoNeckPain.state.win.right,
-                        NoNeckPain.state.namespaceID
-                    )
-                else
-                    vim.api.nvim_win_set_option(
-                        NoNeckPain.state.win.right,
-                        "winhl",
-                        "VertSplit:NoNeckPain,WinSeparator:NoNeckPain,EndOfBuffer:NoNeckPain,NormalNC:NoNeckPain,Normal:NoNeckPain"
-                    )
-                end
+                vim.api.nvim_win_set_hl_ns(NoNeckPain.state.win.right, NoNeckPain.state.namespaceID)
             end
         end
 
