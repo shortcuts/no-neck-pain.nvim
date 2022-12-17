@@ -18,6 +18,12 @@ function C.matchIntegrationToHexCode(colorCode)
         colorCode = "#16161e"
     elseif colorCode == "tokyonight-storm" then
         colorCode = "#1f2335"
+    elseif colorCode == "rose-pine" then
+        colorCode = "#191724"
+    elseif colorCode == "rose-pine-moon" then
+        colorCode = "#232136"
+    elseif colorCode == "rose-pine-dawn" then
+        colorCode = "#faf4ed"
     end
 
     return colorCode

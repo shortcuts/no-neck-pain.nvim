@@ -148,6 +148,9 @@ T["setup()"]["colorCode: map integration name to a value"] = function()
         { "tokyonight-moon", "#1e2030" },
         { "tokyonight-storm", "#1f2335" },
         { "tokyonight-night", "#16161e" },
+        { "rose-pine", "#191724" },
+        { "rose-pine-moon", "#232136" },
+        { "rose-pine-dawn", "#faf4ed" },
     }
 
     for _, integration in pairs(integrationsMapping) do
