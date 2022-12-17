@@ -70,10 +70,10 @@ Default values:
 Define your no-neck-pain setup.
 
 Parameters~
-{options} `(table)` Module config table. See |NoNeckPain.config|.
+{options} `(table)` Module option table. See |NoNeckPain.option|.
 
 Usage~
-`require("no-neck-pain").setup()` (add `{}` with your |NoNeckPain.config| table)
+`require("no-neck-pain").setup()` (add `{}` with your |NoNeckPain.option| table)
 
 
 ==============================================================================

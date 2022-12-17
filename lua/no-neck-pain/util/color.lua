@@ -2,10 +2,6 @@ local C = {}
 
 -- tries to match the provided `colorCode` to an integration name, defaults to the provided string if not successful.
 function C.matchIntegrationToHexCode(colorCode)
-    if colorCode == nil then
-        return colorCode
-    end
-
     if colorCode == "catppuccin-frappe" then
         colorCode = "#292C3C"
     elseif colorCode == "catppuccin-latte" then

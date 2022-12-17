@@ -1,21 +1,76 @@
 -- imported from https://github.com/echasnovski/mini.nvim
-
 local Helpers = {}
 
 -- Add extra expectations
 Helpers.expect = vim.deepcopy(MiniTest.expect)
 
+local function errorMessage(str, pattern)
+    return string.format("Pattern: %s\nObserved string: %s", vim.inspect(pattern), str)
+end
+
+Helpers.expect.global_equality = MiniTest.new_expectation(
+    "variable in child process matches",
+    function(child, field, value)
+        return Helpers.expect.equality(child.lua_get(field), value)
+    end,
+    errorMessage
+)
+
+Helpers.expect.global_type_equality = MiniTest.new_expectation(
+    "variable type in child process matches",
+    function(child, field, value)
+        return Helpers.expect.global_equality(child, "type(" .. field .. ")", value)
+    end,
+    errorMessage
+)
+
+Helpers.expect.option_equality = MiniTest.new_expectation(
+    "config option matches",
+    function(child, field, value)
+        return Helpers.expect.global_equality(child, "_G.NoNeckPain.config." .. field, value)
+    end,
+    errorMessage
+)
+
+Helpers.expect.option_type_equality = MiniTest.new_expectation(
+    "config option type matches",
+    function(child, field, value)
+        return Helpers.expect.global_equality(
+            child,
+            "type(_G.NoNeckPain.config." .. field .. ")",
+            value
+        )
+    end,
+    errorMessage
+)
+
+Helpers.expect.state_equality = MiniTest.new_expectation(
+    "state matches",
+    function(child, field, value)
+        return Helpers.expect.global_equality(child, "_G.NoNeckPain.state." .. field, value)
+    end,
+    errorMessage
+)
+
+Helpers.expect.state_type_equality = MiniTest.new_expectation(
+    "state type matches",
+    function(child, field, value)
+        return Helpers.expect.global_equality(
+            child,
+            "type(_G.NoNeckPain.state." .. field .. ")",
+            value
+        )
+    end,
+    errorMessage
+)
+
 Helpers.expect.match = MiniTest.new_expectation("string matching", function(str, pattern)
     return str:find(pattern) ~= nil
-end, function(str, pattern)
-    return string.format("Pattern: %s\nObserved string: %s", vim.inspect(pattern), str)
-end)
+end, errorMessage)
 
 Helpers.expect.no_match = MiniTest.new_expectation("no string matching", function(str, pattern)
     return str:find(pattern) == nil
-end, function(str, pattern)
-    return string.format("Pattern: %s\nObserved string: %s", vim.inspect(pattern), str)
-end)
+end, errorMessage)
 
 -- Monkey-patch `MiniTest.new_child_neovim` with helpful wrappers
 Helpers.new_child_neovim = function()
@@ -156,15 +211,6 @@ Helpers.new_child_neovim = function()
     end
 
     return child
-end
-
--- Mark test failure as "flaky"
-Helpers.mark_flaky = function()
-    MiniTest.finally(function()
-        if #MiniTest.current.case.exec.fails > 0 then
-            MiniTest.add_note("This test is flaky.")
-        end
-    end)
 end
 
 return Helpers

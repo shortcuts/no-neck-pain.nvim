@@ -1,10 +1,14 @@
 local helpers = dofile("tests/helpers.lua")
 
 local child = helpers.new_child_neovim()
-local _, eq = helpers.expect, helpers.expect.equality
-local new_set, _ = MiniTest.new_set, MiniTest.finally
+local eq_global, eq_option, eq_state =
+    helpers.expect.global_equality, helpers.expect.option_equality, helpers.expect.state_equality
+local eq_type_global, eq_type_option, eq_type_state =
+    helpers.expect.global_type_equality,
+    helpers.expect.option_type_equality,
+    helpers.expect.state_type_equality
 
-local T = new_set({
+local T = MiniTest.new_set({
     hooks = {
         -- This will be executed before every (even nested) case
         pre_case = function()
@@ -16,68 +20,67 @@ local T = new_set({
     },
 })
 
-T["install"] = new_set()
+T["install"] = MiniTest.new_set()
 
-T["install"]["sets global loaded variable and toggle command"] = function()
-    eq(child.lua_get("type(_G.NoNeckPainLoaded)"), "boolean")
+T["install"]["sets global loaded variable and provide toggle command"] = function()
+    eq_type_global(child, "_G.NoNeckPainLoaded", "boolean")
+    eq_global(child, "_G.NoNeckPain", vim.NIL)
 
-    eq(child.lua_get("_G.NoNeckPain"), vim.NIL)
     child.cmd("NoNeckPain")
-    eq(child.lua_get("_G.NoNeckPain.state.enabled"), true)
+    eq_state(child, "enabled", true)
+
+    child.cmd("NoNeckPain")
+    eq_state(child, "enabled", false)
 end
 
-T["setup()"] = new_set()
+T["setup()"] = MiniTest.new_set()
 
-T["setup()"]["sets exposed methods and config"] = function()
-    child.lua([[M = require('no-neck-pain').setup()]])
+T["setup()"]["sets exposed methods and default options value"] = function()
+    child.lua([[require('no-neck-pain').setup()]])
 
-    eq(child.lua_get("type(_G.NoNeckPain)"), "table")
+    eq_type_global(child, "_G.NoNeckPain", "table")
 
     -- public methods
-    eq(child.lua_get("type(_G.NoNeckPain.toggle)"), "function")
-    eq(child.lua_get("type(_G.NoNeckPain.enable)"), "function")
-    eq(child.lua_get("type(_G.NoNeckPain.setup)"), "function")
+    eq_type_global(child, "_G.NoNeckPain.toggle", "function")
+    eq_type_global(child, "_G.NoNeckPain.enable", "function")
+    eq_type_global(child, "_G.NoNeckPain.setup", "function")
 
-    -- config
-    eq(child.lua_get("type(_G.NoNeckPain.config)"), "table")
-    eq(child.lua_get("type(_G.NoNeckPain.config.options)"), "table")
-    eq(child.lua_get("type(_G.NoNeckPain.config.options.buffers)"), "table")
-    eq(child.lua_get("type(_G.NoNeckPain.config.options.buffers.background)"), "table")
-    eq(child.lua_get("type(_G.NoNeckPain.config.options.buffers.options)"), "table")
-    eq(child.lua_get("type(_G.NoNeckPain.config.options.buffers.options.bo)"), "table")
-    eq(child.lua_get("type(_G.NoNeckPain.config.options.buffers.options.wo)"), "table")
+    -- options
+    eq_type_global(child, "_G.NoNeckPain.config", "table")
 
-    local expect_config = function(field, value)
-        eq(child.lua_get("_G.NoNeckPain.config.options." .. field), value)
-    end
+    eq_type_option(child, "buffers", "table")
+    eq_type_option(child, "buffers.background", "table")
+    eq_type_option(child, "buffers.options", "table")
+    eq_type_option(child, "buffers.options.bo", "table")
+    eq_type_option(child, "buffers.options.wo", "table")
 
-    expect_config("width", 100)
-    expect_config("debug", false)
-    expect_config("disableOnLastBuffer", false)
-    expect_config("killAllBuffersOnDisable", false)
-    expect_config("buffers.left", true)
-    expect_config("buffers.right", true)
-    expect_config("buffers.showName", false)
+    eq_option(child, "width", 100)
+    eq_option(child, "debug", false)
+    eq_option(child, "disableOnLastBuffer", false)
+    eq_option(child, "killAllBuffersOnDisable", false)
+    eq_option(child, "buffers.left", true)
+    eq_option(child, "buffers.right", true)
+    eq_option(child, "buffers.showName", false)
 
-    expect_config("buffers.background.colorCode", vim.NIL)
+    eq_option(child, "buffers.background.colorCode", vim.NIL)
 
-    expect_config("buffers.options.bo.filetype", "no-neck-pain")
-    expect_config("buffers.options.bo.buftype", "nofile")
-    expect_config("buffers.options.bo.bufhidden", "hide")
-    expect_config("buffers.options.bo.modifiable", false)
-    expect_config("buffers.options.bo.buflisted", false)
-    expect_config("buffers.options.bo.swapfile", false)
+    eq_option(child, "buffers.options.bo.filetype", "no-neck-pain")
+    eq_option(child, "buffers.options.bo.buftype", "nofile")
+    eq_option(child, "buffers.options.bo.bufhidden", "hide")
+    eq_option(child, "buffers.options.bo.modifiable", false)
+    eq_option(child, "buffers.options.bo.buflisted", false)
+    eq_option(child, "buffers.options.bo.swapfile", false)
 
-    expect_config("buffers.options.wo.cursorline", false)
-    expect_config("buffers.options.wo.cursorcolumn", false)
-    expect_config("buffers.options.wo.number", false)
-    expect_config("buffers.options.wo.relativenumber", false)
-    expect_config("buffers.options.wo.foldenable", false)
-    expect_config("buffers.options.wo.list", false)
+    eq_option(child, "buffers.options.wo.cursorline", false)
+    eq_option(child, "buffers.options.wo.cursorcolumn", false)
+    eq_option(child, "buffers.options.wo.number", false)
+    eq_option(child, "buffers.options.wo.relativenumber", false)
+    eq_option(child, "buffers.options.wo.foldenable", false)
+    eq_option(child, "buffers.options.wo.list", false)
 end
 
 T["setup()"]["overrides default values"] = function()
-    child.lua([[M = require('no-neck-pain').setup({
+    child.lua([[require('no-neck-pain').setup({
         width = 42,
         debug = true,
         disableOnLastBuffer = true,
@@ -110,198 +113,140 @@ T["setup()"]["overrides default values"] = function()
         },
     })]])
 
-    local expect_config = function(field, value)
-        eq(child.lua_get("_G.NoNeckPain.config.options." .. field), value)
-    end
+    eq_option(child, "width", 42)
+    eq_option(child, "debug", true)
+    eq_option(child, "disableOnLastBuffer", true)
+    eq_option(child, "killAllBuffersOnDisable", true)
+    eq_option(child, "buffers.left", false)
+    eq_option(child, "buffers.right", false)
+    eq_option(child, "buffers.showName", true)
 
-    expect_config("width", 42)
-    expect_config("debug", true)
-    expect_config("disableOnLastBuffer", true)
-    expect_config("killAllBuffersOnDisable", true)
-    expect_config("buffers.left", false)
-    expect_config("buffers.right", false)
-    expect_config("buffers.showName", true)
+    eq_option(child, "buffers.background.colorCode", "#2E1E2E")
 
-    expect_config("buffers.background.colorCode", "#2E1E2E")
+    eq_option(child, "buffers.options.bo.filetype", "my-file-type")
+    eq_option(child, "buffers.options.bo.buftype", "help")
+    eq_option(child, "buffers.options.bo.bufhidden", "")
+    eq_option(child, "buffers.options.bo.modifiable", true)
+    eq_option(child, "buffers.options.bo.buflisted", true)
+    eq_option(child, "buffers.options.bo.swapfile", true)
 
-    expect_config("buffers.options.bo.filetype", "my-file-type")
-    expect_config("buffers.options.bo.buftype", "help")
-    expect_config("buffers.options.bo.bufhidden", "")
-    expect_config("buffers.options.bo.modifiable", true)
-    expect_config("buffers.options.bo.buflisted", true)
-    expect_config("buffers.options.bo.swapfile", true)
-
-    expect_config("buffers.options.wo.cursorline", true)
-    expect_config("buffers.options.wo.cursorcolumn", true)
-    expect_config("buffers.options.wo.number", true)
-    expect_config("buffers.options.wo.relativenumber", true)
-    expect_config("buffers.options.wo.foldenable", true)
-    expect_config("buffers.options.wo.list", true)
+    eq_option(child, "buffers.options.wo.cursorline", true)
+    eq_option(child, "buffers.options.wo.cursorcolumn", true)
+    eq_option(child, "buffers.options.wo.number", true)
+    eq_option(child, "buffers.options.wo.relativenumber", true)
+    eq_option(child, "buffers.options.wo.foldenable", true)
+    eq_option(child, "buffers.options.wo.list", true)
 end
 
 T["setup()"]["colorCode: map integration name to a value"] = function()
-    child.lua([[M = require('no-neck-pain').setup({
-        buffers = {
-            background = {
-                colorCode = "catppuccin-frappe"
-            },
-        },
-    })]])
+    local integrationsMapping = {
+        { "catppuccin-frappe", "#292C3C" },
+        { "catppuccin-latte", "#E6E9EF" },
+        { "catppuccin-macchiato", "#1E2030" },
+        { "catppuccin-mocha", "#181825" },
+        { "tokyonight-day", "#16161e" },
+        { "tokyonight-moon", "#1e2030" },
+        { "tokyonight-storm", "#1f2335" },
+        { "tokyonight-night", "#16161e" },
+    }
 
-    local expect_config = function(field, value)
-        eq(child.lua_get("_G.NoNeckPain.config.options." .. field), value)
+    for _, integration in pairs(integrationsMapping) do
+        child.lua(string.format(
+            [[require('no-neck-pain').setup({
+                buffers = {
+                    background = {
+                        colorCode = "%s"
+                    },
+                },
+            })]],
+            integration[1]
+        ))
+        eq_option(child, "buffers.background.colorCode", integration[2])
     end
-
-    expect_config("buffers.background.colorCode", "#292C3C")
-
-    child.lua([[M = require('no-neck-pain').setup({
-        buffers = {
-            background = {
-                colorCode = "catppuccin-latte"
-            },
-        },
-    })]])
-    expect_config("buffers.background.colorCode", "#E6E9EF")
-
-    child.lua([[M = require('no-neck-pain').setup({
-        buffers = {
-            background = {
-                colorCode = "catppuccin-macchiato"
-            },
-        },
-    })]])
-    expect_config("buffers.background.colorCode", "#1E2030")
-
-    child.lua([[M = require('no-neck-pain').setup({
-        buffers = {
-            background = {
-                colorCode = "catppuccin-mocha"
-            },
-        },
-    })]])
-    expect_config("buffers.background.colorCode", "#181825")
-
-    child.lua([[M = require('no-neck-pain').setup({
-        buffers = {
-            background = {
-                colorCode = "tokyonight-day"
-            },
-        },
-    })]])
-    expect_config("buffers.background.colorCode", "#16161e")
-
-    child.lua([[M = require('no-neck-pain').setup({
-        buffers = {
-            background = {
-                colorCode = "tokyonight-moon"
-            },
-        },
-    })]])
-    expect_config("buffers.background.colorCode", "#1e2030")
-
-    child.lua([[M = require('no-neck-pain').setup({
-        buffers = {
-            background = {
-                colorCode = "tokyonight-night"
-            },
-        },
-    })]])
-    expect_config("buffers.background.colorCode", "#16161e")
-
-    child.lua([[M = require('no-neck-pain').setup({
-        buffers = {
-            background = {
-                colorCode = "tokyonight-storm"
-            },
-        },
-    })]])
-    expect_config("buffers.background.colorCode", "#1f2335")
 end
 
-T["enable()"] = new_set()
+T["enable()"] = MiniTest.new_set()
 
 T["enable()"]["sets state and internal methods"] = function()
-    child.lua([[M = require('no-neck-pain').enable()]])
+    child.lua([[require('no-neck-pain').enable()]])
 
     -- internal methods
-    eq(child.lua_get("type(_G.NoNeckPain.internal.toggle)"), "function")
-    eq(child.lua_get("type(_G.NoNeckPain.internal.enable)"), "function")
-    eq(child.lua_get("type(_G.NoNeckPain.internal.disable)"), "function")
+    eq_type_global(child, "_G.NoNeckPain.internal.toggle", "function")
+    eq_type_global(child, "_G.NoNeckPain.internal.enable", "function")
+    eq_type_global(child, "_G.NoNeckPain.internal.disable", "function")
 
     -- state
-    eq(child.lua_get("type(_G.NoNeckPain.state)"), "table")
+    eq_type_global(child, "_G.NoNeckPain.state", "table")
 
-    local expect_state = function(field, value)
-        eq(child.lua_get("_G.NoNeckPain.state." .. field), value)
-    end
+    eq_state(child, "enabled", true)
+    eq_state(child, "augroup", 15)
 
-    -- status
-    expect_state("enabled", true)
-    expect_state("augroup", 15)
+    eq_type_state(child, "win", "table")
 
-    -- stored window ids
-    expect_state("win.curr", 1000)
-    expect_state("win.left", 1001)
-    expect_state("win.right", 1002)
-    expect_state("win.split", vim.NIL)
+    eq_state(child, "win.curr", 1000)
+    eq_state(child, "win.left", 1001)
+    eq_state(child, "win.right", 1002)
+    eq_state(child, "win.split", vim.NIL)
 end
 
-T["toggle()"] = new_set()
+T["disable()"] = MiniTest.new_set()
 
-T["toggle()"]["sets state and internal methods"] = function()
-    child.lua([[M = require('no-neck-pain').toggle()]])
-
-    -- internal methods
-    eq(child.lua_get("type(_G.NoNeckPain.internal.toggle)"), "function")
-    eq(child.lua_get("type(_G.NoNeckPain.internal.enable)"), "function")
-    eq(child.lua_get("type(_G.NoNeckPain.internal.disable)"), "function")
+T["disable()"]["resets state and remove internal methods"] = function()
+    child.lua([[require('no-neck-pain').disable()]])
 
     -- state
-    eq(child.lua_get("type(_G.NoNeckPain.state)"), "table")
+    eq_type_global(child, "_G.NoNeckPain.state", "table")
 
-    local expect_state = function(field, value)
-        eq(child.lua_get("_G.NoNeckPain.state." .. field), value)
-    end
+    eq_state(child, "enabled", false)
+    eq_state(child, "augroup", vim.NIL)
 
-    -- status
-    expect_state("enabled", true)
-    expect_state("augroup", 15)
+    eq_type_state(child, "win", "table")
 
-    -- stored window ids
-    expect_state("win.curr", 1000)
-    expect_state("win.left", 1001)
-    expect_state("win.right", 1002)
-    expect_state("win.split", vim.NIL)
+    eq_state(child, "win.curr", vim.NIL)
+    eq_state(child, "win.left", vim.NIL)
+    eq_state(child, "win.right", vim.NIL)
+    eq_state(child, "win.split", vim.NIL)
 end
 
-T["toggle()"]["resets everything once toggled again"] = function()
-    child.lua([[M = require('no-neck-pain').toggle()]])
+T["toggle()"] = MiniTest.new_set()
 
-    local expect_state = function(field, value)
-        eq(child.lua_get("_G.NoNeckPain.state." .. field), value)
+T["toggle()"]["sets state and internal methods and resets everything when toggled again"] =
+    function()
+        child.lua([[require('no-neck-pain').toggle()]])
+
+        -- internal methods
+        eq_type_global(child, "_G.NoNeckPain.internal.toggle", "function")
+        eq_type_global(child, "_G.NoNeckPain.internal.enable", "function")
+        eq_type_global(child, "_G.NoNeckPain.internal.disable", "function")
+
+        -- state
+        eq_type_global(child, "_G.NoNeckPain.state", "table")
+
+        eq_state(child, "enabled", true)
+        eq_state(child, "augroup", 15)
+
+        eq_type_state(child, "win", "table")
+
+        eq_state(child, "win.curr", 1000)
+        eq_state(child, "win.left", 1001)
+        eq_state(child, "win.right", 1002)
+        eq_state(child, "win.split", vim.NIL)
+
+        -- disable
+        child.lua([[require('no-neck-pain').toggle()]])
+
+        -- state
+        eq_type_state(child, "win", "table")
+
+        eq_state(child, "enabled", false)
+        eq_state(child, "augroup", vim.NIL)
+
+        eq_type_state(child, "win", "table")
+
+        eq_state(child, "win.curr", vim.NIL)
+        eq_state(child, "win.left", vim.NIL)
+        eq_state(child, "win.right", vim.NIL)
+        eq_state(child, "win.split", vim.NIL)
     end
-
-    -- status
-    expect_state("enabled", true)
-    expect_state("augroup", 15)
-
-    -- stored window ids
-    expect_state("win.curr", 1000)
-    expect_state("win.left", 1001)
-    expect_state("win.right", 1002)
-    expect_state("win.split", vim.NIL)
-
-    child.lua([[require('no-neck-pain').toggle()]])
-
-    -- status
-    expect_state("enabled", false)
-    expect_state("augroup", vim.NIL)
-
-    -- stored window ids
-    expect_state("win.curr", vim.NIL)
-    expect_state("win.left", vim.NIL)
-    expect_state("win.right", vim.NIL)
-    expect_state("win.split", vim.NIL)
-end
 
 return T
