@@ -30,6 +30,9 @@ NoNeckPain.options = {
             -- - tokyonight-moon
             -- - tokyonight-night
             -- - tokyonight-storm
+            -- - rose-pine
+            -- - rose-pine-moon
+            -- - rose-pine-dawn
             colorCode = nil,
         },
         -- When `false`, the `left` padding buffer won't be created.
