@@ -29,13 +29,16 @@ end
 
 -- creates a namespace for `no-neck-pain`, and assign the provided `colorCode` to the side buffers.
 function C.init(colorCode)
-    local namespaceID = vim.api.nvim_create_namespace("no-neck-pain")
+    local namespaceID = vim.api.nvim_create_namespace("NoNeckPain")
 
     vim.api.nvim_set_hl(namespaceID, "Normal", {
         bg = colorCode,
     })
     vim.api.nvim_set_hl(namespaceID, "NormalNC", {
         bg = colorCode,
+    })
+    vim.api.nvim_set_hl(namespaceID, "NonText", {
+        fg = colorCode,
     })
     vim.api.nvim_set_hl(namespaceID, "EndOfBuffer", {
         fg = colorCode,

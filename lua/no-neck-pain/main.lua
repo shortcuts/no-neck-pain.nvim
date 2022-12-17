@@ -95,14 +95,38 @@ local function createWin(action)
         vim.o.splitbelow, vim.o.splitright = splitbelow, splitright
 
         if options.buffers.background.colorCode ~= nil then
+            D.print("CreateWin: setting `colorCode` for side buffers")
+
             NoNeckPain.state.namespaceID = C.init(options.buffers.background.colorCode)
 
             if NoNeckPain.state.win.left ~= nil then
-                vim.api.nvim_win_set_hl_ns(NoNeckPain.state.win.left, NoNeckPain.state.namespaceID)
+                if vim.fn.has("nvim-0.8") then
+                    vim.api.nvim_win_set_hl_ns(
+                        NoNeckPain.state.win.left,
+                        NoNeckPain.state.namespaceID
+                    )
+                else
+                    vim.api.nvim_win_set_option(
+                        NoNeckPain.state.win.left,
+                        "winhl",
+                        "VertSplit:NoNeckPain,WinSeparator:NoNeckPain,EndOfBuffer:NoNeckPain,NormalNC:NoNeckPain,Normal:NoNeckPain"
+                    )
+                end
             end
 
             if NoNeckPain.state.win.right ~= nil then
-                vim.api.nvim_win_set_hl_ns(NoNeckPain.state.win.right, NoNeckPain.state.namespaceID)
+                if vim.fn.has("nvim-0.7") then
+                    vim.api.nvim_win_set_hl_ns(
+                        NoNeckPain.state.win.right,
+                        NoNeckPain.state.namespaceID
+                    )
+                else
+                    vim.api.nvim_win_set_option(
+                        NoNeckPain.state.win.right,
+                        "winhl",
+                        "VertSplit:NoNeckPain,WinSeparator:NoNeckPain,EndOfBuffer:NoNeckPain,NormalNC:NoNeckPain,Normal:NoNeckPain"
+                    )
+                end
             end
         end
 
