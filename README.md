@@ -10,6 +10,12 @@
   <video src="https://user-images.githubusercontent.com/20689156/207925631-deb043f4-4263-4a29-9851-f90558eea228.mp4"/>
 </div>
 
+<div align="center">
+
+[GIF version for mobile users](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase#default-configuration-with-splitvsplit-showcase)
+
+</div>
+
 ## Introduction
 
 The plugin creates evenly sized empty buffers on each side of your focused buffer, which acts as padding for your nvim window.
