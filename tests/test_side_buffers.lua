@@ -4,8 +4,7 @@ local child = helpers.new_child_neovim()
 local eq = helpers.expect.equality
 local eq, eq_state = eq, helpers.expect.state_equality
 local eq_type_global, eq_type_state =
-    helpers.expect.global_type_equality,
-    helpers.expect.state_type_equality
+    helpers.expect.global_type_equality, helpers.expect.state_type_equality
 
 local new_set = MiniTest.new_set
 
