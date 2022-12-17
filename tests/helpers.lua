@@ -8,6 +8,17 @@ local function errorMessage(str, pattern)
     return string.format("Pattern: %s\nObserved string: %s", vim.inspect(pattern), str)
 end
 
+Helpers.expect.buf_width_equality = MiniTest.new_expectation(
+    "variable in child process matches",
+    function(child, field, value)
+        return Helpers.expect.equality(
+            child.lua_get("vim.api.nvim_win_get_width(_G.NoNeckPain.state.win." .. field .. ")"),
+            value
+        )
+    end,
+    errorMessage
+)
+
 Helpers.expect.global_equality = MiniTest.new_expectation(
     "variable in child process matches",
     function(child, field, value)
