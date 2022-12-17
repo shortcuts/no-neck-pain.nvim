@@ -1,12 +1,12 @@
 local C = require("no-neck-pain.util.color")
 
-local Config = {}
+local NoNeckPain = {}
 
 --- Plugin config
 ---
 --- Default values:
 ---@eval return MiniDoc.afterlines_to_code(MiniDoc.current.eval_section)
-Config.options = {
+NoNeckPain.options = {
     -- The width of the focused buffer when enabling NNP.
     -- If the available window size is less than `width`, the buffer will take the whole screen.
     width = 100,
@@ -67,14 +67,14 @@ Config.options = {
 ---@param options table Module config table. See |NoNeckPain.options|.
 ---
 ---@usage `require("no-neck-pain").setup()` (add `{}` with your |NoNeckPain.options| table)
-function Config.setup(options)
-    options = vim.tbl_deep_extend("keep", options or {}, Config.options)
+function NoNeckPain.setup(options)
+    options = vim.tbl_deep_extend("keep", options or {}, NoNeckPain.options)
     options.buffers.background.colorCode =
         C.matchIntegrationToHexCode(options.buffers.background.colorCode)
 
-    Config.options = options
+    NoNeckPain.options = options
 
-    return Config.options
+    return NoNeckPain.options
 end
 
-return Config
+return NoNeckPain
