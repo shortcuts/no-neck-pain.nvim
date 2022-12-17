@@ -27,7 +27,7 @@ function C.matchIntegrationToHexCode(colorCode)
     return colorCode
 end
 
--- creates a namespace for `no-neck-pain`, and assign the provided `colorCode` to the side buffers.
+-- creates an highlight group `NoNeckPain` with the given `colorCode` and assign it to the side buffer of the given `id`.
 function C.init(win, colorCode)
     local groupName = "NoNeckPain"
     vim.cmd(
