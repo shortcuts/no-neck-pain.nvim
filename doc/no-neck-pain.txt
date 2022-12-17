@@ -22,10 +22,10 @@ Default values:
           background = {
               -- Hexadecimal color code to override the current background color of the buffer. (e.g. #24273A)
               -- popular theme are supported by their name:
-              -- - catpuccin-frappe
-              -- - catpuccin-latte
-              -- - catpuccin-macchiato
-              -- - catpuccin-mocha
+              -- - catppuccin-frappe
+              -- - catppuccin-latte
+              -- - catppuccin-macchiato
+              -- - catppuccin-mocha
               -- - tokyonight-day
               -- - tokyonight-moon
               -- - tokyonight-night
