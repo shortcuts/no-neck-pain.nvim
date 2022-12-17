@@ -1,3 +1,5 @@
+local C = require("no-neck-pain.util.color")
+
 local NoNeckPain = {}
 
 --- Plugin config
@@ -14,15 +16,29 @@ NoNeckPain.options = {
     disableOnLastBuffer = false,
     -- When `true`, disabling NNP kills every split/vsplit buffers except the main NNP buffer.
     killAllBuffersOnDisable = false,
-    -- Options related to the side buffers
+    -- Options related to the side buffers.
     buffers = {
+        -- The background options of the side buffer(s).
+        background = {
+            -- Hexadecimal color code to override the current background color of the buffer. (e.g. #24273A)
+            -- popular theme are supported by their name:
+            -- - catppuccin-frappe
+            -- - catppuccin-latte
+            -- - catppuccin-macchiato
+            -- - catppuccin-mocha
+            -- - tokyonight-day
+            -- - tokyonight-moon
+            -- - tokyonight-night
+            -- - tokyonight-storm
+            colorCode = nil,
+        },
         -- When `false`, the `left` padding buffer won't be created.
         left = true,
         -- When `false`, the `right` padding buffer won't be created.
         right = true,
         -- When `true`, the side buffers will be named `no-neck-pain-left` and `no-neck-pain-right` respectively.
         showName = false,
-        -- The buffer options when creating the buffer
+        -- The buffer options when creating the buffer.
         options = {
             -- Buffer-scoped options, below are the default values, but any `vim.bo` options are valid and will be forwarded to the buffer creation.
             bo = {
@@ -48,11 +64,15 @@ NoNeckPain.options = {
 
 --- Define your no-neck-pain setup.
 ---
----@param config table Module config table. See |NoNeckPain.config|.
+---@param options table Module config table. See |NoNeckPain.config|.
 ---
----@usage `require("no-neck-pain").setup()` (add `{}` with your `config` table)
-function NoNeckPain.setup(config)
-    NoNeckPain.options = vim.tbl_deep_extend("keep", config or {}, NoNeckPain.options)
+---@usage `require("no-neck-pain").setup()` (add `{}` with your |NoNeckPain.config| table)
+function NoNeckPain.setup(options)
+    options = vim.tbl_deep_extend("keep", options or {}, NoNeckPain.options)
+    options.buffers.background.colorCode =
+        C.matchIntegrationToHexCode(options.buffers.background.colorCode)
+
+    NoNeckPain.options = options
 
     return NoNeckPain.options
 end

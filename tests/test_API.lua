@@ -42,6 +42,10 @@ T["setup()"]["sets exposed methods and config"] = function()
     eq(child.lua_get("type(_G.NoNeckPain.config)"), "table")
     eq(child.lua_get("type(_G.NoNeckPain.config.options)"), "table")
     eq(child.lua_get("type(_G.NoNeckPain.config.options.buffers)"), "table")
+    eq(child.lua_get("type(_G.NoNeckPain.config.options.buffers.background)"), "table")
+    eq(child.lua_get("type(_G.NoNeckPain.config.options.buffers.options)"), "table")
+    eq(child.lua_get("type(_G.NoNeckPain.config.options.buffers.options.bo)"), "table")
+    eq(child.lua_get("type(_G.NoNeckPain.config.options.buffers.options.wo)"), "table")
 
     local expect_config = function(field, value)
         eq(child.lua_get("_G.NoNeckPain.config.options." .. field), value)
@@ -54,6 +58,8 @@ T["setup()"]["sets exposed methods and config"] = function()
     expect_config("buffers.left", true)
     expect_config("buffers.right", true)
     expect_config("buffers.showName", false)
+
+    expect_config("buffers.background.colorCode", vim.NIL)
 
     expect_config("buffers.options.bo.filetype", "no-neck-pain")
     expect_config("buffers.options.bo.buftype", "nofile")
@@ -77,6 +83,9 @@ T["setup()"]["overrides default values"] = function()
         disableOnLastBuffer = true,
         killAllBuffersOnDisable = true,
         buffers = {
+            background = {
+                colorCode = "#2E1E2E"
+            },
             left = false,
             right = false,
             showName = true,
@@ -113,6 +122,8 @@ T["setup()"]["overrides default values"] = function()
     expect_config("buffers.right", false)
     expect_config("buffers.showName", true)
 
+    expect_config("buffers.background.colorCode", "#2E1E2E")
+
     expect_config("buffers.options.bo.filetype", "my-file-type")
     expect_config("buffers.options.bo.buftype", "help")
     expect_config("buffers.options.bo.bufhidden", "")
@@ -126,6 +137,85 @@ T["setup()"]["overrides default values"] = function()
     expect_config("buffers.options.wo.relativenumber", true)
     expect_config("buffers.options.wo.foldenable", true)
     expect_config("buffers.options.wo.list", true)
+end
+
+T["setup()"]["colorCode: map integration name to a value"] = function()
+    child.lua([[M = require('no-neck-pain').setup({
+        buffers = {
+            background = {
+                colorCode = "catppuccin-frappe"
+            },
+        },
+    })]])
+
+    local expect_config = function(field, value)
+        eq(child.lua_get("_G.NoNeckPain.config.options." .. field), value)
+    end
+
+    expect_config("buffers.background.colorCode", "#292C3C")
+
+    child.lua([[M = require('no-neck-pain').setup({
+        buffers = {
+            background = {
+                colorCode = "catppuccin-latte"
+            },
+        },
+    })]])
+    expect_config("buffers.background.colorCode", "#E6E9EF")
+
+    child.lua([[M = require('no-neck-pain').setup({
+        buffers = {
+            background = {
+                colorCode = "catppuccin-macchiato"
+            },
+        },
+    })]])
+    expect_config("buffers.background.colorCode", "#1E2030")
+
+    child.lua([[M = require('no-neck-pain').setup({
+        buffers = {
+            background = {
+                colorCode = "catppuccin-mocha"
+            },
+        },
+    })]])
+    expect_config("buffers.background.colorCode", "#181825")
+
+    child.lua([[M = require('no-neck-pain').setup({
+        buffers = {
+            background = {
+                colorCode = "tokyonight-day"
+            },
+        },
+    })]])
+    expect_config("buffers.background.colorCode", "#16161e")
+
+    child.lua([[M = require('no-neck-pain').setup({
+        buffers = {
+            background = {
+                colorCode = "tokyonight-moon"
+            },
+        },
+    })]])
+    expect_config("buffers.background.colorCode", "#1e2030")
+
+    child.lua([[M = require('no-neck-pain').setup({
+        buffers = {
+            background = {
+                colorCode = "tokyonight-night"
+            },
+        },
+    })]])
+    expect_config("buffers.background.colorCode", "#16161e")
+
+    child.lua([[M = require('no-neck-pain').setup({
+        buffers = {
+            background = {
+                colorCode = "tokyonight-storm"
+            },
+        },
+    })]])
+    expect_config("buffers.background.colorCode", "#1f2335")
 end
 
 T["enable()"] = new_set()

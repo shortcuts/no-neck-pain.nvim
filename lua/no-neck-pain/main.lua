@@ -1,7 +1,8 @@
 local options = require("no-neck-pain.config").options
+local C = require("no-neck-pain.util.color")
 local D = require("no-neck-pain.util.debug")
-local W = require("no-neck-pain.util.win")
 local M = require("no-neck-pain.util.map")
+local W = require("no-neck-pain.util.win")
 local SIDES = { "left", "right" }
 
 local NoNeckPain = {
@@ -62,6 +63,12 @@ local function createBuf(name, cmd, padding, moveTo)
     end
 
     vim.cmd(moveTo)
+
+    if options.buffers.background.colorCode ~= nil then
+        D.print("CreateWin: setting `colorCode` for buffer" .. id)
+
+        C.init(id, options.buffers.background.colorCode)
+    end
 
     return id
 end
