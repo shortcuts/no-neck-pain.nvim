@@ -64,9 +64,9 @@ NoNeckPain.options = {
 
 --- Define your no-neck-pain setup.
 ---
----@param options table Module config table. See |NoNeckPain.config|.
+---@param options table Module config table. See |NoNeckPain.options|.
 ---
----@usage `require("no-neck-pain").setup()` (add `{}` with your |NoNeckPain.config| table)
+---@usage `require("no-neck-pain").setup()` (add `{}` with your |NoNeckPain.options| table)
 function NoNeckPain.setup(options)
     options = vim.tbl_deep_extend("keep", options or {}, NoNeckPain.options)
     options.buffers.background.colorCode =

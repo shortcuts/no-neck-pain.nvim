@@ -293,8 +293,6 @@ function NoNeckPain.disable()
 
     D.print("disabling NNP")
 
-    D.print(NoNeckPain.state.augroup)
-
     vim.api.nvim_del_augroup_by_id(NoNeckPain.state.augroup)
 
     if not options.killAllBuffersOnDisable then
