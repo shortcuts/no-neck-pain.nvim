@@ -28,31 +28,31 @@ function C.matchIntegrationToHexCode(colorCode)
 end
 
 -- creates a namespace for `no-neck-pain`, and assign the provided `colorCode` to the side buffers.
-function C.init(colorCode)
-    local namespaceID = vim.api.nvim_create_namespace("NoNeckPain")
-
-    vim.api.nvim_set_hl(namespaceID, "Normal", {
-        bg = colorCode,
-    })
-    vim.api.nvim_set_hl(namespaceID, "NormalNC", {
-        bg = colorCode,
-    })
-    vim.api.nvim_set_hl(namespaceID, "NonText", {
-        fg = colorCode,
-    })
-    vim.api.nvim_set_hl(namespaceID, "EndOfBuffer", {
-        fg = colorCode,
-    })
-    vim.api.nvim_set_hl(namespaceID, "WinSeparator", {
-        bg = colorCode,
-        fg = colorCode,
-    })
-    vim.api.nvim_set_hl(namespaceID, "VertSplit", {
-        bg = colorCode,
-        fg = colorCode,
-    })
-
-    return namespaceID
+function C.init(win, colorCode)
+    local groupName = "NoNeckPain"
+    vim.cmd(
+        string.format(
+            [[highlight %s guifg=%s guibg=%s]],
+            groupName,
+            colorCode,
+            colorCode,
+            colorCode,
+            colorCode
+        )
+    )
+    vim.api.nvim_win_set_option(
+        win,
+        "winhl",
+        string.format(
+            "Normal:%s,NormalNC:%s,NonText:%s,EndOfBuffer:%s,WinSeparator:%s,VertSplit:%s",
+            groupName,
+            groupName,
+            groupName,
+            groupName,
+            groupName,
+            groupName
+        )
+    )
 end
 
 return C

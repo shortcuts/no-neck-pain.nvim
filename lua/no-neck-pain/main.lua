@@ -9,7 +9,6 @@ local NoNeckPain = {
     state = {
         enabled = false,
         augroup = nil,
-        namespaceID = nil,
         win = {
             curr = nil,
             left = nil,
@@ -65,6 +64,12 @@ local function createBuf(name, cmd, padding, moveTo)
 
     vim.cmd(moveTo)
 
+    if options.buffers.background.colorCode ~= nil then
+        D.print("CreateWin: setting `colorCode` for side buffers")
+
+        C.init(id, options.buffers.background.colorCode)
+    end
+
     return id
 end
 
@@ -93,20 +98,6 @@ local function createWin(action)
         end
 
         vim.o.splitbelow, vim.o.splitright = splitbelow, splitright
-
-        if options.buffers.background.colorCode ~= nil then
-            D.print("CreateWin: setting `colorCode` for side buffers")
-
-            NoNeckPain.state.namespaceID = C.init(options.buffers.background.colorCode)
-
-            if NoNeckPain.state.win.left ~= nil then
-                vim.api.nvim_win_set_hl_ns(NoNeckPain.state.win.left, NoNeckPain.state.namespaceID)
-            end
-
-            if NoNeckPain.state.win.right ~= nil then
-                vim.api.nvim_win_set_hl_ns(NoNeckPain.state.win.right, NoNeckPain.state.namespaceID)
-            end
-        end
 
         return
     end

@@ -238,7 +238,6 @@ T["enable()"]["sets state and internal methods"] = function()
     -- status
     expect_state("enabled", true)
     expect_state("augroup", 15)
-    expect_state("namespaceID", vim.NIL)
 
     -- stored window ids
     expect_state("win.curr", 1000)
@@ -267,29 +266,12 @@ T["toggle()"]["sets state and internal methods"] = function()
     -- status
     expect_state("enabled", true)
     expect_state("augroup", 15)
-    expect_state("namespaceID", vim.NIL)
 
     -- stored window ids
     expect_state("win.curr", 1000)
     expect_state("win.left", 1001)
     expect_state("win.right", 1002)
     expect_state("win.split", vim.NIL)
-end
-
-T["toggle()"]["set namespaceID when colorCode is defined"] = function()
-    child.lua([[
-        local NNP = require('no-neck-pain')
-        NNP.setup({
-            buffers = {
-                background = {
-                    colorCode = "#2E1E2E",
-                },
-            },
-        })
-        NNP.toggle()
-    ]])
-
-    eq(child.lua_get("_G.NoNeckPain.state.namespaceID"), 1)
 end
 
 T["toggle()"]["resets everything once toggled again"] = function()
