@@ -4,21 +4,7 @@
 {{ range .CommitGroups -}}
 ### {{ .Title }}
 {{ range .Commits -}}
-- {{ if .Scope }}**{{ .Scope }}:** {{ end }}{{ .Subject }} by [@{{ .Author.Name }}](https://github.com/@{{ .Author.Name }})
-{{ end }}
-{{ end -}}
-
-{{- if .RevertCommits -}}
-### Reverts
-{{ range .RevertCommits -}}
-- {{ .Revert.Header }}
-{{ end }}
-{{ end -}}
-
-{{- if .MergeCommits -}}
-### Pull Requests
-{{ range .MergeCommits -}}
-- {{ .Header }}
+- {{ if .Scope }}**{{ .Scope }}:** {{ end }}{{ .Subject }}
 {{ end }}
 {{ end -}}
 
@@ -30,6 +16,13 @@
 {{ end }}
 {{ end -}}
 {{ end -}}
+
+### Contributors
+
+Thanks for contributing to the project:
+{{ range .Commits -}}
+- [@{{ .Author.Name }}](https://github.com/@{{ .Author.Name }})
+{{ end }}
 {{ end -}}
 
 {{- if .Versions }}
