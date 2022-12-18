@@ -2,6 +2,9 @@ local NNP = {}
 
 -- toggles NNP switch between enabled/disable state.
 function NNP.toggle()
+    if NNP.config == nil then
+        NNP.config = require("no-neck-pain.config").options
+    end
     local main = require("no-neck-pain.main")
 
     if main.toggle() then
