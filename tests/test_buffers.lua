@@ -114,6 +114,18 @@ end
 
 T["auto command"] = new_set()
 
+T["auto command"]["does not create side buffers window's width < options.width"] = function()
+    child.lua([[
+            require('no-neck-pain').setup({width=100})
+            require('no-neck-pain').enable()
+        ]])
+
+    eq(child.lua_get("vim.api.nvim_list_wins()"), { 1000 })
+    eq_state(child, "win.curr", 1000)
+    eq_state(child, "win.left", vim.NIL)
+    eq_state(child, "win.right", vim.NIL)
+end
+
 T["auto command"]["closing `curr` makes `split` the new `curr`"] = function()
     child.lua([[
             require('no-neck-pain').setup({width=50})
