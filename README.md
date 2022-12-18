@@ -144,6 +144,6 @@ PRs and issues are always welcome. Make sure to provide as much context as possi
 
 ## Motivations
 
-Although there's other (amazing!) alternative that provide a zen-distraction-free-center mode, they usually make assumptions that might alter your workflow, or at least require some configuration to suit your needs.
+Although there's other (amazing!) alternatives that provide a zen-distraction-free-center mode, they usually make assumptions that might alter your workflow, or at least require some configuration to suit your needs.
 
 `no-neck-pain.nvim` aims at providing a non-opinionated buffer centering experience, while being super customizable.
