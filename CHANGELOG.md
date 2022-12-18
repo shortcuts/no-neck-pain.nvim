@@ -120,6 +120,7 @@ Thanks for contributing to the project:
 Thanks for contributing to the project:
 - [@shortcuts](https://github.com/shortcuts)
 
-[Unreleased]: https://github.com/shortcuts/no-neck-pain.nvim/compare/0.1.1...HEAD
+[Unreleased]: https://github.com/shortcuts/no-neck-pain.nvim/compare/0.1.2...HEAD
+[0.1.2]: https://github.com/shortcuts/no-neck-pain.nvim/compare/0.1.1...0.1.2
 [0.1.1]: https://github.com/shortcuts/no-neck-pain.nvim/compare/0.1.0...0.1.1
 [0.1.0]: https://github.com/shortcuts/no-neck-pain.nvim/compare/0.0.1...0.1.0
