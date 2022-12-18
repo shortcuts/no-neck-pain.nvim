@@ -20,9 +20,13 @@
 
 The plugin creates evenly sized empty buffers on each side of your focused buffer, which acts as padding for your nvim window.
 
+<div align="center">
+
 | Before                    | After                     |
 |:---------------------------|:---------------------------:|
 |`\|current--------------\|`|`\|empty\|current\|empty\|`|
+
+</div>
 
 > thanks to @BerkeleyTrue for the drawing
 
@@ -123,17 +127,23 @@ require("no-neck-pain").setup({
 |-------------|----------------------------|
 |`:NoNeckPain`| Toggle the `enabled` state.|
 
-## Wiki links
-
-- [automate `no-neck-pain` startup](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Automate-no-neck-pain-enabling)
-- [showcase](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase)
-
 ## Contributing
 
 PRs and issues are always welcome. Make sure to provide as much context as possible when opening one.
 
+## Wiki links
+
+- [Automate `no-neck-pain.nvim` enabling](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Automate-%60no-neck-pain.nvim%60-enabling)
+  - [When entering Neovim](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Automate-%60no-neck-pain.nvim%60-enabling#when-entering-nvim-vimenter)
+  - [With `dashboard-nvim` support](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Automate-%60no-neck-pain.nvim%60-enabling#when-entering-nvim-vimenter)
+- [Showcase](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase)
+  - [Default configuration](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase#default-configuration-with-splitvsplit-showcase)
+  - [Left or right padding only](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase#selective-padding)
+  - [Theme blending](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase#selective-padding)
+  - [Window resize support](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase#selective-padding)
+
 ## Motivations
 
-While there's many other (amazing!) plugins that does similar stuff, they all require some configuration or alter your NeoVim workflow.
+Although there's other (amazing!) alternatives that provide a zen-distraction-free-center mode, they usually make assumptions that might alter your workflow, or at least require some configuration to suit your needs.
 
-In my case, I only wanted a plugin that: **center the current buffer**.
+`no-neck-pain.nvim` aims at providing a non-opinionated buffer centering experience, while being super customizable.
