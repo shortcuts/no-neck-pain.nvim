@@ -95,7 +95,7 @@ T["curr buffer"]["have the default width from the config"] = function()
     eq_buf_width(child, "curr", 48)
 end
 
-T["curr buffer"]["closing `curr` buffer kills side buffers"] = function()
+T["curr buffer"]["closing `curr` buffer without any other window open closes Neovim"] = function()
     child.lua([[
         require('no-neck-pain').setup({width=50})
         require('no-neck-pain').enable()
@@ -106,7 +106,10 @@ T["curr buffer"]["closing `curr` buffer kills side buffers"] = function()
 
     child.lua("vim.api.nvim_win_close(1000, false)")
 
-    eq(child.lua_get("vim.api.nvim_list_wins()"), { 1002 })
+    -- neovim is closed, we can't run anything against it
+    helpers.expect.error(function()
+        child.lua_get("vim.api.nvim_list_wins()")
+    end)
 end
 
 T["auto command"] = new_set()
