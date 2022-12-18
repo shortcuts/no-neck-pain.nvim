@@ -1,4 +1,3 @@
-local U = require("no-neck-pain.util.debug")
 local NNP = {}
 
 -- toggles NNP switch between enabled/disable state.
