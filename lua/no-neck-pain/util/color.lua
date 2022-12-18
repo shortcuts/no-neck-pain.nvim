@@ -1,3 +1,4 @@
+local D = require("no-neck-pain.util.debug")
 local C = {}
 
 -- tries to match the provided `colorCode` to an integration name, defaults to the provided string if not successful.
@@ -30,11 +31,23 @@ function C.matchIntegrationToHexCode(colorCode)
 end
 
 -- creates an highlight group `NoNeckPain` with the given `colorCode` and assign it to the side buffer of the given `id`.
+-- `cmd` is used instead of native commands for backward compatibility with Neovim 0.7
 function C.init(win, colorCode)
-    local groupName = "NoNeckPain"
+    local groupName = "nnpcolorname"
+
+    D.print(
+        "Color.init: initializing background mode with groupname "
+            .. groupName
+            .. " for win "
+            .. win
+            .. " with color "
+            .. colorCode
+    )
+
+    vim.cmd(string.format([[highlight! clear %s NONE]], groupName))
     vim.cmd(
         string.format(
-            [[highlight %s guifg=%s guibg=%s]],
+            [[highlight! %s guifg=%s guibg=%s]],
             groupName,
             colorCode,
             colorCode,
@@ -46,7 +59,7 @@ function C.init(win, colorCode)
         win,
         "winhl",
         string.format(
-            "Normal:%s,NormalNC:%s,CursorColumn:%s,CursorColumnNr:%s,SignColumn:%s,Cursor:%sLineNr:%s,NonText:%s,EndOfBuffer:%s,WinSeparator:%s,VertSplit:%s",
+            "Normal:%s,NormalNC:%s,CursorColumn:%s,CursorColumnNr:%s,NonText:%s,SignColumn:%s,Cursor:%s,LineNr:%s,EndOfBuffer:%s,WinSeparator:%s,VertSplit:%s",
             groupName,
             groupName,
             groupName,
