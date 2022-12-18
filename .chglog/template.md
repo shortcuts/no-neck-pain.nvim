@@ -4,7 +4,7 @@
 {{ range .CommitGroups -}}
 ### {{ .Title }}
 {{ range .Commits -}}
-- {{ if .Scope }}**{{ .Scope }}:** {{ end }}{{ .Subject }} by @{{ .Author.Name }}
+- {{ if .Scope }}**{{ .Scope }}:** {{ end }}{{ .Subject }} by [@{{ .Author.Name }}](https://github.com/@{{ .Author.Name }})
 {{ end }}
 {{ end -}}
 
