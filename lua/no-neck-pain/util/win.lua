@@ -3,16 +3,16 @@ local M = require("no-neck-pain.util.map")
 local W = {}
 
 -- returns the buffers without the NNP ones, and their number.
-function W.bufferListWithoutNNP(scope, nnpBuffers)
+function W.bufferListWithoutNNP(scope)
     local buffers = vim.api.nvim_list_wins()
     local validBuffers = {}
     local size = 0
 
     for _, buffer in pairs(buffers) do
         if
-            buffer ~= nnpBuffers.curr
-            and buffer ~= nnpBuffers.left
-            and buffer ~= nnpBuffers.right
+            buffer ~= _G.NoNeckPain.state.win.curr
+            and buffer ~= _G.NoNeckPain.state.win.left
+            and buffer ~= _G.NoNeckPain.state.win.right
             and not W.isRelativeWindow(scope, buffer)
         then
             table.insert(validBuffers, buffer)
@@ -37,7 +37,8 @@ function W.isRelativeWindow(scope, win)
     end
 end
 
--- closes a window if it exists and is valid.
+-- closes a given `win` (NNP buffer) if there's other buffers (not NNP buffers) open.
+-- quits Neovim if we close an NNP buffer but there's no other valid buffer left.
 function W.close(scope, win)
     if win == nil then
         return false
@@ -45,21 +46,26 @@ function W.close(scope, win)
 
     local buffers = vim.api.nvim_list_wins()
 
-    if M.tsize(buffers) == 1 then
-        D.print(scope .. ": last window is " .. win .. " can't kill it")
+    if M.tsize(buffers) == 1 and buffers[1] == win then
+        D.print(
+            scope
+                .. ": trying to kill the last available buffer "
+                .. win
+                .. ", we can safely quit Neovim"
+        )
 
-        return false
+        vim.cmd([[quit!]])
+
+        return true
     end
 
     D.print(scope .. ": killing window " .. win)
 
     if vim.api.nvim_win_is_valid(win) then
         vim.api.nvim_win_close(win, false)
-
-        return true
     end
 
-    return false
+    return true
 end
 
 return W

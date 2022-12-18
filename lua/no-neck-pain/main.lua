@@ -160,7 +160,7 @@ function NoNeckPain.enable()
                     )
                 end
 
-                local buffers, total = W.bufferListWithoutNNP("WinEnter", NoNeckPain.state.win)
+                local buffers, total = W.bufferListWithoutNNP("WinEnter")
                 local focusedWin = vim.api.nvim_get_current_win()
 
                 if total == 0 or not M.contains(buffers, focusedWin) then
@@ -214,8 +214,7 @@ function NoNeckPain.enable()
                     return NoNeckPain.disable()
                 end
 
-                local _, total =
-                    W.bufferListWithoutNNP("WinClosed, BufDelete", NoNeckPain.state.win)
+                local _, total = W.bufferListWithoutNNP("WinClosed, BufDelete")
 
                 if
                     options.disableOnLastBuffer
@@ -316,10 +315,8 @@ function NoNeckPain.disable()
     NoNeckPain.state.enabled = false
     vim.api.nvim_del_augroup_by_id(NoNeckPain.state.augroup)
 
-    if not options.killAllBuffersOnDisable then
-        W.close("Disable left", NoNeckPain.state.win.left)
-        W.close("Disable right", NoNeckPain.state.win.right)
-    end
+    W.close("Disable left", NoNeckPain.state.win.left)
+    W.close("Disable right", NoNeckPain.state.win.right)
 
     -- shutdowns gracefully by focusing the stored `curr` buffer, if possible
     if
