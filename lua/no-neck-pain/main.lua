@@ -1,4 +1,3 @@
-local options = require("no-neck-pain.config").options
 local C = require("no-neck-pain.util.color")
 local D = require("no-neck-pain.util.debug")
 local M = require("no-neck-pain.util.map")
@@ -31,26 +30,26 @@ function NoNeckPain.toggle()
     return true
 end
 
--- Determine the "padding" (width) of the buffer based on the `options.width` parameter.
+-- Determine the "padding" (width) of the buffer based on the `_G.NoNeckPain.config.width` parameter.
 local function getPadding()
     local width = vim.api.nvim_list_uis()[1].width
 
-    if options.width >= width then
+    if _G.NoNeckPain.config.width >= width then
         return 1
     end
 
-    return math.floor((width - options.width) / 2)
+    return math.floor((width - _G.NoNeckPain.config.width) / 2)
 end
 
 -- Creates a buffer for the given "padding" (width), at the given `moveTo` direction.
--- Options from `options.buffer.options` are applied to the created buffer.
+-- Options from `_G.NoNeckPain.config.buffer.options` are applied to the created buffer.
 --
 --@param name string: the name of the buffer, `no-neck-pain-` will be prepended.
 --@param cmd string: the command to execute when creating the buffer
 --@param padding number: the "padding" (width) of the buffer
 --@param moveTo string: the command to execute to place the buffer at the correct spot.
 local function createBuf(name, cmd, padding, moveTo)
-    if vim.api.nvim_list_uis()[1].width < options.width then
+    if vim.api.nvim_list_uis()[1].width < _G.NoNeckPain.config.width then
         return D.print("createBuf: not enough space to create side buffer " .. name)
     end
 
@@ -60,22 +59,22 @@ local function createBuf(name, cmd, padding, moveTo)
 
     vim.api.nvim_win_set_width(0, padding)
 
-    if options.buffers.showName then
+    if _G.NoNeckPain.config.buffers.showName then
         vim.api.nvim_buf_set_name(0, "no-neck-pain-" .. name)
     end
 
-    for scope, _ in pairs(options.buffers.options) do
-        for key, value in pairs(options.buffers.options[scope]) do
+    for scope, _ in pairs(_G.NoNeckPain.config.buffers.options) do
+        for key, value in pairs(_G.NoNeckPain.config.buffers.options[scope]) do
             vim[scope][key] = value
         end
     end
 
     vim.cmd(moveTo)
 
-    if options.buffers.background.colorCode ~= nil then
+    if _G.NoNeckPain.config.buffers.background.colorCode ~= nil then
         D.print("CreateWin: setting `colorCode` for buffer " .. id)
 
-        C.init(id, options.buffers.background.colorCode)
+        C.init(id, _G.NoNeckPain.config.buffers.background.colorCode)
     end
 
     return id
@@ -97,11 +96,11 @@ local function createWin(action)
             curr = vim.api.nvim_get_current_win(),
         }
 
-        if options.buffers.left then
+        if _G.NoNeckPain.config.buffers.left then
             NoNeckPain.state.win.left = createBuf("left", "leftabove vnew", padding, "wincmd l")
         end
 
-        if options.buffers.right then
+        if _G.NoNeckPain.config.buffers.right then
             NoNeckPain.state.win.right = createBuf("right", "vnew", padding, "wincmd h")
         end
 
@@ -154,7 +153,7 @@ function NoNeckPain.enable()
 
                 local width = vim.api.nvim_list_uis()[1].width
 
-                if width > options.width then
+                if width > _G.NoNeckPain.config.width then
                     D.print("VimResized: window's width is above the `width` option")
 
                     if NoNeckPain.state.win.left == nil and NoNeckPain.state.win.right == nil then
@@ -261,7 +260,7 @@ function NoNeckPain.enable()
                 local _, total = W.bufferListWithoutNNP("WinClosed, BufDelete")
 
                 if
-                    options.disableOnLastBuffer
+                    _G.NoNeckPain.config.disableOnLastBuffer
                     and total == 0
                     and vim.api.nvim_buf_get_option(0, "buftype") == ""
                     and vim.api.nvim_buf_get_option(0, "filetype") == ""
@@ -326,7 +325,7 @@ function NoNeckPain.enable()
                 end
 
                 local width = vim.api.nvim_list_uis()[1].width
-                local totalSideSizes = (width - padding) - options.width
+                local totalSideSizes = (width - padding) - _G.NoNeckPain.config.width
 
                 D.print("WinEnter, WinClosed: resizing side buffers")
                 for _, side in ipairs(SIDES) do
@@ -371,7 +370,7 @@ function NoNeckPain.disable()
         vim.fn.win_gotoid(NoNeckPain.state.win.curr)
     end
 
-    if options.killAllBuffersOnDisable then
+    if _G.NoNeckPain.config.killAllBuffersOnDisable then
         vim.cmd("only")
     end
 

@@ -71,11 +71,9 @@ NoNeckPain.options = {
 ---
 ---@usage `require("no-neck-pain").setup()` (add `{}` with your |NoNeckPain.options| table)
 function NoNeckPain.setup(options)
-    options = vim.tbl_deep_extend("keep", options or {}, NoNeckPain.options)
-    options.buffers.background.colorCode =
-        C.matchIntegrationToHexCode(options.buffers.background.colorCode)
-
-    NoNeckPain.options = options
+    NoNeckPain.options = vim.tbl_deep_extend("keep", options or {}, NoNeckPain.options)
+    NoNeckPain.options.buffers.background.colorCode =
+        C.matchIntegrationToHexCode(NoNeckPain.options.buffers.background.colorCode)
 
     return NoNeckPain.options
 end
