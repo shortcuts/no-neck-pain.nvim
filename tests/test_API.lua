@@ -171,7 +171,10 @@ end
 T["enable()"] = MiniTest.new_set()
 
 T["enable()"]["sets state and internal methods"] = function()
-    child.lua([[require('no-neck-pain').enable()]])
+    child.lua([[
+        require('no-neck-pain').setup({width=50})
+        require('no-neck-pain').enable()
+    ]])
 
     -- internal methods
     eq_type_global(child, "_G.NoNeckPain.internal.toggle", "function")
@@ -215,7 +218,10 @@ T["toggle()"] = MiniTest.new_set()
 
 T["toggle()"]["sets state and internal methods and resets everything when toggled again"] =
     function()
-        child.lua([[require('no-neck-pain').toggle()]])
+        child.lua([[
+        require('no-neck-pain').setup({width=50})
+        require('no-neck-pain').enable()
+    ]])
 
         -- internal methods
         eq_type_global(child, "_G.NoNeckPain.internal.toggle", "function")

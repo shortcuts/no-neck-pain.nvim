@@ -50,6 +50,10 @@ end
 --@param padding number: the "padding" (width) of the buffer
 --@param moveTo string: the command to execute to place the buffer at the correct spot.
 local function createBuf(name, cmd, padding, moveTo)
+    if vim.api.nvim_list_uis()[1].width < options.width then
+        return D.print("createBuf: not enough space to create side buffer " .. name)
+    end
+
     vim.cmd(cmd)
 
     local id = vim.api.nvim_get_current_win()
@@ -133,11 +137,51 @@ function NoNeckPain.enable()
 
     vim.api.nvim_create_autocmd({ "VimResized" }, {
         callback = function()
-            if not NoNeckPain.state.enabled then
-                return D.print("VimResized: event received but NNP is disabled")
-            end
+            vim.schedule(function()
+                if not NoNeckPain.state.enabled then
+                    return D.print("VimResized: event received but NNP is disabled")
+                end
 
-            createWin("VimResized")
+                if
+                    NoNeckPain.state.win.split ~= nil
+                    -- we don't want close action on float window to impact NNP
+                    or W.isRelativeWindow("VimEnter")
+                then
+                    return D.print(
+                        "VimResized: already in split view or float window detected, nothing more to do"
+                    )
+                end
+
+                local width = vim.api.nvim_list_uis()[1].width
+
+                if width > options.width then
+                    D.print("VimResized: window's width is above the `width` option")
+
+                    if NoNeckPain.state.win.left == nil and NoNeckPain.state.win.right == nil then
+                        D.print("VimResized: no side buffer found, creating...")
+
+                        return createWin("init")
+                    end
+
+                    D.print("VimResized: buffers are here, resizing...")
+
+                    return createWin("VimResized")
+                end
+
+                D.print(
+                    "VimResized: window's width is below the `width` option, closing opened buffers..."
+                )
+
+                local ok = W.close("VimResized", NoNeckPain.state.win.left)
+                if ok then
+                    NoNeckPain.state.win.left = nil
+                end
+
+                ok = W.close("VimResized", NoNeckPain.state.win.right)
+                if ok then
+                    NoNeckPain.state.win.right = nil
+                end
+            end)
         end,
         group = "NoNeckPain",
         desc = "Resizes side windows after shell has been resized",
