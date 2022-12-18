@@ -23,6 +23,11 @@
 - side buffers not closing when `killAllBuffersOnDisable` is false ([#44](https://github.com/shortcuts/no-neck-pain.nvim/issues/44))
 - remove event redundancy ([#40](https://github.com/shortcuts/no-neck-pain.nvim/issues/40))
 
+### Contributors
+
+Thanks for contributing to the project:
+- [@shortcuts](https://github.com/shortcuts)
+- [@BerkeleyTrue](https://github.com/BerkeleyTrue)
 
 <a name="0.1.0"></a>
 ## [0.1.0] - 2022-12-11
@@ -36,6 +41,10 @@
 
 exposed API and configuration have changed
 
+### Contributors
+
+Thanks for contributing to the project:
+- [@shortcuts](https://github.com/shortcuts)
 
 <a name="0.0.1"></a>
 ## 0.0.1 - 2022-12-11
@@ -73,6 +82,10 @@ exposed API and configuration have changed
 - remove `enableOnWinEnter`
 - some padding wrongly toggling
 
+### Contributors
+
+Thanks for contributing to the project:
+- [@shortcuts](https://github.com/shortcuts)
 
 [Unreleased]: https://github.com/shortcuts/no-neck-pain.nvim/compare/0.1.1...HEAD
 [0.1.1]: https://github.com/shortcuts/no-neck-pain.nvim/compare/0.1.0...0.1.1
