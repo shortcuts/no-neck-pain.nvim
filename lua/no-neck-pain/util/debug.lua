@@ -1,9 +1,8 @@
-local options = require("no-neck-pain.config").options
 local D = {}
 
 -- prints only if debug is true.
 function D.print(...)
-    if not options.debug then
+    if _G.NoNeckPain.config ~= nil and not _G.NoNeckPain.config.debug then
         return
     end
 
@@ -19,7 +18,7 @@ end
 
 -- prints table only if debug is true.
 function D.tprint(table, indent)
-    if not options.debug then
+    if _G.NoNeckPain.config ~= nil and not _G.NoNeckPain.config.debug then
         return
     end
 

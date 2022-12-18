@@ -21,10 +21,14 @@ local NoNeckPain = {
 --- Toggle the plugin by calling the `enable`/`disable` methods respectively.
 function NoNeckPain.toggle()
     if NoNeckPain.state.enabled then
-        return NoNeckPain.disable()
+        NoNeckPain.disable()
+
+        return false
     end
 
     NoNeckPain.enable()
+
+    return true
 end
 
 -- Determine the "padding" (width) of the buffer based on the `options.width` parameter.
@@ -65,7 +69,7 @@ local function createBuf(name, cmd, padding, moveTo)
     vim.cmd(moveTo)
 
     if options.buffers.background.colorCode ~= nil then
-        D.print("CreateWin: setting `colorCode` for buffer" .. id)
+        D.print("CreateWin: setting `colorCode` for buffer " .. id)
 
         C.init(id, options.buffers.background.colorCode)
     end
@@ -129,6 +133,10 @@ function NoNeckPain.enable()
 
     vim.api.nvim_create_autocmd({ "VimResized" }, {
         callback = function()
+            if not NoNeckPain.state.enabled then
+                return D.print("VimResized: event received but NNP is disabled")
+            end
+
             createWin("VimResized")
         end,
         group = "NoNeckPain",
@@ -138,6 +146,10 @@ function NoNeckPain.enable()
     vim.api.nvim_create_autocmd({ "WinEnter" }, {
         callback = function()
             vim.schedule(function()
+                if not NoNeckPain.state.enabled then
+                    return D.print("WinEnter: event received but NNP is disabled")
+                end
+
                 if
                     NoNeckPain.state.win.split ~= nil
                     -- we don't want close action on float window to impact NNP
@@ -178,6 +190,10 @@ function NoNeckPain.enable()
     vim.api.nvim_create_autocmd({ "WinClosed", "BufDelete" }, {
         callback = function()
             vim.schedule(function()
+                if not NoNeckPain.state.enabled then
+                    return D.print("WinClose, BufDelete: event received but NNP is disabled")
+                end
+
                 -- we don't want close action on float window to impact NNP
                 if W.isRelativeWindow("WinClosed, BufDelete") then
                     return
@@ -234,6 +250,10 @@ function NoNeckPain.enable()
     vim.api.nvim_create_autocmd({ "WinEnter", "WinClosed" }, {
         callback = function()
             vim.schedule(function()
+                if not NoNeckPain.state.enabled then
+                    return D.print("WinEnter, WinClosed: event received but NNP is disabled")
+                end
+
                 if NoNeckPain.state.win.split ~= nil or W.isRelativeWindow("WinEnter") then
                     return D.print("WinEnter: stop because of split view or float window")
                 end
@@ -293,6 +313,7 @@ function NoNeckPain.disable()
 
     D.print("disabling NNP")
 
+    NoNeckPain.state.enabled = false
     vim.api.nvim_del_augroup_by_id(NoNeckPain.state.augroup)
 
     if not options.killAllBuffersOnDisable then
@@ -313,14 +334,12 @@ function NoNeckPain.disable()
         vim.cmd("only")
     end
 
-    NoNeckPain.state = {
-        enabled = false,
-        win = {
-            curr = nil,
-            left = nil,
-            right = nil,
-            split = nil,
-        },
+    NoNeckPain.state.augroup = nil
+    NoNeckPain.state.win = {
+        curr = nil,
+        left = nil,
+        right = nil,
+        split = nil,
     }
 end
 

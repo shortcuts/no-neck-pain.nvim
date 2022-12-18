@@ -4,11 +4,7 @@ local NNP = {}
 function NNP.toggle()
     local main = require("no-neck-pain.main")
 
-    main.toggle()
-
-    NNP.state = main.state
-
-    if main.state.enabled then
+    if main.toggle() then
         NNP.internal = {
             toggle = main.toggle,
             enable = main.enable,
@@ -21,6 +17,8 @@ function NNP.toggle()
             disable = nil,
         }
     end
+
+    NNP.state = main.state
 end
 
 -- starts NNP and set internal functions and state.
