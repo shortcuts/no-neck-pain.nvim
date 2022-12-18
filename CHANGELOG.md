@@ -1,4 +1,37 @@
 
+<a name="0.1.2"></a>
+## [0.1.2] - 2022-12-18
+### Chore
+- release 0.1.2
+- changelog with author ([#67](https://github.com/shortcuts/no-neck-pain.nvim/issues/67))
+- showcase for mobile users
+- better test coverage ([#60](https://github.com/shortcuts/no-neck-pain.nvim/issues/60))
+- add issue and PR templates ([#59](https://github.com/shortcuts/no-neck-pain.nvim/issues/59))
+- README add options
+- make tests less redundant ([#57](https://github.com/shortcuts/no-neck-pain.nvim/issues/57))
+- disable make `all` rule
+- split utils code ([#50](https://github.com/shortcuts/no-neck-pain.nvim/issues/50))
+- update README.md
+- release 0.1.1
+
+### Feat
+- add `rose-pine` color themes ([#58](https://github.com/shortcuts/no-neck-pain.nvim/issues/58))
+- allow customizing bg color of side buffers ([#54](https://github.com/shortcuts/no-neck-pain.nvim/issues/54))
+- support same buffer splits ([#52](https://github.com/shortcuts/no-neck-pain.nvim/issues/52))
+
+### Fix
+- quit Neovim when killing one of the last NNP buffer ([#66](https://github.com/shortcuts/no-neck-pain.nvim/issues/66))
+- highlight group typo ([#65](https://github.com/shortcuts/no-neck-pain.nvim/issues/65))
+- prevent config reset ([#63](https://github.com/shortcuts/no-neck-pain.nvim/issues/63))
+- color leaving non-colored blocks ([#61](https://github.com/shortcuts/no-neck-pain.nvim/issues/61))
+- prevent error on last buffer close ([#49](https://github.com/shortcuts/no-neck-pain.nvim/issues/49))
+
+### Contributors
+
+Thanks for contributing to the project:
+- [@shortcuts](https://github.com/shortcuts)
+- [@PrimaMateria](https://github.com/PrimaMateria)
+
 <a name="0.1.1"></a>
 ## [0.1.1] - 2022-12-15
 ### Chore
