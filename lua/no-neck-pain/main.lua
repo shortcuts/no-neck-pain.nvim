@@ -39,20 +39,6 @@ function NoNeckPain.toggle()
     return true
 end
 
--- Determine the "padding" (width) of the buffer based on the `_G.NoNeckPain.config.width` parameter.
---
--- @param paddingToSubstract number: a value to be substracted to the `width` of the screen
-local function getPadding(paddingToSubstract)
-    paddingToSubstract = paddingToSubstract or 0
-    local width = vim.api.nvim_list_uis()[1].width
-
-    if _G.NoNeckPain.config.width >= width then
-        return 1
-    end
-
-    return math.floor((width - paddingToSubstract - _G.NoNeckPain.config.width) / 2)
-end
-
 -- Creates a buffer for the given "padding" (width), at the given `moveTo` direction.
 -- Options from `_G.NoNeckPain.config.buffer.options` are applied to the created buffer.
 --
@@ -98,20 +84,31 @@ end
 local function createWin(action)
     D.print("CreateWin: ", action)
 
-    local padding = getPadding()
-
     if action == "init" then
         local splitbelow, splitright = vim.o.splitbelow, vim.o.splitright
         vim.o.splitbelow, vim.o.splitright = true, true
 
         S.win.main.curr = vim.api.nvim_get_current_win()
 
+        -- before creating side buffers, we determine if a side tree is open
+        S.win.external.tree = W.getSideTree()
+
         if _G.NoNeckPain.config.buffers.left then
-            S.win.main.left = createBuf("left", "leftabove vnew", padding, "wincmd l")
+            S.win.main.left = createBuf(
+                "left",
+                "leftabove vnew",
+                W.getPadding("left", S.win.external.tree.width),
+                "wincmd l"
+            )
         end
 
         if _G.NoNeckPain.config.buffers.right then
-            S.win.main.right = createBuf("right", "vnew", padding, "wincmd h")
+            S.win.main.right = createBuf(
+                "right",
+                "vnew",
+                W.getPadding("right", S.win.external.tree.width),
+                "wincmd h"
+            )
         end
 
         vim.o.splitbelow, vim.o.splitright = splitbelow, splitright
@@ -119,8 +116,8 @@ local function createWin(action)
         return
     end
 
-    W.resize("createWin", S.win.main.left, getPadding(S.win.external.tree.width * 2))
-    W.resize("createWin", S.win.main.right, getPadding())
+    W.resize("createWin", S.win.main.left, W.getPadding("left", S.win.external.tree.width))
+    W.resize("createWin", S.win.main.right, W.getPadding("right", S.win.external.tree.width))
 end
 
 --- Initializes NNP and sets event listeners.
@@ -218,7 +215,7 @@ function NoNeckPain.enable()
                 -- below we will check for plugins that opens windows as splits (e.g. tree)
                 -- and early return while storing its NoNeckPain.
                 if vim.api.nvim_buf_get_option(0, "filetype") == "NvimTree" then
-                    S.win.external.tree.id = focusedWin
+                    S.win.external.tree = W.getSideTree()
 
                     return D.print("WinEnter: encoutered an NvimTree split")
                 end
@@ -320,7 +317,7 @@ function NoNeckPain.enable()
 
                 -- when opening a new buffer as current, store its padding and resize everything (e.g. side tree)
                 if focusedWin ~= S.win.main.curr then
-                    S.win.external.tree.width = vim.api.nvim_win_get_width(focusedWin)
+                    S.win.external.tree = W.getSideTree()
 
                     D.print(
                         "WinEnter, WinClosed: new current buffer with width:",
@@ -335,13 +332,16 @@ function NoNeckPain.enable()
                     }
                 end
 
-                -- TODO: Make this configurable, here we assume the tree is on the left of the screen.
                 W.resize(
                     "WinEnter, WinClosed",
                     S.win.main.left,
-                    getPadding(S.win.external.tree.width * 2)
+                    W.getPadding("left", S.win.external.tree.width)
                 )
-                W.resize("WinEnter, WinClosed", S.win.main.right, getPadding())
+                W.resize(
+                    "WinEnter, WinClosed",
+                    S.win.main.right,
+                    W.getPadding("right", S.win.external.tree.width)
+                )
             end)
         end,
         group = "NoNeckPain",
