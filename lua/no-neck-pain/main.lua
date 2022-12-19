@@ -63,8 +63,6 @@ local function createBuf(name, cmd, padding, moveTo)
         vim.api.nvim_buf_set_name(0, "no-neck-pain-" .. name)
     end
 
-    -- there is probably a cleaner way to do this but it's kind of annoying
-    -- since the tables contain multiple different kinds of values
     for opt, val in pairs(_G.NoNeckPain.config.buffers[name].bo) do
         vim.bo[opt] = val
     end
