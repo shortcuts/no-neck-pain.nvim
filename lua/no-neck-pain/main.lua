@@ -65,19 +65,11 @@ local function createBuf(name, cmd, padding, moveTo)
 
     -- there is probably a cleaner way to do this but it's kind of annoying
     -- since the tables contain multiple different kinds of values
-    for opt, val in pairs(_G.NoNeckPain.config.buffers.left.bo) do
+    for opt, val in pairs(_G.NoNeckPain.config.buffers[name].bo) do
         vim.bo[opt] = val
     end
 
-    for opt, val in pairs(_G.NoNeckPain.config.buffers.left.wo) do
-        vim.wo[opt] = val
-    end
-
-    for opt, val in pairs(_G.NoNeckPain.config.buffers.right.bo) do
-        vim.bo[opt] = val
-    end
-
-    for opt, val in pairs(_G.NoNeckPain.config.buffers.right.wo) do
+    for opt, val in pairs(_G.NoNeckPain.config.buffers[name].wo) do
         vim.wo[opt] = val
     end
 
