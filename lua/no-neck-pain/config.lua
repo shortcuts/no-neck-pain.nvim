@@ -18,7 +18,7 @@ NoNeckPain.options = {
     killAllBuffersOnDisable = false,
     -- Options related to the side buffers.
     -- When `true`, the side buffers will be named `no-neck-pain-left` and `no-neck-pain-right` respectively.
-    showBufferNames = false,
+    setBufferNames = false,
     buffers = {
         left = {
             enabled = true,
