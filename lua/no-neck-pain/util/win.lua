@@ -3,18 +3,13 @@ local M = require("no-neck-pain.util.map")
 local W = {}
 
 -- returns the buffers without the NNP ones, and their number.
-function W.bufferListWithoutNNP(scope)
+function W.bufferListWithoutNNP(scope, list)
     local buffers = vim.api.nvim_list_wins()
     local validBuffers = {}
     local size = 0
 
     for _, buffer in pairs(buffers) do
-        if
-            buffer ~= _G.NoNeckPain.state.win.curr
-            and buffer ~= _G.NoNeckPain.state.win.left
-            and buffer ~= _G.NoNeckPain.state.win.right
-            and not W.isRelativeWindow(scope, buffer)
-        then
+        if not M.contains(list, buffer) and not W.isRelativeWindow(scope, buffer) then
             table.insert(validBuffers, buffer)
             size = size + 1
         end
@@ -66,6 +61,19 @@ function W.close(scope, win)
     end
 
     return true
+end
+
+-- resizes a given `win` for the given `padding`
+function W.resize(scope, win, padding)
+    if win == nil then
+        return
+    end
+
+    if vim.api.nvim_win_is_valid(win) then
+        D.print(scope, "resizing", win, padding)
+
+        vim.api.nvim_win_set_width(win, padding)
+    end
 end
 
 return W

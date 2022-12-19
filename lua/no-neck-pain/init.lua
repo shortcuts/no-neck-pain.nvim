@@ -7,11 +7,11 @@ function NNP.toggle()
     end
     local main = require("no-neck-pain.main")
 
-    if main.toggle() then
+    if main[1].toggle() then
         NNP.internal = {
-            toggle = main.toggle,
-            enable = main.enable,
-            disable = main.disable,
+            toggle = main[1].toggle,
+            enable = main[1].enable,
+            disable = main[1].disable,
         }
     else
         NNP.internal = {
@@ -21,20 +21,20 @@ function NNP.toggle()
         }
     end
 
-    NNP.state = main.state
+    NNP.state = main[2]
 end
 
 -- starts NNP and set internal functions and state.
 function NNP.enable()
     local main = require("no-neck-pain.main")
 
-    main.enable()
+    main[1].enable()
 
-    NNP.state = main.state
+    NNP.state = main[2]
     NNP.internal = {
-        toggle = main.toggle,
-        enable = main.enable,
-        disable = main.disable,
+        toggle = main[1].toggle,
+        enable = main[1].enable,
+        disable = main[1].disable,
     }
 end
 
@@ -42,9 +42,9 @@ end
 function NNP.disable()
     local main = require("no-neck-pain.main")
 
-    main.disable()
+    main[1].disable()
 
-    NNP.state = main.state
+    NNP.state = main[2]
 end
 
 -- setup NNP options and merge them with user provided ones.
