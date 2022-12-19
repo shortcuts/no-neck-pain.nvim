@@ -73,8 +73,7 @@ local function createBuf(name, cmd, padding, moveTo)
 
     vim.cmd(moveTo)
 
-    C.init(id, _G.NoNeckPain.config.buffers.left.color)
-    C.init(id, _G.NoNeckPain.config.buffers.right.color)
+    C.init(id, _G.NoNeckPain.config.buffers[name].color)
 
     return id
 end
