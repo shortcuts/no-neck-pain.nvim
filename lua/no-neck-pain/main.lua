@@ -75,10 +75,7 @@ local function createBuf(name, cmd, padding, moveTo)
 
     vim.cmd(moveTo)
 
-    D.print(string.format("CreateWin: setting color `%s` for left buffer (`%s`)", _G.NoNeckPain.config.buffers.left.color, id))
     C.init(id, _G.NoNeckPain.config.buffers.left.color)
-
-    D.print(string.format("CreateWin: setting color `%s` for right buffer (`%s`)", _G.NoNeckPain.config.buffers.right.color, id))
     C.init(id, _G.NoNeckPain.config.buffers.right.color)
 
     return id

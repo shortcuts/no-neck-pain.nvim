@@ -33,6 +33,8 @@ end
 -- creates an highlight group `NNPBuffers` with the given `color` and assign it to the side buffer of the given `id`.
 -- `cmd` is used instead of native commands for backward compatibility with Neovim 0.7
 function C.init(win, color)
+    D.print(string.format("CreateWin: setting color `%s` for right buffer (`%s`)", color, win))
+
     local groupName = "NNPBuffers"
 
     local defaultBackground = vim.api.nvim_get_hl_by_name("Normal", true).background
