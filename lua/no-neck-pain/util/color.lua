@@ -30,10 +30,10 @@ function C.matchIntegrationToHexCode(colorCode)
     return colorCode
 end
 
--- creates an highlight group `NNPBuffers` with the given `color` and assign it to the side buffer of the given `id`.
+-- creates an highlight group `NNPBuffers` with the given `backgroundColor` and assign it to the side buffer of the given `id`.
 -- `cmd` is used instead of native commands for backward compatibility with Neovim 0.7
-function C.init(win, color)
-    D.print(string.format("CreateWin: setting color `%s` for right buffer (`%s`)", color, win))
+function C.init(win, backgroundColor)
+    D.print(string.format("CreateWin: setting color `%s` for buffer `%s`", backgroundColor, win))
 
     local groupName = "NNPBuffers"
 
@@ -47,7 +47,7 @@ function C.init(win, color)
         defaultBackground = string.format("#%06X", defaultBackground)
     end
 
-    color = color or defaultBackground
+    backgroundColor = backgroundColor or defaultBackground
 
     D.print(
         string.format(
@@ -55,11 +55,11 @@ function C.init(win, color)
 Color.init: initializing colors:
 - groupName: `%s`
 - window: `%s`
-- color: `%s`
+- backgroundColor: `%s`
             ]],
             groupName,
             win,
-            color
+            backgroundColor
         )
     )
 
@@ -68,8 +68,8 @@ Color.init: initializing colors:
         string.format(
             [[highlight! %s guifg=%s guibg=%s]],
             groupName,
-            color,
-            color
+            backgroundColor,
+            backgroundColor
         )
     )
 
