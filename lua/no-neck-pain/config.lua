@@ -35,9 +35,9 @@ NoNeckPain.options = {
                 buflisted = false,
                 swapfile = false
             },
+            -- window-scoped options
+            -- Note: any `vim.wo` options will work here
             wo = {
-                -- window-scoped options
-                -- Note: any `vim.wo` options will work here
                 cursorline = false,
                 cursorcolumn = false,
                 number = false,
