@@ -59,7 +59,7 @@ local function createBuf(name, cmd, padding, moveTo)
 
     vim.api.nvim_win_set_width(0, padding)
 
-    if _G.NoNeckPain.config.buffers.showName then
+    if _G.NoNeckPain.config.showBufferNames then
         vim.api.nvim_buf_set_name(0, "no-neck-pain-" .. name)
     end
 
@@ -108,11 +108,11 @@ local function createWin(action)
             curr = vim.api.nvim_get_current_win(),
         }
 
-        if _G.NoNeckPain.config.buffers.left then
+        if _G.NoNeckPain.config.buffers.left.enabled then
             NoNeckPain.state.win.left = createBuf("left", "leftabove vnew", padding, "wincmd l")
         end
 
-        if _G.NoNeckPain.config.buffers.right then
+        if _G.NoNeckPain.config.buffers.right.enabled then
             NoNeckPain.state.win.right = createBuf("right", "vnew", padding, "wincmd h")
         end
 
