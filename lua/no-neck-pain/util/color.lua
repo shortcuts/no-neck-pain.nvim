@@ -30,18 +30,35 @@ function C.matchIntegrationToHexCode(colorCode)
     return colorCode
 end
 
--- creates an highlight group `NoNeckPain` with the given `colorCode` and assign it to the side buffer of the given `id`.
+-- creates an highlight group `NNPBuffers` with the given `color` and assign it to the side buffer of the given `id`.
 -- `cmd` is used instead of native commands for backward compatibility with Neovim 0.7
-function C.init(win, colorCode)
-    local groupName = "nnpcolorname"
+function C.init(win, color)
+    local groupName = "NNPBuffers"
+
+    local defaultBackground = vim.api.nvim_get_hl_by_name("Normal", true).background
+
+    -- check if the user has a transparent background or not
+    if defaultBackground == nil then
+        defaultBackground = "NONE"
+    else
+        -- if it's not transparent, get the user's current background color
+        defaultBackground = string.format("#%06X", defaultBackground)
+    end
+
+    color = color or defaultBackground
 
     D.print(
-        "Color.init: initializing background mode with groupname "
-            .. groupName
-            .. " for win "
-            .. win
-            .. " with color "
-            .. colorCode
+        string.format(
+        	[[
+Color.init: initializing colors:
+- groupName: `%s`
+- window: `%s`
+- color: `%s`
+            ]],
+            groupName,
+            win,
+            color
+        )
     )
 
     vim.cmd(string.format([[highlight! clear %s NONE]], groupName))
@@ -49,12 +66,11 @@ function C.init(win, colorCode)
         string.format(
             [[highlight! %s guifg=%s guibg=%s]],
             groupName,
-            colorCode,
-            colorCode,
-            colorCode,
-            colorCode
+            color,
+            color
         )
     )
+
     vim.api.nvim_win_set_option(
         win,
         "winhl",

@@ -17,52 +17,62 @@ NoNeckPain.options = {
     -- When `true`, disabling NNP kills every split/vsplit buffers except the main NNP buffer.
     killAllBuffersOnDisable = false,
     -- Options related to the side buffers.
+    -- When `true`, the side buffers will be named `no-neck-pain-left` and `no-neck-pain-right` respectively.
+    showBufferNames = false,
     buffers = {
-        -- The background options of the side buffer(s).
-        background = {
-            -- Hexadecimal color code to override the current background color of the buffer. (e.g. #24273A)
-            -- popular theme are supported by their name:
-            -- - catppuccin-frappe
-            -- - catppuccin-latte
-            -- - catppuccin-macchiato
-            -- - catppuccin-mocha
-            -- - tokyonight-day
-            -- - tokyonight-moon
-            -- - tokyonight-night
-            -- - tokyonight-storm
-            -- - rose-pine
-            -- - rose-pine-moon
-            -- - rose-pine-dawn
-            colorCode = nil,
-        },
-        -- When `false`, the `left` padding buffer won't be created.
-        left = true,
-        -- When `false`, the `right` padding buffer won't be created.
-        right = true,
-        -- When `true`, the side buffers will be named `no-neck-pain-left` and `no-neck-pain-right` respectively.
-        showName = false,
-        -- The buffer options when creating the buffer.
-        options = {
-            -- Buffer-scoped options, below are the default values, but any `vim.bo` options are valid and will be forwarded to the buffer creation.
+        left = {
+            enabled = true,
+            -- Hex color for setting the background color of the NNP buffer as well as some other
+            -- highlight groups to make it look clean
+            color = nil,
             bo = {
+                -- buffer-scoped options
+                -- Note: any `vim.bo` options will work here
                 filetype = "no-neck-pain",
                 buftype = "nofile",
                 bufhidden = "hide",
                 modifiable = false,
                 buflisted = false,
-                swapfile = false,
+                swapfile = false
             },
-            -- Window-scoped options, below are the default values, but any `vim.wo` options are valid and will be forwarded to the buffer creation.
             wo = {
+                -- window-scoped options
+                -- Note: any `vim.wo` options will work here
                 cursorline = false,
                 cursorcolumn = false,
                 number = false,
                 relativenumber = false,
                 foldenable = false,
-                list = false,
-            },
+                list = false
+            }
         },
-    },
+        right = {
+            enabled = true,
+            -- Hex color for setting the background color of the NNP buffer as well as some other
+            -- highlight groups to make it look clean
+            color = nil,
+            bo = {
+                -- buffer-scoped options
+                -- Note: any `vim.bo` options will work here
+                filetype = "no-neck-pain",
+                buftype = "nofile",
+                bufhidden = "hide",
+                modifiable = false,
+                buflisted = false,
+                swapfile = false
+            },
+            wo = {
+                -- window-scoped options
+                -- Note: any `vim.wo` options will work here
+                cursorline = false,
+                cursorcolumn = false,
+                number = false,
+                relativenumber = false,
+                foldenable = false,
+                list = false
+            }
+        }
+    }
 }
 
 --- Define your no-neck-pain setup.
@@ -72,8 +82,12 @@ NoNeckPain.options = {
 ---@usage `require("no-neck-pain").setup()` (add `{}` with your |NoNeckPain.options| table)
 function NoNeckPain.setup(options)
     NoNeckPain.options = vim.tbl_deep_extend("keep", options or {}, NoNeckPain.options)
-    NoNeckPain.options.buffers.background.colorCode =
-        C.matchIntegrationToHexCode(NoNeckPain.options.buffers.background.colorCode)
+
+    NoNeckPain.options.buffers.left.color =
+        C.matchIntegrationToHexCode(NoNeckPain.options.buffers.left.color)
+
+    NoNeckPain.options.buffers.right.color =
+        C.matchIntegrationToHexCode(NoNeckPain.options.buffers.right.color)
 
     return NoNeckPain.options
 end

@@ -63,19 +63,31 @@ local function createBuf(name, cmd, padding, moveTo)
         vim.api.nvim_buf_set_name(0, "no-neck-pain-" .. name)
     end
 
-    for scope, _ in pairs(_G.NoNeckPain.config.buffers.options) do
-        for key, value in pairs(_G.NoNeckPain.config.buffers.options[scope]) do
-            vim[scope][key] = value
-        end
+    -- there is probably a cleaner way to do this but it's kind of annoying
+    -- since the tables contain multiple different kinds of values
+    for opt, val in pairs(_G.NoNeckPain.config.buffers.left.bo) do
+        vim.bo[opt] = val
+    end
+
+    for opt, val in pairs(_G.NoNeckPain.config.buffers.left.wo) do
+        vim.wo[opt] = val
+    end
+
+    for opt, val in pairs(_G.NoNeckPain.config.buffers.right.bo) do
+        vim.bo[opt] = val
+    end
+
+    for opt, val in pairs(_G.NoNeckPain.config.buffers.right.wo) do
+        vim.wo[opt] = val
     end
 
     vim.cmd(moveTo)
 
-    if _G.NoNeckPain.config.buffers.background.colorCode ~= nil then
-        D.print("CreateWin: setting `colorCode` for buffer " .. id)
+    D.print(string.format("CreateWin: setting color `%s` for left buffer (`%s`)", _G.NoNeckPain.config.buffers.left.color, id))
+    C.init(id, _G.NoNeckPain.config.buffers.left.color)
 
-        C.init(id, _G.NoNeckPain.config.buffers.background.colorCode)
-    end
+    D.print(string.format("CreateWin: setting color `%s` for right buffer (`%s`)", _G.NoNeckPain.config.buffers.right.color, id))
+    C.init(id, _G.NoNeckPain.config.buffers.right.color)
 
     return id
 end
