@@ -10,6 +10,6 @@ if #vim.api.nvim_list_uis() == 0 then
     -- Set up 'mini.test'
     require("mini.test").setup()
 
-    -- Set up 'mini.test'
+    -- Set up 'mini.doc'
     require("mini.doc").setup()
 end

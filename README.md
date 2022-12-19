@@ -118,6 +118,14 @@ require("no-neck-pain").setup({
             },
         },
     },
+    -- lists supported integrations that might clash with `no-neck-pain.nvim`'s behavior
+    integrations = {
+        -- https://github.com/nvim-tree/nvim-tree.lua
+        nvimTree = {
+            -- the position of the tree, can be `left` or `right``
+            position = "left",
+        },
+    },
 })
 ```
 
