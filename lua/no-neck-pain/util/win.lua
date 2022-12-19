@@ -94,9 +94,9 @@ function W.getSideTree()
     }
 end
 
--- Determine the "padding" (width) of the buffer based on the `_G.NoNeckPain.config.width`, the width of the screen, and it a side tree is currently open.
+-- Determine the "padding" (width) of the buffer based on the `_G.NoNeckPain.config.width` and the width of the screen.
 --
--- @param paddingToSubstract number: a value to be substracted to the `width` of the screen
+-- @param paddingToSubstract number: a value to be substracted to the `width` of the screen.
 function W.getPadding(side, paddingToSubstract)
     local width = vim.api.nvim_list_uis()[1].width
 
