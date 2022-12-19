@@ -21,9 +21,21 @@ NoNeckPain.options = {
     setBufferNames = false,
     buffers = {
         left = {
+            -- When `false` the buffer won't be created.
             enabled = true,
-            -- Hex color for setting the background color of the NNP buffer as well as some other
-            -- highlight groups to make it look clean
+            -- Hexadecimal color code to override the current background color of the buffer. (e.g. #24273A)
+            -- popular theme are supported by their name:
+            -- - catppuccin-frappe
+            -- - catppuccin-latte
+            -- - catppuccin-macchiato
+            -- - catppuccin-mocha
+            -- - tokyonight-day
+            -- - tokyonight-moon
+            -- - tokyonight-night
+            -- - tokyonight-storm
+            -- - rose-pine
+            -- - rose-pine-moon
+            -- - rose-pine-dawn
             backgroundColor = nil,
             -- buffer-scoped options
             -- Note: any `vim.bo` options will work here
@@ -47,10 +59,22 @@ NoNeckPain.options = {
             }
         },
         right = {
+            -- When `false` the buffer won't be created.
             enabled = true,
-            -- Hex color for setting the background color of the NNP buffer as well as some other
-            -- highlight groups to make it look clean
-            color = nil,
+            -- Hexadecimal color code to override the current background color of the buffer. (e.g. #24273A)
+            -- popular theme are supported by their name:
+            -- - catppuccin-frappe
+            -- - catppuccin-latte
+            -- - catppuccin-macchiato
+            -- - catppuccin-mocha
+            -- - tokyonight-day
+            -- - tokyonight-moon
+            -- - tokyonight-night
+            -- - tokyonight-storm
+            -- - rose-pine
+            -- - rose-pine-moon
+            -- - rose-pine-dawn
+            backgroundColor = nil,
             bo = {
                 -- buffer-scoped options
                 -- Note: any `vim.bo` options will work here

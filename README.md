@@ -73,16 +73,28 @@ require("no-neck-pain").setup({
     killAllBuffersOnDisable = false,
     -- Options related to the side buffers.
     -- When `true`, the side buffers will be named `no-neck-pain-left` and `no-neck-pain-right` respectively.
-    showBufferNames = false,
+    setBufferNames = false,
     buffers = {
         left = {
+            -- When `false` the buffer won't be created.
             enabled = true,
-            -- Hex color for setting the background color of the NNP buffer as well as some other
-            -- highlight groups to make it look clean
+            -- Hexadecimal color code to override the current background color of the buffer. (e.g. #24273A)
+            -- popular theme are supported by their name:
+            -- - catppuccin-frappe
+            -- - catppuccin-latte
+            -- - catppuccin-macchiato
+            -- - catppuccin-mocha
+            -- - tokyonight-day
+            -- - tokyonight-moon
+            -- - tokyonight-night
+            -- - tokyonight-storm
+            -- - rose-pine
+            -- - rose-pine-moon
+            -- - rose-pine-dawn
             backgroundColor = nil,
+            -- buffer-scoped options
+            -- Note: any `vim.bo` options will work here
             bo = {
-                -- buffer-scoped options
-                -- Note: any `vim.bo` options will work here
                 filetype = "no-neck-pain",
                 buftype = "nofile",
                 bufhidden = "hide",
@@ -90,9 +102,9 @@ require("no-neck-pain").setup({
                 buflisted = false,
                 swapfile = false
             },
+            -- window-scoped options
+            -- Note: any `vim.wo` options will work here
             wo = {
-                -- window-scoped options
-                -- Note: any `vim.wo` options will work here
                 cursorline = false,
                 cursorcolumn = false,
                 number = false,
@@ -102,10 +114,22 @@ require("no-neck-pain").setup({
             }
         },
         right = {
+            -- When `false` the buffer won't be created.
             enabled = true,
-            -- Hex color for setting the background color of the NNP buffer as well as some other
-            -- highlight groups to make it look clean
-            color = nil,
+            -- Hexadecimal color code to override the current background color of the buffer. (e.g. #24273A)
+            -- popular theme are supported by their name:
+            -- - catppuccin-frappe
+            -- - catppuccin-latte
+            -- - catppuccin-macchiato
+            -- - catppuccin-mocha
+            -- - tokyonight-day
+            -- - tokyonight-moon
+            -- - tokyonight-night
+            -- - tokyonight-storm
+            -- - rose-pine
+            -- - rose-pine-moon
+            -- - rose-pine-dawn
+            backgroundColor = nil,
             bo = {
                 -- buffer-scoped options
                 -- Note: any `vim.bo` options will work here
