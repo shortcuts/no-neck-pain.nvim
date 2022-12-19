@@ -49,19 +49,17 @@ function C.init(win, backgroundColor)
 
     backgroundColor = backgroundColor or defaultBackground
 
-    D.print(
-        string.format(
-        	[[
+    D.print(string.format(
+        [[
 Color.init: initializing colors:
 - groupName: `%s`
 - window: `%s`
 - backgroundColor: `%s`
             ]],
-            groupName,
-            win,
-            backgroundColor
-        )
-    )
+        groupName,
+        win,
+        backgroundColor
+    ))
 
     vim.cmd(string.format([[highlight! clear %s NONE]], groupName))
     vim.cmd(

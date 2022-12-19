@@ -45,7 +45,7 @@ NoNeckPain.options = {
                 bufhidden = "hide",
                 modifiable = false,
                 buflisted = false,
-                swapfile = false
+                swapfile = false,
             },
             -- window-scoped options
             -- Note: any `vim.wo` options will work here
@@ -55,8 +55,8 @@ NoNeckPain.options = {
                 number = false,
                 relativenumber = false,
                 foldenable = false,
-                list = false
-            }
+                list = false,
+            },
         },
         right = {
             -- When `false` the buffer won't be created.
@@ -83,7 +83,7 @@ NoNeckPain.options = {
                 bufhidden = "hide",
                 modifiable = false,
                 buflisted = false,
-                swapfile = false
+                swapfile = false,
             },
             wo = {
                 -- window-scoped options
@@ -93,10 +93,10 @@ NoNeckPain.options = {
                 number = false,
                 relativenumber = false,
                 foldenable = false,
-                list = false
-            }
-        }
-    }
+                list = false,
+            },
+        },
+    },
 }
 
 --- Define your no-neck-pain setup.
