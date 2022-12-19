@@ -25,9 +25,9 @@ NoNeckPain.options = {
             -- Hex color for setting the background color of the NNP buffer as well as some other
             -- highlight groups to make it look clean
             backgroundColor = nil,
+            -- buffer-scoped options
+            -- Note: any `vim.bo` options will work here
             bo = {
-                -- buffer-scoped options
-                -- Note: any `vim.bo` options will work here
                 filetype = "no-neck-pain",
                 buftype = "nofile",
                 bufhidden = "hide",
