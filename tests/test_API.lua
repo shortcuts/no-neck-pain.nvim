@@ -140,10 +140,10 @@ end
 
 T["setup()"]["colorCode: map integration name to a value"] = function()
     local integrationsMapping = {
-        { "catppuccin-frappe", "#292C3C" },
-        { "catppuccin-latte", "#E6E9EF" },
-        { "catppuccin-macchiato", "#1E2030" },
-        { "catppuccin-mocha", "#181825" },
+        { "catppuccin-frappe", "#303446" },
+        { "catppuccin-latte", "#EFF1F5" },
+        { "catppuccin-macchiato", "#24273A" },
+        { "catppuccin-mocha", "#1E1E2E" },
         { "tokyonight-day", "#16161e" },
         { "tokyonight-moon", "#1e2030" },
         { "tokyonight-storm", "#1f2335" },

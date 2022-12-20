@@ -4,13 +4,13 @@ local C = {}
 -- tries to match the provided `colorCode` to an integration name, defaults to the provided string if not successful.
 function C.matchIntegrationToHexCode(colorCode)
     if colorCode == "catppuccin-frappe" then
-        colorCode = "#292C3C"
+        colorCode = "#303446"
     elseif colorCode == "catppuccin-latte" then
-        colorCode = "#E6E9EF"
+        colorCode = "#EFF1F5"
     elseif colorCode == "catppuccin-macchiato" then
-        colorCode = "#1E2030"
+        colorCode = "#24273A"
     elseif colorCode == "catppuccin-mocha" then
-        colorCode = "#181825"
+        colorCode = "#1E1E2E"
     elseif colorCode == "tokyonight-day" then
         colorCode = "#16161e"
     elseif colorCode == "tokyonight-moon" then
