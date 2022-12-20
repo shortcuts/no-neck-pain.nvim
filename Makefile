@@ -8,11 +8,11 @@ test:
 		-c "lua require('mini.test').setup()" \
 		-c "lua MiniTest.run({ execute = { reporter = MiniTest.gen_reporter.stdout({ group_depth = 1 }) } })"
 
-deps/mini.nvim:
+deps:
 	@mkdir -p deps
-	git clone --depth 1 https://github.com/echasnovski/mini.nvim $@
+	git clone --depth 1 https://github.com/echasnovski/mini.nvim deps/mini.nvim
 
-test-ci: deps/mini.nvim
+test-ci: deps
 	nvim --headless --noplugin -u ./scripts/minimal_init.lua \
 		-c "lua require('mini.test').setup()" \
 		-c "lua MiniTest.run()"

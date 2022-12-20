@@ -16,9 +16,9 @@ NoNeckPain.options = {
     disableOnLastBuffer = false,
     -- When `true`, disabling NNP kills every split/vsplit buffers except the main NNP buffer.
     killAllBuffersOnDisable = false,
-    -- Options related to the side buffers.
     -- When `true`, the side buffers will be named `no-neck-pain-left` and `no-neck-pain-right` respectively.
     setBufferNames = false,
+    -- Options related to the side buffers.
     buffers = {
         left = {
             -- When `false` the buffer won't be created.
@@ -37,8 +37,7 @@ NoNeckPain.options = {
             -- - rose-pine-moon
             -- - rose-pine-dawn
             backgroundColor = nil,
-            -- buffer-scoped options
-            -- Note: any `vim.bo` options will work here
+            -- buffer-scoped options: any `vim.bo` options is accepted here.
             bo = {
                 filetype = "no-neck-pain",
                 buftype = "nofile",
@@ -47,8 +46,7 @@ NoNeckPain.options = {
                 buflisted = false,
                 swapfile = false,
             },
-            -- window-scoped options
-            -- Note: any `vim.wo` options will work here
+            -- window-scoped options: any `vim.wo` options is accepted here.
             wo = {
                 cursorline = false,
                 cursorcolumn = false,
@@ -75,9 +73,8 @@ NoNeckPain.options = {
             -- - rose-pine-moon
             -- - rose-pine-dawn
             backgroundColor = nil,
+            -- buffer-scoped options: any `vim.bo` options is accepted here.
             bo = {
-                -- buffer-scoped options
-                -- Note: any `vim.bo` options will work here
                 filetype = "no-neck-pain",
                 buftype = "nofile",
                 bufhidden = "hide",
@@ -85,9 +82,8 @@ NoNeckPain.options = {
                 buflisted = false,
                 swapfile = false,
             },
+            -- window-scoped options: any `vim.wo` options is accepted here.
             wo = {
-                -- window-scoped options
-                -- Note: any `vim.wo` options will work here
                 cursorline = false,
                 cursorcolumn = false,
                 number = false,
@@ -95,6 +91,14 @@ NoNeckPain.options = {
                 foldenable = false,
                 list = false,
             },
+        },
+    },
+    -- lists supported integrations that might clash with `no-neck-pain.nvim`'s behavior
+    integrations = {
+        -- https://github.com/nvim-tree/nvim-tree.lua
+        nvimTree = {
+            -- the position of the tree, can be `left` or `right``
+            position = "left",
         },
     },
 }

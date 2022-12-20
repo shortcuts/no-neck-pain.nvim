@@ -167,52 +167,6 @@ Helpers.new_child_neovim = function()
         MiniTest.expect.equality(child.api.nvim_buf_get_mark(0, ">"), last)
     end
 
-    -- Work with 'mini.nvim':
-    -- - `mini_load` - load with "normal" table config
-    -- - `mini_load_strconfig` - load with "string" config, which is still a
-    --   table but with string values. Final loading is done by constructing
-    --   final string table. Needed to be used if one of the config entries is a
-    --   function (as currently there is no way to communicate a function object
-    --   through RPC).
-    -- - `mini_unload` - unload module and revert common side effects.
-    child.mini_load = function(name, config)
-        local lua_cmd = ([[require('mini.%s').setup(...)]]):format(name)
-        child.lua(lua_cmd, { config })
-    end
-
-    child.mini_load_strconfig = function(name, strconfig)
-        local t = {}
-        for key, val in pairs(strconfig) do
-            table.insert(t, key .. " = " .. val)
-        end
-        local str = string.format("{ %s }", table.concat(t, ", "))
-
-        local command = ([[require('mini.%s').setup(%s)]]):format(name, str)
-        child.lua(command)
-    end
-
-    child.mini_unload = function(name)
-        local module_name = "mini." .. name
-        local tbl_name = "Mini" .. name:sub(1, 1):upper() .. name:sub(2)
-
-        -- Unload Lua module
-        child.lua(([[package.loaded['%s'] = nil]]):format(module_name))
-
-        -- Remove global table
-        child.lua(("_G[%s] = nil"):format(tbl_name))
-
-        -- Remove autocmd group
-        if child.fn.exists("#" .. tbl_name) == 1 then
-            -- NOTE: having this in one line as `'augroup %s | au! | augroup END'`
-            -- for some reason seemed to sometimes not execute `augroup END` part.
-            -- That lead to a subsequent bare `au ...` calls to be inside `tbl_name`
-            -- group, which gets empty after every `require(<module_name>)` call.
-            child.cmd(("augroup %s"):format(tbl_name))
-            child.cmd("au!")
-            child.cmd("augroup END")
-        end
-    end
-
     child.expect_screenshot = function(opts, path, screenshot_opts)
         if child.fn.has("nvim-0.8") == 0 then
             MiniTest.skip("Screenshots are tested for Neovim>=0.8 (for simplicity).")
