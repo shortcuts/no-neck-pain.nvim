@@ -36,9 +36,9 @@ The plugin creates evenly sized empty buffers on each side of your focused buffe
 <table>
 <thead>
 <tr>
-<th width="20%">Package manager</th>
-<th width="40%">Stable</th>
-<th width="40%">Dev</th>
+<th>Package manager</th>
+<th>Stable</th>
+<th>Dev</th>
 </tr>
 </thead>
 <tbody>
