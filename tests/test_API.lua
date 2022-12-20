@@ -20,6 +20,8 @@ local T = MiniTest.new_set({
     },
 })
 
+local SCOPES = { "common", "left", "right" }
+
 T["install"] = MiniTest.new_set()
 
 T["install"]["sets global loaded variable and provide toggle command"] = function()
@@ -45,38 +47,39 @@ T["setup()"]["sets exposed methods and default options value"] = function()
     eq_type_global(child, "_G.NoNeckPain.enable", "function")
     eq_type_global(child, "_G.NoNeckPain.setup", "function")
 
-    -- options
+    -- config
     eq_type_global(child, "_G.NoNeckPain.config", "table")
-
     eq_type_option(child, "buffers", "table")
-    eq_type_option(child, "buffers.background", "table")
-    eq_type_option(child, "buffers.options", "table")
-    eq_type_option(child, "buffers.options.bo", "table")
-    eq_type_option(child, "buffers.options.wo", "table")
 
     eq_option(child, "width", 100)
     eq_option(child, "debug", false)
     eq_option(child, "disableOnLastBuffer", false)
     eq_option(child, "killAllBuffersOnDisable", false)
-    eq_option(child, "buffers.left", true)
-    eq_option(child, "buffers.right", true)
-    eq_option(child, "buffers.showName", false)
 
-    eq_option(child, "buffers.background.colorCode", vim.NIL)
+    -- buffers
+    eq_option(child, "buffers.setNames", false)
 
-    eq_option(child, "buffers.options.bo.filetype", "no-neck-pain")
-    eq_option(child, "buffers.options.bo.buftype", "nofile")
-    eq_option(child, "buffers.options.bo.bufhidden", "hide")
-    eq_option(child, "buffers.options.bo.modifiable", false)
-    eq_option(child, "buffers.options.bo.buflisted", false)
-    eq_option(child, "buffers.options.bo.swapfile", false)
+    for _, scope in pairs(SCOPES) do
+        eq_type_option(child, "buffers." .. scope, "table")
+        eq_type_option(child, "buffers." .. scope .. ".bo", "table")
+        eq_type_option(child, "buffers." .. scope .. ".wo", "table")
 
-    eq_option(child, "buffers.options.wo.cursorline", false)
-    eq_option(child, "buffers.options.wo.cursorcolumn", false)
-    eq_option(child, "buffers.options.wo.number", false)
-    eq_option(child, "buffers.options.wo.relativenumber", false)
-    eq_option(child, "buffers.options.wo.foldenable", false)
-    eq_option(child, "buffers.options.wo.list", false)
+        eq_option(child, "buffers." .. scope .. ".backgroundColor", vim.NIL)
+
+        eq_option(child, "buffers." .. scope .. ".bo.filetype", "no-neck-pain")
+        eq_option(child, "buffers." .. scope .. ".bo.buftype", "nofile")
+        eq_option(child, "buffers." .. scope .. ".bo.bufhidden", "hide")
+        eq_option(child, "buffers." .. scope .. ".bo.modifiable", false)
+        eq_option(child, "buffers." .. scope .. ".bo.buflisted", false)
+        eq_option(child, "buffers." .. scope .. ".bo.swapfile", false)
+
+        eq_option(child, "buffers." .. scope .. ".wo.cursorline", false)
+        eq_option(child, "buffers." .. scope .. ".wo.cursorcolumn", false)
+        eq_option(child, "buffers." .. scope .. ".wo.number", false)
+        eq_option(child, "buffers." .. scope .. ".wo.relativenumber", false)
+        eq_option(child, "buffers." .. scope .. ".wo.foldenable", false)
+        eq_option(child, "buffers." .. scope .. ".wo.list", false)
+    end
 end
 
 T["setup()"]["overrides default values"] = function()
@@ -86,13 +89,47 @@ T["setup()"]["overrides default values"] = function()
         disableOnLastBuffer = true,
         killAllBuffersOnDisable = true,
         buffers = {
-            background = {
-                colorCode = "#2E1E2E"
+            setNames = true,
+            common = {
+                backgroundColor = "catppuccin-frappe",
+                bo = {
+                    filetype = "my-file-type",
+                    buftype = "help",
+                    bufhidden = "",
+                    modifiable = true,
+                    buflisted = true,
+                    swapfile = true,
+                },
+                wo = {
+                    cursorline = true,
+                    cursorcolumn = true,
+                    number = true,
+                    relativenumber = true,
+                    foldenable = true,
+                    list = true,
+                },
             },
-            left = false,
-            right = false,
-            showName = true,
-            options = {
+            left = {
+                backgroundColor = "catppuccin-frappe",
+                bo = {
+                    filetype = "my-file-type",
+                    buftype = "help",
+                    bufhidden = "",
+                    modifiable = true,
+                    buflisted = true,
+                    swapfile = true,
+                },
+                wo = {
+                    cursorline = true,
+                    cursorcolumn = true,
+                    number = true,
+                    relativenumber = true,
+                    foldenable = true,
+                    list = true,
+                },
+            },
+            right = {
+                backgroundColor = "catppuccin-frappe",
                 bo = {
                     filetype = "my-file-type",
                     buftype = "help",
@@ -113,29 +150,33 @@ T["setup()"]["overrides default values"] = function()
         },
     })]])
 
+    -- config
     eq_option(child, "width", 42)
     eq_option(child, "debug", true)
     eq_option(child, "disableOnLastBuffer", true)
     eq_option(child, "killAllBuffersOnDisable", true)
-    eq_option(child, "buffers.left", false)
-    eq_option(child, "buffers.right", false)
-    eq_option(child, "buffers.showName", true)
 
-    eq_option(child, "buffers.background.colorCode", "#2E1E2E")
+    -- buffers
+    eq_option(child, "buffers.setNames", true)
 
-    eq_option(child, "buffers.options.bo.filetype", "my-file-type")
-    eq_option(child, "buffers.options.bo.buftype", "help")
-    eq_option(child, "buffers.options.bo.bufhidden", "")
-    eq_option(child, "buffers.options.bo.modifiable", true)
-    eq_option(child, "buffers.options.bo.buflisted", true)
-    eq_option(child, "buffers.options.bo.swapfile", true)
+    -- common
+    for _, scope in pairs(SCOPES) do
+        eq_option(child, "buffers." .. scope .. ".backgroundColor", "#303446")
 
-    eq_option(child, "buffers.options.wo.cursorline", true)
-    eq_option(child, "buffers.options.wo.cursorcolumn", true)
-    eq_option(child, "buffers.options.wo.number", true)
-    eq_option(child, "buffers.options.wo.relativenumber", true)
-    eq_option(child, "buffers.options.wo.foldenable", true)
-    eq_option(child, "buffers.options.wo.list", true)
+        eq_option(child, "buffers." .. scope .. ".bo.filetype", "my-file-type")
+        eq_option(child, "buffers." .. scope .. ".bo.buftype", "help")
+        eq_option(child, "buffers." .. scope .. ".bo.bufhidden", "")
+        eq_option(child, "buffers." .. scope .. ".bo.modifiable", true)
+        eq_option(child, "buffers." .. scope .. ".bo.buflisted", true)
+        eq_option(child, "buffers." .. scope .. ".bo.swapfile", true)
+
+        eq_option(child, "buffers." .. scope .. ".wo.cursorline", true)
+        eq_option(child, "buffers." .. scope .. ".wo.cursorcolumn", true)
+        eq_option(child, "buffers." .. scope .. ".wo.number", true)
+        eq_option(child, "buffers." .. scope .. ".wo.relativenumber", true)
+        eq_option(child, "buffers." .. scope .. ".wo.foldenable", true)
+        eq_option(child, "buffers." .. scope .. ".wo.list", true)
+    end
 end
 
 T["setup()"]["colorCode: map integration name to a value"] = function()
@@ -161,14 +202,18 @@ T["setup()"]["colorCode: map integration name to a value"] = function()
         child.lua(string.format(
             [[require('no-neck-pain').setup({
                 buffers = {
-                    background = {
-                        colorCode = "%s"
-                    },
+                    common = { backgroundColor = "%s" },
+                    left = { backgroundColor = "%s" },
+                    right = { backgroundColor = "%s" },
                 },
             })]],
+            integration[1],
+            integration[1],
             integration[1]
         ))
-        eq_option(child, "buffers.background.colorCode", integration[2])
+        for _, scope in pairs(SCOPES) do
+            eq_option(child, "buffers." .. scope .. ".backgroundColor", integration[2])
+        end
     end
 end
 
