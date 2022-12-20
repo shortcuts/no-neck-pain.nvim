@@ -77,7 +77,7 @@ end
 
 -- Resizes both of the NNP buffers.
 local function resize(scope)
-    D.print(scope)
+    D.print(scope, "resizing NNP buffers")
 
     W.resize("createWin", S.win.main.left, W.getPadding("left", S.win.external.tree.width))
     W.resize("createWin", S.win.main.right, W.getPadding("right", S.win.external.tree.width))
@@ -85,7 +85,7 @@ end
 
 -- Creates NNP buffers.
 local function init(scope)
-    D.print(scope)
+    D.print(scope, "intializing NNP")
 
     local splitbelow, splitright = vim.o.splitbelow, vim.o.splitright
     vim.o.splitbelow, vim.o.splitright = true, true
