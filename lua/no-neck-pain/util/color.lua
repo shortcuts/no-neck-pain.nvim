@@ -33,10 +33,7 @@ end
 -- creates an highlight group `NNPBuffers` with the given `backgroundColor` and assign it to the side buffer of the given `id`.
 -- `cmd` is used instead of native commands for backward compatibility with Neovim 0.7
 function C.init(win, backgroundColor)
-    D.print(string.format("CreateWin: setting color `%s` for buffer `%s`", backgroundColor, win))
-
     local groupName = "NNPBuffers"
-
     local defaultBackground = vim.api.nvim_get_hl_by_name("Normal", true).background
 
     -- check if the user has a transparent background or not
@@ -49,22 +46,19 @@ function C.init(win, backgroundColor)
 
     backgroundColor = backgroundColor or defaultBackground
 
-    D.print(string.format(
-        [[
-Color.init: initializing colors:
-- groupName: `%s`
-- window: `%s`
-- backgroundColor: `%s`
-            ]],
-        groupName,
-        win,
-        backgroundColor
-    ))
+    D.print(
+        string.format(
+            "Color.init: groupName `%s` - window `%s` - backgroundColor `%s`",
+            groupName,
+            win,
+            backgroundColor
+        )
+    )
 
-    vim.cmd(string.format([[highlight! clear %s NONE]], groupName))
+    vim.cmd(string.format("highlight! clear %s NONE", groupName))
     vim.cmd(
         string.format(
-            [[highlight! %s guifg=%s guibg=%s]],
+            "highlight! %s guifg=%s guibg=%s",
             groupName,
             backgroundColor,
             backgroundColor

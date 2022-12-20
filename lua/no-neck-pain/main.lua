@@ -40,7 +40,7 @@ function NoNeckPain.toggle()
 end
 
 -- Creates a buffer for the given "padding" (width), at the given `moveTo` direction.
--- Options from `_G.NoNeckPain.config.buffer.options` are applied to the created buffer.
+-- Options are applied to the created buffer, `_G.NoNeckPain.config.buffer.left` and `_G.NoNeckPain.config.buffer.right` will override the common option `_G.NoNeckPain.config.buffer.options` when defined.
 --
 --@param name string: the name of the buffer, `no-neck-pain-` will be prepended.
 --@param cmd string: the command to execute when creating the buffer
@@ -57,7 +57,7 @@ local function createBuf(name, cmd, padding, moveTo)
 
     vim.api.nvim_win_set_width(0, padding)
 
-    if _G.NoNeckPain.config.showBufferNames then
+    if _G.NoNeckPain.config.buffers.setNames then
         vim.api.nvim_buf_set_name(0, "no-neck-pain-" .. name)
     end
 
@@ -71,7 +71,7 @@ local function createBuf(name, cmd, padding, moveTo)
 
     vim.cmd(moveTo)
 
-    C.init(id, _G.NoNeckPain.config.buffers[name].color)
+    C.init(id, _G.NoNeckPain.config.buffers[name].backgroundColor)
 
     return id
 end
