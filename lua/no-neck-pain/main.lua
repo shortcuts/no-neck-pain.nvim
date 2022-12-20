@@ -40,7 +40,7 @@ function NoNeckPain.toggle()
 end
 
 -- Creates a buffer for the given "padding" (width), at the given `moveTo` direction.
--- Options from `_G.NoNeckPain.config.buffer.options` are applied to the created buffer.
+-- Options are applied to the created buffer, `_G.NoNeckPain.config.buffer.left` and `_G.NoNeckPain.config.buffer.right` will override the common option `_G.NoNeckPain.config.buffer.options` when defined.
 --
 --@param name string: the name of the buffer, `no-neck-pain-` will be prepended.
 --@param cmd string: the command to execute when creating the buffer
@@ -57,23 +57,21 @@ local function createBuf(name, cmd, padding, moveTo)
 
     vim.api.nvim_win_set_width(0, padding)
 
-    if _G.NoNeckPain.config.buffers.showName then
+    if _G.NoNeckPain.config.buffers.setNames then
         vim.api.nvim_buf_set_name(0, "no-neck-pain-" .. name)
     end
 
-    for scope, _ in pairs(_G.NoNeckPain.config.buffers.options) do
-        for key, value in pairs(_G.NoNeckPain.config.buffers.options[scope]) do
-            vim[scope][key] = value
-        end
+    for opt, val in pairs(_G.NoNeckPain.config.buffers[name].bo) do
+        vim.bo[opt] = val
+    end
+
+    for opt, val in pairs(_G.NoNeckPain.config.buffers[name].wo) do
+        vim.wo[opt] = val
     end
 
     vim.cmd(moveTo)
 
-    if _G.NoNeckPain.config.buffers.background.colorCode ~= nil then
-        D.print("CreateWin: setting `colorCode` for buffer " .. id)
-
-        C.init(id, _G.NoNeckPain.config.buffers.background.colorCode)
-    end
+    C.init(id, _G.NoNeckPain.config.buffers[name].backgroundColor)
 
     return id
 end
@@ -93,7 +91,7 @@ local function createWin(action)
         -- before creating side buffers, we determine if a side tree is open
         S.win.external.tree = W.getSideTree()
 
-        if _G.NoNeckPain.config.buffers.left then
+        if _G.NoNeckPain.config.buffers.left.enabled then
             S.win.main.left = createBuf(
                 "left",
                 "leftabove vnew",
@@ -102,7 +100,7 @@ local function createWin(action)
             )
         end
 
-        if _G.NoNeckPain.config.buffers.right then
+        if _G.NoNeckPain.config.buffers.right.enabled then
             S.win.main.right = createBuf(
                 "right",
                 "vnew",

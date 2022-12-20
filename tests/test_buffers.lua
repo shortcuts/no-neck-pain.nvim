@@ -32,7 +32,7 @@ end
 
 T["side buffers"]["only creates a `left` buffer when `right` is `false`"] = function()
     child.lua([[
-        require('no-neck-pain').setup({width=50,buffers={right=false}})
+        require('no-neck-pain').setup({width=50,buffers={right={enabled=false}}})
         require('no-neck-pain').enable()
     ]])
 
@@ -44,7 +44,7 @@ end
 
 T["side buffers"]["only creates a `right` buffer when `left` is `false`"] = function()
     child.lua([[
-        require('no-neck-pain').setup({width=50,buffers={left=false}})
+        require('no-neck-pain').setup({width=50,buffers={left={enabled=false}}})
         require('no-neck-pain').enable()
     ]])
 

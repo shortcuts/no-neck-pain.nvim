@@ -30,36 +30,46 @@ function C.matchIntegrationToHexCode(colorCode)
     return colorCode
 end
 
--- creates an highlight group `NoNeckPain` with the given `colorCode` and assign it to the side buffer of the given `id`.
+-- creates an highlight group `NNPBuffers` with the given `backgroundColor` and assign it to the side buffer of the given `id`.
 -- `cmd` is used instead of native commands for backward compatibility with Neovim 0.7
-function C.init(win, colorCode)
-    local groupName = "nnpcolorname"
+function C.init(win, backgroundColor)
+    local groupName = "NNPBuffers"
+    local defaultBackground = vim.api.nvim_get_hl_by_name("Normal", true).background
+
+    -- check if the user has a transparent background or not
+    if defaultBackground == nil then
+        defaultBackground = "NONE"
+    else
+        -- if it's not transparent, get the user's current background color
+        defaultBackground = string.format("#%06X", defaultBackground)
+    end
+
+    backgroundColor = backgroundColor or defaultBackground
 
     D.print(
-        "Color.init: initializing background mode with groupname "
-            .. groupName
-            .. " for win "
-            .. win
-            .. " with color "
-            .. colorCode
-    )
-
-    vim.cmd(string.format([[highlight! clear %s NONE]], groupName))
-    vim.cmd(
         string.format(
-            [[highlight! %s guifg=%s guibg=%s]],
+            "Color.init: groupName `%s` - window `%s` - backgroundColor `%s`",
             groupName,
-            colorCode,
-            colorCode,
-            colorCode,
-            colorCode
+            win,
+            backgroundColor
         )
     )
+
+    vim.cmd(string.format("highlight! clear %s NONE", groupName))
+    vim.cmd(
+        string.format(
+            "highlight! %s guifg=%s guibg=%s",
+            groupName,
+            backgroundColor,
+            backgroundColor
+        )
+    )
+
     vim.api.nvim_win_set_option(
         win,
         "winhl",
         string.format(
-            "Normal:%s,NormalNC:%s,CursorColumn:%s,CursorColumnNr:%s,NonText:%s,SignColumn:%s,Cursor:%s,LineNr:%s,EndOfBuffer:%s,WinSeparator:%s,VertSplit:%s",
+            "Normal:%s,NormalNC:%s,CursorColumn:%s,CursorLineNr:%s,NonText:%s,SignColumn:%s,Cursor:%s,LineNr:%s,EndOfBuffer:%s,WinSeparator:%s,VertSplit:%s",
             groupName,
             groupName,
             groupName,
