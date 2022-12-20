@@ -136,7 +136,6 @@ require("no-neck-pain").setup({
             position = "left",
         },
     },
-
 })
 
 NoNeckPain.bufferOptions = {
@@ -178,7 +177,6 @@ NoNeckPain.bufferOptions = {
         foldenable = false,
         list = false,
     },
-
 }
 ```
 

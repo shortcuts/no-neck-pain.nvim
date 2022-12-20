@@ -12,9 +12,13 @@ Default values:
       -- Hexadecimal color code to override the current background color of the buffer. (e.g. #24273A)
       -- popular theme are supported by their name:
       -- - catppuccin-frappe
+      -- - catppuccin-frappe-dark
       -- - catppuccin-latte
+      -- - catppuccin-latte-dark
       -- - catppuccin-macchiato
+      -- - catppuccin-macchiato-dark
       -- - catppuccin-mocha
+      -- - catppuccin-mocha-dark
       -- - tokyonight-day
       -- - tokyonight-moon
       -- - tokyonight-night
@@ -64,34 +68,6 @@ Default values:
       killAllBuffersOnDisable = false,
       --- Options related to the side buffers. See |NoNeckPain.bufferOptions|.
       buffers = {
-<<<<<<< HEAD
-          -- The background options of the side buffer(s).
-          background = {
-              -- Hexadecimal color code to override the current background color of the buffer. (e.g. #24273A)
-              -- popular theme are supported by their name:
-              -- - catppuccin-frappe
-              -- - catppuccin-frappe-dark
-              -- - catppuccin-latte
-              -- - catppuccin-latte-dark
-              -- - catppuccin-macchiato
-              -- - catppuccin-macchiato-dark
-              -- - catppuccin-mocha
-              -- - catppuccin-mocha-dark
-              -- - tokyonight-day
-              -- - tokyonight-moon
-              -- - tokyonight-night
-              -- - tokyonight-storm
-              -- - rose-pine
-              -- - rose-pine-moon
-              -- - rose-pine-dawn
-              colorCode = nil,
-          },
-          -- When `false`, the `left` padding buffer won't be created.
-          left = true,
-          -- When `false`, the `right` padding buffer won't be created.
-          right = true,
-=======
->>>>>>> main
           -- When `true`, the side buffers will be named `no-neck-pain-left` and `no-neck-pain-right` respectively.
           setNames = false,
           -- Common options are set to both buffers, for option scoped to the `left` and/or `right` buffer, see `buffers.left` and `buffers.right`.
