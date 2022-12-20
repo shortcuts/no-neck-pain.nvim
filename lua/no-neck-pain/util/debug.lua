@@ -1,7 +1,7 @@
 local D = {}
 
 -- prints only if debug is true.
-function D.print(...)
+function D.log(scope, str, ...)
     if _G.NoNeckPain.config ~= nil and not _G.NoNeckPain.config.debug then
         return
     end
@@ -13,7 +13,15 @@ function D.print(...)
         line = " L" .. info.currentline
     end
 
-    print("[no-neck-pain:" .. os.date("%H:%M:%S") .. line .. "] --> ", ...)
+    print(
+        string.format(
+            "[no-neck-pain:%s %s in %s] > %s",
+            os.date("%H:%M:%S"),
+            line,
+            scope,
+            string.format(str, ...)
+        )
+    )
 end
 
 -- prints table only if debug is true.

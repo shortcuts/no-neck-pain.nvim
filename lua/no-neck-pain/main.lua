@@ -41,16 +41,12 @@ end
 
 -- Resizes both of the NNP buffers.
 local function resize(scope)
-    D.print(scope, "resizing NNP buffers")
-
     W.resize(scope, S.win.main.left, W.getPadding("left", S.win.external.tree.width))
     W.resize(scope, S.win.main.right, W.getPadding("right", S.win.external.tree.width))
 end
 
 -- Creates NNP buffers.
-local function init(scope)
-    D.print(scope, "intializing NNP")
-
+local function init()
     local splitbelow, splitright = vim.o.splitbelow, vim.o.splitright
     vim.o.splitbelow, vim.o.splitright = true, true
 
@@ -83,50 +79,55 @@ end
 --- Initializes NNP and sets event listeners.
 function NoNeckPain.enable()
     if S.enabled then
-        return D.print("Enable: tried to enable already enabled NNP")
+        return D.log("NoNeckPain.enable()", "tried to enable already enabled NNP")
     end
-
-    D.print("enabling NNP")
 
     S.augroup = vim.api.nvim_create_augroup("NoNeckPain", {
         clear = true,
     })
 
-    init("NoNeckPain.enable")
+    init()
 
     vim.api.nvim_create_autocmd({ "VimResized" }, {
         callback = function()
             vim.schedule(function()
-                if E.skip("VimResized", S.enabled, S.win.split) then
+                local scope = "VimResized"
+                if E.skip(scope, S.enabled, S.win.split) then
                     return
                 end
 
                 local width = vim.api.nvim_list_uis()[1].width
 
                 if width > _G.NoNeckPain.config.width then
-                    D.print("VimResized: window's width is above the `width` option")
+                    D.log(
+                        scope,
+                        "window's width %s is above the given `width` option %s",
+                        width,
+                        _G.NoNeckPain.config.width
+                    )
 
                     if S.win.main.left == nil and S.win.main.right == nil then
-                        D.print("VimResized: no side buffer found, creating...")
+                        D.log(scope, "no side buffer found, creating...")
 
-                        return init("VimEnter")
+                        return init()
                     end
 
-                    D.print("VimResized: buffers are here, resizing...")
+                    D.log(scope, "buffers are here, resizing...")
 
-                    return resize("VimResized")
+                    return resize(scope)
                 end
 
-                D.print(
-                    "VimResized: window's width is below the `width` option, closing opened buffers..."
+                D.log(
+                    scope,
+                    "window's width is below the `width` option, closing opened buffers..."
                 )
 
-                local ok = W.close("VimResized", S.win.main.left)
+                local ok = W.close(scope, S.win.main.left)
                 if ok then
                     S.win.main.left = nil
                 end
 
-                ok = W.close("VimResized", S.win.main.right)
+                ok = W.close(scope, S.win.main.right)
                 if ok then
                     S.win.main.right = nil
                 end
@@ -139,35 +140,36 @@ function NoNeckPain.enable()
     vim.api.nvim_create_autocmd({ "WinEnter" }, {
         callback = function()
             vim.schedule(function()
-                if E.skip("WinEnter", S.enabled, S.win.split) then
+                local scope = "WinEnter"
+                if E.skip(scope, S.enabled, S.win.split) then
                     return
                 end
 
-                local buffers, total = W.bufferListWithoutNNP("WinEnter", S.win.main)
+                local buffers, total = W.bufferListWithoutNNP(S.win.main)
                 local focusedWin = vim.api.nvim_get_current_win()
 
                 if total == 0 or not M.contains(buffers, focusedWin) then
-                    return D.print("WinEnter: no valid buffers to handle, no split to handle")
+                    return D.log(scope, "no valid buffers to handle, no split to handle")
                 end
 
-                D.print("WinEnter: found ", total, " remaining valid buffers")
+                D.log(scope, "found %s remaining valid buffers", total)
 
                 -- below we will check for plugins that opens windows as splits (e.g. tree)
                 -- and early return while storing its NoNeckPain.
                 if vim.api.nvim_buf_get_option(0, "filetype") == "NvimTree" then
                     S.win.external.tree = W.getSideTree()
 
-                    return D.print("WinEnter: encoutered an NvimTree split")
+                    return D.log(scope, "encoutered an NvimTree split")
                 end
 
                 -- start by saving the split, because steps below will trigger `WinClosed`
                 S.win.main.split = focusedWin
 
-                if W.close("WinEnter", S.win.main.left) then
+                if W.close(scope, S.win.main.left) then
                     S.win.main.left = nil
                 end
 
-                if W.close("WinEnter", S.win.main.right) then
+                if W.close(scope, S.win.main.right) then
                     S.win.main.right = nil
                 end
             end)
@@ -179,7 +181,8 @@ function NoNeckPain.enable()
     vim.api.nvim_create_autocmd({ "WinClosed", "BufDelete" }, {
         callback = function()
             vim.schedule(function()
-                if E.skip("WinClose, BufDelete", S.enabled, nil) then
+                local scope = "WinClose, BufDelete"
+                if E.skip(scope, S.enabled, nil) then
                     return
                 end
 
@@ -188,14 +191,12 @@ function NoNeckPain.enable()
                 -- if we are not in split view, we check if we killed one of the main buffers (curr, left, right) to disable NNP
                 -- TODO: make killed side buffer decision configurable, we can re-create it
                 if S.win.main.split == nil and not M.every(buffers, S.win.main) then
-                    D.print(
-                        "WinClosed, BufDelete: one of the NNP main buffers have been closed, disabling..."
-                    )
+                    D.log(scope, "one of the NNP main buffers have been closed, disabling...")
 
                     return NoNeckPain.disable()
                 end
 
-                local _, total = W.bufferListWithoutNNP("WinClosed, BufDelete", {
+                local _, total = W.bufferListWithoutNNP({
                     S.win.main.curr,
                     S.win.main.left,
                     S.win.main.right,
@@ -209,13 +210,11 @@ function NoNeckPain.enable()
                     and vim.api.nvim_buf_get_option(0, "filetype") == ""
                     and vim.api.nvim_buf_get_option(0, "bufhidden") == "wipe"
                 then
-                    D.print("WinClosed, BufDelete: found last `wipe` buffer in list, disabling...")
+                    D.log(scope, "found last `wipe` buffer in list, disabling...")
 
                     return NoNeckPain.disable()
                 elseif M.tsize(buffers) > 1 then
-                    return D.print(
-                        "WinClosed, BufDelete: more than one buffer left, no killed split to handle"
-                    )
+                    return D.log(scope, "more than one buffer left, no killed split to handle")
                 end
 
                 S.win.main.curr = buffers[0]
@@ -225,7 +224,7 @@ function NoNeckPain.enable()
                 vim.fn.win_gotoid(S.win.main.curr)
 
                 -- recreate everything
-                init("WinClosed, BufDelete")
+                init()
             end)
         end,
         group = "NoNeckPain",
@@ -235,7 +234,8 @@ function NoNeckPain.enable()
     vim.api.nvim_create_autocmd({ "WinEnter", "WinClosed" }, {
         callback = function()
             vim.schedule(function()
-                if E.skip("WinEnter, WinClosed", S.enabled, nil) then
+                local scope = "WinEnter, WinClosed"
+                if E.skip(scope, S.enabled, nil) then
                     return
                 end
 
@@ -243,17 +243,14 @@ function NoNeckPain.enable()
 
                 -- skip if the newly focused window is a side buffer
                 if focusedWin == S.win.main.left or focusedWin == S.win.main.right then
-                    return D.print("WinEnter, WinClosed: focus on side buffer, skipped resize")
+                    return D.log(scope, "focus on side buffer, skipped resize")
                 end
 
                 -- when opening a new buffer as current, store its padding and resize everything (e.g. side tree)
                 if focusedWin ~= S.win.main.curr then
                     S.win.external.tree = W.getSideTree()
 
-                    D.print(
-                        "WinEnter, WinClosed: new current buffer with width:",
-                        S.win.external.tree.width
-                    )
+                    D.log(scope, "new current buffer with width %s", S.win.external.tree.width)
                 end
 
                 if not M.contains(vim.api.nvim_list_wins(), S.win.external.tree.id) then
@@ -263,7 +260,7 @@ function NoNeckPain.enable()
                     }
                 end
 
-                resize("WinEnter, WinClosed")
+                resize(scope)
             end)
         end,
         group = "NoNeckPain",
@@ -276,16 +273,14 @@ end
 --- Disable NNP and reset windows, leaving the `curr` focused window as focused.
 function NoNeckPain.disable()
     if not S.enabled then
-        return D.print("Disable: tried to disable non-enabled NNP")
+        return D.log("NoNeckPain.disable()", "tried to disable non-enabled NNP")
     end
-
-    D.print("disabling NNP")
 
     S.enabled = false
     vim.api.nvim_del_augroup_by_id(S.augroup)
 
-    W.close("Disable left", S.win.main.left)
-    W.close("Disable right", S.win.main.right)
+    W.close("NoNeckPain.disable() - left", S.win.main.left)
+    W.close("NoNeckPain.disable() - right", S.win.main.right)
 
     -- shutdowns gracefully by focusing the stored `curr` buffer, if possible
     if

@@ -11,7 +11,7 @@ local W = {}
 --@param moveTo string: the command to execute to place the buffer at the correct spot.
 function W.createBuf(name, cmd, padding, moveTo)
     if vim.api.nvim_list_uis()[1].width < _G.NoNeckPain.config.width then
-        return D.print("createBuf: not enough space to create side buffer " .. name)
+        return D.log("W.createBuf", "not enough space to create side buffer %s", name)
     end
 
     vim.cmd(cmd)
@@ -40,13 +40,13 @@ function W.createBuf(name, cmd, padding, moveTo)
 end
 
 -- returns the buffers without the NNP ones, and their number.
-function W.bufferListWithoutNNP(scope, list)
+function W.bufferListWithoutNNP(list)
     local buffers = vim.api.nvim_list_wins()
     local validBuffers = {}
     local size = 0
 
     for _, buffer in pairs(buffers) do
-        if not M.contains(list, buffer) and not W.isRelativeWindow(scope, buffer) then
+        if not M.contains(list, buffer) and not W.isRelativeWindow(buffer) then
             table.insert(validBuffers, buffer)
             size = size + 1
         end
@@ -56,15 +56,13 @@ function W.bufferListWithoutNNP(scope, list)
 end
 
 -- returns true if the index 0 window or the current window is relative.
-function W.isRelativeWindow(scope, win)
+function W.isRelativeWindow(win)
     win = win or vim.api.nvim_get_current_win()
 
     if
         vim.api.nvim_win_get_config(0).relative ~= ""
         or vim.api.nvim_win_get_config(win).relative ~= ""
     then
-        D.print(scope, "float window detected")
-
         return true
     end
 end
@@ -79,19 +77,14 @@ function W.close(scope, win)
     local buffers = vim.api.nvim_list_wins()
 
     if M.tsize(buffers) == 1 and buffers[1] == win then
-        D.print(
-            scope
-                .. ": trying to kill the last available buffer "
-                .. win
-                .. ", we can safely quit Neovim"
-        )
+        D.log(scope, "trying to kill the last available buffer %s, we can safely quit Neovim", win)
 
         vim.cmd([[quit!]])
 
         return true
     end
 
-    D.print(scope .. ": killing window " .. win)
+    D.log(scope, "killing window %s", win)
 
     if vim.api.nvim_win_is_valid(win) then
         vim.api.nvim_win_close(win, false)
@@ -106,7 +99,7 @@ function W.resize(scope, win, padding)
         return
     end
 
-    D.print(scope .. ": resizing window " .. win .. " with padding", padding)
+    D.log(scope, "resizing window %s with padding %s", win, padding)
 
     if vim.api.nvim_win_is_valid(win) then
         vim.api.nvim_win_set_width(win, padding)
@@ -138,7 +131,7 @@ function W.getPadding(side, paddingToSubstract)
     local wins = vim.api.nvim_list_uis()
 
     if wins[1] == nil then
-        return D.print("getPadding: attempted to get the padding of a non-existing window.")
+        return D.log("W.getPadding", "attempted to get the padding of a non-existing window.")
     end
 
     local width = wins[1].width
