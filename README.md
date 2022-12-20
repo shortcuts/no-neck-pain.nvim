@@ -71,82 +71,18 @@ require("no-neck-pain").setup({
     disableOnLastBuffer = false,
     -- When `true`, disabling NNP kills every split/vsplit buffers except the main NNP buffer.
     killAllBuffersOnDisable = false,
-    -- When `true`, the side buffers will be named `no-neck-pain-left` and `no-neck-pain-right` respectively.
-    setBufferNames = false,
-    -- Options related to the side buffers.
+    --- Options related to the side buffers. See |NoNeckPain.bufferOptions|.
     buffers = {
-        left = {
-            -- When `false` the buffer won't be created.
-            enabled = true,
-            -- Hexadecimal color code to override the current background color of the buffer. (e.g. #24273A)
-            -- popular theme are supported by their name:
-            -- - catppuccin-frappe
-            -- - catppuccin-latte
-            -- - catppuccin-macchiato
-            -- - catppuccin-mocha
-            -- - tokyonight-day
-            -- - tokyonight-moon
-            -- - tokyonight-night
-            -- - tokyonight-storm
-            -- - rose-pine
-            -- - rose-pine-moon
-            -- - rose-pine-dawn
-            backgroundColor = nil,
-            -- buffer-scoped options: any `vim.bo` options is accepted here.
-            bo = {
-                filetype = "no-neck-pain",
-                buftype = "nofile",
-                bufhidden = "hide",
-                modifiable = false,
-                buflisted = false,
-                swapfile = false,
-            },
-            -- window-scoped options: any `vim.wo` options is accepted here.
-            wo = {
-                cursorline = false,
-                cursorcolumn = false,
-                number = false,
-                relativenumber = false,
-                foldenable = false,
-                list = false,
-            },
-        },
-        right = {
-            -- When `false` the buffer won't be created.
-            enabled = true,
-            -- Hexadecimal color code to override the current background color of the buffer. (e.g. #24273A)
-            -- popular theme are supported by their name:
-            -- - catppuccin-frappe
-            -- - catppuccin-latte
-            -- - catppuccin-macchiato
-            -- - catppuccin-mocha
-            -- - tokyonight-day
-            -- - tokyonight-moon
-            -- - tokyonight-night
-            -- - tokyonight-storm
-            -- - rose-pine
-            -- - rose-pine-moon
-            -- - rose-pine-dawn
-            backgroundColor = nil,
-            -- buffer-scoped options: any `vim.bo` options is accepted here.
-            bo = {
-                filetype = "no-neck-pain",
-                buftype = "nofile",
-                bufhidden = "hide",
-                modifiable = false,
-                buflisted = false,
-                swapfile = false,
-            },
-            -- window-scoped options: any `vim.wo` options is accepted here.
-            wo = {
-                cursorline = false,
-                cursorcolumn = false,
-                number = false,
-                relativenumber = false,
-                foldenable = false,
-                list = false,
-            },
-        },
+        -- When `true`, the side buffers will be named `no-neck-pain-left` and `no-neck-pain-right` respectively.
+        setNames = false,
+        -- Common options are set to both buffers, for option scoped to the `left` and/or `right` buffer, see `buffers.left` and `buffers.right`.
+        common = NoNeckPain.bufferOptions,
+        --- Options applied to the `left` buffer, the options defined here overrides the `common` ones.
+        --- When `nil`, the buffer won't be created.
+        left = NoNeckPain.bufferOptions,
+        --- Options applied to the `left` buffer, the options defined here overrides the `common` ones.
+        --- When `nil`, the buffer won't be created.
+        right = NoNeckPain.bufferOptions,
     },
     -- lists supported integrations that might clash with `no-neck-pain.nvim`'s behavior
     integrations = {
@@ -157,6 +93,43 @@ require("no-neck-pain").setup({
         },
     },
 })
+
+NoNeckPain.bufferOptions = {
+    -- When `false`, the buffer won't be created.
+    enabled = true,
+    -- Hexadecimal color code to override the current background color of the buffer. (e.g. #24273A)
+    -- popular theme are supported by their name:
+    -- - catppuccin-frappe
+    -- - catppuccin-latte
+    -- - catppuccin-macchiato
+    -- - catppuccin-mocha
+    -- - tokyonight-day
+    -- - tokyonight-moon
+    -- - tokyonight-night
+    -- - tokyonight-storm
+    -- - rose-pine
+    -- - rose-pine-moon
+    -- - rose-pine-dawn
+    backgroundColor = nil,
+    -- buffer-scoped options: any `vim.bo` options is accepted here.
+    bo = {
+        filetype = "no-neck-pain",
+        buftype = "nofile",
+        bufhidden = "hide",
+        modifiable = false,
+        buflisted = false,
+        swapfile = false,
+    },
+    -- window-scoped options: any `vim.wo` options is accepted here.
+    wo = {
+        cursorline = false,
+        cursorcolumn = false,
+        number = false,
+        relativenumber = false,
+        foldenable = false,
+        list = false,
+    },
+}
 ```
 
 ## Commands
