@@ -144,9 +144,13 @@ NoNeckPain.bufferOptions = {
     -- Hexadecimal color code to override the current background color of the buffer. (e.g. #24273A)
     -- popular theme are supported by their name:
     -- - catppuccin-frappe
+    -- - catppuccin-frappe-dark
     -- - catppuccin-latte
+    -- - catppuccin-latte-dark
     -- - catppuccin-macchiato
+    -- - catppuccin-macchiato-dark
     -- - catppuccin-mocha
+    -- - catppuccin-mocha-dark
     -- - tokyonight-day
     -- - tokyonight-moon
     -- - tokyonight-night

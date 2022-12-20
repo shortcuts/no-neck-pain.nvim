@@ -161,7 +161,7 @@ T["setup()"]["overrides default values"] = function()
 
     -- common
     for _, scope in pairs(SCOPES) do
-        eq_option(child, "buffers." .. scope .. ".backgroundColor", "#292C3C")
+        eq_option(child, "buffers." .. scope .. ".backgroundColor", "#303446")
 
         eq_option(child, "buffers." .. scope .. ".bo.filetype", "my-file-type")
         eq_option(child, "buffers." .. scope .. ".bo.buftype", "help")
@@ -181,10 +181,14 @@ end
 
 T["setup()"]["colorCode: map integration name to a value"] = function()
     local integrationsMapping = {
-        { "catppuccin-frappe", "#292C3C" },
-        { "catppuccin-latte", "#E6E9EF" },
-        { "catppuccin-macchiato", "#1E2030" },
-        { "catppuccin-mocha", "#181825" },
+        { "catppuccin-frappe", "#303446" },
+        { "catppuccin-frappe-dark", "#292C3C" },
+        { "catppuccin-latte", "#EFF1F5" },
+        { "catppuccin-latte-dark", "#E6E9EF" },
+        { "catppuccin-macchiato", "#24273A" },
+        { "catppuccin-macchiato-dark", "#1E2030" },
+        { "catppuccin-mocha", "#1E1E2E" },
+        { "catppuccin-mocha-dark", "#181825" },
         { "tokyonight-day", "#16161e" },
         { "tokyonight-moon", "#1e2030" },
         { "tokyonight-storm", "#1f2335" },
