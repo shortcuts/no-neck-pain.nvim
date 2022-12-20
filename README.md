@@ -32,25 +32,69 @@ The plugin creates evenly sized empty buffers on each side of your focused buffe
 
 ## Installation
 
-### Using [wbthomason/packer.nvim](https://github.com/wbthomason/packer.nvim)
+<div align="center">
+<table>
+<thead>
+<tr>
+<th>Package manager</th>
+<th>Snippet</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+
+[wbthomason/packer.nvim](https://github.com/wbthomason/packer.nvim)
+
+</td>
+<td>
 
 ```lua
--- install latest stable version (recommended)
+-- stable version
 use {"shortcuts/no-neck-pain.nvim", tag = "*" }
-
--- install unreleased version
+-- dev version
 use {"shortcuts/no-neck-pain.nvim"}
 ```
 
-### Using [junegunn/vim-plug](https://github.com/junegunn/vim-plug)
+</td>
+</tr>
+<tr>
+<td>
+
+[junegunn/vim-plug](https://github.com/junegunn/vim-plug)
+
+</td>
+<td>
 
 ```lua
--- install latest stable version (recommended)
+-- stable version
 Plug "shortcuts/no-neck-pain.nvim", { "tag": "*" }
-
--- install unreleased version
+-- dev version
 Plug "shortcuts/no-neck-pain.nvim"
 ```
+
+</td>
+</tr>
+<tr>
+<td>
+
+[folke/lazy.nvim](https://github.com/folke/lazy.nvim)
+
+</td>
+<td>
+
+```lua
+-- stable version
+require("lazy").setup({{"shortcuts/no-neck-pain.nvim", version = "*"}})
+-- dev version
+require("lazy").setup({"shortcuts/no-neck-pain.nvim"})
+```
+
+</td>
+</tr>
+</tbody>
+</table>
+</div>
 
 This is all you need! Call `:NoNeckPain` once installed to toggle it.
 
