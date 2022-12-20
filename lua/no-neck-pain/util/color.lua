@@ -38,10 +38,10 @@ function C.matchIntegrationToHexCode(colorCode)
     return colorCode
 end
 
--- creates an highlight group `NNPBuffers` with the given `backgroundColor` and assign it to the side buffer of the given `id`.
+-- creates an highlight group for a given buffer named `NNPBuffers_$NAME` with the given `backgroundColor` and assign it to the side buffer of the given `id`.
 -- `cmd` is used instead of native commands for backward compatibility with Neovim 0.7
-function C.init(win, backgroundColor)
-    local groupName = "NNPBuffers"
+function C.init(win, name, backgroundColor)
+    local groupName = "NNPBuffers_" .. name
     local defaultBackground = vim.api.nvim_get_hl_by_name("Normal", true).background
 
     -- check if the user has a transparent background or not

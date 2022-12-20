@@ -179,6 +179,80 @@ T["setup()"]["overrides default values"] = function()
     end
 end
 
+T["setup()"]["`left` or `right` buffer options overrides `common` ones"] = function()
+    child.lua([[require('no-neck-pain').setup({
+        buffers = {
+            common = {
+                backgroundColor = "catppuccin-frappe",
+                bo = {
+                    filetype = "TEST",
+                },
+                wo = {
+                    cursorline = false,
+                },
+            },
+            left = {
+                backgroundColor = "catppuccin-frappe-dark",
+                bo = {
+                    filetype = "TEST-left",
+                },
+                wo = {
+                    cursorline = true,
+                },
+            },
+            right = {
+                backgroundColor = "catppuccin-latte",
+                bo = {
+                    filetype = "TEST-right",
+                },
+                wo = {
+                    number = true,
+                },
+            },
+        },
+    })]])
+
+    eq_option(child, "buffers.common.backgroundColor", "#303446")
+    eq_option(child, "buffers.left.backgroundColor", "#292C3C")
+    eq_option(child, "buffers.right.backgroundColor", "#EFF1F5")
+
+    eq_option(child, "buffers.common.bo.filetype", "TEST")
+    eq_option(child, "buffers.left.bo.filetype", "TEST-left")
+    eq_option(child, "buffers.right.bo.filetype", "TEST-right")
+
+    eq_option(child, "buffers.common.wo.cursorline", false)
+    eq_option(child, "buffers.left.wo.cursorline", true)
+    eq_option(child, "buffers.right.wo.number", true)
+end
+
+T["setup()"]["`common` options spreads it to `left` and `right` buffers"] = function()
+    child.lua([[require('no-neck-pain').setup({
+        buffers = {
+            common = {
+                backgroundColor = "catppuccin-frappe",
+                bo = {
+                    filetype = "TEST",
+                },
+                wo = {
+                    number = true,
+                },
+            },
+        },
+    })]])
+
+    eq_option(child, "buffers.common.backgroundColor", "#303446")
+    eq_option(child, "buffers.left.backgroundColor", "#303446")
+    eq_option(child, "buffers.right.backgroundColor", "#303446")
+
+    eq_option(child, "buffers.common.bo.filetype", "TEST")
+    eq_option(child, "buffers.left.bo.filetype", "TEST")
+    eq_option(child, "buffers.right.bo.filetype", "TEST")
+
+    eq_option(child, "buffers.common.wo.number", true)
+    eq_option(child, "buffers.left.wo.number", true)
+    eq_option(child, "buffers.right.wo.number", true)
+end
+
 T["setup()"]["colorCode: map integration name to a value"] = function()
     local integrationsMapping = {
         { "catppuccin-frappe", "#303446" },
