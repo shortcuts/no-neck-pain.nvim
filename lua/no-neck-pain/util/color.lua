@@ -34,17 +34,17 @@ end
 -- `cmd` is used instead of native commands for backward compatibility with Neovim 0.7
 function C.init(win, backgroundColor)
     local groupName = "NNPBuffers"
-    -- local defaultBackground = vim.api.nvim_get_hl_by_name("Normal", true).background
-    --
-    -- -- check if the user has a transparent background or not
-    -- if defaultBackground == nil then
-    --     defaultBackground = "NONE"
-    -- else
-    --     -- if it's not transparent, get the user's current background color
-    --     defaultBackground = string.format("#%06X", defaultBackground)
-    -- end
-    --
-    -- backgroundColor = backgroundColor or defaultBackground
+    local defaultBackground = vim.api.nvim_get_hl_by_name("Normal", true).background
+
+    -- check if the user has a transparent background or not
+    if defaultBackground == nil then
+        defaultBackground = "NONE"
+    else
+        -- if it's not transparent, get the user's current background color
+        defaultBackground = string.format("#%06X", defaultBackground)
+    end
+
+    backgroundColor = backgroundColor or defaultBackground
 
     D.print(
         string.format(
@@ -69,7 +69,7 @@ function C.init(win, backgroundColor)
         win,
         "winhl",
         string.format(
-            "Normal:%s,NormalNC:%s,CursorColumn:%s,CursorColumnNr:%s,NonText:%s,SignColumn:%s,Cursor:%s,LineNr:%s,EndOfBuffer:%s,WinSeparator:%s,VertSplit:%s",
+            "Normal:%s,NormalNC:%s,CursorColumn:%s,CursorLineNr:%s,NonText:%s,SignColumn:%s,Cursor:%s,LineNr:%s,EndOfBuffer:%s,WinSeparator:%s,VertSplit:%s",
             groupName,
             groupName,
             groupName,
