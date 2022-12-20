@@ -37,8 +37,7 @@ The plugin creates evenly sized empty buffers on each side of your focused buffe
 <thead>
 <tr>
 <th>Package manager</th>
-<th>Stable</th>
-<th>Dev</th>
+<th>Snippet</th>
 </tr>
 </thead>
 <tbody>
@@ -51,13 +50,9 @@ The plugin creates evenly sized empty buffers on each side of your focused buffe
 <td>
 
 ```lua
+-- stable version
 use {"shortcuts/no-neck-pain.nvim", tag = "*" }
-```
-
-</td>
-<td>
-
-```lua
+-- dev version
 use {"shortcuts/no-neck-pain.nvim"}
 ```
 
@@ -72,13 +67,9 @@ use {"shortcuts/no-neck-pain.nvim"}
 <td>
 
 ```lua
+-- stable version
 Plug "shortcuts/no-neck-pain.nvim", { "tag": "*" }
-```
-
-</td>
-<td>
-
-```lua
+-- dev version
 Plug "shortcuts/no-neck-pain.nvim"
 ```
 
@@ -93,13 +84,9 @@ Plug "shortcuts/no-neck-pain.nvim"
 <td>
 
 ```lua
+-- stable version
 require("lazy").setup({{"shortcuts/no-neck-pain.nvim", version = "*"}})
-```
-
-</td>
-<td>
-
-```lua
+-- dev version
 require("lazy").setup({"shortcuts/no-neck-pain.nvim"})
 ```
 
