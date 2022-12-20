@@ -98,7 +98,13 @@ end
 --
 -- @param paddingToSubstract number: a value to be substracted to the `width` of the screen.
 function W.getPadding(side, paddingToSubstract)
-    local width = vim.api.nvim_list_uis()[1].width
+    local wins = vim.api.nvim_list_uis()
+
+    if wins[1] == nil then
+        return D.print("getPadding: attempted to get the padding of a non-existing window.")
+    end
+
+    local width = wins[1].width
 
     if _G.NoNeckPain.config.width >= width then
         return 1

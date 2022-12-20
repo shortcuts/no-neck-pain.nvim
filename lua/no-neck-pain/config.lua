@@ -90,36 +90,30 @@ NoNeckPain.options = {
 ---
 ---@usage `require("no-neck-pain").setup()` (add `{}` with your |NoNeckPain.options| table)
 function NoNeckPain.setup(options)
+    options = options or {}
+    options.buffers = options.buffers or {}
+    options.buffers.common =
+        vim.tbl_deep_extend("keep", options.buffers.common or {}, NoNeckPain.options.buffers.common)
+    options.buffers.left = vim.tbl_deep_extend(
+        "keep",
+        options.buffers.left or options.buffers.common,
+        NoNeckPain.options.buffers.left
+    )
+    options.buffers.right = vim.tbl_deep_extend(
+        "keep",
+        options.buffers.right or options.buffers.common,
+        NoNeckPain.options.buffers.right
+    )
     NoNeckPain.options = vim.tbl_deep_extend("keep", options or {}, NoNeckPain.options)
+
     NoNeckPain.options.buffers.common.backgroundColor =
         C.matchIntegrationToHexCode(NoNeckPain.options.buffers.common.backgroundColor)
-
-    -- to prevent having to do the left|right > common check internally everytime, we do the merge here so we can rely on the side directly
-    NoNeckPain.options.buffers.left.bo = vim.tbl_deep_extend(
-        "keep",
-        NoNeckPain.options.buffers.left.bo,
-        NoNeckPain.options.buffers.common.bo
-    )
-    NoNeckPain.options.buffers.left.wo = vim.tbl_deep_extend(
-        "keep",
-        NoNeckPain.options.buffers.left.wo,
-        NoNeckPain.options.buffers.common.wo
-    )
-    NoNeckPain.options.buffers.left.backgroundColor =
-        C.matchIntegrationToHexCode(NoNeckPain.options.buffers.left.backgroundColor)
-
-    NoNeckPain.options.buffers.right.bo = vim.tbl_deep_extend(
-        "keep",
-        NoNeckPain.options.buffers.right.bo,
-        NoNeckPain.options.buffers.common.bo
-    )
-    NoNeckPain.options.buffers.right.wo = vim.tbl_deep_extend(
-        "keep",
-        NoNeckPain.options.buffers.right.wo,
-        NoNeckPain.options.buffers.common.wo
-    )
-    NoNeckPain.options.buffers.right.backgroundColor =
-        C.matchIntegrationToHexCode(NoNeckPain.options.buffers.right.backgroundColor)
+    NoNeckPain.options.buffers.left.backgroundColor = C.matchIntegrationToHexCode(
+        NoNeckPain.options.buffers.left.backgroundColor
+    ) or NoNeckPain.options.buffers.common.backgroundColor
+    NoNeckPain.options.buffers.right.backgroundColor = C.matchIntegrationToHexCode(
+        NoNeckPain.options.buffers.right.backgroundColor
+    ) or NoNeckPain.options.buffers.common.backgroundColor
 
     return NoNeckPain.options
 end

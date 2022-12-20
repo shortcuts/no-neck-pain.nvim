@@ -40,7 +40,6 @@ function NoNeckPain.toggle()
 end
 
 -- Creates a buffer for the given "padding" (width), at the given `moveTo` direction.
--- Options are applied to the created buffer, `_G.NoNeckPain.config.buffer.left` and `_G.NoNeckPain.config.buffer.right` will override the common option `_G.NoNeckPain.config.buffer.options` when defined.
 --
 --@param name string: the name of the buffer, `no-neck-pain-` will be prepended.
 --@param cmd string: the command to execute when creating the buffer
@@ -62,60 +61,55 @@ local function createBuf(name, cmd, padding, moveTo)
     end
 
     for opt, val in pairs(_G.NoNeckPain.config.buffers[name].bo) do
-        vim.bo[opt] = val
+        vim.api.nvim_buf_set_option(0, opt, val)
     end
 
     for opt, val in pairs(_G.NoNeckPain.config.buffers[name].wo) do
-        vim.wo[opt] = val
+        vim.api.nvim_win_set_option(id, opt, val)
     end
 
     vim.cmd(moveTo)
 
-    C.init(id, _G.NoNeckPain.config.buffers[name].backgroundColor)
+    C.init(id, name, _G.NoNeckPain.config.buffers[name].backgroundColor)
 
     return id
 end
 
--- Creates NNP buffers.
---
---@param action string: when called with `init`, creates NNP buffers. Resizes side buffers on any other cases.
-local function createWin(action)
-    D.print("CreateWin: ", action)
-
-    if action == "init" then
-        local splitbelow, splitright = vim.o.splitbelow, vim.o.splitright
-        vim.o.splitbelow, vim.o.splitright = true, true
-
-        S.win.main.curr = vim.api.nvim_get_current_win()
-
-        -- before creating side buffers, we determine if a side tree is open
-        S.win.external.tree = W.getSideTree()
-
-        if _G.NoNeckPain.config.buffers.left.enabled then
-            S.win.main.left = createBuf(
-                "left",
-                "leftabove vnew",
-                W.getPadding("left", S.win.external.tree.width),
-                "wincmd l"
-            )
-        end
-
-        if _G.NoNeckPain.config.buffers.right.enabled then
-            S.win.main.right = createBuf(
-                "right",
-                "vnew",
-                W.getPadding("right", S.win.external.tree.width),
-                "wincmd h"
-            )
-        end
-
-        vim.o.splitbelow, vim.o.splitright = splitbelow, splitright
-
-        return
-    end
+-- Resizes both of the NNP buffers.
+local function resize(scope)
+    D.print(scope)
 
     W.resize("createWin", S.win.main.left, W.getPadding("left", S.win.external.tree.width))
     W.resize("createWin", S.win.main.right, W.getPadding("right", S.win.external.tree.width))
+end
+
+-- Creates NNP buffers.
+local function init(scope)
+    D.print(scope)
+
+    local splitbelow, splitright = vim.o.splitbelow, vim.o.splitright
+    vim.o.splitbelow, vim.o.splitright = true, true
+
+    S.win.main.curr = vim.api.nvim_get_current_win()
+
+    -- before creating side buffers, we determine if a side tree is open
+    S.win.external.tree = W.getSideTree()
+
+    if _G.NoNeckPain.config.buffers.left.enabled then
+        S.win.main.left = createBuf(
+            "left",
+            "leftabove vnew",
+            W.getPadding("left", S.win.external.tree.width),
+            "wincmd l"
+        )
+    end
+
+    if _G.NoNeckPain.config.buffers.right.enabled then
+        S.win.main.right =
+            createBuf("right", "vnew", W.getPadding("right", S.win.external.tree.width), "wincmd h")
+    end
+
+    vim.o.splitbelow, vim.o.splitright = splitbelow, splitright
 end
 
 --- Initializes NNP and sets event listeners.
@@ -130,7 +124,7 @@ function NoNeckPain.enable()
         clear = true,
     })
 
-    createWin("init")
+    init("enable")
 
     vim.api.nvim_create_autocmd({ "VimResized" }, {
         callback = function()
@@ -157,12 +151,12 @@ function NoNeckPain.enable()
                     if S.win.main.left == nil and S.win.main.right == nil then
                         D.print("VimResized: no side buffer found, creating...")
 
-                        return createWin("init")
+                        return init("VimEnter")
                     end
 
                     D.print("VimResized: buffers are here, resizing...")
 
-                    return createWin("VimResized")
+                    return resize("VimResized")
                 end
 
                 D.print(
@@ -288,7 +282,7 @@ function NoNeckPain.enable()
                 vim.fn.win_gotoid(S.win.main.curr)
 
                 -- recreate everything
-                createWin("init")
+                init("WinClosed, BufDelete")
             end)
         end,
         group = "NoNeckPain",
