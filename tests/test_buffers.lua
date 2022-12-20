@@ -26,8 +26,8 @@ T["side buffers"]["have the same width"] = function()
         require('no-neck-pain').enable()
     ]])
 
-    eq_buf_width(child, "left", 15)
-    eq_buf_width(child, "right", 15)
+    eq_buf_width(child, "main.left", 15)
+    eq_buf_width(child, "main.right", 15)
 end
 
 T["side buffers"]["only creates a `left` buffer when `right` is `false`"] = function()
@@ -36,10 +36,10 @@ T["side buffers"]["only creates a `left` buffer when `right` is `false`"] = func
         require('no-neck-pain').enable()
     ]])
 
-    eq_state(child, "win.left", 1001)
-    eq_state(child, "win.right", vim.NIL)
+    eq_state(child, "win.main.left", 1001)
+    eq_state(child, "win.main.right", vim.NIL)
 
-    eq_buf_width(child, "left", 15)
+    eq_buf_width(child, "main.left", 15)
 end
 
 T["side buffers"]["only creates a `right` buffer when `left` is `false`"] = function()
@@ -48,10 +48,10 @@ T["side buffers"]["only creates a `right` buffer when `left` is `false`"] = func
         require('no-neck-pain').enable()
     ]])
 
-    eq_state(child, "win.left", vim.NIL)
-    eq_state(child, "win.right", 1001)
+    eq_state(child, "win.main.left", vim.NIL)
+    eq_state(child, "win.main.right", 1001)
 
-    eq_buf_width(child, "right", 15)
+    eq_buf_width(child, "main.right", 15)
 end
 
 T["side buffers"]["closing the `left` buffer kills the `right one"] = function()
@@ -61,8 +61,8 @@ T["side buffers"]["closing the `left` buffer kills the `right one"] = function()
     ]])
 
     eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1000, 1002 })
-    eq_state(child, "win.left", 1001)
-    eq_state(child, "win.right", 1002)
+    eq_state(child, "win.main.left", 1001)
+    eq_state(child, "win.main.right", 1002)
 
     child.lua("vim.api.nvim_win_close(1002, false)")
 
@@ -76,8 +76,8 @@ T["side buffers"]["closing the `right` buffer kills the `left` one"] = function(
     ]])
 
     eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1000, 1002 })
-    eq_state(child, "win.left", 1001)
-    eq_state(child, "win.right", 1002)
+    eq_state(child, "win.main.left", 1001)
+    eq_state(child, "win.main.right", 1002)
 
     child.lua("vim.api.nvim_win_close(1001, false)")
 
@@ -92,7 +92,7 @@ T["curr buffer"]["have the default width from the config"] = function()
         require('no-neck-pain').enable()
     ]])
 
-    eq_buf_width(child, "curr", 48)
+    eq_buf_width(child, "main.curr", 48)
 end
 
 T["curr buffer"]["closing `curr` buffer without any other window open closes Neovim"] = function()
@@ -102,7 +102,7 @@ T["curr buffer"]["closing `curr` buffer without any other window open closes Neo
     ]])
 
     eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1000, 1002 })
-    eq_state(child, "win.curr", 1000)
+    eq_state(child, "win.main.curr", 1000)
 
     child.lua("vim.api.nvim_win_close(1000, false)")
 
@@ -121,9 +121,9 @@ T["auto command"]["does not create side buffers window's width < options.width"]
         ]])
 
     eq(child.lua_get("vim.api.nvim_list_wins()"), { 1000 })
-    eq_state(child, "win.curr", 1000)
-    eq_state(child, "win.left", vim.NIL)
-    eq_state(child, "win.right", vim.NIL)
+    eq_state(child, "win.main.curr", 1000)
+    eq_state(child, "win.main.left", vim.NIL)
+    eq_state(child, "win.main.right", vim.NIL)
 end
 
 T["auto command"]["closing `curr` makes `split` the new `curr`"] = function()
@@ -133,21 +133,21 @@ T["auto command"]["closing `curr` makes `split` the new `curr`"] = function()
         ]])
 
     eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1000, 1002 })
-    eq_state(child, "win.split", vim.NIL)
+    eq_state(child, "win.main.split", vim.NIL)
 
     child.cmd("split")
     eq(child.lua_get("vim.api.nvim_list_wins()"), { 1003, 1000 })
-    eq_state(child, "win.left", vim.NIL)
-    eq_state(child, "win.right", vim.NIL)
-    eq_state(child, "win.split", 1003)
+    eq_state(child, "win.main.left", vim.NIL)
+    eq_state(child, "win.main.right", vim.NIL)
+    eq_state(child, "win.main.split", 1003)
 
     child.lua("vim.api.nvim_win_close(1000, false)")
 
     eq(child.lua_get("vim.api.nvim_list_wins()"), { 1004, 1003, 1005 })
-    eq_state(child, "win.curr", 1003)
-    eq_state(child, "win.left", 1004)
-    eq_state(child, "win.right", 1005)
-    eq_state(child, "win.split", vim.NIL)
+    eq_state(child, "win.main.curr", 1003)
+    eq_state(child, "win.main.left", 1004)
+    eq_state(child, "win.main.right", 1005)
+    eq_state(child, "win.main.split", vim.NIL)
 end
 
 T["auto command"]["hides side buffers after split"] = function()
@@ -158,32 +158,32 @@ T["auto command"]["hides side buffers after split"] = function()
 
     -- At start 1 win automatically sorrounded with side buffers
     eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1000, 1002 })
-    eq_state(child, "win.left", 1001)
-    eq_state(child, "win.right", 1002)
-    eq_state(child, "win.split", vim.NIL)
+    eq_state(child, "win.main.left", 1001)
+    eq_state(child, "win.main.right", 1002)
+    eq_state(child, "win.main.split", vim.NIL)
 
-    eq_buf_width(child, "left", 15)
-    eq_buf_width(child, "right", 15)
+    eq_buf_width(child, "main.left", 15)
+    eq_buf_width(child, "main.right", 15)
 
     -- Opening split hides side buffers
     child.cmd("split")
     eq(child.lua_get("vim.api.nvim_list_wins()"), { 1003, 1000 })
-    eq_state(child, "win.left", vim.NIL)
-    eq_state(child, "win.right", vim.NIL)
-    eq_state(child, "win.split", 1003)
+    eq_state(child, "win.main.left", vim.NIL)
+    eq_state(child, "win.main.right", vim.NIL)
+    eq_state(child, "win.main.split", 1003)
 
-    eq_buf_width(child, "split", 80)
-    eq_buf_width(child, "curr", 80)
+    eq_buf_width(child, "main.split", 80)
+    eq_buf_width(child, "main.curr", 80)
 
     -- Closing split and returning to last window opens side buffers again
     child.cmd("close")
     eq(child.lua_get("vim.api.nvim_list_wins()"), { 1004, 1000, 1005 })
-    eq_state(child, "win.left", 1004)
-    eq_state(child, "win.right", 1005)
-    eq_state(child, "win.split", vim.NIL)
+    eq_state(child, "win.main.left", 1004)
+    eq_state(child, "win.main.right", 1005)
+    eq_state(child, "win.main.split", vim.NIL)
 
-    eq_buf_width(child, "left", 15)
-    eq_buf_width(child, "right", 15)
+    eq_buf_width(child, "main.left", 15)
+    eq_buf_width(child, "main.right", 15)
 end
 
 T["auto command"]["hides side buffers after vsplit"] = function()
@@ -194,32 +194,32 @@ T["auto command"]["hides side buffers after vsplit"] = function()
 
     -- At start 1 win automatically sorrounded with side buffers
     eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1000, 1002 })
-    eq_state(child, "win.left", 1001)
-    eq_state(child, "win.right", 1002)
-    eq_state(child, "win.split", vim.NIL)
+    eq_state(child, "win.main.left", 1001)
+    eq_state(child, "win.main.right", 1002)
+    eq_state(child, "win.main.split", vim.NIL)
 
-    eq_buf_width(child, "left", 15)
-    eq_buf_width(child, "right", 15)
+    eq_buf_width(child, "main.left", 15)
+    eq_buf_width(child, "main.right", 15)
 
     -- Opening vsplit hides side buffers
     child.cmd("vsplit")
     eq(child.lua_get("vim.api.nvim_list_wins()"), { 1003, 1000 })
-    eq_state(child, "win.left", vim.NIL)
-    eq_state(child, "win.right", vim.NIL)
-    eq_state(child, "win.split", 1003)
+    eq_state(child, "win.main.left", vim.NIL)
+    eq_state(child, "win.main.right", vim.NIL)
+    eq_state(child, "win.main.split", 1003)
 
-    eq_buf_width(child, "split", 40)
-    eq_buf_width(child, "curr", 39)
+    eq_buf_width(child, "main.split", 40)
+    eq_buf_width(child, "main.curr", 39)
 
     -- Closing vsplit and returning to last window opens side buffers again
     child.cmd("close")
     eq(child.lua_get("vim.api.nvim_list_wins()"), { 1004, 1000, 1005 })
-    eq_state(child, "win.left", 1004)
-    eq_state(child, "win.right", 1005)
-    eq_state(child, "win.split", vim.NIL)
+    eq_state(child, "win.main.left", 1004)
+    eq_state(child, "win.main.right", 1005)
+    eq_state(child, "win.main.split", vim.NIL)
 
-    eq_buf_width(child, "left", 15)
-    eq_buf_width(child, "right", 15)
+    eq_buf_width(child, "main.left", 15)
+    eq_buf_width(child, "main.right", 15)
 end
 
 T["auto command"]["does not shift using when opening/closing float window"] = function()
@@ -230,11 +230,11 @@ T["auto command"]["does not shift using when opening/closing float window"] = fu
 
     -- At start 1 win automatically sorrounded with side buffers
     eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1000, 1002 })
-    eq_state(child, "win.left", 1001)
-    eq_state(child, "win.right", 1002)
+    eq_state(child, "win.main.left", 1001)
+    eq_state(child, "win.main.right", 1002)
 
-    eq_buf_width(child, "left", 15)
-    eq_buf_width(child, "right", 15)
+    eq_buf_width(child, "main.left", 15)
+    eq_buf_width(child, "main.right", 15)
 
     -- Opening float window keeps the buffer here with the same width
     child.lua(
@@ -242,21 +242,21 @@ T["auto command"]["does not shift using when opening/closing float window"] = fu
     )
 
     eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1000, 1002, 1003 })
-    eq_state(child, "win.left", 1001)
-    eq_state(child, "win.right", 1002)
+    eq_state(child, "win.main.left", 1001)
+    eq_state(child, "win.main.right", 1002)
 
-    eq_buf_width(child, "left", 15)
-    eq_buf_width(child, "right", 15)
+    eq_buf_width(child, "main.left", 15)
+    eq_buf_width(child, "main.right", 15)
 
     -- Close float window keeps the buffer here with the same width
     child.lua("vim.api.nvim_win_close(1003, false)")
 
     eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1000, 1002 })
-    eq_state(child, "win.left", 1001)
-    eq_state(child, "win.right", 1002)
+    eq_state(child, "win.main.left", 1001)
+    eq_state(child, "win.main.right", 1002)
 
-    eq_buf_width(child, "left", 15)
-    eq_buf_width(child, "right", 15)
+    eq_buf_width(child, "main.left", 15)
+    eq_buf_width(child, "main.right", 15)
 end
 
 return T

@@ -188,11 +188,17 @@ T["enable()"]["sets state and internal methods"] = function()
     eq_state(child, "augroup", 15)
 
     eq_type_state(child, "win", "table")
+    eq_type_state(child, "win.main", "table")
+    eq_type_state(child, "win.external", "table")
 
-    eq_state(child, "win.curr", 1000)
-    eq_state(child, "win.left", 1001)
-    eq_state(child, "win.right", 1002)
-    eq_state(child, "win.split", vim.NIL)
+    eq_state(child, "win.main.curr", 1000)
+    eq_state(child, "win.main.left", 1001)
+    eq_state(child, "win.main.right", 1002)
+    eq_state(child, "win.main.split", vim.NIL)
+
+    eq_type_state(child, "win.external.tree", "table")
+    eq_state(child, "win.external.tree.id", vim.NIL)
+    eq_state(child, "win.external.tree.width", 0)
 end
 
 T["disable()"] = MiniTest.new_set()
@@ -207,11 +213,17 @@ T["disable()"]["resets state and remove internal methods"] = function()
     eq_state(child, "augroup", vim.NIL)
 
     eq_type_state(child, "win", "table")
+    eq_type_state(child, "win.main", "table")
+    eq_type_state(child, "win.external", "table")
 
-    eq_state(child, "win.curr", vim.NIL)
-    eq_state(child, "win.left", vim.NIL)
-    eq_state(child, "win.right", vim.NIL)
-    eq_state(child, "win.split", vim.NIL)
+    eq_state(child, "win.main.curr", vim.NIL)
+    eq_state(child, "win.main.left", vim.NIL)
+    eq_state(child, "win.main.right", vim.NIL)
+    eq_state(child, "win.main.split", vim.NIL)
+
+    eq_type_state(child, "win.external.tree", "table")
+    eq_state(child, "win.external.tree.id", vim.NIL)
+    eq_state(child, "win.external.tree.width", 0)
 end
 
 T["toggle()"] = MiniTest.new_set()
@@ -235,11 +247,17 @@ T["toggle()"]["sets state and internal methods and resets everything when toggle
         eq_state(child, "augroup", 15)
 
         eq_type_state(child, "win", "table")
+        eq_type_state(child, "win.main", "table")
+        eq_type_state(child, "win.external", "table")
 
-        eq_state(child, "win.curr", 1000)
-        eq_state(child, "win.left", 1001)
-        eq_state(child, "win.right", 1002)
-        eq_state(child, "win.split", vim.NIL)
+        eq_state(child, "win.main.curr", 1000)
+        eq_state(child, "win.main.left", 1001)
+        eq_state(child, "win.main.right", 1002)
+        eq_state(child, "win.main.split", vim.NIL)
+
+        eq_type_state(child, "win.external.tree", "table")
+        eq_state(child, "win.external.tree.id", vim.NIL)
+        eq_state(child, "win.external.tree.width", 0)
 
         -- disable
         child.lua([[require('no-neck-pain').toggle()]])
@@ -251,11 +269,17 @@ T["toggle()"]["sets state and internal methods and resets everything when toggle
         eq_state(child, "augroup", vim.NIL)
 
         eq_type_state(child, "win", "table")
+        eq_type_state(child, "win.main", "table")
+        eq_type_state(child, "win.external", "table")
 
-        eq_state(child, "win.curr", vim.NIL)
-        eq_state(child, "win.left", vim.NIL)
-        eq_state(child, "win.right", vim.NIL)
-        eq_state(child, "win.split", vim.NIL)
+        eq_state(child, "win.main.curr", vim.NIL)
+        eq_state(child, "win.main.left", vim.NIL)
+        eq_state(child, "win.main.right", vim.NIL)
+        eq_state(child, "win.main.split", vim.NIL)
+
+        eq_type_state(child, "win.external.tree", "table")
+        eq_state(child, "win.external.tree.id", vim.NIL)
+        eq_state(child, "win.external.tree.width", 0)
     end
 
 return T
