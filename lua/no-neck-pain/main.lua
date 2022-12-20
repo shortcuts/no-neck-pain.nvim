@@ -79,7 +79,7 @@ end
 --- Initializes NNP and sets event listeners.
 function NoNeckPain.enable()
     if S.enabled then
-        return D.print("NoNeckPain.enable()", "tried to enable already enabled NNP")
+        return D.log("NoNeckPain.enable()", "tried to enable already enabled NNP")
     end
 
     S.augroup = vim.api.nvim_create_augroup("NoNeckPain", {
@@ -99,7 +99,7 @@ function NoNeckPain.enable()
                 local width = vim.api.nvim_list_uis()[1].width
 
                 if width > _G.NoNeckPain.config.width then
-                    D.print(
+                    D.log(
                         scope,
                         "window's width %s is above the given `width` option %s",
                         width,
@@ -107,17 +107,17 @@ function NoNeckPain.enable()
                     )
 
                     if S.win.main.left == nil and S.win.main.right == nil then
-                        D.print(scope, "no side buffer found, creating...")
+                        D.log(scope, "no side buffer found, creating...")
 
                         return init()
                     end
 
-                    D.print(scope, "buffers are here, resizing...")
+                    D.log(scope, "buffers are here, resizing...")
 
                     return resize(scope)
                 end
 
-                D.print(
+                D.log(
                     scope,
                     "window's width is below the `width` option, closing opened buffers..."
                 )
@@ -149,17 +149,17 @@ function NoNeckPain.enable()
                 local focusedWin = vim.api.nvim_get_current_win()
 
                 if total == 0 or not M.contains(buffers, focusedWin) then
-                    return D.print(scope, "no valid buffers to handle, no split to handle")
+                    return D.log(scope, "no valid buffers to handle, no split to handle")
                 end
 
-                D.print(scope, "found %s remaining valid buffers", total)
+                D.log(scope, "found %s remaining valid buffers", total)
 
                 -- below we will check for plugins that opens windows as splits (e.g. tree)
                 -- and early return while storing its NoNeckPain.
                 if vim.api.nvim_buf_get_option(0, "filetype") == "NvimTree" then
                     S.win.external.tree = W.getSideTree()
 
-                    return D.print(scope, "encoutered an NvimTree split")
+                    return D.log(scope, "encoutered an NvimTree split")
                 end
 
                 -- start by saving the split, because steps below will trigger `WinClosed`
@@ -191,7 +191,7 @@ function NoNeckPain.enable()
                 -- if we are not in split view, we check if we killed one of the main buffers (curr, left, right) to disable NNP
                 -- TODO: make killed side buffer decision configurable, we can re-create it
                 if S.win.main.split == nil and not M.every(buffers, S.win.main) then
-                    D.print(scope, "one of the NNP main buffers have been closed, disabling...")
+                    D.log(scope, "one of the NNP main buffers have been closed, disabling...")
 
                     return NoNeckPain.disable()
                 end
@@ -210,11 +210,11 @@ function NoNeckPain.enable()
                     and vim.api.nvim_buf_get_option(0, "filetype") == ""
                     and vim.api.nvim_buf_get_option(0, "bufhidden") == "wipe"
                 then
-                    D.print(scope, "found last `wipe` buffer in list, disabling...")
+                    D.log(scope, "found last `wipe` buffer in list, disabling...")
 
                     return NoNeckPain.disable()
                 elseif M.tsize(buffers) > 1 then
-                    return D.print(scope, "more than one buffer left, no killed split to handle")
+                    return D.log(scope, "more than one buffer left, no killed split to handle")
                 end
 
                 S.win.main.curr = buffers[0]
@@ -243,14 +243,14 @@ function NoNeckPain.enable()
 
                 -- skip if the newly focused window is a side buffer
                 if focusedWin == S.win.main.left or focusedWin == S.win.main.right then
-                    return D.print(scope, "focus on side buffer, skipped resize")
+                    return D.log(scope, "focus on side buffer, skipped resize")
                 end
 
                 -- when opening a new buffer as current, store its padding and resize everything (e.g. side tree)
                 if focusedWin ~= S.win.main.curr then
                     S.win.external.tree = W.getSideTree()
 
-                    D.print(scope, "new current buffer with width %s", S.win.external.tree.width)
+                    D.log(scope, "new current buffer with width %s", S.win.external.tree.width)
                 end
 
                 if not M.contains(vim.api.nvim_list_wins(), S.win.external.tree.id) then
@@ -273,7 +273,7 @@ end
 --- Disable NNP and reset windows, leaving the `curr` focused window as focused.
 function NoNeckPain.disable()
     if not S.enabled then
-        return D.print("NoNeckPain.disable()", "tried to disable non-enabled NNP")
+        return D.log("NoNeckPain.disable()", "tried to disable non-enabled NNP")
     end
 
     S.enabled = false

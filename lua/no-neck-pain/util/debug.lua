@@ -1,7 +1,7 @@
 local D = {}
 
 -- prints only if debug is true.
-function D.print(scope, str, ...)
+function D.log(scope, str, ...)
     if _G.NoNeckPain.config ~= nil and not _G.NoNeckPain.config.debug then
         return
     end
