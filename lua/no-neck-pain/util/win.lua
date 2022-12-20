@@ -1,6 +1,43 @@
+local C = require("no-neck-pain.util.color")
 local D = require("no-neck-pain.util.debug")
 local M = require("no-neck-pain.util.map")
 local W = {}
+
+-- Creates a buffer for the given "padding" (width), at the given `moveTo` direction.
+--
+--@param name string: the name of the buffer, `no-neck-pain-` will be prepended.
+--@param cmd string: the command to execute when creating the buffer
+--@param padding number: the "padding" (width) of the buffer
+--@param moveTo string: the command to execute to place the buffer at the correct spot.
+function W.createBuf(name, cmd, padding, moveTo)
+    if vim.api.nvim_list_uis()[1].width < _G.NoNeckPain.config.width then
+        return D.print("createBuf: not enough space to create side buffer " .. name)
+    end
+
+    vim.cmd(cmd)
+
+    local id = vim.api.nvim_get_current_win()
+
+    vim.api.nvim_win_set_width(0, padding)
+
+    if _G.NoNeckPain.config.buffers.setNames then
+        vim.api.nvim_buf_set_name(0, "no-neck-pain-" .. name)
+    end
+
+    for opt, val in pairs(_G.NoNeckPain.config.buffers[name].bo) do
+        vim.api.nvim_buf_set_option(0, opt, val)
+    end
+
+    for opt, val in pairs(_G.NoNeckPain.config.buffers[name].wo) do
+        vim.api.nvim_win_set_option(id, opt, val)
+    end
+
+    vim.cmd(moveTo)
+
+    C.init(id, name, _G.NoNeckPain.config.buffers[name].backgroundColor)
+
+    return id
+end
 
 -- returns the buffers without the NNP ones, and their number.
 function W.bufferListWithoutNNP(scope, list)
