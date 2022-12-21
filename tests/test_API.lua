@@ -195,7 +195,6 @@ T["setup()"]["overrides default values"] = function()
     eq_option(child, "buffers.wo.foldenable", true)
     eq_option(child, "buffers.wo.list", true)
 
-    -- common
     for _, scope in pairs(SCOPES) do
         eq_option(child, "buffers." .. scope .. ".backgroundColor", "#303446")
 
