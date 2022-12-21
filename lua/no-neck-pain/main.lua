@@ -85,7 +85,7 @@ end
 --- Initializes NNP and sets event listeners.
 function NoNeckPain.enable()
     if S.enabled then
-        return D.log("NoNeckPain.enable()", "tried to enable already enabled NNP")
+        return
     end
 
     S.augroup = vim.api.nvim_create_augroup("NoNeckPain", {
@@ -111,22 +111,15 @@ function NoNeckPain.enable()
                         _G.NoNeckPain.config.width
                     )
 
+                    -- we create everything if side buffers are missing
                     if S.win.main.left == nil and S.win.main.right == nil then
-                        D.log(p.event, "no side buffer found, creating...")
-
                         return init()
                     end
-
-                    D.log(p.event, "buffers are here, resizing...")
 
                     return resize(p.event)
                 end
 
-                D.log(
-                    p.event,
-                    "window's width is below the `width` option, closing opened buffers..."
-                )
-
+                -- window width below `options.width`
                 close(p.event)
             end)
         end,
@@ -231,7 +224,7 @@ function NoNeckPain.enable()
 
                 -- skip if the newly focused window is a side buffer
                 if focusedWin == S.win.main.left or focusedWin == S.win.main.right then
-                    return D.log(p.event, "focus on side buffer, skipped resize")
+                    return
                 end
 
                 -- when opening a new buffer as current, store its padding and resize everything (e.g. side tree)
