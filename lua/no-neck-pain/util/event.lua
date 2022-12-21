@@ -6,13 +6,11 @@ local E = {}
 -- determines if we should skip the event.
 function E.skip(scope, enabled, split)
     if not enabled then
-        D.log(scope, "event received but NNP is disabled")
-
         return true
     end
 
     if split ~= nil or W.isRelativeWindow() then
-        D.log(scope, "already in split view or float window detected, nothing more to do")
+        D.log(scope, "already in split view or float window detected, skipped")
 
         return true
     end
