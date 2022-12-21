@@ -39,22 +39,6 @@ function W.createBuf(name, cmd, padding, moveTo)
     return id
 end
 
--- returns the buffers without the NNP ones, and their number.
-function W.bufferListWithoutNNP(list)
-    local buffers = vim.api.nvim_list_wins()
-    local validBuffers = {}
-    local size = 0
-
-    for _, buffer in pairs(buffers) do
-        if not M.contains(list, buffer) and not W.isRelativeWindow(buffer) then
-            table.insert(validBuffers, buffer)
-            size = size + 1
-        end
-    end
-
-    return validBuffers, size
-end
-
 -- returns true if the index 0 window or the current window is relative.
 function W.isRelativeWindow(win)
     win = win or vim.api.nvim_get_current_win()
@@ -67,21 +51,36 @@ function W.isRelativeWindow(win)
     end
 end
 
--- closes a given `win` (NNP buffer) if there's other buffers (not NNP buffers) open.
--- quits Neovim if we close an NNP buffer but there's no other valid buffer left.
-function W.close(scope, win)
-    if win == nil then
-        return false
+-- returns the available wins and their total number, without the `list` ones.
+function W.listWinsExcept(list)
+    local wins = vim.api.nvim_list_wins()
+    local validWins = {}
+    local size = 0
+
+    for _, win in pairs(wins) do
+        if not M.contains(list, win) and not W.isRelativeWindow(win) then
+            table.insert(validWins, win)
+            size = size + 1
+        end
     end
 
-    local buffers = vim.api.nvim_list_wins()
+    return validWins, size
+end
 
-    if M.tsize(buffers) == 1 and buffers[1] == win then
-        D.log(scope, "trying to kill the last available buffer %s, we can safely quit Neovim", win)
+-- closes a given `win`. quits Neovim if its the last window open.
+function W.close(scope, win)
+    if win == nil then
+        return nil
+    end
+
+    local wins = vim.api.nvim_list_wins()
+
+    if M.tsize(wins) == 1 and wins[1] == win then
+        D.log(scope, "trying to kill the last available win %s", win)
 
         vim.cmd([[quit!]])
 
-        return true
+        return nil
     end
 
     D.log(scope, "killing window %s", win)
@@ -90,7 +89,7 @@ function W.close(scope, win)
         vim.api.nvim_win_close(win, false)
     end
 
-    return true
+    return nil
 end
 
 -- resizes a given `win` for the given `padding`

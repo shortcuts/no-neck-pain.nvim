@@ -20,7 +20,7 @@ local T = MiniTest.new_set({
     },
 })
 
-local SCOPES = { "common", "left", "right" }
+local SCOPES = { "left", "right" }
 
 T["install"] = MiniTest.new_set()
 
@@ -57,7 +57,26 @@ T["setup()"]["sets exposed methods and default options value"] = function()
     eq_option(child, "killAllBuffersOnDisable", false)
 
     -- buffers
+    eq_type_option(child, "buffers", "table")
+    eq_type_option(child, "buffers.bo", "table")
+    eq_type_option(child, "buffers.wo", "table")
+
     eq_option(child, "buffers.setNames", false)
+    eq_option(child, "buffers.backgroundColor", vim.NIL)
+
+    eq_option(child, "buffers.bo.filetype", "no-neck-pain")
+    eq_option(child, "buffers.bo.buftype", "nofile")
+    eq_option(child, "buffers.bo.bufhidden", "hide")
+    eq_option(child, "buffers.bo.modifiable", false)
+    eq_option(child, "buffers.bo.buflisted", false)
+    eq_option(child, "buffers.bo.swapfile", false)
+
+    eq_option(child, "buffers.wo.cursorline", false)
+    eq_option(child, "buffers.wo.cursorcolumn", false)
+    eq_option(child, "buffers.wo.number", false)
+    eq_option(child, "buffers.wo.relativenumber", false)
+    eq_option(child, "buffers.wo.foldenable", false)
+    eq_option(child, "buffers.wo.list", false)
 
     for _, scope in pairs(SCOPES) do
         eq_type_option(child, "buffers." .. scope, "table")
@@ -90,24 +109,22 @@ T["setup()"]["overrides default values"] = function()
         killAllBuffersOnDisable = true,
         buffers = {
             setNames = true,
-            common = {
-                backgroundColor = "catppuccin-frappe",
-                bo = {
-                    filetype = "my-file-type",
-                    buftype = "help",
-                    bufhidden = "",
-                    modifiable = true,
-                    buflisted = true,
-                    swapfile = true,
-                },
-                wo = {
-                    cursorline = true,
-                    cursorcolumn = true,
-                    number = true,
-                    relativenumber = true,
-                    foldenable = true,
-                    list = true,
-                },
+            backgroundColor = "catppuccin-frappe",
+            bo = {
+                filetype = "my-file-type",
+                buftype = "help",
+                bufhidden = "",
+                modifiable = true,
+                buflisted = true,
+                swapfile = true,
+            },
+            wo = {
+                cursorline = true,
+                cursorcolumn = true,
+                number = true,
+                relativenumber = true,
+                foldenable = true,
+                list = true,
             },
             left = {
                 backgroundColor = "catppuccin-frappe",
@@ -157,9 +174,27 @@ T["setup()"]["overrides default values"] = function()
     eq_option(child, "killAllBuffersOnDisable", true)
 
     -- buffers
-    eq_option(child, "buffers.setNames", true)
+    eq_type_option(child, "buffers", "table")
+    eq_type_option(child, "buffers.bo", "table")
+    eq_type_option(child, "buffers.wo", "table")
 
-    -- common
+    eq_option(child, "buffers.setNames", true)
+    eq_option(child, "buffers.backgroundColor", "#303446")
+
+    eq_option(child, "buffers.bo.filetype", "my-file-type")
+    eq_option(child, "buffers.bo.buftype", "help")
+    eq_option(child, "buffers.bo.bufhidden", "")
+    eq_option(child, "buffers.bo.modifiable", true)
+    eq_option(child, "buffers.bo.buflisted", true)
+    eq_option(child, "buffers.bo.swapfile", true)
+
+    eq_option(child, "buffers.wo.cursorline", true)
+    eq_option(child, "buffers.wo.cursorcolumn", true)
+    eq_option(child, "buffers.wo.number", true)
+    eq_option(child, "buffers.wo.relativenumber", true)
+    eq_option(child, "buffers.wo.foldenable", true)
+    eq_option(child, "buffers.wo.list", true)
+
     for _, scope in pairs(SCOPES) do
         eq_option(child, "buffers." .. scope .. ".backgroundColor", "#303446")
 
@@ -182,14 +217,12 @@ end
 T["setup()"]["`left` or `right` buffer options overrides `common` ones"] = function()
     child.lua([[require('no-neck-pain').setup({
         buffers = {
-            common = {
-                backgroundColor = "catppuccin-frappe",
-                bo = {
-                    filetype = "TEST",
-                },
-                wo = {
-                    cursorline = false,
-                },
+            backgroundColor = "catppuccin-frappe",
+            bo = {
+                filetype = "TEST",
+            },
+            wo = {
+                cursorline = false,
             },
             left = {
                 backgroundColor = "catppuccin-frappe-dark",
@@ -212,15 +245,16 @@ T["setup()"]["`left` or `right` buffer options overrides `common` ones"] = funct
         },
     })]])
 
-    eq_option(child, "buffers.common.backgroundColor", "#303446")
+    eq_option(child, "buffers.backgroundColor", "#303446")
+    eq_option(child, "buffers.bo.filetype", "TEST")
+    eq_option(child, "buffers.wo.cursorline", false)
+
     eq_option(child, "buffers.left.backgroundColor", "#292C3C")
     eq_option(child, "buffers.right.backgroundColor", "#EFF1F5")
 
-    eq_option(child, "buffers.common.bo.filetype", "TEST")
     eq_option(child, "buffers.left.bo.filetype", "TEST-left")
     eq_option(child, "buffers.right.bo.filetype", "TEST-right")
 
-    eq_option(child, "buffers.common.wo.cursorline", false)
     eq_option(child, "buffers.left.wo.cursorline", true)
     eq_option(child, "buffers.right.wo.number", true)
 end
@@ -228,29 +262,28 @@ end
 T["setup()"]["`common` options spreads it to `left` and `right` buffers"] = function()
     child.lua([[require('no-neck-pain').setup({
         buffers = {
-            common = {
-                backgroundColor = "catppuccin-frappe",
-                bo = {
-                    filetype = "TEST",
-                },
-                wo = {
-                    number = true,
-                },
+            backgroundColor = "catppuccin-frappe",
+            bo = {
+                filetype = "TEST",
+            },
+            wo = {
+                number = true,
             },
         },
     })]])
 
-    eq_option(child, "buffers.common.backgroundColor", "#303446")
+    eq_option(child, "buffers.backgroundColor", "#303446")
+    eq_option(child, "buffers.bo.filetype", "TEST")
+    eq_option(child, "buffers.wo.number", true)
+
     eq_option(child, "buffers.left.backgroundColor", "#303446")
     eq_option(child, "buffers.right.backgroundColor", "#303446")
 
-    eq_option(child, "buffers.common.bo.filetype", "TEST")
-    eq_option(child, "buffers.left.bo.filetype", "TEST")
-    eq_option(child, "buffers.right.bo.filetype", "TEST")
-
-    eq_option(child, "buffers.common.wo.number", true)
     eq_option(child, "buffers.left.wo.number", true)
     eq_option(child, "buffers.right.wo.number", true)
+
+    eq_option(child, "buffers.left.bo.filetype", "TEST")
+    eq_option(child, "buffers.right.bo.filetype", "TEST")
 end
 
 T["setup()"]["colorCode: map integration name to a value"] = function()
@@ -276,7 +309,7 @@ T["setup()"]["colorCode: map integration name to a value"] = function()
         child.lua(string.format(
             [[require('no-neck-pain').setup({
                 buffers = {
-                    common = { backgroundColor = "%s" },
+                    backgroundColor = "%s",
                     left = { backgroundColor = "%s" },
                     right = { backgroundColor = "%s" },
                 },
