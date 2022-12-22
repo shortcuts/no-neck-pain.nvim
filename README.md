@@ -16,19 +16,17 @@
 
 </div>
 
-## Introduction
+## Features
 
-The plugin creates evenly sized empty buffers on each side of your focused buffer, which acts as padding for your nvim window.
+_Creates evenly sized empty buffers on each side of your focused buffer, which acts as padding for your window._
 
-<div align="center">
-
-| Before                    | After                     |
-|:---------------------------|:---------------------------:|
-|`\|current--------------\|`|`\|empty\|current\|empty\|`|
-
-</div>
-
-> thanks to @BerkeleyTrue for the drawing
+- Plug and play, no configuration required
+- [Highly customizable experience](https://github.com/shortcuts/no-neck-pain.nvim#configuration)
+- [Themed side buffers](https://github.com/shortcuts/no-neck-pain.nvim#configuration)
+- Support split/vsplit windows
+- Fully integrates with side trees, tmux, and more!
+- Keep your workflow intact
+- Neovim >= 0.5 support
 
 ## Installation
 
