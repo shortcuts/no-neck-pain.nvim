@@ -232,13 +232,10 @@ function NoNeckPain.enable()
                 end
 
                 if total > threshold then
-                    return D.log(
-                        p.event,
-                        "more than one buffer left (%s > %s), no killed split to handle",
-                        total,
-                        threshold
-                    )
+                    return
                 end
+
+                D.log(p.event, "%s < %s, killing split", total, threshold)
 
                 if vim.api.nvim_win_is_valid(S.win.main.split) then
                     S.win.main.curr = S.win.main.split
