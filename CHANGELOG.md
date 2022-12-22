@@ -1,4 +1,38 @@
 
+<a name="0.2.0"></a>
+## [0.2.0] - 2022-12-23
+### Chore
+- release 0.2.0
+- add features to README.md ([#93](https://github.com/shortcuts/no-neck-pain.nvim/issues/93))
+- update issue template
+- better debug logging ([#88](https://github.com/shortcuts/no-neck-pain.nvim/issues/88))
+- add lazy.nvim snippet to README.md ([#86](https://github.com/shortcuts/no-neck-pain.nvim/issues/86))
+- add motivations to README ([#70](https://github.com/shortcuts/no-neck-pain.nvim/issues/70))
+- fix changelog
+- release 0.1.2
+
+### Feat
+- prevent split closing side buffers ([#92](https://github.com/shortcuts/no-neck-pain.nvim/issues/92))
+- refactor setup ([#78](https://github.com/shortcuts/no-neck-pain.nvim/issues/78))
+- handle side tree ([#79](https://github.com/shortcuts/no-neck-pain.nvim/issues/79))
+- close side buffers when no space left ([#69](https://github.com/shortcuts/no-neck-pain.nvim/issues/69))
+- **config:** cleanup fields and unused code ([#91](https://github.com/shortcuts/no-neck-pain.nvim/issues/91))
+
+### Fix
+- prevent `setup` wrong overrides ([#87](https://github.com/shortcuts/no-neck-pain.nvim/issues/87))
+- adjust catppuccin colors to the correct values ([#85](https://github.com/shortcuts/no-neck-pain.nvim/issues/85))
+- make setup-less easier ([#75](https://github.com/shortcuts/no-neck-pain.nvim/issues/75))
+
+### BREAKING CHANGE
+
+exposed configuration options have changed, make sure to check `:h NoNeckPain.options` or https://github.com/shortcuts/no-neck-pain.nvim#configuration if you have trouble configuring
+
+### Contributors
+
+Thanks for contributing to the project:
+- [@shortcuts](https://github.com/shortcuts)
+- [@AlphaKeks](https://github.com/AlphaKeks)
+
 <a name="0.1.2"></a>
 ## [0.1.2] - 2022-12-18
 ### Chore
@@ -120,7 +154,8 @@ Thanks for contributing to the project:
 Thanks for contributing to the project:
 - [@shortcuts](https://github.com/shortcuts)
 
-[Unreleased]: https://github.com/shortcuts/no-neck-pain.nvim/compare/0.1.2...HEAD
+[Unreleased]: https://github.com/shortcuts/no-neck-pain.nvim/compare/0.2.0...HEAD
+[0.2.0]: https://github.com/shortcuts/no-neck-pain.nvim/compare/0.1.2...0.2.0
 [0.1.2]: https://github.com/shortcuts/no-neck-pain.nvim/compare/0.1.1...0.1.2
 [0.1.1]: https://github.com/shortcuts/no-neck-pain.nvim/compare/0.1.0...0.1.1
 [0.1.0]: https://github.com/shortcuts/no-neck-pain.nvim/compare/0.0.1...0.1.0
