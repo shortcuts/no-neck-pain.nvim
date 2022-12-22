@@ -24,6 +24,7 @@ local S = {
             },
         },
     },
+    vsplit = false,
 }
 
 --- Toggle the plugin by calling the `enable`/`disable` methods respectively.
@@ -61,7 +62,7 @@ local function init()
     -- before creating side buffers, we determine if a side tree is open
     S.win.external.tree = W.getSideTree()
 
-    if _G.NoNeckPain.config.buffers.left.enabled then
+    if _G.NoNeckPain.config.buffers.left.enabled and S.win.main.left == nil then
         S.win.main.left = W.createBuf(
             "left",
             "leftabove vnew",
@@ -70,7 +71,7 @@ local function init()
         )
     end
 
-    if _G.NoNeckPain.config.buffers.right.enabled then
+    if _G.NoNeckPain.config.buffers.right.enabled and S.win.main.right == nil then
         S.win.main.right = W.createBuf(
             "right",
             "vnew",
@@ -80,6 +81,7 @@ local function init()
     end
 
     vim.o.splitbelow, vim.o.splitright = splitbelow, splitright
+    vim.fn.win_gotoid(S.win.main.curr)
 end
 
 --- Initializes NNP and sets event listeners.
@@ -97,7 +99,7 @@ function NoNeckPain.enable()
     vim.api.nvim_create_autocmd({ "VimResized" }, {
         callback = function(p)
             vim.schedule(function()
-                if E.skip(p.event, S.enabled, S.win.split) then
+                if E.skip(p.event, S.enabled, nil) then
                     return
                 end
 
@@ -130,7 +132,7 @@ function NoNeckPain.enable()
     vim.api.nvim_create_autocmd({ "WinEnter" }, {
         callback = function(p)
             vim.schedule(function()
-                if E.skip(p.event, S.enabled, S.win.split) then
+                if E.skip(p.event, S.enabled, nil) then
                     return
                 end
 
@@ -152,9 +154,15 @@ function NoNeckPain.enable()
                 -- start by saving the split, because steps below will trigger `WinClosed`
                 S.win.main.split = focusedWin
 
-                D.log(p.event, "split found %s, closing side buffers", focusedWin)
+                local screenWidth = vim.api.nvim_list_uis()[1].width
+                local width = vim.api.nvim_win_get_width(focusedWin) * 2
 
-                close(p.event)
+                D.log(p.event, "split found %s", focusedWin)
+
+                if width < screenWidth then
+                    S.vsplit = true
+                    return close(p.event)
+                end
             end)
         end,
         group = "NoNeckPain",
@@ -169,6 +177,7 @@ function NoNeckPain.enable()
                 end
 
                 local wins = vim.api.nvim_list_wins()
+                local total = M.tsize(wins)
 
                 -- if we are not in split view, we check if we killed one of the main buffers (curr, left, right) to disable NNP
                 -- TODO: make killed side buffer decision configurable, we can re-create it
@@ -178,34 +187,66 @@ function NoNeckPain.enable()
                     return NoNeckPain.disable(p.event)
                 end
 
-                local _, total = W.listWinsExcept({
-                    S.win.main.curr,
-                    S.win.main.left,
-                    S.win.main.right,
-                    S.win.external.tree.id,
-                })
+                if _G.NoNeckPain.config.disableOnLastBuffer then
+                    local _, remaining = W.listWinsExcept({
+                        S.win.main.curr,
+                        S.win.main.left,
+                        S.win.main.right,
+                        S.win.main.split,
+                        S.win.external.tree.id,
+                    })
 
-                if
-                    _G.NoNeckPain.config.disableOnLastBuffer
-                    and total == 0
-                    and vim.api.nvim_buf_get_option(0, "buftype") == ""
-                    and vim.api.nvim_buf_get_option(0, "filetype") == ""
-                    and vim.api.nvim_buf_get_option(0, "bufhidden") == "wipe"
-                then
-                    D.log(p.event, "found last `wipe` buffer in list, disabling...")
+                    if
+                        remaining == 0
+                        and vim.api.nvim_buf_get_option(0, "buftype") == ""
+                        and vim.api.nvim_buf_get_option(0, "filetype") == ""
+                        and vim.api.nvim_buf_get_option(0, "bufhidden") == "wipe"
+                    then
+                        D.log(p.event, "found last `wipe` buffer in list, disabling...")
 
-                    return NoNeckPain.disable()
-                elseif M.tsize(wins) > 1 then
-                    return D.log(p.event, "more than one buffer left, no killed split to handle")
+                        return NoNeckPain.disable()
+                    end
                 end
 
-                S.win.main.curr = wins[0]
+                if S.win.main.split == nil then
+                    return
+                end
+
+                -- `total` needs to be compared with the number of active wins,
+                -- in the NNP context. This threshold holds the count.
+                -- 1 = split && curr && !left && !right
+                --  - vsplit   we have either `curr` or `split` left, basic vsplit case
+                --  - split    we don't have side buffers (e.g. small window, disabled in config)
+                -- 2 = !vsplit && split && curr && (!left || !right)
+                --  - user disabled one of the side buffer
+                -- 3 = !vsplit && split && curr && left && right
+                --  - a default config case
+                local threshold = 1
+
+                if not S.vsplit then
+                    if S.win.main.left ~= nil and S.win.main.right ~= nil then
+                        threshold = 2
+                    elseif S.win.main.left ~= nil or S.win.main.right ~= nil then
+                        threshold = 3
+                    end
+                end
+
+                if total > threshold then
+                    return D.log(
+                        p.event,
+                        "more than one buffer left (%s > %s), no killed split to handle",
+                        total,
+                        threshold
+                    )
+                end
+
+                if vim.api.nvim_win_is_valid(S.win.main.split) then
+                    S.win.main.curr = S.win.main.split
+                end
+
                 S.win.main.split = nil
+                S.vsplit = false
 
-                -- focus curr
-                vim.fn.win_gotoid(S.win.main.curr)
-
-                -- recreate everything
                 init()
             end)
         end,
@@ -278,6 +319,7 @@ function NoNeckPain.disable(scope)
     close(scope)
 
     S.augroup = nil
+    S.vsplit = false
     S.win = {
         main = {
             curr = nil,
