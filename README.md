@@ -1,5 +1,5 @@
 <p align="center">
-  <h1 align="center">no-neck-pain.nvim</h2>
+  <h1 align="center">☕ no-neck-pain.nvim</h2>
 </p>
 
 <p align="center">
