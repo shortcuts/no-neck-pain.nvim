@@ -10,10 +10,6 @@ local W = {}
 --@param padding number: the "padding" (width) of the buffer
 --@param moveTo string: the command to execute to place the buffer at the correct spot.
 function W.createBuf(name, cmd, padding, moveTo)
-    if vim.api.nvim_list_uis()[1].width < _G.NoNeckPain.config.width then
-        return D.log("W.createBuf", "not enough space to create side buffer %s", name)
-    end
-
     vim.cmd(cmd)
 
     local id = vim.api.nvim_get_current_win()
