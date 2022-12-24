@@ -1,6 +1,12 @@
 NoNeckPain.bufferOptions	no-neck-pain.txt	/*NoNeckPain.bufferOptions*
+NoNeckPain.bufferOptions	textColor.txt	/*NoNeckPain.bufferOptions*
 NoNeckPain.disable()	no-neck-pain.txt	/*NoNeckPain.disable()*
+NoNeckPain.disable()	textColor.txt	/*NoNeckPain.disable()*
 NoNeckPain.enable()	no-neck-pain.txt	/*NoNeckPain.enable()*
+NoNeckPain.enable()	textColor.txt	/*NoNeckPain.enable()*
 NoNeckPain.options	no-neck-pain.txt	/*NoNeckPain.options*
+NoNeckPain.options	textColor.txt	/*NoNeckPain.options*
 NoNeckPain.setup()	no-neck-pain.txt	/*NoNeckPain.setup()*
+NoNeckPain.setup()	textColor.txt	/*NoNeckPain.setup()*
 NoNeckPain.toggle()	no-neck-pain.txt	/*NoNeckPain.toggle()*
+NoNeckPain.toggle()	textColor.txt	/*NoNeckPain.toggle()*
