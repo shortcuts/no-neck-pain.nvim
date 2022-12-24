@@ -156,8 +156,10 @@ function NoNeckPain.setup(options)
         or NoNeckPain.options.buffers.backgroundColor
     NoNeckPain.options.buffers.left.textColor = NoNeckPain.options.buffers.left.textColor
         or NoNeckPain.options.buffers.textColor
+        or NoNeckPain.options.buffers.left.backgroundColor
     NoNeckPain.options.buffers.right.textColor = NoNeckPain.options.buffers.right.textColor
         or NoNeckPain.options.buffers.textColor
+        or NoNeckPain.options.buffers.right.backgroundColor
 
     return NoNeckPain.options
 end
