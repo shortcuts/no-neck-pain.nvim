@@ -58,13 +58,14 @@ function C.init(win, name, backgroundColor, textColor)
 
     D.log(
         "Color.init",
-        "groupName `%s` - window `%s` - backgroundColor `%s`",
+        "groupName `%s` - window `%s` - backgroundColor `%s`\ngroupName `%s` - window `%s` - textColor `%s`",
         backgroundGroup,
         win,
-        backgroundColor
+        backgroundColor,
+        textGroup,
+        win,
+        textColor
     )
-
-    D.log("Color.init", "groupName `%s` - window `%s` - textColor `%s`", textGroup, win, textColor)
 
     vim.cmd(string.format("highlight! clear %s NONE", backgroundGroup))
 
