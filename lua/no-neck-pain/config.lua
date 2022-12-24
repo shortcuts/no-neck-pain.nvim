@@ -27,6 +27,8 @@ NoNeckPain.bufferOptions = {
     -- - rose-pine-moon
     -- - rose-pine-dawn
     backgroundColor = nil,
+    -- Hexadecimal color code to override the current text color of the buffer. (e.g. #7480c2)
+    textColor = nil,
     -- buffer-scoped options: any `vim.bo` options is accepted here.
     bo = {
         filetype = "no-neck-pain",
@@ -84,6 +86,8 @@ NoNeckPain.options = {
         -- - rose-pine-moon
         -- - rose-pine-dawn
         backgroundColor = nil,
+        -- Hexadecimal color code to override the current text color of the buffer. (e.g. #7480c2)
+        textColor = nil,
         -- buffer-scoped options: any `vim.bo` options is accepted here.
         bo = {
             filetype = "no-neck-pain",
@@ -147,6 +151,13 @@ function NoNeckPain.setup(options)
     NoNeckPain.options.buffers.right.backgroundColor = C.matchIntegrationToHexCode(
         NoNeckPain.options.buffers.right.backgroundColor
     ) or NoNeckPain.options.buffers.backgroundColor
+
+    NoNeckPain.options.buffers.textColor = NoNeckPain.options.buffers.textColor
+        or NoNeckPain.options.buffers.backgroundColor
+    NoNeckPain.options.buffers.left.textColor = NoNeckPain.options.buffers.left.textColor
+        or NoNeckPain.options.buffers.textColor
+    NoNeckPain.options.buffers.right.textColor = NoNeckPain.options.buffers.right.textColor
+        or NoNeckPain.options.buffers.textColor
 
     return NoNeckPain.options
 end

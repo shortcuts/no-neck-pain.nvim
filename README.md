@@ -136,6 +136,8 @@ require("no-neck-pain").setup({
         -- - rose-pine-moon
         -- - rose-pine-dawn
         backgroundColor = nil,
+        -- Hexadecimal color code to override the current text color of the buffer. (e.g. #7480c2)
+        textColor = nil,
         -- buffer-scoped options: any `vim.bo` options is accepted here.
         bo = {
             filetype = "no-neck-pain",
@@ -192,6 +194,8 @@ NoNeckPain.bufferOptions = {
     -- - rose-pine-moon
     -- - rose-pine-dawn
     backgroundColor = nil,
+    -- Hexadecimal color code to override the current text color of the buffer. (e.g. #7480c2)
+    textColor = nil,
     -- buffer-scoped options: any `vim.bo` options is accepted here.
     bo = {
         filetype = "no-neck-pain",

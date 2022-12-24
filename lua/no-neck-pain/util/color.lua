@@ -40,8 +40,9 @@ end
 
 -- creates an highlight group for a given buffer named `NNPBuffers_$NAME` with the given `backgroundColor` and assign it to the side buffer of the given `id`.
 -- `cmd` is used instead of native commands for backward compatibility with Neovim 0.7
-function C.init(win, name, backgroundColor)
-    local groupName = "NNPBuffers_" .. name
+function C.init(win, name, backgroundColor, textColor)
+    local backgroundGroup = "NNPBuffers_Background_" .. name
+    local textGroup = "NNPBuffers_Text_" .. name
     local defaultBackground = vim.api.nvim_get_hl_by_name("Normal", true).background
 
     -- check if the user has a transparent background or not
@@ -53,41 +54,49 @@ function C.init(win, name, backgroundColor)
     end
 
     backgroundColor = backgroundColor or defaultBackground
+    textColor = textColor or backgroundColor
 
     D.log(
         "Color.init",
         "groupName `%s` - window `%s` - backgroundColor `%s`",
-        groupName,
+        backgroundGroup,
         win,
         backgroundColor
     )
 
-    vim.cmd(string.format("highlight! clear %s NONE", groupName))
+    D.log("Color.init", "groupName `%s` - window `%s` - textColor `%s`", textGroup, win, textColor)
+
+    vim.cmd(string.format("highlight! clear %s NONE", backgroundGroup))
+
+    -- create group for background
     vim.cmd(
         string.format(
             "highlight! %s guifg=%s guibg=%s",
-            groupName,
+            backgroundGroup,
             backgroundColor,
             backgroundColor
         )
     )
+
+    -- create group for text
+    vim.cmd(string.format("highlight! %s guifg=%s", textGroup, textColor))
 
     vim.api.nvim_win_set_option(
         win,
         "winhl",
         string.format(
             "Normal:%s,NormalNC:%s,CursorColumn:%s,CursorLineNr:%s,NonText:%s,SignColumn:%s,Cursor:%s,LineNr:%s,EndOfBuffer:%s,WinSeparator:%s,VertSplit:%s",
-            groupName,
-            groupName,
-            groupName,
-            groupName,
-            groupName,
-            groupName,
-            groupName,
-            groupName,
-            groupName,
-            groupName,
-            groupName
+            textGroup,
+            textGroup,
+            backgroundGroup,
+            backgroundGroup,
+            backgroundGroup,
+            backgroundGroup,
+            backgroundGroup,
+            backgroundGroup,
+            backgroundGroup,
+            backgroundGroup,
+            backgroundGroup
         )
     )
 end
