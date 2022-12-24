@@ -59,7 +59,11 @@ local function init()
 
     S.win.main.curr = vim.api.nvim_get_current_win()
 
-    -- before creating side buffers, we determine if a side tree is open
+    if vim.api.nvim_list_uis()[1].width < _G.NoNeckPain.config.width then
+        return D.log("init", "not enough space to create side buffers")
+    end
+
+    -- before creating side buffers, we determine if we should consider externals
     S.win.external.tree = W.getSideTree()
 
     if _G.NoNeckPain.config.buffers.left.enabled and S.win.main.left == nil then
@@ -143,21 +147,32 @@ function NoNeckPain.enable()
                     return D.log(p.event, "no valid buffers to handle, no split to handle")
                 end
 
-                -- below we will check for plugins that opens windows as splits (e.g. tree)
-                -- and early return while storing its NoNeckPain.
-                if vim.api.nvim_buf_get_option(0, "filetype") == "NvimTree" then
+                local fileType = vim.api.nvim_buf_get_option(0, "filetype")
+                if fileType == "NvimTree" then
                     S.win.external.tree = W.getSideTree()
 
-                    return D.log(p.event, "encoutered an NvimTree split")
+                    return D.log(p.event, "encoutered an external window")
                 end
 
                 -- start by saving the split, because steps below will trigger `WinClosed`
                 S.win.main.split = focusedWin
 
                 local screenWidth = vim.api.nvim_list_uis()[1].width
-                local width = vim.api.nvim_win_get_width(focusedWin) * 2
+                local width = vim.api.nvim_win_get_width(focusedWin)
 
-                D.log(p.event, "split found %s", focusedWin)
+                -- since the side buffer is still there when detecting a split
+                -- we need to add the side buffers to the width to properly compare with
+                -- the screen width.
+                -- note: due to floor/ceil, side widths might be off by 1, so we add it
+                if S.win.main.left ~= nil then
+                    width = width + vim.api.nvim_win_get_width(S.win.main.left) + 1
+                end
+
+                if S.win.main.right ~= nil then
+                    width = width + vim.api.nvim_win_get_width(S.win.main.right) + 1
+                end
+
+                D.log(p.event, "split found [%s/%s]", width, screenWidth)
 
                 if width < screenWidth then
                     S.vsplit = true
@@ -268,8 +283,6 @@ function NoNeckPain.enable()
                 -- when opening a new buffer as current, store its padding and resize everything (e.g. side tree)
                 if focusedWin ~= S.win.main.curr then
                     S.win.external.tree = W.getSideTree()
-
-                    D.log(p.event, "new current buffer with width %s", S.win.external.tree.width)
                 end
 
                 if not M.contains(vim.api.nvim_list_wins(), S.win.external.tree.id) then
