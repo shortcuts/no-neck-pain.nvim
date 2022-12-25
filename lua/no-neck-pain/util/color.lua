@@ -38,7 +38,7 @@ function C.matchIntegrationToHexCode(colorCode)
     return colorCode
 end
 
--- creates two highlight groups for a given buffer named `NNPBuffers_Background_$NAME` and `NNPBuffers_Text_$NAME` with the given `backgroundColor` and assign it to the side buffer of the given `id`.
+-- creates two highlight groups for a given `win` named `NNPBuffers_Background_$NAME` and `NNPBuffers_Text_$NAME`.
 -- `cmd` is used instead of native commands for backward compatibility with Neovim 0.7
 function C.init(win, name, backgroundColor, textColor)
     local backgroundGroup = "NNPBuffers_Background_" .. name
@@ -66,7 +66,9 @@ function C.init(win, name, backgroundColor, textColor)
         textColor
     )
 
+    -- clear groups
     vim.cmd(string.format("highlight! clear %s NONE", backgroundGroup))
+    vim.cmd(string.format("highlight! clear %s NONE", textGroup))
 
     -- create group for background
     vim.cmd(
