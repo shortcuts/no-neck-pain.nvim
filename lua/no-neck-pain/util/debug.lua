@@ -10,7 +10,7 @@ function D.log(scope, str, ...)
     local line = ""
 
     if info then
-        line = " L" .. info.currentline
+        line = "L" .. info.currentline
     end
 
     print(

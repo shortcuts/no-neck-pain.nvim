@@ -184,7 +184,7 @@ function NoNeckPain.enable()
         desc = "WinEnter covers the split/vsplit management",
     })
 
-    vim.api.nvim_create_autocmd({ "WinClosed", "BufDelete" }, {
+    vim.api.nvim_create_autocmd({ "QuitPre", "BufDelete" }, {
         callback = function(p)
             vim.schedule(function()
                 if E.skip(p.event, S.enabled, nil) then
@@ -221,11 +221,20 @@ function NoNeckPain.enable()
                         return NoNeckPain.disable()
                     end
                 end
+            end)
+        end,
+        group = "NoNeckPain",
+        desc = "Handles the closure of main NNP windows and restoring the state correctly",
+    })
 
-                if S.win.main.split == nil then
+    vim.api.nvim_create_autocmd({ "WinClosed", "BufDelete" }, {
+        callback = function(p)
+            vim.schedule(function()
+                if E.skip(p.event, S.enabled, nil) or S.win.main.split == nil then
                     return
                 end
 
+                local wins = vim.api.nvim_list_wins()
                 local total = M.tsize(wins)
 
                 -- `total` needs to be compared with the number of active wins,

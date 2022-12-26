@@ -103,27 +103,24 @@ function W.close(scope, win)
         return nil
     end
 
-    local wins, wsize = W.listWinsExcept({ win })
+    local _, wsize = W.listWinsExcept({ win })
 
-    -- if we are closing the last window, we might just quit Nvim
+    -- we don't have any window left if we close this one
     if wsize == 0 then
-        local _, bsize = W.listBufsExcept(W.winsGetBufs(wins))
-
-        -- if it's the last buffer in the list, we definitely want to quit it
-        if scope == "WinClosed" and bsize == 0 then
+        -- either triggered by a :wq or quit event, we can just quit
+        if scope == "QuitPre" then
             return vim.cmd("quit!")
         end
 
+        -- mostly triggered by :bd or similar
+        -- we will create a new window and close the other
         vim.cmd("new")
     end
 
-    D.log(scope, "killing window %s", win)
-
+    -- when we have more than 1 window left, we can just close it
     if vim.api.nvim_win_is_valid(win) then
         vim.api.nvim_win_close(win, false)
     end
-
-    return nil
 end
 
 -- resizes a given `win` for the given `padding`
