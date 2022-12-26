@@ -234,12 +234,12 @@ function NoNeckPain.enable()
                     return
                 end
 
-                local wins = vim.api.nvim_list_wins()
-                local total = M.tsize(wins)
-
                 if S.win.main.split == nil then
                     return
                 end
+
+                local wins = vim.api.nvim_list_wins()
+                local total = M.tsize(wins)
 
                 -- `total` needs to be compared with the number of active wins,
                 -- in the NNP context. This threshold holds the count.
@@ -293,19 +293,16 @@ function NoNeckPain.enable()
 
                 S.win.external.tree = W.getSideTree()
                 if S.win.external.tree.id ~= nil then
+                    if not M.contains(vim.api.nvim_list_wins(), S.win.external.tree.id) then
+                        S.win.external.tree = {
+                            id = nil,
+                            width = 0,
+                        }
+
+                        return resize(p.event)
+                    end
+
                     D.log(p.event, "side tree found, resizing")
-
-                    return resize(p.event)
-                end
-
-                if
-                    S.win.external.tree.id ~= nil
-                    and not M.contains(vim.api.nvim_list_wins(), S.win.external.tree.id)
-                then
-                    S.win.external.tree = {
-                        id = nil,
-                        width = 0,
-                    }
 
                     return resize(p.event)
                 end
