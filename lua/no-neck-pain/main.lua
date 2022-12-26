@@ -184,7 +184,7 @@ function NoNeckPain.enable()
         desc = "WinEnter covers the split/vsplit management",
     })
 
-    vim.api.nvim_create_autocmd({ "WinClosed", "BufDelete" }, {
+    vim.api.nvim_create_autocmd({ "BufDelete", "WinClosed" }, {
         callback = function(p)
             vim.schedule(function()
                 if E.skip(p.event, S.enabled, nil) then
@@ -192,7 +192,6 @@ function NoNeckPain.enable()
                 end
 
                 local wins = vim.api.nvim_list_wins()
-                local total = M.tsize(wins)
 
                 -- if we are not in split view, we check if we killed one of the main buffers (curr, left, right) to disable NNP
                 -- TODO: make killed side buffer decision configurable, we can re-create it
@@ -222,6 +221,21 @@ function NoNeckPain.enable()
                         return NoNeckPain.disable()
                     end
                 end
+            end)
+        end,
+        group = "NoNeckPain",
+        desc = "Covers the cases where closing should disable NNP",
+    })
+
+    vim.api.nvim_create_autocmd({ "WinClosed", "BufDelete" }, {
+        callback = function(p)
+            vim.schedule(function()
+                if E.skip(p.event, S.enabled, nil) then
+                    return
+                end
+
+                local wins = vim.api.nvim_list_wins()
+                local total = M.tsize(wins)
 
                 if S.win.main.split == nil then
                     return
@@ -269,30 +283,32 @@ function NoNeckPain.enable()
     vim.api.nvim_create_autocmd({ "WinEnter", "WinClosed" }, {
         callback = function(p)
             vim.schedule(function()
-                if E.skip(p.event, S.enabled, nil) then
-                    return
-                end
-
                 local focusedWin = vim.api.nvim_get_current_win()
 
-                -- skip if the newly focused window is a side buffer
-                if focusedWin == S.win.main.left or focusedWin == S.win.main.right then
+                if
+                    E.skip(p.event, S.enabled, S.win.split) or M.contains(S.win.main, focusedWin)
+                then
                     return
                 end
 
-                -- when opening a new buffer as current, store its padding and resize everything (e.g. side tree)
-                if focusedWin ~= S.win.main.curr then
-                    S.win.external.tree = W.getSideTree()
+                S.win.external.tree = W.getSideTree()
+                if S.win.external.tree.id ~= nil then
+                    D.log(p.event, "side tree found, resizing")
+
+                    return resize(p.event)
                 end
 
-                if not M.contains(vim.api.nvim_list_wins(), S.win.external.tree.id) then
+                if
+                    S.win.external.tree.id ~= nil
+                    and not M.contains(vim.api.nvim_list_wins(), S.win.external.tree.id)
+                then
                     S.win.external.tree = {
                         id = nil,
                         width = 0,
                     }
-                end
 
-                resize(p.event)
+                    return resize(p.event)
+                end
             end)
         end,
         group = "NoNeckPain",

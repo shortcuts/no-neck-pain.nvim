@@ -40,7 +40,23 @@ T["curr buffer"]["have the width from the config"] = function()
     eq_buf_width(child, "main.curr", 48)
 end
 
-T["curr buffer"]["closing `curr` buffer without any other window open closes Neovim"] = function()
+T["curr buffer"]["bdelete doesn't close Neovim"] = function()
+    child.lua([[
+        require('no-neck-pain').setup({width=50})
+        require('no-neck-pain').enable()
+    ]])
+
+    eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1000, 1002 })
+
+    child.cmd("bd")
+
+    -- neovim is not closed, otherwise it would throw an error
+    helpers.expect.no_error(function()
+        child.lua_get("vim.api.nvim_list_wins()")
+    end)
+end
+
+T["curr buffer"]["closing `curr` buffer without any other window creates a new window"] = function()
     child.lua([[
         require('no-neck-pain').setup({width=50})
         require('no-neck-pain').enable()
@@ -51,10 +67,12 @@ T["curr buffer"]["closing `curr` buffer without any other window open closes Neo
 
     child.lua("vim.api.nvim_win_close(1000, false)")
 
-    -- neovim is closed, we can't run anything against it
-    helpers.expect.error(function()
-        child.lua_get("vim.api.nvim_list_wins()")
-    end)
+    eq_state(child, "enabled", false)
+    eq_state(child, "win.main.curr", vim.NIL)
+    eq_state(child, "win.main.left", vim.NIL)
+    eq_state(child, "win.main.right", vim.NIL)
+
+    eq(child.lua_get("vim.api.nvim_list_wins()"), { 1003 })
 end
 
 T["side buffers"] = new_set()
