@@ -221,24 +221,11 @@ function NoNeckPain.enable()
                         return NoNeckPain.disable()
                     end
                 end
-            end)
-        end,
-        group = "NoNeckPain",
-        desc = "Covers the cases where closing should disable NNP",
-    })
-
-    vim.api.nvim_create_autocmd({ "WinClosed", "BufDelete" }, {
-        callback = function(p)
-            vim.schedule(function()
-                if E.skip(p.event, S.enabled, nil) then
-                    return
-                end
 
                 if S.win.main.split == nil then
                     return
                 end
 
-                local wins = vim.api.nvim_list_wins()
                 local total = M.tsize(wins)
 
                 -- `total` needs to be compared with the number of active wins,
