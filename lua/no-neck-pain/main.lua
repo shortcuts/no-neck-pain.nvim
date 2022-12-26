@@ -184,7 +184,7 @@ function NoNeckPain.enable()
         desc = "WinEnter covers the split/vsplit management",
     })
 
-    vim.api.nvim_create_autocmd({ "BufDelete", "WinClosed" }, {
+    vim.api.nvim_create_autocmd({ "WinClosed", "BufDelete" }, {
         callback = function(p)
             vim.schedule(function()
                 if E.skip(p.event, S.enabled, nil) then
