@@ -81,7 +81,7 @@ function C.init(win, name, backgroundColor, textColor)
     )
 
     -- create group for text
-    vim.cmd(string.format("highlight! %s guifg=%s", textGroup, textColor))
+    vim.cmd(string.format("highlight! %s guifg=%s guibg=%s", textGroup, textColor, backgroundColor))
 
     vim.api.nvim_win_set_option(
         win,
