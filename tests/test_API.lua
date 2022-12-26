@@ -63,6 +63,7 @@ T["setup()"]["sets exposed methods and default options value"] = function()
 
     eq_option(child, "buffers.setNames", false)
     eq_option(child, "buffers.backgroundColor", vim.NIL)
+    eq_option(child, "buffers.textColor", vim.NIL)
 
     eq_option(child, "buffers.bo.filetype", "no-neck-pain")
     eq_option(child, "buffers.bo.buftype", "nofile")
@@ -84,6 +85,7 @@ T["setup()"]["sets exposed methods and default options value"] = function()
         eq_type_option(child, "buffers." .. scope .. ".wo", "table")
 
         eq_option(child, "buffers." .. scope .. ".backgroundColor", vim.NIL)
+        eq_option(child, "buffers." .. scope .. ".textColor", vim.NIL)
 
         eq_option(child, "buffers." .. scope .. ".bo.filetype", "no-neck-pain")
         eq_option(child, "buffers." .. scope .. ".bo.buftype", "nofile")
@@ -110,6 +112,7 @@ T["setup()"]["overrides default values"] = function()
         buffers = {
             setNames = true,
             backgroundColor = "catppuccin-frappe",
+            textColor = "#7480c2",
             bo = {
                 filetype = "my-file-type",
                 buftype = "help",
@@ -128,6 +131,7 @@ T["setup()"]["overrides default values"] = function()
             },
             left = {
                 backgroundColor = "catppuccin-frappe",
+            	textColor = "#7480c2",
                 bo = {
                     filetype = "my-file-type",
                     buftype = "help",
@@ -147,6 +151,7 @@ T["setup()"]["overrides default values"] = function()
             },
             right = {
                 backgroundColor = "catppuccin-frappe",
+            	textColor = "#7480c2",
                 bo = {
                     filetype = "my-file-type",
                     buftype = "help",
@@ -180,6 +185,7 @@ T["setup()"]["overrides default values"] = function()
 
     eq_option(child, "buffers.setNames", true)
     eq_option(child, "buffers.backgroundColor", "#303446")
+    eq_option(child, "buffers.textColor", "#7480c2")
 
     eq_option(child, "buffers.bo.filetype", "my-file-type")
     eq_option(child, "buffers.bo.buftype", "help")
@@ -197,6 +203,7 @@ T["setup()"]["overrides default values"] = function()
 
     for _, scope in pairs(SCOPES) do
         eq_option(child, "buffers." .. scope .. ".backgroundColor", "#303446")
+        eq_option(child, "buffers." .. scope .. ".textColor", "#7480c2")
 
         eq_option(child, "buffers." .. scope .. ".bo.filetype", "my-file-type")
         eq_option(child, "buffers." .. scope .. ".bo.buftype", "help")
@@ -218,6 +225,7 @@ T["setup()"]["`left` or `right` buffer options overrides `common` ones"] = funct
     child.lua([[require('no-neck-pain').setup({
         buffers = {
             backgroundColor = "catppuccin-frappe",
+            textColor = "#7480c2",
             bo = {
                 filetype = "TEST",
             },
@@ -226,6 +234,7 @@ T["setup()"]["`left` or `right` buffer options overrides `common` ones"] = funct
             },
             left = {
                 backgroundColor = "catppuccin-frappe-dark",
+                textColor = "#123123",
                 bo = {
                     filetype = "TEST-left",
                 },
@@ -235,6 +244,7 @@ T["setup()"]["`left` or `right` buffer options overrides `common` ones"] = funct
             },
             right = {
                 backgroundColor = "catppuccin-latte",
+                textColor = "#456456",
                 bo = {
                     filetype = "TEST-right",
                 },
@@ -246,11 +256,15 @@ T["setup()"]["`left` or `right` buffer options overrides `common` ones"] = funct
     })]])
 
     eq_option(child, "buffers.backgroundColor", "#303446")
+    eq_option(child, "buffers.textColor", "#7480c2")
     eq_option(child, "buffers.bo.filetype", "TEST")
     eq_option(child, "buffers.wo.cursorline", false)
 
     eq_option(child, "buffers.left.backgroundColor", "#292C3C")
     eq_option(child, "buffers.right.backgroundColor", "#EFF1F5")
+
+    eq_option(child, "buffers.left.textColor", "#123123")
+    eq_option(child, "buffers.right.textColor", "#456456")
 
     eq_option(child, "buffers.left.bo.filetype", "TEST-left")
     eq_option(child, "buffers.right.bo.filetype", "TEST-right")
@@ -278,6 +292,9 @@ T["setup()"]["`common` options spreads it to `left` and `right` buffers"] = func
 
     eq_option(child, "buffers.left.backgroundColor", "#303446")
     eq_option(child, "buffers.right.backgroundColor", "#303446")
+
+    eq_option(child, "buffers.left.textColor", "#303446")
+    eq_option(child, "buffers.right.textColor", "#303446")
 
     eq_option(child, "buffers.left.wo.number", true)
     eq_option(child, "buffers.right.wo.number", true)

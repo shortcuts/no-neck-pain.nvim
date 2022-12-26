@@ -30,7 +30,12 @@ function W.createBuf(name, cmd, padding, moveTo)
 
     vim.cmd(moveTo)
 
-    C.init(id, name, _G.NoNeckPain.config.buffers[name].backgroundColor)
+    C.init(
+        id,
+        name,
+        _G.NoNeckPain.config.buffers[name].backgroundColor,
+        _G.NoNeckPain.config.buffers[name].textColor
+    )
 
     return id
 end

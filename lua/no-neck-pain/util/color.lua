@@ -38,10 +38,11 @@ function C.matchIntegrationToHexCode(colorCode)
     return colorCode
 end
 
--- creates an highlight group for a given buffer named `NNPBuffers_$NAME` with the given `backgroundColor` and assign it to the side buffer of the given `id`.
+-- creates two highlight groups for a given `win` named `NNPBuffers_Background_$NAME` and `NNPBuffers_Text_$NAME`.
 -- `cmd` is used instead of native commands for backward compatibility with Neovim 0.7
-function C.init(win, name, backgroundColor)
-    local groupName = "NNPBuffers_" .. name
+function C.init(win, name, backgroundColor, textColor)
+    local backgroundGroup = "NNPBuffers_Background_" .. name
+    local textGroup = "NNPBuffers_Text_" .. name
     local defaultBackground = vim.api.nvim_get_hl_by_name("Normal", true).background
 
     -- check if the user has a transparent background or not
@@ -56,38 +57,48 @@ function C.init(win, name, backgroundColor)
 
     D.log(
         "Color.init",
-        "groupName `%s` - window `%s` - backgroundColor `%s`",
-        groupName,
+        "groupName `%s` - window `%s` - backgroundColor `%s`\ngroupName `%s` - window `%s` - textColor `%s`",
+        backgroundGroup,
         win,
-        backgroundColor
+        backgroundColor,
+        textGroup,
+        win,
+        textColor
     )
 
-    vim.cmd(string.format("highlight! clear %s NONE", groupName))
+    -- clear groups
+    vim.cmd(string.format("highlight! clear %s NONE", backgroundGroup))
+    vim.cmd(string.format("highlight! clear %s NONE", textGroup))
+
+    -- create group for background
     vim.cmd(
         string.format(
             "highlight! %s guifg=%s guibg=%s",
-            groupName,
+            backgroundGroup,
             backgroundColor,
             backgroundColor
         )
     )
+
+    -- create group for text
+    vim.cmd(string.format("highlight! %s guifg=%s guibg=%s", textGroup, textColor, backgroundColor))
 
     vim.api.nvim_win_set_option(
         win,
         "winhl",
         string.format(
             "Normal:%s,NormalNC:%s,CursorColumn:%s,CursorLineNr:%s,NonText:%s,SignColumn:%s,Cursor:%s,LineNr:%s,EndOfBuffer:%s,WinSeparator:%s,VertSplit:%s",
-            groupName,
-            groupName,
-            groupName,
-            groupName,
-            groupName,
-            groupName,
-            groupName,
-            groupName,
-            groupName,
-            groupName,
-            groupName
+            textGroup,
+            textGroup,
+            backgroundGroup,
+            backgroundGroup,
+            backgroundGroup,
+            backgroundGroup,
+            backgroundGroup,
+            backgroundGroup,
+            backgroundGroup,
+            backgroundGroup,
+            backgroundGroup
         )
     )
 end
