@@ -116,7 +116,12 @@ NoNeckPain.options = {
     -- lists supported integrations that might clash with `no-neck-pain.nvim`'s behavior
     integrations = {
         -- https://github.com/nvim-tree/nvim-tree.lua
-        nvimTree = {
+        NvimTree = {
+            -- the position of the tree, can be `left` or `right``
+            position = "left",
+        },
+        -- https://github.com/mbbill/undotree
+        undotree = {
             -- the position of the tree, can be `left` or `right``
             position = "left",
         },

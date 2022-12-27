@@ -370,9 +370,13 @@ T["enable()"]["sets state and internal methods"] = function()
     eq_state(child, "win.main.split", vim.NIL)
     eq_state(child, "vsplit", false)
 
-    eq_type_state(child, "win.external.tree", "table")
-    eq_state(child, "win.external.tree.id", vim.NIL)
-    eq_state(child, "win.external.tree.width", 0)
+    eq_type_state(child, "win.external.trees", "table")
+
+    local integrations = { "NvimTree", "undotree" }
+    for _, integration in pairs(integrations) do
+        eq_state(child, "win.external.trees." .. integration .. ".id", vim.NIL)
+        eq_state(child, "win.external.trees." .. integration .. ".width", 0)
+    end
 end
 
 T["disable()"] = MiniTest.new_set()
@@ -396,9 +400,13 @@ T["disable()"]["resets state and remove internal methods"] = function()
     eq_state(child, "win.main.split", vim.NIL)
     eq_state(child, "vsplit", false)
 
-    eq_type_state(child, "win.external.tree", "table")
-    eq_state(child, "win.external.tree.id", vim.NIL)
-    eq_state(child, "win.external.tree.width", 0)
+    eq_type_state(child, "win.external.trees", "table")
+
+    local integrations = { "NvimTree", "undotree" }
+    for _, integration in pairs(integrations) do
+        eq_state(child, "win.external.trees." .. integration .. ".id", vim.NIL)
+        eq_state(child, "win.external.trees." .. integration .. ".width", 0)
+    end
 end
 
 T["toggle()"] = MiniTest.new_set()
@@ -431,9 +439,13 @@ T["toggle()"]["sets state and internal methods and resets everything when toggle
         eq_state(child, "win.main.split", vim.NIL)
         eq_state(child, "vsplit", false)
 
-        eq_type_state(child, "win.external.tree", "table")
-        eq_state(child, "win.external.tree.id", vim.NIL)
-        eq_state(child, "win.external.tree.width", 0)
+        eq_type_state(child, "win.external.trees", "table")
+
+        local integrations = { "NvimTree", "undotree" }
+        for _, integration in pairs(integrations) do
+            eq_state(child, "win.external.trees." .. integration .. ".id", vim.NIL)
+            eq_state(child, "win.external.trees." .. integration .. ".width", 0)
+        end
 
         -- disable
         child.lua([[require('no-neck-pain').toggle()]])
