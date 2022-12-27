@@ -19,7 +19,7 @@ local S = {
         },
         external = {
             trees = {
-                nvimTree = {
+                NvimTree = {
                     id = nil,
                     width = 0,
                 },
@@ -207,7 +207,7 @@ function NoNeckPain.enable()
                         S.win.main.left,
                         S.win.main.right,
                         S.win.main.split,
-                        S.win.external.trees.nvimTree.id,
+                        S.win.external.trees.NvimTree.id,
                         S.win.external.trees.undotree.id,
                     })
 
@@ -287,7 +287,7 @@ function NoNeckPain.enable()
                 local wins = vim.api.nvim_list_wins()
                 local trees = W.getSideTree()
 
-                -- we cycle ever trees supported to see which got closed or open
+                -- we cycle over supported integrations to see which got closed or open
                 for name, tree in pairs(S.win.external.trees) do
                     -- if there was a tree[name] but not anymore, we resize
                     if tree.id ~= nil and not M.contains(wins, tree.id) then

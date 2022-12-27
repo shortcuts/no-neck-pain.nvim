@@ -141,7 +141,7 @@ end
 function W.getSideTree()
     local wins = vim.api.nvim_list_wins()
     local trees = {
-        nvimTree = {
+        NvimTree = {
             id = nil,
             width = 0,
         },
@@ -183,8 +183,6 @@ function W.getPadding(side, trees)
     local paddingToSubstract = 0
 
     for name, tree in pairs(trees) do
-        D.log(side, name)
-        D.tprint(tree)
         if side == _G.NoNeckPain.config.integrations[name].position and tree.id ~= nil then
             paddingToSubstract = paddingToSubstract + tree.width
         end

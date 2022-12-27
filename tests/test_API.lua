@@ -372,7 +372,7 @@ T["enable()"]["sets state and internal methods"] = function()
 
     eq_type_state(child, "win.external.trees", "table")
 
-    local integrations = { "nvimTree", "undotree" }
+    local integrations = { "NvimTree", "undotree" }
     for _, integration in pairs(integrations) do
         eq_state(child, "win.external.trees." .. integration .. ".id", vim.NIL)
         eq_state(child, "win.external.trees." .. integration .. ".width", 0)
@@ -402,7 +402,7 @@ T["disable()"]["resets state and remove internal methods"] = function()
 
     eq_type_state(child, "win.external.trees", "table")
 
-    local integrations = { "nvimTree", "undotree" }
+    local integrations = { "NvimTree", "undotree" }
     for _, integration in pairs(integrations) do
         eq_state(child, "win.external.trees." .. integration .. ".id", vim.NIL)
         eq_state(child, "win.external.trees." .. integration .. ".width", 0)
@@ -441,7 +441,7 @@ T["toggle()"]["sets state and internal methods and resets everything when toggle
 
         eq_type_state(child, "win.external.trees", "table")
 
-        local integrations = { "nvimTree", "undotree" }
+        local integrations = { "NvimTree", "undotree" }
         for _, integration in pairs(integrations) do
             eq_state(child, "win.external.trees." .. integration .. ".id", vim.NIL)
             eq_state(child, "win.external.trees." .. integration .. ".width", 0)
