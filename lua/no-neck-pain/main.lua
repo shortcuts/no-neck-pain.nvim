@@ -321,8 +321,10 @@ function NoNeckPain.disable(scope)
     end
 
     S.enabled = false
-    vim.cmd("highlight! clear NNPBuffers_left NONE")
-    vim.cmd("highlight! clear NNPBuffers_right NONE")
+    vim.cmd("highlight! clear NNPBuffers_Background_left NONE")
+    vim.cmd("highlight! clear NNPBuffers_Text_left NONE")
+    vim.cmd("highlight! clear NNPBuffers_Background_Right NONE")
+    vim.cmd("highlight! clear NNPBuffers_Text_Right NONE")
     vim.api.nvim_del_augroup_by_id(S.augroup)
 
     -- shutdowns gracefully by focusing the stored `curr` buffer

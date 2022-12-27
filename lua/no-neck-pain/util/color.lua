@@ -59,10 +59,8 @@ function C.init(win, name, backgroundColor, textColor)
         "Color.init",
         "`%s` with bg `%s` | `%s` with fg `%s`",
         backgroundGroup,
-        win,
         backgroundColor,
         textGroup,
-        win,
         textColor
     )
 
