@@ -18,9 +18,15 @@ local S = {
             split = nil,
         },
         external = {
-            tree = {
-                id = nil,
-                width = 0,
+            trees = {
+                nvimTree = {
+                    id = nil,
+                    width = 0,
+                },
+                undotree = {
+                    id = nil,
+                    width = 0,
+                },
             },
         },
     },
@@ -42,8 +48,8 @@ end
 
 -- Resizes both of the NNP buffers.
 local function resize(scope)
-    W.resize(scope, S.win.main.left, W.getPadding("left", S.win.external.tree.width))
-    W.resize(scope, S.win.main.right, W.getPadding("right", S.win.external.tree.width))
+    W.resize(scope, S.win.main.left, W.getPadding("left", S.win.external.trees))
+    W.resize(scope, S.win.main.right, W.getPadding("right", S.win.external.trees))
 end
 
 -- Close both of the NNP buffers and set their state to `nil`.
@@ -64,24 +70,20 @@ local function init()
     end
 
     -- before creating side buffers, we determine if we should consider externals
-    S.win.external.tree = W.getSideTree()
+    S.win.external.trees = W.getSideTree()
 
     if _G.NoNeckPain.config.buffers.left.enabled and S.win.main.left == nil then
         S.win.main.left = W.createBuf(
             "left",
             "leftabove vnew",
-            W.getPadding("left", S.win.external.tree.width),
+            W.getPadding("left", S.win.external.trees),
             "wincmd l"
         )
     end
 
     if _G.NoNeckPain.config.buffers.right.enabled and S.win.main.right == nil then
-        S.win.main.right = W.createBuf(
-            "right",
-            "vnew",
-            W.getPadding("right", S.win.external.tree.width),
-            "wincmd h"
-        )
+        S.win.main.right =
+            W.createBuf("right", "vnew", W.getPadding("right", S.win.external.trees), "wincmd h")
     end
 
     vim.o.splitbelow, vim.o.splitright = splitbelow, splitright
@@ -148,7 +150,7 @@ function NoNeckPain.enable()
                 end
 
                 local fileType = vim.api.nvim_buf_get_option(0, "filetype")
-                if fileType == "NvimTree" then
+                if fileType == "NvimTree" or fileType == "undotree" then
                     return D.log(p.event, "encountered an external window")
                 end
 
@@ -205,7 +207,8 @@ function NoNeckPain.enable()
                         S.win.main.left,
                         S.win.main.right,
                         S.win.main.split,
-                        S.win.external.tree.id,
+                        S.win.external.trees.nvimTree.id,
+                        S.win.external.trees.undotree.id,
                     })
 
                     if
@@ -281,22 +284,28 @@ function NoNeckPain.enable()
                     return
                 end
 
-                if
-                    S.win.external.tree.id ~= nil
-                    and not M.contains(vim.api.nvim_list_wins(), S.win.external.tree.id)
-                then
-                    S.win.external.tree = {
-                        id = nil,
-                        width = 0,
-                    }
+                local wins = vim.api.nvim_list_wins()
+                local trees = W.getSideTree()
 
-                    return resize(p.event)
-                end
+                -- we cycle ever trees supported to see which got closed or open
+                for name, tree in pairs(S.win.external.trees) do
+                    -- if there was a tree[name] but not anymore, we resize
+                    if tree.id ~= nil and not M.contains(wins, tree.id) then
+                        S.win.external.trees[name] = {
+                            id = nil,
+                            width = 0,
+                        }
 
-                S.win.external.tree = W.getSideTree()
-                if S.win.external.tree.id ~= nil then
-                    return resize(p.event)
+                        return resize(p.event)
+                    end
+
+                    -- we have a new tree registered, we can resize
+                    if S.win.external.trees[name].id == nil and trees[name].id ~= nil then
+                        S.win.external.trees = trees
+                        return resize(p.event)
+                    end
                 end
+                S.win.external.trees = trees
             end)
         end,
         group = "NoNeckPain",

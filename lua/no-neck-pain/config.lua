@@ -120,6 +120,11 @@ NoNeckPain.options = {
             -- the position of the tree, can be `left` or `right``
             position = "left",
         },
+        -- https://github.com/mbbill/undotree
+        undotree = {
+            -- the position of the tree, can be `left` or `right``
+            position = "left",
+        },
     },
 }
 
