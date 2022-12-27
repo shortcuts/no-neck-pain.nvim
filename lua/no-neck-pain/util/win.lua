@@ -121,6 +121,8 @@ function W.close(scope, win)
     if vim.api.nvim_win_is_valid(win) then
         vim.api.nvim_win_close(win, false)
     end
+
+    return nil
 end
 
 -- resizes a given `win` for the given `padding`

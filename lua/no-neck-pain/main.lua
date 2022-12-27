@@ -149,9 +149,7 @@ function NoNeckPain.enable()
 
                 local fileType = vim.api.nvim_buf_get_option(0, "filetype")
                 if fileType == "NvimTree" then
-                    S.win.external.tree = W.getSideTree()
-
-                    return D.log(p.event, "encoutered an external window")
+                    return D.log(p.event, "encountered an external window")
                 end
 
                 -- start by saving the split, because steps below will trigger `WinClosed`
@@ -279,11 +277,7 @@ function NoNeckPain.enable()
     vim.api.nvim_create_autocmd({ "WinEnter", "WinClosed" }, {
         callback = function(p)
             vim.schedule(function()
-                local focusedWin = vim.api.nvim_get_current_win()
-
-                if
-                    E.skip(p.event, S.enabled, S.win.split) or M.contains(S.win.main, focusedWin)
-                then
+                if E.skip(p.event, S.enabled, S.win.split) then
                     return
                 end
 
@@ -301,14 +295,12 @@ function NoNeckPain.enable()
 
                 S.win.external.tree = W.getSideTree()
                 if S.win.external.tree.id ~= nil then
-                    D.log(p.event, "side tree found, resizing")
-
                     return resize(p.event)
                 end
             end)
         end,
         group = "NoNeckPain",
-        desc = "Resize to apply on WinEnter/Closed",
+        desc = "Resize to apply on WinEnter/Closed of external windows",
     })
 
     S.enabled = true
