@@ -68,24 +68,56 @@ function W.listWinsExcept(list)
     return validWins, size
 end
 
+-- returns the available buffers and their total number, without the `list` ones.
+function W.listBufsExcept(list)
+    local bufs = vim.api.nvim_list_bufs()
+    local validBufs = {}
+    local size = 0
+
+    for _, buf in pairs(bufs) do
+        if not M.contains(list, buf) then
+            table.insert(validBufs, buf)
+            size = size + 1
+        end
+    end
+
+    return validBufs, size
+end
+
+-- gets the bufs of the given `wins` list, if win are valid.
+function W.winsGetBufs(wins)
+    local bufs = {}
+
+    for _, win in pairs(wins) do
+        if win ~= nil and vim.api.nvim_win_is_valid(win) then
+            table.insert(bufs, vim.api.nvim_win_get_buf(win))
+        end
+    end
+
+    return bufs
+end
+
 -- closes a given `win`. quits Neovim if its the last window open.
 function W.close(scope, win)
     if win == nil then
         return nil
     end
 
-    local wins = vim.api.nvim_list_wins()
+    local _, wsize = W.listWinsExcept({ win })
 
-    if M.tsize(wins) == 1 and wins[1] == win then
-        D.log(scope, "trying to kill the last available win %s", win)
+    -- we don't have any window left if we close this one
+    if wsize == 0 then
+        -- either triggered by a :wq or quit event, we can just quit
+        if scope == "QuitPre" then
+            return vim.cmd("quit!")
+        end
 
-        vim.cmd([[quit!]])
-
-        return nil
+        -- mostly triggered by :bd or similar
+        -- we will create a new window and close the other
+        vim.cmd("new")
     end
 
-    D.log(scope, "killing window %s", win)
-
+    -- when we have more than 1 window left, we can just close it
     if vim.api.nvim_win_is_valid(win) then
         vim.api.nvim_win_close(win, false)
     end

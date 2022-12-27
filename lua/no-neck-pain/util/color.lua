@@ -57,12 +57,10 @@ function C.init(win, name, backgroundColor, textColor)
 
     D.log(
         "Color.init",
-        "groupName `%s` - window `%s` - backgroundColor `%s`\ngroupName `%s` - window `%s` - textColor `%s`",
+        "`%s` with bg `%s` | `%s` with fg `%s`",
         backgroundGroup,
-        win,
         backgroundColor,
         textGroup,
-        win,
         textColor
     )
 

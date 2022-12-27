@@ -149,9 +149,7 @@ function NoNeckPain.enable()
 
                 local fileType = vim.api.nvim_buf_get_option(0, "filetype")
                 if fileType == "NvimTree" then
-                    S.win.external.tree = W.getSideTree()
-
-                    return D.log(p.event, "encoutered an external window")
+                    return D.log(p.event, "encountered an external window")
                 end
 
                 -- start by saving the split, because steps below will trigger `WinClosed`
@@ -184,7 +182,7 @@ function NoNeckPain.enable()
         desc = "WinEnter covers the split/vsplit management",
     })
 
-    vim.api.nvim_create_autocmd({ "WinClosed", "BufDelete" }, {
+    vim.api.nvim_create_autocmd({ "QuitPre", "BufDelete" }, {
         callback = function(p)
             vim.schedule(function()
                 if E.skip(p.event, S.enabled, nil) then
@@ -192,7 +190,6 @@ function NoNeckPain.enable()
                 end
 
                 local wins = vim.api.nvim_list_wins()
-                local total = M.tsize(wins)
 
                 -- if we are not in split view, we check if we killed one of the main buffers (curr, left, right) to disable NNP
                 -- TODO: make killed side buffer decision configurable, we can re-create it
@@ -222,10 +219,21 @@ function NoNeckPain.enable()
                         return NoNeckPain.disable()
                     end
                 end
+            end)
+        end,
+        group = "NoNeckPain",
+        desc = "Handles the closure of main NNP windows and restoring the state correctly",
+    })
 
-                if S.win.main.split == nil then
+    vim.api.nvim_create_autocmd({ "WinClosed", "BufDelete" }, {
+        callback = function(p)
+            vim.schedule(function()
+                if E.skip(p.event, S.enabled, nil) or S.win.main.split == nil then
                     return
                 end
+
+                local wins = vim.api.nvim_list_wins()
+                local total = M.tsize(wins)
 
                 -- `total` needs to be compared with the number of active wins,
                 -- in the NNP context. This threshold holds the count.
@@ -269,34 +277,30 @@ function NoNeckPain.enable()
     vim.api.nvim_create_autocmd({ "WinEnter", "WinClosed" }, {
         callback = function(p)
             vim.schedule(function()
-                if E.skip(p.event, S.enabled, nil) then
+                if E.skip(p.event, S.enabled, S.win.split) then
                     return
                 end
 
-                local focusedWin = vim.api.nvim_get_current_win()
-
-                -- skip if the newly focused window is a side buffer
-                if focusedWin == S.win.main.left or focusedWin == S.win.main.right then
-                    return
-                end
-
-                -- when opening a new buffer as current, store its padding and resize everything (e.g. side tree)
-                if focusedWin ~= S.win.main.curr then
-                    S.win.external.tree = W.getSideTree()
-                end
-
-                if not M.contains(vim.api.nvim_list_wins(), S.win.external.tree.id) then
+                if
+                    S.win.external.tree.id ~= nil
+                    and not M.contains(vim.api.nvim_list_wins(), S.win.external.tree.id)
+                then
                     S.win.external.tree = {
                         id = nil,
                         width = 0,
                     }
+
+                    return resize(p.event)
                 end
 
-                resize(p.event)
+                S.win.external.tree = W.getSideTree()
+                if S.win.external.tree.id ~= nil then
+                    return resize(p.event)
+                end
             end)
         end,
         group = "NoNeckPain",
-        desc = "Resize to apply on WinEnter/Closed",
+        desc = "Resize to apply on WinEnter/Closed of external windows",
     })
 
     S.enabled = true
@@ -309,8 +313,10 @@ function NoNeckPain.disable(scope)
     end
 
     S.enabled = false
-    vim.cmd("highlight! clear NNPBuffers_left NONE")
-    vim.cmd("highlight! clear NNPBuffers_right NONE")
+    vim.cmd("highlight! clear NNPBuffers_Background_left NONE")
+    vim.cmd("highlight! clear NNPBuffers_Text_left NONE")
+    vim.cmd("highlight! clear NNPBuffers_Background_Right NONE")
+    vim.cmd("highlight! clear NNPBuffers_Text_Right NONE")
     vim.api.nvim_del_augroup_by_id(S.augroup)
 
     -- shutdowns gracefully by focusing the stored `curr` buffer
