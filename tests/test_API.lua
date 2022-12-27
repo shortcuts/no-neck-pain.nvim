@@ -63,6 +63,7 @@ T["setup()"]["sets exposed methods and default options value"] = function()
 
     eq_option(child, "buffers.setNames", false)
     eq_option(child, "buffers.backgroundColor", vim.NIL)
+    eq_option(child, "buffers.blend", 0)
     eq_option(child, "buffers.textColor", vim.NIL)
 
     eq_option(child, "buffers.bo.filetype", "no-neck-pain")
@@ -85,6 +86,7 @@ T["setup()"]["sets exposed methods and default options value"] = function()
         eq_type_option(child, "buffers." .. scope .. ".wo", "table")
 
         eq_option(child, "buffers." .. scope .. ".backgroundColor", vim.NIL)
+        eq_option(child, "buffers." .. scope .. ".blend", 0)
         eq_option(child, "buffers." .. scope .. ".textColor", vim.NIL)
 
         eq_option(child, "buffers." .. scope .. ".bo.filetype", "no-neck-pain")
@@ -112,6 +114,7 @@ T["setup()"]["overrides default values"] = function()
         buffers = {
             setNames = true,
             backgroundColor = "catppuccin-frappe",
+            blend = 0.4,
             textColor = "#7480c2",
             bo = {
                 filetype = "my-file-type",
@@ -131,6 +134,7 @@ T["setup()"]["overrides default values"] = function()
             },
             left = {
                 backgroundColor = "catppuccin-frappe",
+                blend = 0.2,
             	textColor = "#7480c2",
                 bo = {
                     filetype = "my-file-type",
@@ -151,6 +155,7 @@ T["setup()"]["overrides default values"] = function()
             },
             right = {
                 backgroundColor = "catppuccin-frappe",
+                blend = 0.2,
             	textColor = "#7480c2",
                 bo = {
                     filetype = "my-file-type",
@@ -184,7 +189,8 @@ T["setup()"]["overrides default values"] = function()
     eq_type_option(child, "buffers.wo", "table")
 
     eq_option(child, "buffers.setNames", true)
-    eq_option(child, "buffers.backgroundColor", "#303446")
+    eq_option(child, "buffers.backgroundColor", "#828590")
+    eq_option(child, "buffers.blend", 0.4)
     eq_option(child, "buffers.textColor", "#7480c2")
 
     eq_option(child, "buffers.bo.filetype", "my-file-type")
@@ -202,7 +208,8 @@ T["setup()"]["overrides default values"] = function()
     eq_option(child, "buffers.wo.list", true)
 
     for _, scope in pairs(SCOPES) do
-        eq_option(child, "buffers." .. scope .. ".backgroundColor", "#303446")
+        eq_option(child, "buffers." .. scope .. ".backgroundColor", "#595c6b")
+        eq_option(child, "buffers." .. scope .. ".blend", 0.2)
         eq_option(child, "buffers." .. scope .. ".textColor", "#7480c2")
 
         eq_option(child, "buffers." .. scope .. ".bo.filetype", "my-file-type")
@@ -225,6 +232,7 @@ T["setup()"]["`left` or `right` buffer options overrides `common` ones"] = funct
     child.lua([[require('no-neck-pain').setup({
         buffers = {
             backgroundColor = "catppuccin-frappe",
+            blend = 0.1,
             textColor = "#7480c2",
             bo = {
                 filetype = "TEST",
@@ -234,6 +242,7 @@ T["setup()"]["`left` or `right` buffer options overrides `common` ones"] = funct
             },
             left = {
                 backgroundColor = "catppuccin-frappe-dark",
+                blend = -0.8,
                 textColor = "#123123",
                 bo = {
                     filetype = "TEST-left",
@@ -244,6 +253,7 @@ T["setup()"]["`left` or `right` buffer options overrides `common` ones"] = funct
             },
             right = {
                 backgroundColor = "catppuccin-latte",
+                blend = 1,
                 textColor = "#456456",
                 bo = {
                     filetype = "TEST-right",
@@ -255,13 +265,17 @@ T["setup()"]["`left` or `right` buffer options overrides `common` ones"] = funct
         },
     })]])
 
-    eq_option(child, "buffers.backgroundColor", "#303446")
+    eq_option(child, "buffers.backgroundColor", "#444858")
+    eq_option(child, "buffers.blend", 0.1)
     eq_option(child, "buffers.textColor", "#7480c2")
     eq_option(child, "buffers.bo.filetype", "TEST")
     eq_option(child, "buffers.wo.cursorline", false)
 
-    eq_option(child, "buffers.left.backgroundColor", "#292C3C")
-    eq_option(child, "buffers.right.backgroundColor", "#EFF1F5")
+    eq_option(child, "buffers.left.backgroundColor", "#08080b")
+    eq_option(child, "buffers.right.backgroundColor", "#ffffff")
+
+    eq_option(child, "buffers.left.blend", -0.8)
+    eq_option(child, "buffers.right.blend", 1)
 
     eq_option(child, "buffers.left.textColor", "#123123")
     eq_option(child, "buffers.right.textColor", "#456456")
@@ -277,6 +291,7 @@ T["setup()"]["`common` options spreads it to `left` and `right` buffers"] = func
     child.lua([[require('no-neck-pain').setup({
         buffers = {
             backgroundColor = "catppuccin-frappe",
+            blend = 1,
             bo = {
                 filetype = "TEST",
             },
@@ -286,15 +301,18 @@ T["setup()"]["`common` options spreads it to `left` and `right` buffers"] = func
         },
     })]])
 
-    eq_option(child, "buffers.backgroundColor", "#303446")
+    eq_option(child, "buffers.backgroundColor", "#ffffff")
     eq_option(child, "buffers.bo.filetype", "TEST")
     eq_option(child, "buffers.wo.number", true)
 
-    eq_option(child, "buffers.left.backgroundColor", "#303446")
-    eq_option(child, "buffers.right.backgroundColor", "#303446")
+    eq_option(child, "buffers.left.backgroundColor", "#ffffff")
+    eq_option(child, "buffers.right.backgroundColor", "#ffffff")
 
-    eq_option(child, "buffers.left.textColor", "#303446")
-    eq_option(child, "buffers.right.textColor", "#303446")
+    eq_option(child, "buffers.left.blend", 1)
+    eq_option(child, "buffers.right.blend", 1)
+
+    eq_option(child, "buffers.left.textColor", "#ffffff")
+    eq_option(child, "buffers.right.textColor", "#ffffff")
 
     eq_option(child, "buffers.left.wo.number", true)
     eq_option(child, "buffers.right.wo.number", true)
@@ -306,12 +324,12 @@ end
 T["setup()"]["colorCode: map integration name to a value"] = function()
     local integrationsMapping = {
         { "catppuccin-frappe", "#303446" },
-        { "catppuccin-frappe-dark", "#292C3C" },
-        { "catppuccin-latte", "#EFF1F5" },
-        { "catppuccin-latte-dark", "#E6E9EF" },
-        { "catppuccin-macchiato", "#24273A" },
-        { "catppuccin-macchiato-dark", "#1E2030" },
-        { "catppuccin-mocha", "#1E1E2E" },
+        { "catppuccin-frappe-dark", "#292c3c" },
+        { "catppuccin-latte", "#eff1f5" },
+        { "catppuccin-latte-dark", "#e6e9ef" },
+        { "catppuccin-macchiato", "#24273a" },
+        { "catppuccin-macchiato-dark", "#1e2030" },
+        { "catppuccin-mocha", "#1e1e2e" },
         { "catppuccin-mocha-dark", "#181825" },
         { "tokyonight-day", "#16161e" },
         { "tokyonight-moon", "#1e2030" },

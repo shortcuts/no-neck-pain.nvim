@@ -1,8 +1,49 @@
 local D = require("no-neck-pain.util.debug")
 local C = {}
 
--- tries to match the provided `colorCode` to an integration name, defaults to the provided string if not successful.
-function C.matchIntegrationToHexCode(colorCode)
+-- converts an hex color code to RGB, values are returned independently.
+local function hexToRGB(hex)
+    local r, g, b = hex:sub(2, 3), hex:sub(4, 5), hex:sub(6, 7)
+
+    return tonumber("0x" .. r), tonumber("0x" .. g), tonumber("0x" .. b)
+end
+
+-- blend the given `colorCode` RGB for the given `factor`.
+local function blend(colorCode, factor)
+    local r, g, b = hexToRGB(colorCode)
+    local format = "#%02x%02x%02x"
+
+    if factor < 0 then
+        factor = 1 + factor
+        return string.lower(string.format(format, r * factor, g * factor, b * factor))
+    end
+
+    return string.lower(
+        string.format(
+            format,
+            (255 - r) * factor + r,
+            (255 - g) * factor + g,
+            (255 - b) * factor + b
+        )
+    )
+end
+
+-- tries to match the given `colorCode` to an integration name, defaults to the given `colorCode` if not found.
+-- if a `factor` is provided, the color will be blended (brighten/darken) before being returned.
+local function matchAndBlend(colorCode, factor)
+    if colorCode == nil then
+        return nil
+    end
+
+    if factor ~= nil then
+        assert(
+            factor >= -1 and factor <= 1,
+            "`blend` "
+                .. colorCode
+                .. " does not match the range constraint, number must be between -1 and 1 "
+        )
+    end
+
     if colorCode == "catppuccin-frappe" then
         colorCode = "#303446"
     elseif colorCode == "catppuccin-frappe-dark" then
@@ -35,7 +76,48 @@ function C.matchIntegrationToHexCode(colorCode)
         colorCode = "#faf4ed"
     end
 
-    return colorCode
+    local hexPattern = "^#" .. "[abcdef0-9]" .. ("[abcdef0-9]"):rep(5) .. "$"
+    colorCode = string.lower(colorCode)
+
+    assert(
+        colorCode:match(hexPattern) ~= nil,
+        "`colorCode` " .. colorCode .. " does not match the regex " .. hexPattern
+    )
+
+    if factor == 0 then
+        return colorCode
+    end
+
+    local blended = blend(colorCode, factor)
+
+    assert(
+        blended:match(hexPattern) ~= nil,
+        "`colorCode` blended " .. blended .. " does not match the regex " .. hexPattern
+    )
+
+    return blended
+end
+
+function C.parseColors(buffers)
+    buffers.backgroundColor = matchAndBlend(buffers.backgroundColor, buffers.blend)
+    buffers.left.backgroundColor = matchAndBlend(
+        buffers.left.backgroundColor,
+        buffers.left.blend or buffers.blend
+    ) or buffers.backgroundColor
+    buffers.right.backgroundColor = matchAndBlend(
+        buffers.right.backgroundColor,
+        buffers.right.blend or buffers.blend
+    ) or buffers.backgroundColor
+
+    buffers.textColor = buffers.textColor or buffers.backgroundColor
+    buffers.left.textColor = buffers.left.textColor
+        or buffers.textColor
+        or buffers.left.backgroundColor
+    buffers.right.textColor = buffers.right.textColor
+        or buffers.textColor
+        or buffers.right.backgroundColor
+
+    return buffers
 end
 
 -- creates two highlight groups for a given `win` named `NNPBuffers_Background_$NAME` and `NNPBuffers_Text_$NAME`.
