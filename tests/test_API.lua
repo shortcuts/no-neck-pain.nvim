@@ -105,6 +105,27 @@ T["setup()"]["sets exposed methods and default options value"] = function()
     end
 end
 
+T["setup()"]["buffers: throws with wrong values"] = function()
+    local keyValueSetupErrors = {
+        { "backgroundColor", "no-neck-pain" },
+        { "blend", 30 },
+    }
+
+    for _, keyValueSetupError in pairs(keyValueSetupErrors) do
+        helpers.expect.error(function()
+            child.lua(string.format(
+                [[require('no-neck-pain').setup({
+            buffers = {
+                %s = "%s",
+            },
+        })]],
+                keyValueSetupError[1],
+                keyValueSetupError[2]
+            ))
+        end)
+    end
+end
+
 T["setup()"]["overrides default values"] = function()
     child.lua([[require('no-neck-pain').setup({
         width = 42,
