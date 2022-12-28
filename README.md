@@ -247,7 +247,7 @@ You can find guides and showcase of the plugin in [our Wiki](https://github.com/
   - [Theme blending](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase#selective-padding)
   - [Window resize support](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase#selective-padding)
 
-## 〽 Motivations
+## 🎭 Motivations
 
 Although there's other (amazing!) alternatives that provide a zen-distraction-free-center mode, they usually make assumptions that might alter your workflow, or at least require some configuration to suit your needs.
 
