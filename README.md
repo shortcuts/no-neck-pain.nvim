@@ -16,19 +16,21 @@ _[GIF version of the showcase video for mobile users](https://github.com/shortcu
 
 </div>
 
-## Features
+## ⚡️ Features
 
 _Creates evenly sized empty buffers on each side of your focused buffer, which acts as padding for your window._
 
 - Plug and play, no configuration required
 - [Highly customizable experience](https://github.com/shortcuts/no-neck-pain.nvim#configuration)
-- [Themed side buffers](https://github.com/shortcuts/no-neck-pain.nvim#configuration)
-- Support split/vsplit windows
-- Fully integrates with side trees, tmux, and more!
+- [Themed side buffers](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase#custom-background-color)
+- [Support split/vsplit windows](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase#window-layout-support)
+- [Fully integrates with side trees, tmux, and more!](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase#window-layout-support)
 - Keep your workflow intact
 - Neovim >= 0.5 support
 
-## Installation
+> Want to see it in action? Take a look at [the showcase section](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase)
+
+## 📋 Installation
 
 <div align="center">
 <table>
@@ -98,7 +100,7 @@ This is all you need! Call `:NoNeckPain` once installed to toggle it.
 
 If you wish to enable the plugin on Neovim start: [-> take a look at the guide <-](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Automate-no-neck-pain-enabling)
 
-## Configuration
+## ⚙ Configuration
 
 > The options are also available from Neovim, use `:h NoNeckPain.options` to see all the options, and `:h NoNeckPain.bufferOptions` for the buffer ones.
 
@@ -222,17 +224,19 @@ NoNeckPain.bufferOptions = {
 }
 ```
 
-## Commands
+## 🧰 Commands
 
 |   Command   |         Description        |
 |-------------|----------------------------|
 |`:NoNeckPain`| Toggle the `enabled` state.|
 
-## Contributing
+## ⌨ Contributing
 
 PRs and issues are always welcome. Make sure to provide as much context as possible when opening one.
 
-## Wiki links
+## 🗞 Wiki
+
+You can find guides and showcase of the plugin in [our Wiki](https://github.com/shortcuts/no-neck-pain.nvim/wiki)
 
 - [Automate `no-neck-pain.nvim` enabling](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Automate-%60no-neck-pain.nvim%60-enabling)
   - [When entering Neovim](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Automate-%60no-neck-pain.nvim%60-enabling#when-entering-nvim-vimenter)
@@ -243,7 +247,7 @@ PRs and issues are always welcome. Make sure to provide as much context as possi
   - [Theme blending](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase#selective-padding)
   - [Window resize support](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase#selective-padding)
 
-## Motivations
+## 〽 Motivations
 
 Although there's other (amazing!) alternatives that provide a zen-distraction-free-center mode, they usually make assumptions that might alter your workflow, or at least require some configuration to suit your needs.
 
