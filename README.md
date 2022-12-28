@@ -236,16 +236,8 @@ PRs and issues are always welcome. Make sure to provide as much context as possi
 
 ## 🗞 Wiki
 
-You can find guides and showcase of the plugin in [our Wiki](https://github.com/shortcuts/no-neck-pain.nvim/wiki)
-
-- [Automate `no-neck-pain.nvim` enabling](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Automate-%60no-neck-pain.nvim%60-enabling)
-  - [When entering Neovim](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Automate-%60no-neck-pain.nvim%60-enabling#when-entering-nvim-vimenter)
-  - [With `dashboard-nvim` support](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Automate-%60no-neck-pain.nvim%60-enabling#when-entering-nvim-vimenter)
-- [Showcase](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase)
-  - [Default configuration](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase#default-configuration-with-splitvsplit-showcase)
-  - [Left or right padding only](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase#selective-padding)
-  - [Theme blending](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase#selective-padding)
-  - [Window resize support](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase#selective-padding)
+You can find guides and showcase of the plugin on [the Wiki](https://github.com/shortcuts/no-neck-pain.nvim/wiki)
+ts/no-neck-pain.nvim/wiki/Showcase#selective-padding)
 
 ## 🎭 Motivations
 
