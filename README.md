@@ -143,6 +143,8 @@ require("no-neck-pain").setup({
         -- - rose-pine-moon
         -- - rose-pine-dawn
         backgroundColor = nil,
+        -- Brighten (positive) or darken (negative) the side buffers background color. Accepted values are [-1..1].
+        blend = 0,
         -- Hexadecimal color code to override the current text color of the buffer. (e.g. #7480c2)
         textColor = nil,
         -- vim buffer-scoped options: any `vim.bo` options is accepted here.
@@ -206,6 +208,8 @@ NoNeckPain.bufferOptions = {
     -- - rose-pine-moon
     -- - rose-pine-dawn
     backgroundColor = nil,
+    -- Brighten (positive) or darken (negative) the side buffers background color. Accepted values are [-1..1].
+    blend = 0,
     -- Hexadecimal color code to override the current text color of the buffer. (e.g. #7480c2)
     textColor = nil,
     -- vim buffer-scoped options: any `vim.bo` options is accepted here.

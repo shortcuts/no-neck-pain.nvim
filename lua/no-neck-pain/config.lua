@@ -27,6 +27,8 @@ NoNeckPain.bufferOptions = {
     -- - rose-pine-moon
     -- - rose-pine-dawn
     backgroundColor = nil,
+    -- Brighten (positive) or darken (negative) the side buffers background color. Accepted values are [-1..1].
+    blend = 0,
     -- Hexadecimal color code to override the current text color of the buffer. (e.g. #7480c2)
     textColor = nil,
     -- vim buffer-scoped options: any `vim.bo` options is accepted here.
@@ -86,6 +88,8 @@ NoNeckPain.options = {
         -- - rose-pine-moon
         -- - rose-pine-dawn
         backgroundColor = nil,
+        -- Brighten (positive) or darken (negative) the side buffers background color. Accepted values are [-1..1].
+        blend = 0,
         -- Hexadecimal color code to override the current text color of the buffer. (e.g. #7480c2)
         textColor = nil,
         -- vim buffer-scoped options: any `vim.bo` options is accepted here.
@@ -148,23 +152,7 @@ function NoNeckPain.setup(options)
         NoNeckPain.options.buffers.right
     )
 
-    NoNeckPain.options.buffers.backgroundColor =
-        C.matchIntegrationToHexCode(NoNeckPain.options.buffers.backgroundColor)
-    NoNeckPain.options.buffers.left.backgroundColor = C.matchIntegrationToHexCode(
-        NoNeckPain.options.buffers.left.backgroundColor
-    ) or NoNeckPain.options.buffers.backgroundColor
-    NoNeckPain.options.buffers.right.backgroundColor = C.matchIntegrationToHexCode(
-        NoNeckPain.options.buffers.right.backgroundColor
-    ) or NoNeckPain.options.buffers.backgroundColor
-
-    NoNeckPain.options.buffers.textColor = NoNeckPain.options.buffers.textColor
-        or NoNeckPain.options.buffers.backgroundColor
-    NoNeckPain.options.buffers.left.textColor = NoNeckPain.options.buffers.left.textColor
-        or NoNeckPain.options.buffers.textColor
-        or NoNeckPain.options.buffers.left.backgroundColor
-    NoNeckPain.options.buffers.right.textColor = NoNeckPain.options.buffers.right.textColor
-        or NoNeckPain.options.buffers.textColor
-        or NoNeckPain.options.buffers.right.backgroundColor
+    NoNeckPain.options.buffers = C.parseColors(NoNeckPain.options.buffers)
 
     return NoNeckPain.options
 end
