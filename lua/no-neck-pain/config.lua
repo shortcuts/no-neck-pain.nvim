@@ -31,7 +31,7 @@ NoNeckPain.bufferOptions = {
     blend = 0,
     -- Hexadecimal color code to override the current text color of the buffer. (e.g. #7480c2)
     textColor = nil,
-    -- buffer-scoped options: any `vim.bo` options is accepted here.
+    -- vim buffer-scoped options: any `vim.bo` options is accepted here.
     bo = {
         filetype = "no-neck-pain",
         buftype = "nofile",
@@ -40,7 +40,7 @@ NoNeckPain.bufferOptions = {
         buflisted = false,
         swapfile = false,
     },
-    -- window-scoped options: any `vim.wo` options is accepted here.
+    -- vim window-scoped options: any `vim.wo` options is accepted here.
     wo = {
         cursorline = false,
         cursorcolumn = false,
@@ -92,7 +92,7 @@ NoNeckPain.options = {
         blend = 0,
         -- Hexadecimal color code to override the current text color of the buffer. (e.g. #7480c2)
         textColor = nil,
-        -- buffer-scoped options: any `vim.bo` options is accepted here.
+        -- vim buffer-scoped options: any `vim.bo` options is accepted here.
         bo = {
             filetype = "no-neck-pain",
             buftype = "nofile",
@@ -101,7 +101,7 @@ NoNeckPain.options = {
             buflisted = false,
             swapfile = false,
         },
-        -- window-scoped options: any `vim.wo` options is accepted here.
+        -- vim window-scoped options: any `vim.wo` options is accepted here.
         wo = {
             cursorline = false,
             cursorcolumn = false,
