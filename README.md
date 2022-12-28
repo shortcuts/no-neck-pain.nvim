@@ -102,7 +102,12 @@ If you wish to enable the plugin on Neovim start: [-> take a look at the guide <
 
 ## ⚙ Configuration
 
-> The options are also available from Neovim, use `:h NoNeckPain.options` to see all the options, and `:h NoNeckPain.bufferOptions` for the buffer ones.
+> The options are also available in Neovim by using:
+> - `:h NoNeckPain.options` to see the plugin options.
+> - `:h NoNeckPain.bufferOptions` to see the buffer options.
+
+<details>
+<summary>Click to unfold the full list of options</summary>
 
 ```lua
 require("no-neck-pain").setup({
@@ -140,7 +145,7 @@ require("no-neck-pain").setup({
         backgroundColor = nil,
         -- Hexadecimal color code to override the current text color of the buffer. (e.g. #7480c2)
         textColor = nil,
-        -- buffer-scoped options: any `vim.bo` options is accepted here.
+        -- vim buffer-scoped options: any `vim.bo` options is accepted here.
         bo = {
             filetype = "no-neck-pain",
             buftype = "nofile",
@@ -149,7 +154,7 @@ require("no-neck-pain").setup({
             buflisted = false,
             swapfile = false,
         },
-        -- window-scoped options: any `vim.wo` options is accepted here.
+        -- vim window-scoped options: any `vim.wo` options is accepted here.
         wo = {
             cursorline = false,
             cursorcolumn = false,
@@ -203,7 +208,7 @@ NoNeckPain.bufferOptions = {
     backgroundColor = nil,
     -- Hexadecimal color code to override the current text color of the buffer. (e.g. #7480c2)
     textColor = nil,
-    -- buffer-scoped options: any `vim.bo` options is accepted here.
+    -- vim buffer-scoped options: any `vim.bo` options is accepted here.
     bo = {
         filetype = "no-neck-pain",
         buftype = "nofile",
@@ -212,7 +217,7 @@ NoNeckPain.bufferOptions = {
         buflisted = false,
         swapfile = false,
     },
-    -- window-scoped options: any `vim.wo` options is accepted here.
+    -- vim window-scoped options: any `vim.wo` options is accepted here.
     wo = {
         cursorline = false,
         cursorcolumn = false,
@@ -223,6 +228,8 @@ NoNeckPain.bufferOptions = {
     },
 }
 ```
+
+</details>
 
 ## 🧰 Commands
 
