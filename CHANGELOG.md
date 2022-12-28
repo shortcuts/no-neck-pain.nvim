@@ -1,4 +1,23 @@
 
+<a name="0.2.1"></a>
+## [0.2.1] - 2022-12-27
+### Chore
+- release 0.2.1
+
+### Feat
+- support undotree ([#100](https://github.com/shortcuts/no-neck-pain.nvim/issues/100))
+- reduce number of resize event ([#98](https://github.com/shortcuts/no-neck-pain.nvim/issues/98))
+- Allow custom Text Color ([#95](https://github.com/shortcuts/no-neck-pain.nvim/issues/95))
+
+### Fix
+- split/vsplit computing ([#96](https://github.com/shortcuts/no-neck-pain.nvim/issues/96))
+
+### Contributors
+
+Thanks for contributing to the project:
+- [@shortcuts](https://github.com/shortcuts)
+- [@AlphaKeks](https://github.com/AlphaKeks)
+
 <a name="0.2.0"></a>
 ## [0.2.0] - 2022-12-23
 ### Chore
@@ -154,7 +173,8 @@ Thanks for contributing to the project:
 Thanks for contributing to the project:
 - [@shortcuts](https://github.com/shortcuts)
 
-[Unreleased]: https://github.com/shortcuts/no-neck-pain.nvim/compare/0.2.0...HEAD
+[Unreleased]: https://github.com/shortcuts/no-neck-pain.nvim/compare/0.2.1...HEAD
+[0.2.1]: https://github.com/shortcuts/no-neck-pain.nvim/compare/0.2.0...0.2.1
 [0.2.0]: https://github.com/shortcuts/no-neck-pain.nvim/compare/0.1.2...0.2.0
 [0.1.2]: https://github.com/shortcuts/no-neck-pain.nvim/compare/0.1.1...0.1.2
 [0.1.1]: https://github.com/shortcuts/no-neck-pain.nvim/compare/0.1.0...0.1.1
