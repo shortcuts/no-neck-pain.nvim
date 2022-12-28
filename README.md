@@ -12,7 +12,7 @@
 
 <div align="center">
 
-[GIF version for mobile users](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase#default-configuration-with-splitvsplit-showcase)
+_[GIF version of the showcase video for mobile users](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase#default-configuration-with-splitvsplit-showcase)_
 
 </div>
 
