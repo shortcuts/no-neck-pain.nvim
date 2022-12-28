@@ -102,7 +102,12 @@ If you wish to enable the plugin on Neovim start: [-> take a look at the guide <
 
 ## ⚙ Configuration
 
-> The options are also available from Neovim, use `:h NoNeckPain.options` to see all the options, and `:h NoNeckPain.bufferOptions` for the buffer ones.
+> The options are also available in Neovim by using:
+- `:h NoNeckPain.options` to see the plugin options.
+- `:h NoNeckPain.bufferOptions` to see the buffer options.
+
+<details>
+<summary>Click to unfold the full list of options</summary>
 
 ```lua
 require("no-neck-pain").setup({
@@ -223,6 +228,8 @@ NoNeckPain.bufferOptions = {
     },
 }
 ```
+
+</details>
 
 ## 🧰 Commands
 
