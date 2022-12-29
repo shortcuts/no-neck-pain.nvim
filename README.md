@@ -254,7 +254,6 @@ PRs and issues are always welcome. Make sure to provide as much context as possi
 ## 🗞 Wiki
 
 You can find guides and showcase of the plugin on [the Wiki](https://github.com/shortcuts/no-neck-pain.nvim/wiki)
-ts/no-neck-pain.nvim/wiki/Showcase#selective-padding)
 
 ## 🎭 Motivations
 
