@@ -16,13 +16,6 @@
 {{ end }}
 {{ end -}}
 {{ end -}}
-
-### Contributors
-
-Thanks for contributing to the project:
-{{ range .Commits -}}
-- [@{{ .Author.Name }}](https://github.com/{{ .Author.Name }})
-{{ end }}
 {{ end -}}
 
 {{- if .Versions }}

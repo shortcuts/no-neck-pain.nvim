@@ -10,14 +10,12 @@ options:
         - feat
         - fix
         - refactor
-        - chore
         - docs
   commit_groups:
     title_order:
       - feat
       - fix
       - refactor
-      - chore
       - docs
   header:
     pattern: "^(\\w*)(?:\\(([\\w\\$\\.\\-\\*\\s]*)\\))?(?:\\!)?:\\s(.*)$"

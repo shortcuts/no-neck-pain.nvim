@@ -1,9 +1,6 @@
 
 <a name="0.2.1"></a>
 ## [0.2.1] - 2022-12-27
-### Chore
-- release 0.2.1
-
 ### Feat
 - support undotree ([#100](https://github.com/shortcuts/no-neck-pain.nvim/issues/100))
 - reduce number of resize event ([#98](https://github.com/shortcuts/no-neck-pain.nvim/issues/98))
@@ -12,24 +9,9 @@
 ### Fix
 - split/vsplit computing ([#96](https://github.com/shortcuts/no-neck-pain.nvim/issues/96))
 
-### Contributors
-
-Thanks for contributing to the project:
-- [@shortcuts](https://github.com/shortcuts)
-- [@AlphaKeks](https://github.com/AlphaKeks)
 
 <a name="0.2.0"></a>
 ## [0.2.0] - 2022-12-23
-### Chore
-- release 0.2.0
-- add features to README.md ([#93](https://github.com/shortcuts/no-neck-pain.nvim/issues/93))
-- update issue template
-- better debug logging ([#88](https://github.com/shortcuts/no-neck-pain.nvim/issues/88))
-- add lazy.nvim snippet to README.md ([#86](https://github.com/shortcuts/no-neck-pain.nvim/issues/86))
-- add motivations to README ([#70](https://github.com/shortcuts/no-neck-pain.nvim/issues/70))
-- fix changelog
-- release 0.1.2
-
 ### Feat
 - prevent split closing side buffers ([#92](https://github.com/shortcuts/no-neck-pain.nvim/issues/92))
 - refactor setup ([#78](https://github.com/shortcuts/no-neck-pain.nvim/issues/78))
@@ -46,27 +28,11 @@ Thanks for contributing to the project:
 
 exposed configuration options have changed, make sure to check `:h NoNeckPain.options` or https://github.com/shortcuts/no-neck-pain.nvim#configuration if you have trouble configuring
 
-### Contributors
+exposed configuration options have changed, make sure to check `:h NoNeckPain.options` or https://github.com/shortcuts/no-neck-pain.nvim#configuration if you have trouble configuring
 
-Thanks for contributing to the project:
-- [@shortcuts](https://github.com/shortcuts)
-- [@AlphaKeks](https://github.com/AlphaKeks)
 
 <a name="0.1.2"></a>
 ## [0.1.2] - 2022-12-18
-### Chore
-- release 0.1.2
-- changelog with author ([#67](https://github.com/shortcuts/no-neck-pain.nvim/issues/67))
-- showcase for mobile users
-- better test coverage ([#60](https://github.com/shortcuts/no-neck-pain.nvim/issues/60))
-- add issue and PR templates ([#59](https://github.com/shortcuts/no-neck-pain.nvim/issues/59))
-- README add options
-- make tests less redundant ([#57](https://github.com/shortcuts/no-neck-pain.nvim/issues/57))
-- disable make `all` rule
-- split utils code ([#50](https://github.com/shortcuts/no-neck-pain.nvim/issues/50))
-- update README.md
-- release 0.1.1
-
 ### Feat
 - add `rose-pine` color themes ([#58](https://github.com/shortcuts/no-neck-pain.nvim/issues/58))
 - allow customizing bg color of side buffers ([#54](https://github.com/shortcuts/no-neck-pain.nvim/issues/54))
@@ -79,22 +45,9 @@ Thanks for contributing to the project:
 - color leaving non-colored blocks ([#61](https://github.com/shortcuts/no-neck-pain.nvim/issues/61))
 - prevent error on last buffer close ([#49](https://github.com/shortcuts/no-neck-pain.nvim/issues/49))
 
-### Contributors
-
-Thanks for contributing to the project:
-- [@shortcuts](https://github.com/shortcuts)
-- [@PrimaMateria](https://github.com/PrimaMateria)
 
 <a name="0.1.1"></a>
 ## [0.1.1] - 2022-12-15
-### Chore
-- release 0.1.1
-- document simpler usage ([#45](https://github.com/shortcuts/no-neck-pain.nvim/issues/45))
-- make README usage more straight forward ([#34](https://github.com/shortcuts/no-neck-pain.nvim/issues/34))
-- recommend latest stable tag for `vim-plug` ([#29](https://github.com/shortcuts/no-neck-pain.nvim/issues/29))
-- recommend latest stable tag for `packer` ([#28](https://github.com/shortcuts/no-neck-pain.nvim/issues/28))
-- release 0.1.0
-
 ### Docs
 - generate documentation ([#31](https://github.com/shortcuts/no-neck-pain.nvim/issues/31))
 - **README:** misspelled api ([#33](https://github.com/shortcuts/no-neck-pain.nvim/issues/33))
@@ -109,17 +62,9 @@ Thanks for contributing to the project:
 - side buffers not closing when `killAllBuffersOnDisable` is false ([#44](https://github.com/shortcuts/no-neck-pain.nvim/issues/44))
 - remove event redundancy ([#40](https://github.com/shortcuts/no-neck-pain.nvim/issues/40))
 
-### Contributors
-
-Thanks for contributing to the project:
-- [@shortcuts](https://github.com/shortcuts)
-- [@BerkeleyTrue](https://github.com/BerkeleyTrue)
 
 <a name="0.1.0"></a>
 ## [0.1.0] - 2022-12-11
-### Chore
-- release 0.1.0
-
 ### Feat
 - **api:** make API extensible ([#27](https://github.com/shortcuts/no-neck-pain.nvim/issues/27))
 
@@ -127,24 +72,9 @@ Thanks for contributing to the project:
 
 exposed API and configuration have changed
 
-### Contributors
-
-Thanks for contributing to the project:
-- [@shortcuts](https://github.com/shortcuts)
 
 <a name="0.0.1"></a>
 ## 0.0.1 - 2022-12-11
-### Chore
-- release 0.0.1
-- better snippets for dashboard support ([#24](https://github.com/shortcuts/no-neck-pain.nvim/issues/24))
-- update README.md ([#9](https://github.com/shortcuts/no-neck-pain.nvim/issues/9))
-- add submodules
-- remove submodule
-- github action
-- add deps
-- remove deps
-- README
-
 ### Docs
 - add wiki ([#25](https://github.com/shortcuts/no-neck-pain.nvim/issues/25))
 
@@ -168,10 +98,6 @@ Thanks for contributing to the project:
 - remove `enableOnWinEnter`
 - some padding wrongly toggling
 
-### Contributors
-
-Thanks for contributing to the project:
-- [@shortcuts](https://github.com/shortcuts)
 
 [Unreleased]: https://github.com/shortcuts/no-neck-pain.nvim/compare/0.2.1...HEAD
 [0.2.1]: https://github.com/shortcuts/no-neck-pain.nvim/compare/0.2.0...0.2.1
