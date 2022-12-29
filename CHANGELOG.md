@@ -1,4 +1,11 @@
 
+<a name="0.2.2"></a>
+## [0.2.2] - 2022-12-29
+### Feat
+- add release script ([#103](https://github.com/shortcuts/no-neck-pain.nvim/issues/103))
+- add `blend` value to brighten/darken color background ([#74](https://github.com/shortcuts/no-neck-pain.nvim/issues/74))
+
+
 <a name="0.2.1"></a>
 ## [0.2.1] - 2022-12-27
 ### Feat
@@ -99,7 +106,8 @@ exposed API and configuration have changed
 - some padding wrongly toggling
 
 
-[Unreleased]: https://github.com/shortcuts/no-neck-pain.nvim/compare/0.2.1...HEAD
+[Unreleased]: https://github.com/shortcuts/no-neck-pain.nvim/compare/0.2.2...HEAD
+[0.2.2]: https://github.com/shortcuts/no-neck-pain.nvim/compare/0.2.1...0.2.2
 [0.2.1]: https://github.com/shortcuts/no-neck-pain.nvim/compare/0.2.0...0.2.1
 [0.2.0]: https://github.com/shortcuts/no-neck-pain.nvim/compare/0.1.2...0.2.0
 [0.1.2]: https://github.com/shortcuts/no-neck-pain.nvim/compare/0.1.1...0.1.2
