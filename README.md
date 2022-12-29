@@ -96,18 +96,24 @@ require("lazy").setup({"shortcuts/no-neck-pain.nvim"})
 </table>
 </div>
 
-This is all you need! Call `:NoNeckPain` once installed to toggle it.
+## ☄ Getting started
 
-If you wish to enable the plugin on Neovim start: [-> take a look at the guide <-](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Automate-no-neck-pain-enabling)
+> **Note**:
+> Wish to start Neovim with the plugin enabled automatically? [Take a look at the guide](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Automate-no-neck-pain-enabling)
+
+No configuration/setup steps needed! Sit back, relax and call `:NoNeckPain`.
 
 ## ⚙ Configuration
 
-> The options are also available in Neovim by using:
-> - `:h NoNeckPain.options` to see the plugin options.
-> - `:h NoNeckPain.bufferOptions` to see the buffer options.
+> **Note**:
+> Need some inspiration on customizing your experience? [Take a look at the showcase](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase)
 
 <details>
-<summary>Click to unfold the full list of options</summary>
+<summary>Click to unfold the full list of options with their default values</summary>
+
+> **Note**: The options are also available in Neovim by using:
+> - `:h NoNeckPain.options` to see the plugin options.
+> - `:h NoNeckPain.bufferOptions` to see the buffer options.
 
 ```lua
 require("no-neck-pain").setup({
