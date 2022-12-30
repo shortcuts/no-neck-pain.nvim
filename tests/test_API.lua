@@ -52,6 +52,7 @@ T["setup()"]["sets exposed methods and default options value"] = function()
     eq_type_config(child, "buffers", "table")
 
     eq_config(child, "width", 100)
+    eq_config(child, "enableOnVimEnter", false)
     eq_config(child, "toggleMapping", "<Leader>np")
     eq_config(child, "debug", false)
     eq_config(child, "disableOnLastBuffer", false)
@@ -130,6 +131,7 @@ end
 T["setup()"]["overrides default values"] = function()
     child.lua([[require('no-neck-pain').setup({
         width = 42,
+        enableOnVimEnter = true,
         toggleMapping = "<Leader>kz",
         debug = true,
         disableOnLastBuffer = true,
@@ -202,6 +204,7 @@ T["setup()"]["overrides default values"] = function()
 
     -- config
     eq_config(child, "width", 42)
+    eq_config(child, "enableOnVimEnter", true)
     eq_config(child, "toggleMapping", "<Leader>kz")
     eq_config(child, "debug", true)
     eq_config(child, "disableOnLastBuffer", true)
