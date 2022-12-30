@@ -35,7 +35,7 @@ Helpers.expect.global_type_equality = MiniTest.new_expectation(
     errorMessage
 )
 
-Helpers.expect.option_equality = MiniTest.new_expectation(
+Helpers.expect.config_equality = MiniTest.new_expectation(
     "config option matches",
     function(child, field, value)
         return Helpers.expect.global_equality(child, "_G.NoNeckPain.config." .. field, value)
@@ -43,7 +43,7 @@ Helpers.expect.option_equality = MiniTest.new_expectation(
     errorMessage
 )
 
-Helpers.expect.option_type_equality = MiniTest.new_expectation(
+Helpers.expect.config_type_equality = MiniTest.new_expectation(
     "config option type matches",
     function(child, field, value)
         return Helpers.expect.global_equality(
