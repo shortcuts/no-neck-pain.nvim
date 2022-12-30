@@ -36,7 +36,6 @@ NoNeckPain.bufferOptions = {
         filetype = "no-neck-pain",
         buftype = "nofile",
         bufhidden = "hide",
-        modifiable = false,
         buflisted = false,
         swapfile = false,
     },
@@ -48,6 +47,8 @@ NoNeckPain.bufferOptions = {
         relativenumber = false,
         foldenable = false,
         list = false,
+        wrap = true,
+        linebreak = true,
     },
 }
 
@@ -102,7 +103,6 @@ NoNeckPain.options = {
             filetype = "no-neck-pain",
             buftype = "nofile",
             bufhidden = "hide",
-            modifiable = false,
             buflisted = false,
             swapfile = false,
         },
@@ -114,6 +114,8 @@ NoNeckPain.options = {
             relativenumber = false,
             foldenable = false,
             list = false,
+            wrap = true,
+            linebreak = true,
         },
         --- Options applied to the `left` buffer, the options defined here overrides the ones at the root of the `buffers` level.
         --- See |NoNeckPain.bufferOptions|.
