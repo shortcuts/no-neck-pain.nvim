@@ -238,6 +238,12 @@ function NoNeckPain.enable()
                 local wins = vim.api.nvim_list_wins()
                 local total = M.tsize(wins)
 
+                -- if all the main buffers are still present,
+                -- it means we have nothing to do here
+                if M.every(wins, S.win.main) then
+                    return
+                end
+
                 -- `total` needs to be compared with the number of active wins,
                 -- in the NNP context. This threshold holds the count.
                 -- 1 = split && curr && !left && !right

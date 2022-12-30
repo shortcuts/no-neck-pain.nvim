@@ -143,6 +143,28 @@ T["auto command"]["does not create side buffers window's width < options.width"]
     eq_state(child, "win.main.right", vim.NIL)
 end
 
+T["auto command"]["(split) with only one side buffer, closing help doesn't close NNP"] = function()
+    child.set_size(500, 500)
+    child.lua([[
+        require('no-neck-pain').setup({width=50, buffers={right={enabled=false}}})
+        require('no-neck-pain').enable()
+    ]])
+
+    child.cmd("h")
+
+    eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1002, 1000 })
+    eq_state(child, "win.main.left", 1001)
+    eq_state(child, "win.main.right", vim.NIL)
+    eq_state(child, "win.main.split", 1002)
+    eq_state(child, "win.main.curr", 1000)
+    eq_state(child, "vsplit", false)
+
+    child.cmd("q")
+
+    eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1000 })
+    eq(child.lua_get("vim.api.nvim_get_current_win()"), 1000)
+end
+
 T["auto command"]["(split) closing `curr` makes `split` the new `curr`"] = function()
     child.set_size(200, 200)
     child.lua([[
