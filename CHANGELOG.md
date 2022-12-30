@@ -1,4 +1,15 @@
 
+<a name="0.2.3"></a>
+## [0.2.3] - 2022-12-30
+### Feat
+- make side buffer a scratch pad ([#108](https://github.com/shortcuts/no-neck-pain.nvim/issues/108))
+- add `enableOnVimEnter` option ([#107](https://github.com/shortcuts/no-neck-pain.nvim/issues/107))
+- add `toggleMapping` option ([#105](https://github.com/shortcuts/no-neck-pain.nvim/issues/105))
+
+### Fix
+- prevent help split disabling nnp ([#106](https://github.com/shortcuts/no-neck-pain.nvim/issues/106))
+
+
 <a name="0.2.2"></a>
 ## [0.2.2] - 2022-12-29
 ### Feat
@@ -106,7 +117,8 @@ exposed API and configuration have changed
 - some padding wrongly toggling
 
 
-[Unreleased]: https://github.com/shortcuts/no-neck-pain.nvim/compare/0.2.2...HEAD
+[Unreleased]: https://github.com/shortcuts/no-neck-pain.nvim/compare/0.2.3...HEAD
+[0.2.3]: https://github.com/shortcuts/no-neck-pain.nvim/compare/0.2.2...0.2.3
 [0.2.2]: https://github.com/shortcuts/no-neck-pain.nvim/compare/0.2.1...0.2.2
 [0.2.1]: https://github.com/shortcuts/no-neck-pain.nvim/compare/0.2.0...0.2.1
 [0.2.0]: https://github.com/shortcuts/no-neck-pain.nvim/compare/0.1.2...0.2.0
