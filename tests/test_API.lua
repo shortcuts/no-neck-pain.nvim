@@ -1,8 +1,11 @@
 local helpers = dofile("tests/helpers.lua")
 
 local child = helpers.new_child_neovim()
-local eq_global, eq_config, eq_state =
-    helpers.expect.global_equality, helpers.expect.config_equality, helpers.expect.state_equality
+local eq, eq_global, eq_config, eq_state =
+    helpers.expect.equality,
+    helpers.expect.global_equality,
+    helpers.expect.config_equality,
+    helpers.expect.state_equality
 local eq_type_global, eq_type_config, eq_type_state =
     helpers.expect.global_type_equality,
     helpers.expect.config_type_equality,
@@ -52,6 +55,7 @@ T["setup()"]["sets exposed methods and default options value"] = function()
     eq_type_config(child, "buffers", "table")
 
     eq_config(child, "width", 100)
+    eq_config(child, "enableOnVimEnter", false)
     eq_config(child, "toggleMapping", "<Leader>np")
     eq_config(child, "debug", false)
     eq_config(child, "disableOnLastBuffer", false)
@@ -130,6 +134,7 @@ end
 T["setup()"]["overrides default values"] = function()
     child.lua([[require('no-neck-pain').setup({
         width = 42,
+        enableOnVimEnter = true,
         toggleMapping = "<Leader>kz",
         debug = true,
         disableOnLastBuffer = true,
@@ -202,6 +207,7 @@ T["setup()"]["overrides default values"] = function()
 
     -- config
     eq_config(child, "width", 42)
+    eq_config(child, "enableOnVimEnter", true)
     eq_config(child, "toggleMapping", "<Leader>kz")
     eq_config(child, "debug", true)
     eq_config(child, "disableOnLastBuffer", true)
@@ -381,6 +387,29 @@ T["setup()"]["colorCode: map integration name to a value"] = function()
             eq_config(child, "buffers." .. scope .. ".backgroundColor", integration[2])
         end
     end
+end
+
+T["setup()"]["enables the plugin with mapping"] = function()
+    child.lua([[
+        require('no-neck-pain').setup({width=50,toggleMapping="nn"})
+    ]])
+
+    eq(child.lua_get("vim.api.nvim_list_wins()"), { 1000 })
+    eq_type_global(child, "_G.NoNeckPainLoaded", "boolean")
+
+    child.lua("vim.api.nvim_input('nn')")
+
+    eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1000, 1002 })
+    eq_state(child, "enabled", true)
+end
+
+T["setup()"]["starts the plugin on VimEnter"] = function()
+    child.restart({ "-u", "scripts/test_auto_open.lua" })
+
+    eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1000, 1002 })
+    eq_state(child, "enabled", true)
+
+    child.stop()
 end
 
 T["enable()"] = MiniTest.new_set()

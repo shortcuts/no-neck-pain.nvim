@@ -50,6 +50,19 @@ end
 -- setup NNP options and merge them with user provided ones.
 function NNP.setup(opts)
     NNP.config = require("no-neck-pain.config").setup(opts)
+
+    if NNP.config.enableOnVimEnter then
+        vim.api.nvim_create_augroup("NoNeckPainVimEnter", { clear = true })
+        vim.api.nvim_create_autocmd({ "VimEnter" }, {
+            group = "NoNeckPainVimEnter",
+            pattern = "*",
+            callback = function()
+                vim.schedule(function()
+                    NNP.enable()
+                end)
+            end,
+        })
+    end
 end
 
 _G.NoNeckPain = NNP

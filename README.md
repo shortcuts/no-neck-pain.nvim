@@ -119,6 +119,8 @@ No configuration/setup steps needed! Sit back, relax and call `:NoNeckPain`.
 require("no-neck-pain").setup({
     -- Prints useful logs about what event are triggered, and reasons actions are executed.
     debug = false,
+    -- When `true`, enables the plugin when your start Neovim.
+    enableOnVimEnter = false,
     -- The width of the focused buffer when enabling NNP.
     -- If the available window size is less than `width`, the buffer will take the whole screen.
     width = 100,
