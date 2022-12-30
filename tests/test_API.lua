@@ -74,7 +74,6 @@ T["setup()"]["sets exposed methods and default options value"] = function()
     eq_config(child, "buffers.bo.filetype", "no-neck-pain")
     eq_config(child, "buffers.bo.buftype", "nofile")
     eq_config(child, "buffers.bo.bufhidden", "hide")
-    eq_config(child, "buffers.bo.modifiable", false)
     eq_config(child, "buffers.bo.buflisted", false)
     eq_config(child, "buffers.bo.swapfile", false)
 
@@ -84,6 +83,8 @@ T["setup()"]["sets exposed methods and default options value"] = function()
     eq_config(child, "buffers.wo.relativenumber", false)
     eq_config(child, "buffers.wo.foldenable", false)
     eq_config(child, "buffers.wo.list", false)
+    eq_config(child, "buffers.wo.wrap", true)
+    eq_config(child, "buffers.wo.linebreak", true)
 
     for _, scope in pairs(SCOPES) do
         eq_type_config(child, "buffers." .. scope, "table")
@@ -97,7 +98,6 @@ T["setup()"]["sets exposed methods and default options value"] = function()
         eq_config(child, "buffers." .. scope .. ".bo.filetype", "no-neck-pain")
         eq_config(child, "buffers." .. scope .. ".bo.buftype", "nofile")
         eq_config(child, "buffers." .. scope .. ".bo.bufhidden", "hide")
-        eq_config(child, "buffers." .. scope .. ".bo.modifiable", false)
         eq_config(child, "buffers." .. scope .. ".bo.buflisted", false)
         eq_config(child, "buffers." .. scope .. ".bo.swapfile", false)
 
@@ -107,6 +107,8 @@ T["setup()"]["sets exposed methods and default options value"] = function()
         eq_config(child, "buffers." .. scope .. ".wo.relativenumber", false)
         eq_config(child, "buffers." .. scope .. ".wo.foldenable", false)
         eq_config(child, "buffers." .. scope .. ".wo.list", false)
+        eq_config(child, "buffers." .. scope .. ".wo.wrap", true)
+        eq_config(child, "buffers." .. scope .. ".wo.linebreak", true)
     end
 end
 
@@ -148,7 +150,6 @@ T["setup()"]["overrides default values"] = function()
                 filetype = "my-file-type",
                 buftype = "help",
                 bufhidden = "",
-                modifiable = true,
                 buflisted = true,
                 swapfile = true,
             },
@@ -159,6 +160,8 @@ T["setup()"]["overrides default values"] = function()
                 relativenumber = true,
                 foldenable = true,
                 list = true,
+                wrap = false,
+                linebreak = false,
             },
             left = {
                 backgroundColor = "catppuccin-frappe",
@@ -168,7 +171,6 @@ T["setup()"]["overrides default values"] = function()
                     filetype = "my-file-type",
                     buftype = "help",
                     bufhidden = "",
-                    modifiable = true,
                     buflisted = true,
                     swapfile = true,
                 },
@@ -179,6 +181,8 @@ T["setup()"]["overrides default values"] = function()
                     relativenumber = true,
                     foldenable = true,
                     list = true,
+                    wrap = false,
+                    linebreak = false,
                 },
             },
             right = {
@@ -189,7 +193,6 @@ T["setup()"]["overrides default values"] = function()
                     filetype = "my-file-type",
                     buftype = "help",
                     bufhidden = "",
-                    modifiable = true,
                     buflisted = true,
                     swapfile = true,
                 },
@@ -200,6 +203,8 @@ T["setup()"]["overrides default values"] = function()
                     relativenumber = true,
                     foldenable = true,
                     list = true,
+                    wrap = false,
+                    linebreak = false,
                 },
             },
         },
@@ -226,7 +231,6 @@ T["setup()"]["overrides default values"] = function()
     eq_config(child, "buffers.bo.filetype", "my-file-type")
     eq_config(child, "buffers.bo.buftype", "help")
     eq_config(child, "buffers.bo.bufhidden", "")
-    eq_config(child, "buffers.bo.modifiable", true)
     eq_config(child, "buffers.bo.buflisted", true)
     eq_config(child, "buffers.bo.swapfile", true)
 
@@ -236,6 +240,8 @@ T["setup()"]["overrides default values"] = function()
     eq_config(child, "buffers.wo.relativenumber", true)
     eq_config(child, "buffers.wo.foldenable", true)
     eq_config(child, "buffers.wo.list", true)
+    eq_config(child, "buffers.wo.wrap", false)
+    eq_config(child, "buffers.wo.linebreak", false)
 
     for _, scope in pairs(SCOPES) do
         eq_config(child, "buffers." .. scope .. ".backgroundColor", "#595c6b")
@@ -245,7 +251,6 @@ T["setup()"]["overrides default values"] = function()
         eq_config(child, "buffers." .. scope .. ".bo.filetype", "my-file-type")
         eq_config(child, "buffers." .. scope .. ".bo.buftype", "help")
         eq_config(child, "buffers." .. scope .. ".bo.bufhidden", "")
-        eq_config(child, "buffers." .. scope .. ".bo.modifiable", true)
         eq_config(child, "buffers." .. scope .. ".bo.buflisted", true)
         eq_config(child, "buffers." .. scope .. ".bo.swapfile", true)
 
@@ -255,6 +260,8 @@ T["setup()"]["overrides default values"] = function()
         eq_config(child, "buffers." .. scope .. ".wo.relativenumber", true)
         eq_config(child, "buffers." .. scope .. ".wo.foldenable", true)
         eq_config(child, "buffers." .. scope .. ".wo.list", true)
+        eq_config(child, "buffers." .. scope .. ".wo.wrap", false)
+        eq_config(child, "buffers." .. scope .. ".wo.linebreak", false)
     end
 end
 
