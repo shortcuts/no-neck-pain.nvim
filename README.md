@@ -117,11 +117,14 @@ No configuration/setup steps needed! Sit back, relax and call `:NoNeckPain`.
 
 ```lua
 require("no-neck-pain").setup({
+    -- Prints useful logs about what event are triggered, and reasons actions are executed.
+    debug = false,
     -- The width of the focused buffer when enabling NNP.
     -- If the available window size is less than `width`, the buffer will take the whole screen.
     width = 100,
-    -- Prints useful logs about what event are triggered, and reasons actions are executed.
-    debug = false,
+    -- Set globally to Neovim, it allows you to toggle the enable/disable state.
+    -- When `false`, the mapping is not created.
+    toggleMapping = "<Leader>np",
     -- Disables NNP if the last valid buffer in the list has been closed.
     disableOnLastBuffer = false,
     -- When `true`, disabling NNP kills every split/vsplit buffers except the main NNP buffer.
