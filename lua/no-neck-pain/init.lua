@@ -1,3 +1,5 @@
+local E = require("no-neck-pain.util.event")
+
 local NNP = {}
 
 -- toggles NNP switch between enabled/disable state.
@@ -52,15 +54,21 @@ function NNP.setup(opts)
     NNP.config = require("no-neck-pain.config").setup(opts)
 
     if NNP.config.enableOnVimEnter then
-        vim.api.nvim_create_augroup("NoNeckPainVimEnter", { clear = true })
-        vim.api.nvim_create_autocmd({ "VimEnter" }, {
-            group = "NoNeckPainVimEnter",
+        vim.api.nvim_create_augroup("NoNeckPainBufWinEnter", { clear = true })
+        vim.api.nvim_create_autocmd({ "BufWinEnter" }, {
+            group = "NoNeckPainBufWinEnter",
             pattern = "*",
-            callback = function()
+            callback = function(p)
                 vim.schedule(function()
+                    if E.abortEnable(NNP.state, vim.bo.filetype) then
+                        return
+                    end
+
                     NNP.enable()
+                    vim.api.nvim_del_autocmd(p.id)
                 end)
             end,
+            desc = "Triggers until it find the correct moment/buffer to enable the plugin.",
         })
     end
 end
