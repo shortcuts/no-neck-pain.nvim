@@ -163,6 +163,11 @@ T["auto command"]["(split) with only one side buffer, closing help doesn't close
 
     eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1000 })
     eq(child.lua_get("vim.api.nvim_get_current_win()"), 1000)
+
+    eq_state(child, "win.main.left", 1001)
+    eq_state(child, "win.main.right", vim.NIL)
+    eq_state(child, "win.main.split", vim.NIL)
+    eq_state(child, "win.main.curr", 1000)
 end
 
 T["auto command"]["(split) closing `curr` makes `split` the new `curr`"] = function()
@@ -229,7 +234,6 @@ T["auto command"]["split keeps side buffers"] = function()
     child.cmd("q")
 
     eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1000, 1002 })
-
     eq_buf_width(child, "main.left", 15)
     eq_buf_width(child, "main.right", 15)
 end
