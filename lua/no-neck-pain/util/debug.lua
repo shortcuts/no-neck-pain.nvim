@@ -26,9 +26,9 @@ end
 
 -- prints table only if debug is true.
 function D.tprint(table, indent)
-    -- if _G.NoNeckPain.config ~= nil and not _G.NoNeckPain.config.debug then
-    --     return
-    -- end
+    if _G.NoNeckPain.config ~= nil and not _G.NoNeckPain.config.debug then
+        return
+    end
 
     if not indent then
         indent = 0
