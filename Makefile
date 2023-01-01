@@ -17,6 +17,8 @@ test-ci: deps test
 documentation:
 	nvim --headless --noplugin -u ./scripts/minimal_init.lua -c "lua require('mini.doc').generate()" -c "qa!"
 
+documentation-ci: deps documentation
+
 lint:
 	stylua .
 

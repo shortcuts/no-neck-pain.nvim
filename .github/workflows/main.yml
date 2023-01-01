@@ -35,14 +35,11 @@ jobs:
           neovim: true
           version: v0.8.2
 
-      - name: install deps
-        run: make deps
-
       - name: generate documentation
-        run: make documentation
+        run: make documentation-ci
 
       - name: check docs diff
-        run: exit $(git diff --name-only main -- doc | wc -l)
+        run: exit $(git diff --name-only origin/main -- doc | wc -l)
 
   tests:
     needs:
