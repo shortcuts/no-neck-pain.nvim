@@ -155,9 +155,9 @@ T["auto command"]["(split) with only one side buffer, closing help doesn't close
     eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1002, 1000 })
     eq_state(child, "win.main.left", 1001)
     eq_state(child, "win.main.right", vim.NIL)
-    eq_state(child, "win.main.split", 1002)
+    eq_state(child, "win.splits[1].id", 1002)
     eq_state(child, "win.main.curr", 1000)
-    eq_state(child, "vsplit", false)
+    eq_state(child, "win.splits[1].vsplit", false)
 
     child.cmd("q")
 
@@ -177,9 +177,9 @@ T["auto command"]["(split) closing `curr` makes `split` the new `curr`"] = funct
     eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1003, 1000, 1002 })
     eq_state(child, "win.main.left", 1001)
     eq_state(child, "win.main.right", 1002)
-    eq_state(child, "win.main.split", 1003)
+    eq_state(child, "win.splits[1].id", 1003)
     eq_state(child, "win.main.curr", 1000)
-    eq_state(child, "vsplit", false)
+    eq_state(child, "win.splits[1].vsplit", false)
 
     child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.win.main.curr)")
     child.cmd("q")
@@ -188,7 +188,7 @@ T["auto command"]["(split) closing `curr` makes `split` the new `curr`"] = funct
     eq(child.lua_get("vim.api.nvim_get_current_win()"), 1003)
 end
 
-T["auto command"]["(vsplit) closing `curr` makes `split` the new `curr`"] = function()
+T["auto command"]["(win.splits[1].vsplit) closing `curr` makes `split` the new `curr`"] = function()
     child.lua([[
         require('no-neck-pain').setup({width=50})
         require('no-neck-pain').enable()
@@ -199,9 +199,9 @@ T["auto command"]["(vsplit) closing `curr` makes `split` the new `curr`"] = func
     eq(child.lua_get("vim.api.nvim_list_wins()"), { 1003, 1000 })
     eq_state(child, "win.main.left", vim.NIL)
     eq_state(child, "win.main.right", vim.NIL)
-    eq_state(child, "win.main.split", 1003)
+    eq_state(child, "win.splits[1].id", 1003)
     eq_state(child, "win.main.curr", 1000)
-    eq_state(child, "vsplit", true)
+    eq_state(child, "win.splits[1].vsplit", true)
 
     child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.win.main.curr)")
     child.cmd("q")
@@ -222,10 +222,10 @@ T["auto command"]["split keeps side buffers"] = function()
     eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1003, 1000, 1002 })
     eq_state(child, "win.main.left", 1001)
     eq_state(child, "win.main.right", 1002)
-    eq_state(child, "win.main.split", 1003)
-    eq_state(child, "vsplit", false)
+    eq_state(child, "win.splits[1].id", 1003)
+    eq_state(child, "win.splits[1].vsplit", false)
 
-    child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.win.main.split)")
+    child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.win.splits[1].id)")
     child.cmd("q")
 
     eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1000, 1002 })
@@ -234,7 +234,7 @@ T["auto command"]["split keeps side buffers"] = function()
     eq_buf_width(child, "main.right", 15)
 end
 
-T["auto command"]["hides side buffers after vsplit"] = function()
+T["auto command"]["hides side buffers after win.splits[1].vsplit"] = function()
     child.lua([[
         require('no-neck-pain').setup({width=50})
         require('no-neck-pain').enable()
@@ -245,17 +245,16 @@ T["auto command"]["hides side buffers after vsplit"] = function()
     eq(child.lua_get("vim.api.nvim_list_wins()"), { 1003, 1000 })
     eq_state(child, "win.main.left", vim.NIL)
     eq_state(child, "win.main.right", vim.NIL)
-    eq_state(child, "win.main.split", 1003)
-    eq_state(child, "vsplit", true)
+    eq_state(child, "win.splits[1].id", 1003)
+    eq_state(child, "win.splits[1].vsplit", true)
 
-    child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.win.main.split)")
+    child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.win.splits[1].id)")
     child.cmd("q")
 
     eq(child.lua_get("vim.api.nvim_list_wins()"), { 1004, 1000, 1005 })
     eq_state(child, "win.main.left", 1004)
     eq_state(child, "win.main.right", 1005)
-    eq_state(child, "win.main.split", vim.NIL)
-    eq_state(child, "vsplit", false)
+    eq_state(child, "win.splits", vim.NIL)
 end
 
 T["auto command"]["does not shift using when opening/closing float window"] = function()

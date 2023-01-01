@@ -445,8 +445,7 @@ T["enable()"]["sets state and internal methods"] = function()
     eq_state(child, "win.main.curr", 1000)
     eq_state(child, "win.main.left", 1001)
     eq_state(child, "win.main.right", 1002)
-    eq_state(child, "win.main.split", vim.NIL)
-    eq_state(child, "vsplit", false)
+    eq_state(child, "win.splits", vim.NIL)
 
     eq_type_state(child, "win.external.trees", "table")
 
@@ -475,8 +474,7 @@ T["disable()"]["resets state and remove internal methods"] = function()
     eq_state(child, "win.main.curr", vim.NIL)
     eq_state(child, "win.main.left", vim.NIL)
     eq_state(child, "win.main.right", vim.NIL)
-    eq_state(child, "win.main.split", vim.NIL)
-    eq_state(child, "vsplit", false)
+    eq_state(child, "win.splits", vim.NIL)
 
     eq_type_state(child, "win.external.trees", "table")
 
@@ -514,8 +512,7 @@ T["toggle()"]["sets state and internal methods and resets everything when toggle
         eq_state(child, "win.main.curr", 1000)
         eq_state(child, "win.main.left", 1001)
         eq_state(child, "win.main.right", 1002)
-        eq_state(child, "win.main.split", vim.NIL)
-        eq_state(child, "vsplit", false)
+        eq_state(child, "win.splits", vim.NIL)
 
         eq_type_state(child, "win.external.trees", "table")
 
@@ -541,12 +538,14 @@ T["toggle()"]["sets state and internal methods and resets everything when toggle
         eq_state(child, "win.main.curr", vim.NIL)
         eq_state(child, "win.main.left", vim.NIL)
         eq_state(child, "win.main.right", vim.NIL)
-        eq_state(child, "win.main.split", vim.NIL)
-        eq_state(child, "vsplit", false)
+        eq_state(child, "win.splits", vim.NIL)
 
-        eq_type_state(child, "win.external.tree", "table")
-        eq_state(child, "win.external.tree.id", vim.NIL)
-        eq_state(child, "win.external.tree.width", 0)
+        eq_type_state(child, "win.external.trees", "table")
+
+        for _, integration in pairs(integrations) do
+            eq_state(child, "win.external.trees." .. integration .. ".id", vim.NIL)
+            eq_state(child, "win.external.trees." .. integration .. ".width", 0)
+        end
     end
 
 return T

@@ -39,4 +39,16 @@ function M.tsize(map)
     return count
 end
 
+-- insert to a map if it exists or initializes insert
+function M.initOrAdd(map, winID, vsplit)
+    map = map or {}
+
+    table.insert(map, {
+        id = winID,
+        vsplit = vsplit,
+    })
+
+    return map
+end
+
 return M

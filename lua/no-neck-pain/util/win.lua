@@ -191,4 +191,27 @@ function W.getPadding(side, trees)
     return math.floor((width - paddingToSubstract - _G.NoNeckPain.config.width) / 2)
 end
 
+-- Merges the state windows to get a list of ids.
+function W.mergeStateWins(main, splits, trees)
+    local wins = {}
+
+    for _, side in pairs(main) do
+        table.insert(wins, side)
+    end
+
+    if splits ~= nil then
+        for _, split in pairs(splits) do
+            table.insert(wins, split.id)
+        end
+    end
+
+    if trees ~= nil then
+        for _, tree in pairs(trees) do
+            table.insert(wins, tree.id)
+        end
+    end
+
+    return wins
+end
+
 return W
