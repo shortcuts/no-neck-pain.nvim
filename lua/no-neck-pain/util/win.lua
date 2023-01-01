@@ -15,12 +15,12 @@ function W.createSideBuffers(wins)
         left = {
             cmd = "leftabove vnew",
             moveTo = "wincmd l",
-            id = nil,
+            id = wins.main.left,
         },
         right = {
             cmd = "vnew",
             moveTo = "wincmd h",
-            id = nil,
+            id = wins.main.right,
         },
     }
 

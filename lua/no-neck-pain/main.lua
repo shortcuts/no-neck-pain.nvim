@@ -147,6 +147,8 @@ function N.enable()
                 if width < screenWidth then
                     S.vsplit = true
                     S.win.main.left, S.win.main.right = W.closeSideBuffers(p.event, S.win.main)
+
+                    return
                 end
             end)
         end,
