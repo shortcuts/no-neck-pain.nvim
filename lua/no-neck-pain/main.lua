@@ -2,6 +2,7 @@ local D = require("no-neck-pain.util.debug")
 local E = require("no-neck-pain.util.event")
 local M = require("no-neck-pain.util.map")
 local W = require("no-neck-pain.util.win")
+local ST = require("no-neck-pain.util.state")
 
 local N = {}
 
@@ -11,10 +12,14 @@ local S = {
     augroup = nil,
     win = {
         main = {
+            -- the center window.
             curr = nil,
+            -- the left padding.
             left = nil,
+            -- the right padding.
             right = nil,
         },
+        -- the opened splits.
         splits = nil,
         external = {
             trees = {
@@ -112,7 +117,7 @@ function N.enable()
                 end
 
                 local focusedWin = vim.api.nvim_get_current_win()
-                local buffers, total = W.listWinsExcept(W.mergeStateWins(S.win.main, S.win.splits))
+                local buffers, total = W.listWinsExcept(ST.mergeStateWins(S.win.main, S.win.splits))
 
                 if total == 0 or not M.contains(buffers, focusedWin) then
                     return D.log(p.event, "no valid buffers to handle, no splits to handle")
@@ -141,11 +146,11 @@ function N.enable()
                 D.log(p.event, "split found [%s/%s]", width, screenWidth)
 
                 if width < screenWidth then
-                    S.win.splits = M.initOrAdd(S.win.splits, focusedWin, true)
+                    S.win.splits = ST.insertInSplits(S.win.splits, focusedWin, true)
                     return W.resizeSideBuffers(p.event, S.win)
                 end
 
-                S.win.splits = M.initOrAdd(S.win.splits, focusedWin, false)
+                S.win.splits = ST.insertInSplits(S.win.splits, focusedWin, false)
             end)
         end,
         group = "NoNeckPain",
@@ -163,10 +168,7 @@ function N.enable()
 
                 -- if we are not in split view, we check if we killed one of the main buffers (curr, left, right) to disable NNP
                 -- TODO: make killed side buffer decision configurable, we can re-create it
-                if
-                    S.win.splits == nil
-                    and not M.every(wins, W.mergeStateWins(S.win.main, S.win.splits))
-                then
+                if S.win.splits == nil and not M.every(wins, S.win.main) then
                     D.log(p.event, "one of the NNP main buffers have been closed, disabling...")
 
                     return N.disable(p.event)
@@ -174,7 +176,7 @@ function N.enable()
 
                 if _G.NoNeckPain.config.disableOnLastBuffer then
                     local _, remaining = W.listWinsExcept(
-                        W.mergeStateWins(S.win.main, S.win.splits, S.win.external.trees)
+                        ST.mergeStateWins(S.win.main, S.win.splits, S.win.external.trees)
                     )
 
                     if
@@ -206,27 +208,25 @@ function N.enable()
 
                 -- if all the main buffers are still present,
                 -- it means we have nothing to do here
-                if M.every(wins, W.mergeStateWins(S.win.main, S.win.splits)) then
+                if M.every(wins, ST.mergeStateWins(S.win.main, S.win.splits)) then
                     return
                 end
 
                 -- `total` needs to be compared with the number of active wins,
                 -- in the NNP context. This threshold holds the count.
-                -- 1 = split && curr && !left && !right
-                --  - vsplit   we have either `curr` or `split` left, basic vsplit case
-                --  - split    we don't have side buffers (e.g. small window, disabled in config)
-                -- 2 = !vsplit && split && curr && (!left || !right)
+                -- we only keep count of the `vsplit` internally because they impact side buffer.
+                -- 1 + nbVerticals && curr && !left && !right
+                --   - a basic split case where we just need to define which will be the last `curr`.
+                -- 2 + nbVerticals && curr && (!left || !right)
                 --  - user disabled one of the side buffer
-                -- 3 = !vsplit && split && curr && left && right
+                -- 3 + nbVerticals && curr && left && right
                 --  - a default config case
-                local threshold = 1
+                local threshold = 1 + ST.getNbVerticalSplit(S.win.splits)
 
-                if not S.win.splits[1].vsplit then
-                    if S.win.main.left ~= nil and S.win.main.right ~= nil then
-                        threshold = 2
-                    elseif S.win.main.left ~= nil or S.win.main.right ~= nil then
-                        threshold = 3
-                    end
+                if S.win.main.left ~= nil and S.win.main.right ~= nil then
+                    threshold = threshold + 1
+                elseif S.win.main.left ~= nil or S.win.main.right ~= nil then
+                    threshold = threshold + 2
                 end
 
                 if total > threshold then
@@ -241,7 +241,7 @@ function N.enable()
 
                 S.win.splits = nil
 
-                init()
+                W.resizeSideBuffers(p.event, S.win)
             end)
         end,
         group = "NoNeckPain",
