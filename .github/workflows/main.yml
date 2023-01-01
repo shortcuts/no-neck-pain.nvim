@@ -25,9 +25,15 @@ jobs:
 
   documentation:
     runs-on: ubuntu-latest
-    name: lint
+    name: documentation
     steps:
       - uses: actions/checkout@v3
+
+      - name: setup neovim
+        uses: rhysd/action-setup-vim@v1
+        with:
+          neovim: true
+          version: v0.8.2
 
       - name: install deps
         run: make deps
