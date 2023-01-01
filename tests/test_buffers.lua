@@ -235,26 +235,26 @@ T["auto command"]["split keeps side buffers"] = function()
     eq_buf_width(child, "main.right", 15)
 end
 
-T["auto command"]["split/vsplit/side state is correctly sync'd even after many changes"] =
-    function()
-        child.lua([[ require('no-neck-pain').setup({width=50}) ]])
+T["auto command"]["split/vsplit/side state is correctly sync'd even after many changes"] = function(
+)
+    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
 
-        eq(child.lua_get("vim.api.nvim_list_wins()"), { 1000 })
+    eq(child.lua_get("vim.api.nvim_list_wins()"), { 1000 })
 
-        child.lua([[ require('no-neck-pain').enable() ]])
+    child.lua([[ require('no-neck-pain').enable() ]])
 
-        eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1000, 1002 })
+    eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1000, 1002 })
 
-        child.cmd("split")
-        eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1003, 1000, 1002 })
-        child.cmd("q")
+    child.cmd("split")
+    eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1003, 1000, 1002 })
+    child.cmd("q")
 
-        child.cmd("vsplit")
-        eq(child.lua_get("vim.api.nvim_list_wins()"), { 1004, 1000 })
-        child.cmd("q")
+    child.cmd("vsplit")
+    eq(child.lua_get("vim.api.nvim_list_wins()"), { 1004, 1000 })
+    child.cmd("q")
 
-        eq(child.lua_get("vim.api.nvim_list_wins()"), { 1005, 1000, 1006 })
-    end
+    eq(child.lua_get("vim.api.nvim_list_wins()"), { 1005, 1000, 1006 })
+end
 
 T["auto command"]["hides side buffers after vsplit"] = function()
     child.lua([[
