@@ -24,6 +24,7 @@ local T = MiniTest.new_set({
 })
 
 local SCOPES = { "left", "right" }
+local EXTERNALS = { "NvimTree", "undotree" }
 
 T["install"] = MiniTest.new_set()
 
@@ -450,17 +451,24 @@ T["enable()"]["sets state and internal methods"] = function()
 
     eq_type_state(child, "win.external.trees", "table")
 
-    local integrations = { "NvimTree", "undotree" }
-    for _, integration in pairs(integrations) do
-        eq_state(child, "win.external.trees." .. integration .. ".id", vim.NIL)
-        eq_state(child, "win.external.trees." .. integration .. ".width", 0)
+    for _, external in pairs(EXTERNALS) do
+        eq_state(child, "win.external.trees." .. external .. ".id", vim.NIL)
+        eq_state(child, "win.external.trees." .. external .. ".width", 0)
     end
 end
 
 T["disable()"] = MiniTest.new_set()
 
 T["disable()"]["resets state and remove internal methods"] = function()
-    child.lua([[require('no-neck-pain').disable()]])
+    child.lua([[
+        require('no-neck-pain').enable()
+        require('no-neck-pain').disable()
+    ]])
+
+    -- internal methods
+    eq_type_global(child, "_G.NoNeckPain.internal.toggle", "nil")
+    eq_type_global(child, "_G.NoNeckPain.internal.enable", "nil")
+    eq_type_global(child, "_G.NoNeckPain.internal.disable", "nil")
 
     -- state
     eq_type_global(child, "_G.NoNeckPain.state", "table")
@@ -480,10 +488,9 @@ T["disable()"]["resets state and remove internal methods"] = function()
 
     eq_type_state(child, "win.external.trees", "table")
 
-    local integrations = { "NvimTree", "undotree" }
-    for _, integration in pairs(integrations) do
-        eq_state(child, "win.external.trees." .. integration .. ".id", vim.NIL)
-        eq_state(child, "win.external.trees." .. integration .. ".width", 0)
+    for _, external in pairs(EXTERNALS) do
+        eq_state(child, "win.external.trees." .. external .. ".id", vim.NIL)
+        eq_state(child, "win.external.trees." .. external .. ".width", 0)
     end
 end
 
@@ -500,6 +507,9 @@ T["toggle()"]["sets state and internal methods and resets everything when toggle
         eq_type_global(child, "_G.NoNeckPain.internal.toggle", "function")
         eq_type_global(child, "_G.NoNeckPain.internal.enable", "function")
         eq_type_global(child, "_G.NoNeckPain.internal.disable", "function")
+
+        -- config -- shouldn't reset
+        eq_type_global(child, "_G.NoNeckPain.config", "table")
 
         -- state
         eq_type_global(child, "_G.NoNeckPain.state", "table")
@@ -519,10 +529,9 @@ T["toggle()"]["sets state and internal methods and resets everything when toggle
 
         eq_type_state(child, "win.external.trees", "table")
 
-        local integrations = { "NvimTree", "undotree" }
-        for _, integration in pairs(integrations) do
-            eq_state(child, "win.external.trees." .. integration .. ".id", vim.NIL)
-            eq_state(child, "win.external.trees." .. integration .. ".width", 0)
+        for _, external in pairs(EXTERNALS) do
+            eq_state(child, "win.external.trees." .. external .. ".id", vim.NIL)
+            eq_state(child, "win.external.trees." .. external .. ".width", 0)
         end
 
         -- disable
@@ -544,9 +553,12 @@ T["toggle()"]["sets state and internal methods and resets everything when toggle
         eq_state(child, "win.main.split", vim.NIL)
         eq_state(child, "vsplit", false)
 
-        eq_type_state(child, "win.external.tree", "table")
-        eq_state(child, "win.external.tree.id", vim.NIL)
-        eq_state(child, "win.external.tree.width", 0)
+        eq_type_state(child, "win.external.trees", "table")
+
+        for _, external in pairs(EXTERNALS) do
+            eq_state(child, "win.external.trees." .. external .. ".id", vim.NIL)
+            eq_state(child, "win.external.trees." .. external .. ".width", 0)
+        end
     end
 
 return T

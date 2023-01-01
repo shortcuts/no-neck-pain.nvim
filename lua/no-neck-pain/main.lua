@@ -3,8 +3,7 @@ local E = require("no-neck-pain.util.event")
 local M = require("no-neck-pain.util.map")
 local W = require("no-neck-pain.util.win")
 
--- internal methods
-local NoNeckPain = {}
+local N = {}
 
 -- state
 local S = {
@@ -33,32 +32,16 @@ local S = {
     vsplit = false,
 }
 
---- Toggle the plugin by calling the `enable`/`disable` methods respectively.
-function NoNeckPain.toggle()
+-- Toggle the plugin by calling the `enable`/`disable` methods respectively.
+function N.toggle()
     if S.enabled then
-        NoNeckPain.disable()
-
-        return false
+        return false, N.disable()
     end
 
-    NoNeckPain.enable()
-
-    return true
+    return true, N.enable()
 end
 
--- Resizes both of the NNP buffers.
-local function resize(scope)
-    W.resize(scope, S.win.main.left, W.getPadding("left", S.win.external.trees))
-    W.resize(scope, S.win.main.right, W.getPadding("right", S.win.external.trees))
-end
-
--- Close both of the NNP buffers and set their state to `nil`.
-local function close(scope)
-    S.win.main.left = W.close(scope, S.win.main.left)
-    S.win.main.right = W.close(scope, S.win.main.right)
-end
-
--- Creates NNP buffers.
+-- Creates side buffers and set the internal state considering potential external trees.
 local function init()
     local splitbelow, splitright = vim.o.splitbelow, vim.o.splitright
     vim.o.splitbelow, vim.o.splitright = true, true
@@ -70,7 +53,7 @@ local function init()
     end
 
     -- before creating side buffers, we determine if we should consider externals
-    S.win.external.trees = W.getSideTree()
+    S.win.external.trees = W.getSideTrees()
 
     if _G.NoNeckPain.config.buffers.left.enabled and S.win.main.left == nil then
         S.win.main.left = W.createBuf(
@@ -90,10 +73,10 @@ local function init()
     vim.fn.win_gotoid(S.win.main.curr)
 end
 
---- Initializes NNP and sets event listeners.
-function NoNeckPain.enable()
+-- Initializes the plugin, sets event listeners and internal state.
+function N.enable()
     if S.enabled then
-        return
+        return S
     end
 
     S.augroup = vim.api.nvim_create_augroup("NoNeckPain", {
@@ -124,11 +107,11 @@ function NoNeckPain.enable()
                         return init()
                     end
 
-                    return resize(p.event)
+                    return W.resizeSideBuffers(p.event, S.win)
                 end
 
                 -- window width below `options.width`
-                close(p.event)
+                S.win.main.left, S.win.main.right = W.closeSideBuffers(p.event, S.win.main)
             end)
         end,
         group = "NoNeckPain",
@@ -176,7 +159,7 @@ function NoNeckPain.enable()
 
                 if width < screenWidth then
                     S.vsplit = true
-                    return close(p.event)
+                    S.win.main.left, S.win.main.right = W.closeSideBuffers(p.event, S.win.main)
                 end
             end)
         end,
@@ -198,7 +181,7 @@ function NoNeckPain.enable()
                 if S.win.main.split == nil and not M.every(wins, S.win.main) then
                     D.log(p.event, "one of the NNP main buffers have been closed, disabling...")
 
-                    return NoNeckPain.disable(p.event)
+                    return N.disable(p.event)
                 end
 
                 if _G.NoNeckPain.config.disableOnLastBuffer then
@@ -219,7 +202,7 @@ function NoNeckPain.enable()
                     then
                         D.log(p.event, "found last `wipe` buffer in list, disabling...")
 
-                        return NoNeckPain.disable()
+                        return N.disable()
                     end
                 end
             end)
@@ -291,9 +274,9 @@ function NoNeckPain.enable()
                 end
 
                 local wins = vim.api.nvim_list_wins()
-                local trees = W.getSideTree()
+                local trees = W.getSideTrees()
 
-                -- we cycle over supported integrations to see which got closed or open
+                -- we cycle over supported integrations to see which got closed or opened
                 for name, tree in pairs(S.win.external.trees) do
                     -- if there was a tree[name] but not anymore, we resize
                     if tree.id ~= nil and not M.contains(wins, tree.id) then
@@ -302,13 +285,13 @@ function NoNeckPain.enable()
                             width = 0,
                         }
 
-                        return resize(p.event)
+                        return W.resizeSideBuffers(p.event, S.win)
                     end
 
                     -- we have a new tree registered, we can resize
                     if S.win.external.trees[name].id == nil and trees[name].id ~= nil then
                         S.win.external.trees = trees
-                        return resize(p.event)
+                        return W.resizeSideBuffers(p.event, S.win)
                     end
                 end
                 S.win.external.trees = trees
@@ -319,12 +302,14 @@ function NoNeckPain.enable()
     })
 
     S.enabled = true
+
+    return S
 end
 
---- Disable NNP and reset windows, leaving the `curr` focused window as focused.
-function NoNeckPain.disable(scope)
+-- Disables the plugin, clear highlight groups and autocmds, closes side buffers and resets the internal state.
+function N.disable(scope)
     if not S.enabled then
-        return
+        return S
     end
 
     S.enabled = false
@@ -347,24 +332,35 @@ function NoNeckPain.disable(scope)
         end
     end
 
-    close(scope)
+    W.closeSideBuffers(scope, S.win.main)
 
-    S.augroup = nil
-    S.vsplit = false
-    S.win = {
-        main = {
-            curr = nil,
-            left = nil,
-            right = nil,
-            split = nil,
-        },
-        external = {
-            tree = {
-                id = nil,
-                width = 0,
+    S = {
+        enabled = false,
+        augroup = nil,
+        win = {
+            main = {
+                curr = nil,
+                left = nil,
+                right = nil,
+                split = nil,
+            },
+            external = {
+                trees = {
+                    NvimTree = {
+                        id = nil,
+                        width = 0,
+                    },
+                    undotree = {
+                        id = nil,
+                        width = 0,
+                    },
+                },
             },
         },
+        vsplit = false,
     }
+
+    return S
 end
 
-return { NoNeckPain, S }
+return N

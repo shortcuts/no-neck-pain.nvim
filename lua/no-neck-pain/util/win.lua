@@ -2,6 +2,7 @@ local C = require("no-neck-pain.util.color")
 local D = require("no-neck-pain.util.debug")
 local M = require("no-neck-pain.util.map")
 local W = {}
+local SIDES = { "left", "right" }
 
 -- Creates a buffer for the given "padding" (width), at the given `moveTo` direction.
 --
@@ -97,48 +98,52 @@ function W.winsGetBufs(wins)
     return bufs
 end
 
--- closes a given `win`. quits Neovim if its the last window open.
-function W.close(scope, win)
-    if win == nil then
-        return nil
-    end
+-- Closes side buffers, quits Neovim if there's no other window left.
+function W.closeSideBuffers(scope, wins)
+    for _, side in pairs(SIDES) do
+        if wins[side] ~= nil then
+            local _, wsize = W.listWinsExcept({ wins[side] })
 
-    local _, wsize = W.listWinsExcept({ win })
+            -- we don't have any window left if we close this one
+            if wsize == 0 then
+                -- either triggered by a :wq or quit event, we can just quit
+                if scope == "QuitPre" then
+                    return vim.cmd("quit!")
+                end
 
-    -- we don't have any window left if we close this one
-    if wsize == 0 then
-        -- either triggered by a :wq or quit event, we can just quit
-        if scope == "QuitPre" then
-            return vim.cmd("quit!")
+                -- mostly triggered by :bd or similar
+                -- we will create a new window and close the other
+                vim.cmd("new")
+            end
+
+            -- when we have more than 1 window left, we can just close it
+            if vim.api.nvim_win_is_valid(wins[side]) then
+                D.log(scope, "closing %s window", side)
+
+                vim.api.nvim_win_close(wins[side], false)
+            end
         end
-
-        -- mostly triggered by :bd or similar
-        -- we will create a new window and close the other
-        vim.cmd("new")
     end
 
-    -- when we have more than 1 window left, we can just close it
-    if vim.api.nvim_win_is_valid(win) then
-        vim.api.nvim_win_close(win, false)
-    end
-
-    return nil
+    return nil, nil
 end
 
--- resizes a given `win` for the given `padding`
-function W.resize(scope, win, padding)
-    if win == nil then
-        return
-    end
+-- Resizes side buffers, considering the existing trees.
+function W.resizeSideBuffers(scope, wins)
+    D.log(scope, "resizing side buffers")
 
-    D.log(scope, "resizing window %s with padding %s", win, padding)
+    for _, side in pairs(SIDES) do
+        if wins.main[side] ~= nil then
+            local padding = W.getPadding("left", wins.external.trees)
 
-    if vim.api.nvim_win_is_valid(win) then
-        vim.api.nvim_win_set_width(win, padding)
+            if vim.api.nvim_win_is_valid(wins.main[side]) then
+                vim.api.nvim_win_set_width(wins.main[side], padding)
+            end
+        end
     end
 end
 
-function W.getSideTree()
+function W.getSideTrees()
     local wins = vim.api.nvim_list_wins()
     local trees = {
         NvimTree = {
