@@ -88,8 +88,9 @@ Helpers.new_child_neovim = function()
     local child = MiniTest.new_child_neovim()
 
     local prevent_hanging = function(method)
-    -- stylua: ignore
-    if not child.is_blocked() then return end
+        if not child.is_blocked() then
+            return
+        end
 
         local msg =
             string.format("Can not use `child.%s` because child process is blocked.", method)
