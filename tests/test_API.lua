@@ -31,10 +31,10 @@ T["install"]["sets global loaded variable and provide toggle command"] = functio
     eq_type_global(child, "_G.NoNeckPainLoaded", "boolean")
     eq_global(child, "_G.NoNeckPain", vim.NIL)
 
-    child.cmd("NoNeckPain")
+    child.lua([[require('no-neck-pain').toggle()]])
     eq_state(child, "enabled", true)
 
-    child.cmd("NoNeckPain")
+    child.lua([[require('no-neck-pain').toggle()]])
     eq_state(child, "enabled", false)
 end
 
