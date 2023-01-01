@@ -22,7 +22,7 @@ Helpers.expect.buf_width_equality = MiniTest.new_expectation(
 Helpers.expect.global_equality = MiniTest.new_expectation(
     "variable in child process matches",
     function(child, field, value)
-        return Helpers.expect.equality(child.lua("return " .. field), value)
+        return Helpers.expect.equality(child.lua_get(field), value)
     end,
     errorMessage
 )
