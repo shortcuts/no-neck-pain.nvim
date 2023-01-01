@@ -41,7 +41,7 @@ function NoNeckPain.setup(opts)
                         return
                     end
 
-                    _G.NoNeckPain.enable()
+                    NoNeckPain.enable()
                     vim.api.nvim_del_autocmd(p.id)
                 end)
             end,
