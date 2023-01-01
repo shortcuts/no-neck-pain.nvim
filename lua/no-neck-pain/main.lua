@@ -54,20 +54,7 @@ local function init()
 
     -- before creating side buffers, we determine if we should consider externals
     S.win.external.trees = W.getSideTrees()
-
-    if _G.NoNeckPain.config.buffers.left.enabled and S.win.main.left == nil then
-        S.win.main.left = W.createBuf(
-            "left",
-            "leftabove vnew",
-            W.getPadding("left", S.win.external.trees),
-            "wincmd l"
-        )
-    end
-
-    if _G.NoNeckPain.config.buffers.right.enabled and S.win.main.right == nil then
-        S.win.main.right =
-            W.createBuf("right", "vnew", W.getPadding("right", S.win.external.trees), "wincmd h")
-    end
+    S.win.main.left, S.win.main.right = W.createSideBuffers(S.win)
 
     vim.o.splitbelow, vim.o.splitright = splitbelow, splitright
     vim.fn.win_gotoid(S.win.main.curr)

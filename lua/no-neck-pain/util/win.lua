@@ -4,41 +4,62 @@ local M = require("no-neck-pain.util.map")
 local W = {}
 local SIDES = { "left", "right" }
 
--- Creates a buffer for the given "padding" (width), at the given `moveTo` direction.
+-- Creates side buffers with the correct padding.
 --
---@param name string: the name of the buffer, `no-neck-pain-` will be prepended.
---@param cmd string: the command to execute when creating the buffer
---@param padding number: the "padding" (width) of the buffer
---@param moveTo string: the command to execute to place the buffer at the correct spot.
-function W.createBuf(name, cmd, padding, moveTo)
-    vim.cmd(cmd)
+--@param wins list: the current wins state, useful to get `external` trees to consider the padding, and to know if the buffer already exists.
+function W.createSideBuffers(wins)
+    -- cmd: command to create the side buffer
+    -- moveTo: the destination of the side buffer
+    -- id: the id stored in the internal state
+    local config = {
+        left = {
+            cmd = "leftabove vnew",
+            moveTo = "wincmd l",
+            id = nil,
+        },
+        right = {
+            cmd = "vnew",
+            moveTo = "wincmd h",
+            id = nil,
+        },
+    }
 
-    local id = vim.api.nvim_get_current_win()
+    for _, side in pairs(SIDES) do
+        if _G.NoNeckPain.config.buffers[side].enabled and wins.main[side] == nil then
+            local padding = W.getPadding(side, wins.external.trees)
 
-    vim.api.nvim_win_set_width(0, padding)
+            vim.cmd(config[side].cmd)
 
-    if _G.NoNeckPain.config.buffers.setNames then
-        vim.api.nvim_buf_set_name(0, "no-neck-pain-" .. name)
+            local id = vim.api.nvim_get_current_win()
+
+            vim.api.nvim_win_set_width(0, padding)
+
+            if _G.NoNeckPain.config.buffers.setNames then
+                vim.api.nvim_buf_set_name(0, "no-neck-pain-" .. side)
+            end
+
+            for opt, val in pairs(_G.NoNeckPain.config.buffers[side].bo) do
+                vim.api.nvim_buf_set_option(0, opt, val)
+            end
+
+            for opt, val in pairs(_G.NoNeckPain.config.buffers[side].wo) do
+                vim.api.nvim_win_set_option(id, opt, val)
+            end
+
+            vim.cmd(config[side].moveTo)
+
+            C.init(
+                id,
+                side,
+                _G.NoNeckPain.config.buffers[side].backgroundColor,
+                _G.NoNeckPain.config.buffers[side].textColor
+            )
+
+            config[side].id = id
+        end
     end
 
-    for opt, val in pairs(_G.NoNeckPain.config.buffers[name].bo) do
-        vim.api.nvim_buf_set_option(0, opt, val)
-    end
-
-    for opt, val in pairs(_G.NoNeckPain.config.buffers[name].wo) do
-        vim.api.nvim_win_set_option(id, opt, val)
-    end
-
-    vim.cmd(moveTo)
-
-    C.init(
-        id,
-        name,
-        _G.NoNeckPain.config.buffers[name].backgroundColor,
-        _G.NoNeckPain.config.buffers[name].textColor
-    )
-
-    return id
+    return config.left.id, config.right.id
 end
 
 -- returns true if the index 0 window or the current window is relative.
@@ -51,6 +72,8 @@ function W.isRelativeWindow(win)
     then
         return true
     end
+
+    return false
 end
 
 -- returns the available wins and their total number, without the `list` ones.
