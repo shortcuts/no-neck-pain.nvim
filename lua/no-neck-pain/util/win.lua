@@ -157,7 +157,7 @@ function W.resizeSideBuffers(scope, wins)
 
     for _, side in pairs(SIDES) do
         if wins.main[side] ~= nil then
-            local padding = W.getPadding("left", wins.external.trees)
+            local padding = W.getPadding(side, wins.external.trees)
 
             if vim.api.nvim_win_is_valid(wins.main[side]) then
                 vim.api.nvim_win_set_width(wins.main[side], padding)
