@@ -12,10 +12,7 @@ deps:
 	@mkdir -p deps
 	git clone --depth 1 https://github.com/echasnovski/mini.nvim deps/mini.nvim
 
-test-ci: deps
-	nvim --headless --noplugin -u ./scripts/minimal_init.lua \
-		-c "lua require('mini.test').setup()" \
-		-c "lua MiniTest.run()"
+test-ci: deps test
 
 documentation:
 	nvim --headless --noplugin -u ./scripts/minimal_init.lua -c "lua require('mini.doc').generate()" -c "qa!"
