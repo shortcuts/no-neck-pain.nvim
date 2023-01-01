@@ -427,16 +427,11 @@ end
 
 T["enable()"] = MiniTest.new_set()
 
-T["enable()"]["sets state and internal methods"] = function()
+T["enable()"]["sets state"] = function()
     child.lua([[
         require('no-neck-pain').setup({width=50})
         require('no-neck-pain').enable()
     ]])
-
-    -- internal methods
-    eq_type_global(child, "_G.NoNeckPain.internal.toggle", "function")
-    eq_type_global(child, "_G.NoNeckPain.internal.enable", "function")
-    eq_type_global(child, "_G.NoNeckPain.internal.disable", "function")
 
     -- state
     eq_type_global(child, "_G.NoNeckPain.state", "table")
@@ -464,16 +459,11 @@ end
 
 T["disable()"] = MiniTest.new_set()
 
-T["disable()"]["resets state and remove internal methods"] = function()
+T["disable()"]["resets state"] = function()
     child.lua([[
         require('no-neck-pain').enable()
         require('no-neck-pain').disable()
     ]])
-
-    -- internal methods
-    eq_type_global(child, "_G.NoNeckPain.internal.toggle", "nil")
-    eq_type_global(child, "_G.NoNeckPain.internal.enable", "nil")
-    eq_type_global(child, "_G.NoNeckPain.internal.disable", "nil")
 
     -- state
     eq_type_global(child, "_G.NoNeckPain.state", "table")
@@ -501,69 +491,63 @@ end
 
 T["toggle()"] = MiniTest.new_set()
 
-T["toggle()"]["sets state and internal methods and resets everything when toggled again"] =
-    function()
-        child.lua([[
+T["toggle()"]["sets state and resets everything when toggled again"] = function()
+    child.lua([[
         require('no-neck-pain').setup({width=50})
         require('no-neck-pain').enable()
     ]])
 
-        -- internal methods
-        eq_type_global(child, "_G.NoNeckPain.internal.toggle", "function")
-        eq_type_global(child, "_G.NoNeckPain.internal.enable", "function")
-        eq_type_global(child, "_G.NoNeckPain.internal.disable", "function")
+    -- config -- shouldn't reset
+    eq_type_global(child, "_G.NoNeckPain.config", "table")
 
-        -- config -- shouldn't reset
-        eq_type_global(child, "_G.NoNeckPain.config", "table")
+    -- state
+    eq_type_global(child, "_G.NoNeckPain.state", "table")
 
-        -- state
-        eq_type_global(child, "_G.NoNeckPain.state", "table")
+    eq_state(child, "enabled", true)
+    eq_state(child, "augroup", 15)
 
-        eq_state(child, "enabled", true)
-        eq_state(child, "augroup", 15)
+    eq_type_state(child, "win", "table")
+    eq_type_state(child, "win.main", "table")
+    eq_type_state(child, "win.external", "table")
 
-        eq_type_state(child, "win", "table")
-        eq_type_state(child, "win.main", "table")
-        eq_type_state(child, "win.external", "table")
+    eq_state(child, "win.main.curr", 1000)
+    eq_state(child, "win.main.left", 1001)
+    eq_state(child, "win.main.right", 1002)
+    eq_state(child, "win.main.split", vim.NIL)
+    eq_state(child, "vsplit", false)
 
-        eq_state(child, "win.main.curr", 1000)
-        eq_state(child, "win.main.left", 1001)
-        eq_state(child, "win.main.right", 1002)
-        eq_state(child, "win.main.split", vim.NIL)
-        eq_state(child, "vsplit", false)
+    eq_type_state(child, "win.external.trees", "table")
 
-        eq_type_state(child, "win.external.trees", "table")
-
-        for _, external in pairs(EXTERNALS) do
-            eq_state(child, "win.external.trees." .. external .. ".id", vim.NIL)
-            eq_state(child, "win.external.trees." .. external .. ".width", 0)
-        end
-
-        -- disable
-        child.lua([[require('no-neck-pain').toggle()]])
-
-        -- state
-        eq_type_state(child, "win", "table")
-
-        eq_state(child, "enabled", false)
-        eq_state(child, "augroup", vim.NIL)
-
-        eq_type_state(child, "win", "table")
-        eq_type_state(child, "win.main", "table")
-        eq_type_state(child, "win.external", "table")
-
-        eq_state(child, "win.main.curr", vim.NIL)
-        eq_state(child, "win.main.left", vim.NIL)
-        eq_state(child, "win.main.right", vim.NIL)
-        eq_state(child, "win.main.split", vim.NIL)
-        eq_state(child, "vsplit", false)
-
-        eq_type_state(child, "win.external.trees", "table")
-
-        for _, external in pairs(EXTERNALS) do
-            eq_state(child, "win.external.trees." .. external .. ".id", vim.NIL)
-            eq_state(child, "win.external.trees." .. external .. ".width", 0)
-        end
+    for _, external in pairs(EXTERNALS) do
+        eq_state(child, "win.external.trees." .. external .. ".id", vim.NIL)
+        eq_state(child, "win.external.trees." .. external .. ".width", 0)
     end
+
+    -- disable
+    child.lua([[require('no-neck-pain').toggle()]])
+
+    -- state
+    eq_type_state(child, "win", "table")
+
+    eq_state(child, "enabled", false)
+    eq_state(child, "augroup", vim.NIL)
+
+    eq_type_state(child, "win", "table")
+    eq_type_state(child, "win.main", "table")
+    eq_type_state(child, "win.external", "table")
+
+    eq_state(child, "win.main.curr", vim.NIL)
+    eq_state(child, "win.main.left", vim.NIL)
+    eq_state(child, "win.main.right", vim.NIL)
+    eq_state(child, "win.main.split", vim.NIL)
+    eq_state(child, "vsplit", false)
+
+    eq_type_state(child, "win.external.trees", "table")
+
+    for _, external in pairs(EXTERNALS) do
+        eq_state(child, "win.external.trees." .. external .. ".id", vim.NIL)
+        eq_state(child, "win.external.trees." .. external .. ".width", 0)
+    end
+end
 
 return T

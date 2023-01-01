@@ -35,10 +35,10 @@ local S = {
 -- Toggle the plugin by calling the `enable`/`disable` methods respectively.
 function N.toggle()
     if S.enabled then
-        return false, N.disable()
+        return N.disable()
     end
 
-    return true, N.enable()
+    return N.enable()
 end
 
 -- Creates side buffers and set the internal state considering potential external trees.

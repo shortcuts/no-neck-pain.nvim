@@ -9,21 +9,7 @@ function NoNeckPain.toggle()
         _G.NoNeckPain.config = require("no-neck-pain.config").options
     end
 
-    local enabled, state = M.toggle()
-
-    _G.NoNeckPain.state = state
-
-    if not enabled then
-        _G.NoNeckPain.internal = {
-            toggle = nil,
-            enable = nil,
-            disable = nil,
-        }
-
-        return
-    end
-
-    _G.NoNeckPain.internal = M
+    _G.NoNeckPain.state = M.toggle()
 end
 
 --- Initializes the plugin, sets event listeners and internal state.
@@ -33,17 +19,11 @@ function NoNeckPain.enable()
     end
 
     _G.NoNeckPain.state = M.enable()
-    _G.NoNeckPain.internal = M
 end
 
 --- Disables the plugin, clear highlight groups and autocmds, closes side buffers and resets the internal state.
 function NoNeckPain.disable()
     _G.NoNeckPain.state = M.disable()
-    _G.NoNeckPain.internal = {
-        toggle = nil,
-        enable = nil,
-        disable = nil,
-    }
 end
 
 -- setup NoNeckPain options and merge them with user provided ones.
