@@ -41,6 +41,8 @@ function D.tprint(table, indent)
             D.tprint(v, indent + 1)
         elseif type(v) == "boolean" then
             print(formatting .. tostring(v))
+        elseif type(v) == "function" then
+            print(formatting .. "FUNCTION")
         else
             print(formatting .. v)
         end

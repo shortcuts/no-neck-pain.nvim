@@ -17,19 +17,39 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - uses: JohnnyMorganz/stylua-action@v1
+      - uses: JohnnyMorganz/stylua-action@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           version: latest
           args: --check .
 
+  documentation:
+    runs-on: ubuntu-latest
+    name: documentation
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: setup neovim
+        uses: rhysd/action-setup-vim@v1
+        with:
+          neovim: true
+          version: v0.8.2
+
+      - name: generate documentation
+        run: make documentation-ci
+
+      - name: check docs diff
+        run: exit $(git diff --name-only origin/main -- doc | wc -l)
+
   tests:
-    needs: lint
+    needs:
+      - lint
+      - documentation
     runs-on: ubuntu-latest
     timeout-minutes: 2
     strategy:
       matrix:
-        neovim_version: ['v0.7.2', 'v0.8.1', 'nightly']
+        neovim_version: ['v0.7.2', 'v0.8.2', 'nightly']
 
     steps:
       - uses: actions/checkout@v3

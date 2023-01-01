@@ -1,70 +1,47 @@
+local M = require("no-neck-pain.main")
 local E = require("no-neck-pain.util.event")
 
-local NNP = {}
+local NoNeckPain = {}
 
--- toggles NNP switch between enabled/disable state.
-function NNP.toggle()
-    if NNP.config == nil then
-        NNP.config = require("no-neck-pain.config").options
-    end
-    local main = require("no-neck-pain.main")
-
-    if main[1].toggle() then
-        NNP.internal = {
-            toggle = main[1].toggle,
-            enable = main[1].enable,
-            disable = main[1].disable,
-        }
-    else
-        NNP.internal = {
-            toggle = nil,
-            enable = nil,
-            disable = nil,
-        }
+--- Toggle the plugin by calling the `enable`/`disable` methods respectively.
+function NoNeckPain.toggle()
+    if _G.NoNeckPain.config == nil then
+        _G.NoNeckPain.config = require("no-neck-pain.config").options
     end
 
-    NNP.state = main[2]
+    _G.NoNeckPain.state = M.toggle()
 end
 
--- starts NNP and set internal functions and state.
-function NNP.enable()
-    local main = require("no-neck-pain.main")
+--- Initializes the plugin, sets event listeners and internal state.
+function NoNeckPain.enable()
+    if _G.NoNeckPain.config == nil then
+        _G.NoNeckPain.config = require("no-neck-pain.config").options
+    end
 
-    main[1].enable()
-
-    NNP.state = main[2]
-    NNP.internal = {
-        toggle = main[1].toggle,
-        enable = main[1].enable,
-        disable = main[1].disable,
-    }
+    _G.NoNeckPain.state = M.enable()
 end
 
--- disables NNP and reset internal functions and state.
-function NNP.disable()
-    local main = require("no-neck-pain.main")
-
-    main[1].disable()
-
-    NNP.state = main[2]
+--- Disables the plugin, clear highlight groups and autocmds, closes side buffers and resets the internal state.
+function NoNeckPain.disable()
+    _G.NoNeckPain.state = M.disable()
 end
 
--- setup NNP options and merge them with user provided ones.
-function NNP.setup(opts)
-    NNP.config = require("no-neck-pain.config").setup(opts)
+-- setup NoNeckPain options and merge them with user provided ones.
+function NoNeckPain.setup(opts)
+    _G.NoNeckPain.config = require("no-neck-pain.config").setup(opts)
 
-    if NNP.config.enableOnVimEnter then
+    if _G.NoNeckPain.config.enableOnVimEnter then
         vim.api.nvim_create_augroup("NoNeckPainBufWinEnter", { clear = true })
         vim.api.nvim_create_autocmd({ "BufWinEnter" }, {
             group = "NoNeckPainBufWinEnter",
             pattern = "*",
             callback = function(p)
                 vim.schedule(function()
-                    if E.abortEnable(NNP.state, vim.bo.filetype) then
+                    if E.abortEnable(_G.NoNeckPain.state, vim.bo.filetype) then
                         return
                     end
 
-                    NNP.enable()
+                    NoNeckPain.enable()
                     vim.api.nvim_del_autocmd(p.id)
                 end)
             end,
@@ -73,6 +50,6 @@ function NNP.setup(opts)
     end
 end
 
-_G.NoNeckPain = NNP
+_G.NoNeckPain = NoNeckPain
 
-return NNP
+return _G.NoNeckPain
