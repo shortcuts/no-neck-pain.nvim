@@ -1,9 +1,7 @@
 local M = require("no-neck-pain.main")
-local D = require("no-neck-pain.util.debug")
 local E = require("no-neck-pain.util.event")
 
 local NoNeckPain = {}
-_G.NoNeckPain = _G.NoNeckPain or {}
 
 --- Toggle the plugin by calling the `enable`/`disable` methods respectively.
 function NoNeckPain.toggle()
