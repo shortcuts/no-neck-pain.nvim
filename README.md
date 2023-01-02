@@ -68,9 +68,9 @@ use {"shortcuts/no-neck-pain.nvim"}
 
 ```lua
 -- stable version
-Plug "shortcuts/no-neck-pain.nvim", { "tag": "*" }
+Plug 'shortcuts/no-neck-pain.nvim', { 'tag': '*' }
 -- dev version
-Plug "shortcuts/no-neck-pain.nvim"
+Plug 'shortcuts/no-neck-pain.nvim'
 ```
 
 </td>
