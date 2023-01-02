@@ -51,9 +51,9 @@ _Creates evenly sized empty buffers on each side of your focused buffer, which a
 
 ```lua
 -- stable version
-use {"shortcuts/no-neck-pain.nvim", tag = "*" }
+Plug 'shortcuts/no-neck-pain.nvim', { 'tag': '*' }
 -- dev version
-use {"shortcuts/no-neck-pain.nvim"}
+Plug 'shortcuts/no-neck-pain.nvim'
 ```
 
 </td>
