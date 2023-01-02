@@ -237,11 +237,14 @@ function N.enable()
 
                 if vim.api.nvim_win_is_valid(S.win.splits[1].id) then
                     S.win.main.curr = S.win.splits[1].id
+                    vim.fn.win_gotoid(S.win.main.curr)
                 end
 
                 S.win.splits = nil
 
                 W.resizeSideBuffers(p.event, S.win)
+
+
             end)
         end,
         group = "NoNeckPain",
