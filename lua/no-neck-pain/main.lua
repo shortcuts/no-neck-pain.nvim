@@ -243,8 +243,6 @@ function N.enable()
                 S.win.splits = nil
 
                 W.resizeSideBuffers(p.event, S.win)
-
-
             end)
         end,
         group = "NoNeckPain",
