@@ -21,9 +21,3 @@ documentation-ci: deps documentation
 
 lint:
 	stylua .
-
-release:
-	./scripts/release.sh
-
-changelog:
-	git-chglog -o CHANGELOG.md -no-case
