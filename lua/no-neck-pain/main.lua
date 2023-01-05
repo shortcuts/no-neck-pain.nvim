@@ -43,9 +43,6 @@ end
 
 -- Creates side buffers and set the internal state considering potential external trees.
 local function init()
-    local splitbelow, splitright = vim.o.splitbelow, vim.o.splitright
-    vim.o.splitbelow, vim.o.splitright = true, true
-
     S.win.main.curr = vim.api.nvim_get_current_win()
 
     if vim.api.nvim_list_uis()[1].width < _G.NoNeckPain.config.width then
@@ -56,7 +53,6 @@ local function init()
     S.win.external.trees = W.getSideTrees()
     S.win.main.left, S.win.main.right = W.createSideBuffers(S.win)
 
-    vim.o.splitbelow, vim.o.splitright = splitbelow, splitright
     vim.fn.win_gotoid(S.win.main.curr)
 end
 
@@ -75,7 +71,7 @@ function N.enable()
     vim.api.nvim_create_autocmd({ "VimResized" }, {
         callback = function(p)
             vim.schedule(function()
-                if E.skip(p.event, S.enabled, nil) then
+                if E.skip(S.enabled, nil) then
                     return
                 end
 
@@ -108,7 +104,7 @@ function N.enable()
     vim.api.nvim_create_autocmd({ "WinEnter" }, {
         callback = function(p)
             vim.schedule(function()
-                if E.skip(p.event, S.enabled, nil) then
+                if E.skip(S.enabled, nil) then
                     return
                 end
 
@@ -159,7 +155,7 @@ function N.enable()
     vim.api.nvim_create_autocmd({ "QuitPre", "BufDelete" }, {
         callback = function(p)
             vim.schedule(function()
-                if E.skip(p.event, S.enabled, nil) then
+                if E.skip(S.enabled, nil) then
                     return
                 end
 
@@ -203,7 +199,7 @@ function N.enable()
     vim.api.nvim_create_autocmd({ "WinClosed", "BufDelete" }, {
         callback = function(p)
             vim.schedule(function()
-                if E.skip(p.event, S.enabled, nil) or S.win.main.split == nil then
+                if E.skip(S.enabled, nil) or S.win.main.split == nil then
                     return
                 end
 
@@ -258,7 +254,7 @@ function N.enable()
     vim.api.nvim_create_autocmd({ "WinEnter", "WinClosed" }, {
         callback = function(p)
             vim.schedule(function()
-                if E.skip(p.event, S.enabled, S.win.split) then
+                if E.skip(S.enabled, S.win.split) then
                     return
                 end
 
