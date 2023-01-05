@@ -22,14 +22,12 @@ function E.abortEnable(state, filetype)
 end
 
 -- determines if we should skip the event.
-function E.skip(scope, enabled, split)
+function E.skip(enabled, split)
     if not enabled then
         return true
     end
 
     if split ~= nil or W.isRelativeWindow() then
-        D.log(scope, "already in split view or float window detected, skipped")
-
         return true
     end
 

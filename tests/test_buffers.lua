@@ -129,6 +129,19 @@ T["side buffers"]["closing the `right` buffer disables NNP"] = function()
     eq_state(child, "enabled", false)
 end
 
+T["side buffers"]["are correctly positionned on enable the plugin with vsplits open"] = function()
+    child.cmd("vsplit")
+
+    eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1000 })
+
+    child.lua([[
+        require('no-neck-pain').setup({width=50})
+        require('no-neck-pain').enable()
+    ]])
+
+    eq(child.lua_get("vim.api.nvim_list_wins()"), { 1002, 1001, 1000, 1003 })
+end
+
 T["auto command"] = new_set()
 
 T["auto command"]["does not create side buffers window's width < options.width"] = function()

@@ -137,15 +137,6 @@ function C.init(win, name, backgroundColor, textColor)
 
     backgroundColor = backgroundColor or defaultBackground
 
-    D.log(
-        "Color.init",
-        "`%s` with bg `%s` | `%s` with fg `%s`",
-        backgroundGroup,
-        backgroundColor,
-        textGroup,
-        textColor
-    )
-
     -- clear groups
     vim.cmd(string.format("highlight! clear %s NONE", backgroundGroup))
     vim.cmd(string.format("highlight! clear %s NONE", textGroup))

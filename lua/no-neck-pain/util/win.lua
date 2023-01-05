@@ -13,13 +13,11 @@ function W.createSideBuffers(wins)
     -- id: the id stored in the internal state
     local config = {
         left = {
-            cmd = "leftabove vnew",
-            moveTo = "wincmd l",
+            cmd = "topleft vnew",
             id = wins.main.left,
         },
         right = {
-            cmd = "vnew",
-            moveTo = "wincmd h",
+            cmd = "botright vnew",
             id = wins.main.right,
         },
     }
@@ -45,8 +43,6 @@ function W.createSideBuffers(wins)
             for opt, val in pairs(_G.NoNeckPain.config.buffers[side].wo) do
                 vim.api.nvim_win_set_option(id, opt, val)
             end
-
-            vim.cmd(config[side].moveTo)
 
             C.init(
                 id,
