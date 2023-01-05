@@ -49,7 +49,6 @@ jobs:
     timeout-minutes: 2
     strategy:
       matrix:
-        # neovim_version: ['v0.7.2', 'v0.8.2', 'nightly']
         neovim_version: ['v0.7.2', 'v0.8.2']
 
     steps:
@@ -71,3 +70,29 @@ jobs:
 
       - name: run tests
         run: make test-ci
+
+  release:
+    name: release
+    if: ${{ github.ref == 'refs/heads/main' }}
+    needs:
+      - tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: google-github-actions/release-please-action@v3
+        id: release
+        with:
+          release-type: simple
+          package-name: no-neck-pain.nvim
+
+      - name: tag stable versions
+        if: ${{ steps.release.outputs.release_created }}
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email github-actions[bot]@users.noreply.github.com
+          git remote add gh-token "https://${{ secrets.GITHUB_TOKEN }}@github.com/google-github-actions/release-please-action.git"
+          git tag -d stable || true
+          git push origin :stable || true
+          git tag -a stable -m "Last Stable Release"
+          git push origin stable
