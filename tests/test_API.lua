@@ -446,8 +446,7 @@ T["enable()"]["sets state"] = function()
     eq_state(child, "win.main.curr", 1000)
     eq_state(child, "win.main.left", 1001)
     eq_state(child, "win.main.right", 1002)
-    eq_state(child, "win.main.split", vim.NIL)
-    eq_state(child, "vsplit", false)
+    eq_state(child, "win.splits", vim.NIL)
 
     eq_type_state(child, "win.external.trees", "table")
 
@@ -478,8 +477,7 @@ T["disable()"]["resets state"] = function()
     eq_state(child, "win.main.curr", vim.NIL)
     eq_state(child, "win.main.left", vim.NIL)
     eq_state(child, "win.main.right", vim.NIL)
-    eq_state(child, "win.main.split", vim.NIL)
-    eq_state(child, "vsplit", false)
+    eq_state(child, "win.splits", vim.NIL)
 
     eq_type_state(child, "win.external.trees", "table")
 
@@ -513,8 +511,7 @@ T["toggle()"]["sets state and resets everything when toggled again"] = function(
     eq_state(child, "win.main.curr", 1000)
     eq_state(child, "win.main.left", 1001)
     eq_state(child, "win.main.right", 1002)
-    eq_state(child, "win.main.split", vim.NIL)
-    eq_state(child, "vsplit", false)
+    eq_state(child, "win.splits", vim.NIL)
 
     eq_type_state(child, "win.external.trees", "table")
 
@@ -539,8 +536,7 @@ T["toggle()"]["sets state and resets everything when toggled again"] = function(
     eq_state(child, "win.main.curr", vim.NIL)
     eq_state(child, "win.main.left", vim.NIL)
     eq_state(child, "win.main.right", vim.NIL)
-    eq_state(child, "win.main.split", vim.NIL)
-    eq_state(child, "vsplit", false)
+    eq_state(child, "win.splits", vim.NIL)
 
     eq_type_state(child, "win.external.trees", "table")
 
