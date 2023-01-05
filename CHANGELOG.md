@@ -1,5 +1,11 @@
-
 <a name="0.2.3"></a>
+## [0.3.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/0.2.3...v0.3.0) (2023-01-05)
+
+
+### Features
+
+* add built-in nvim-tree and dashboard support ([#109](https://github.com/shortcuts/no-neck-pain.nvim/issues/109)) ([20ebf11](https://github.com/shortcuts/no-neck-pain.nvim/commit/20ebf111b5fb54ea23c98ed28af4cc4fa9f986b8))
+
 ## [0.2.3] - 2022-12-30
 ### Feat
 - make side buffer a scratch pad ([#108](https://github.com/shortcuts/no-neck-pain.nvim/issues/108))
