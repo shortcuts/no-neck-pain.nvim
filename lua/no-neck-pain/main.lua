@@ -47,9 +47,6 @@ end
 
 -- Creates side buffers and set the internal state considering potential external trees.
 local function init()
-    local splitbelow, splitright = vim.o.splitbelow, vim.o.splitright
-    vim.o.splitbelow, vim.o.splitright = true, true
-
     S.win.main.curr = vim.api.nvim_get_current_win()
 
     if vim.api.nvim_list_uis()[1].width < _G.NoNeckPain.config.width then
@@ -60,7 +57,6 @@ local function init()
     S.win.external.trees = W.getSideTrees()
     S.win.main.left, S.win.main.right = W.createSideBuffers(S.win)
 
-    vim.o.splitbelow, vim.o.splitright = splitbelow, splitright
     vim.fn.win_gotoid(S.win.main.curr)
 end
 
@@ -79,57 +75,57 @@ function N.enable()
     vim.api.nvim_create_autocmd({ "VimResized" }, {
         callback = function(p)
             vim.schedule(function()
-                if E.skip(p.event, S.enabled, nil) then
+                if E.skip(S.enabled, nil) then
                     return
                 end
 
                 local width = vim.api.nvim_list_uis()[1].width
 
-                if width > _G.NoNeckPain.config.width then
-                    -- we create everything if side buffers are missing
-                    if S.win.main.left == nil and S.win.main.right == nil then
-                        return init()
-                    end
-
-                    S.win.main.left, S.win.main.right = W.resizeOrCloseSideBuffers(p.event, S.win)
+                -- we create everything if side buffers are missing
+                if
+                    width > _G.NoNeckPain.config.width
+                    and S.win.main.left == nil
+                    and S.win.main.right == nil
+                then
+                    S.win.main.left, S.win.main.right = W.createSideBuffers(S.win)
 
                     return
                 end
 
-                -- window width below `options.width`
-                S.win.main.left, S.win.main.right = W.closeSideBuffers(p.event, S.win.main)
+                S.win.main.left, S.win.main.right = W.resizeOrCloseSideBuffers(p.event, S.win)
             end)
         end,
         group = "NoNeckPain",
-        desc = "Resizes side windows after shell has been resized",
+        desc = "Resizes side windows after terminal has been resized, close if not enough space left.",
     })
 
     vim.api.nvim_create_autocmd({ "WinEnter" }, {
         callback = function(p)
             vim.schedule(function()
-                if E.skip(p.event, S.enabled, nil) then
+                if E.skip(S.enabled, nil) then
                     return
                 end
 
                 local focusedWin = vim.api.nvim_get_current_win()
-                local buffers, total = W.listWinsExcept(ST.mergeStateWins(S.win.main, S.win.splits))
+                local remainingWins, total = W.listWinsExcept(ST.mergeStateWins(S.win.main, S.win.splits))
 
-                if total == 0 or not M.contains(buffers, focusedWin) then
-                    return D.log(p.event, "no valid buffers to handle, no splits to handle")
+                -- the currently focused buffer is one of the already registered.
+                if total == 0 or not M.contains(remainingWins, focusedWin) then
+                    return
                 end
 
-                local fileType = vim.api.nvim_buf_get_option(0, "filetype")
-                if fileType == "NvimTree" or fileType == "undotree" then
+                if W.isSideTree(vim.api.nvim_buf_get_option(0, "filetype")) then
                     return D.log(p.event, "encountered an external window")
                 end
 
+                -- now we determine if it's a split or vsplit that opened.
                 local screenWidth = vim.api.nvim_list_uis()[1].width
                 local width = vim.api.nvim_win_get_width(focusedWin)
 
                 -- since the side buffer might still there when detecting a split
                 -- we need to add the side buffers to the width to properly compare with
                 -- the screen width.
-                -- note: due to floor/ceil, side widths might be off by 1, so we add it
+                -- note: due to floor, side widths might be off by 1, so we add it
                 if S.win.main.left ~= nil then
                     width = width + vim.api.nvim_win_get_width(S.win.main.left) + 1
                 end
@@ -157,7 +153,7 @@ function N.enable()
     vim.api.nvim_create_autocmd({ "QuitPre", "BufDelete" }, {
         callback = function(p)
             vim.schedule(function()
-                if E.skip(p.event, S.enabled, nil) then
+                if E.skip(S.enabled, nil) then
                     return
                 end
 
@@ -194,7 +190,7 @@ function N.enable()
     vim.api.nvim_create_autocmd({ "WinClosed", "BufDelete" }, {
         callback = function(p)
             vim.schedule(function()
-                if E.skip(p.event, S.enabled, nil) or S.win.splits == nil then
+                if E.skip(S.enabled, nil) or S.win.splits == nil then
                     return
                 end
 
@@ -205,11 +201,10 @@ function N.enable()
                 S.win.splits = ST.getValidSplits(S.win.splits)
 
                 if S.win.main.left == nil and S.win.main.right == nil then
-                    init()
-                else
-                    S.win.main.left, S.win.main.right = W.resizeOrCloseSideBuffers(p.event, S.win)
-                    vim.fn.win_gotoid(S.win.main.curr)
+                    return init()
                 end
+
+                S.win.main.left, S.win.main.right = W.resizeOrCloseSideBuffers(p.event, S.win)
             end)
         end,
         group = "NoNeckPain",
@@ -219,9 +214,18 @@ function N.enable()
     vim.api.nvim_create_autocmd({ "WinEnter", "WinClosed" }, {
         callback = function(p)
             vim.schedule(function()
-                if E.skip(p.event, S.enabled, S.win.splits) then
+                if E.skip(S.enabled, S.win.splits) then
                     return
                 end
+
+                local focusedWin = vim.api.nvim_get_current_win()
+                local remainingWins, total = W.listWinsExcept(ST.mergeStateWins(S.win.main, S.win.splits))
+
+                -- the currently focused buffer is one of the already registered.
+                if total == 0 or not M.contains(remainingWins, focusedWin) then
+                    return
+                end
+
 
                 local wins = vim.api.nvim_list_wins()
                 local trees = W.getSideTrees()

@@ -4,22 +4,19 @@ local M = require("no-neck-pain.util.map")
 local W = {}
 local SIDES = { "left", "right" }
 
--- Creates side buffers with the correct padding.
+-- Creates side buffers with the correct padding. Side buffers are not created if there's not enough space.
 --
---@param wins list: the current wins state, useful to get `external` trees to consider the padding, and to know if the buffer already exists.
+-- @param wins list: the current wins state.
 function W.createSideBuffers(wins)
     -- cmd: command to create the side buffer
-    -- moveTo: the destination of the side buffer
     -- id: the id stored in the internal state
     local config = {
         left = {
-            cmd = "leftabove vnew",
-            moveTo = "wincmd l",
+            cmd = "topleft vnew",
             id = wins.main.left,
         },
         right = {
-            cmd = "vnew",
-            moveTo = "wincmd h",
+            cmd = "botright vnew",
             id = wins.main.right,
         },
     }
@@ -46,8 +43,6 @@ function W.createSideBuffers(wins)
                 for opt, val in pairs(_G.NoNeckPain.config.buffers[side].wo) do
                     vim.api.nvim_win_set_option(id, opt, val)
                 end
-
-                vim.cmd(config[side].moveTo)
 
                 C.init(
                     id,
@@ -159,17 +154,15 @@ function W.resizeOrCloseSideBuffers(scope, wins)
         if wins.main[side] ~= nil then
             local padding = W.getPadding(side, wins)
 
-            D.log(scope, "padding %d for %s", padding, side)
+            D.log(scope, "[%s] padding %d", side, padding)
 
             if vim.api.nvim_win_is_valid(wins.main[side]) then
                 if padding > 0 then
                     vim.api.nvim_win_set_width(wins.main[side], padding)
-
-                    return wins.main.left, wins.main.right
+                else
+                    vim.api.nvim_win_close(wins.main[side], false)
+                    wins.main[side] = nil
                 end
-
-                vim.api.nvim_win_close(wins.main[side], false)
-                wins.main[side] = nil
             end
         end
     end
@@ -192,7 +185,8 @@ function W.getSideTrees()
 
     for _, win in pairs(wins) do
         local fileType = vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(win), "filetype")
-        if fileType == "NvimTree" or fileType == "undotree" then
+
+        if W.isSideTree(fileType) then
             trees[fileType] = {
                 id = win,
                 width = vim.api.nvim_win_get_width(win) * 2,
@@ -203,14 +197,19 @@ function W.getSideTrees()
     return trees
 end
 
--- Determine the "padding" (width) of the buffer based on the `_G.NoNeckPain.config.width` and the width of the screen.
+function W.isSideTree(fileType)
+    return fileType == "NvimTree" or fileType == "undotree"
+end
+
+-- Determine the padding of the buffer based on the `_G.NoNeckPain.config.width` and the width of the screen.
 --
--- @param trees list: the external trees supported with their `width` and `id`.
+-- @param side string: the side of the buffer, left or right.
+-- @param wins list: the current wins state.
 function W.getPadding(side, wins)
     local uis = vim.api.nvim_list_uis()
 
     if uis[1] == nil then
-        return D.log("W.getPadding", "attempted to get the padding of a non-existing window.")
+        return D.log(side, "attempted to get the padding of a non-existing UI.")
     end
 
     local width = uis[1].width
@@ -218,34 +217,37 @@ function W.getPadding(side, wins)
     -- if the available screen size is lowe than the config width,
     -- we don't have to create side buffers.
     if _G.NoNeckPain.config.width >= width then
-        D.log("W.getPadding", "ui - no space left to create side buffers")
+        D.log(side, "ui - no space left to create side buffers")
 
         return 0
     end
 
-    -- we need to see if there's enough space to have side buffers
-    local occupied = 0
-    local hasVerticals = false
+    -- we need to see if there's enough space left to have side buffers
+    local nbVSplits = 1
 
     if wins.splits ~= nil then
+        D.tprint(wins.splits)
         for _, split in pairs(wins.splits) do
             if split.vertical then
-                occupied = occupied + _G.NoNeckPain.config.width
-                hasVerticals = true
+                nbVSplits = nbVSplits + 1
             end
         end
     end
 
+    local occupied = _G.NoNeckPain.config.width * nbVSplits
+
     -- if there's no space left according to the config width,
     -- then we don't have to create side buffers.
-    if hasVerticals and occupied >= width then
-        D.log("W.getPadding", "vsplit - no space left to create side buffers")
+    if occupied >= width then
+        D.log(side, "vsplit - no space left to create side buffers")
 
         return 0
     end
 
-    D.log("W.getPadding", "%d occupied - checking trees", occupied)
+    D.log(side, "%d occupied - checking trees", occupied)
 
+    -- now we need to determine how much we should substract from the remaining padding
+    -- if there's side trees open.
     local paddingToSubstract = 0
 
     for name, tree in pairs(wins.external.trees) do
@@ -254,7 +256,7 @@ function W.getPadding(side, wins)
         end
     end
 
-    return math.floor((width - paddingToSubstract - _G.NoNeckPain.config.width) / 2)
+    return math.floor((width - paddingToSubstract - (_G.NoNeckPain.config.width * nbVSplits)) / 2)
 end
 
 return W
