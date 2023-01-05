@@ -86,19 +86,14 @@ function N.enable()
                 local width = vim.api.nvim_list_uis()[1].width
 
                 if width > _G.NoNeckPain.config.width then
-                    D.log(
-                        p.event,
-                        "window's width %s is above the given `width` option %s",
-                        width,
-                        _G.NoNeckPain.config.width
-                    )
-
                     -- we create everything if side buffers are missing
                     if S.win.main.left == nil and S.win.main.right == nil then
                         return init()
                     end
 
-                    return W.resizeSideBuffers(p.event, S.win)
+                    S.win.main.left, S.win.main.right = W.resizeOrCloseSideBuffers(p.event, S.win)
+
+                    return
                 end
 
                 -- window width below `options.width`
@@ -147,7 +142,9 @@ function N.enable()
 
                 if width < screenWidth then
                     S.win.splits = ST.insertInSplits(S.win.splits, focusedWin, true)
-                    return W.resizeSideBuffers(p.event, S.win)
+                    S.win.main.left, S.win.main.right = W.resizeOrCloseSideBuffers(p.event, S.win)
+
+                    return
                 end
 
                 S.win.splits = ST.insertInSplits(S.win.splits, focusedWin, false)
@@ -164,11 +161,9 @@ function N.enable()
                     return
                 end
 
-                local wins = vim.api.nvim_list_wins()
-
                 -- if we are not in split view, we check if we killed one of the main buffers (curr, left, right) to disable NNP
                 -- TODO: make killed side buffer decision configurable, we can re-create it
-                if S.win.splits == nil and not M.every(wins, S.win.main) then
+                if S.win.splits == nil and not ST.stateWinsPresent(S.win, false) then
                     D.log(p.event, "one of the NNP main buffers have been closed, disabling...")
 
                     return N.disable(p.event)
@@ -203,46 +198,18 @@ function N.enable()
                     return
                 end
 
-                local wins = vim.api.nvim_list_wins()
-                local total = M.tsize(wins)
-
-                -- if all the main buffers are still present,
-                -- it means we have nothing to do here
-                if M.every(wins, ST.mergeStateWins(S.win.main, S.win.splits)) then
-                    return
+                if ST.stateWinsPresent(S.win, true) then
+                    return D.log(p.event, "state wins are still active, no need to kill splits.")
                 end
 
-                -- `total` needs to be compared with the number of active wins,
-                -- in the NNP context. This threshold holds the count.
-                -- we only keep count of the `vsplit` internally because they impact side buffer.
-                -- 1 + nbVerticals && curr && !left && !right
-                --   - a basic split case where we just need to define which will be the last `curr`.
-                -- 2 + nbVerticals && curr && (!left || !right)
-                --  - user disabled one of the side buffer
-                -- 3 + nbVerticals && curr && left && right
-                --  - a default config case
-                local threshold = 1 + ST.getNbVerticalSplit(S.win.splits)
+                S.win.splits = ST.getValidSplits(S.win.splits)
 
-                if S.win.main.left ~= nil and S.win.main.right ~= nil then
-                    threshold = threshold + 1
-                elseif S.win.main.left ~= nil or S.win.main.right ~= nil then
-                    threshold = threshold + 2
-                end
-
-                if total > threshold then
-                    return
-                end
-
-                D.log(p.event, "%s < %s, killing split", total, threshold)
-
-                if vim.api.nvim_win_is_valid(S.win.splits[1].id) then
-                    S.win.main.curr = S.win.splits[1].id
+                if S.win.main.left == nil and S.win.main.right == nil then
+                    init()
+                else
+                    S.win.main.left, S.win.main.right = W.resizeOrCloseSideBuffers(p.event, S.win)
                     vim.fn.win_gotoid(S.win.main.curr)
                 end
-
-                S.win.splits = nil
-
-                W.resizeSideBuffers(p.event, S.win)
             end)
         end,
         group = "NoNeckPain",
@@ -268,13 +235,19 @@ function N.enable()
                             width = 0,
                         }
 
-                        return W.resizeSideBuffers(p.event, S.win)
+                        S.win.main.left, S.win.main.right =
+                            W.resizeOrCloseSideBuffers(p.event, S.win)
+
+                        return
                     end
 
                     -- we have a new tree registered, we can resize
                     if S.win.external.trees[name].id == nil and trees[name].id ~= nil then
                         S.win.external.trees = trees
-                        return W.resizeSideBuffers(p.event, S.win)
+                        S.win.main.left, S.win.main.right =
+                            W.resizeOrCloseSideBuffers(p.event, S.win)
+
+                        return
                     end
                 end
                 S.win.external.trees = trees

@@ -1,5 +1,24 @@
 local S = {}
 
+-- returns only the list of splits that are still active.
+function S.getValidSplits(splits)
+    local actives = {}
+    local hasActives = false
+
+    for _, split in pairs(splits) do
+        if vim.api.nvim_win_is_valid(split.id) then
+            hasActives = true
+            table.insert(actives, split)
+        end
+    end
+
+    if not hasActives then
+        return nil
+    end
+
+    return actives
+end
+
 -- Merges the state windows to get a list of ids.
 function S.mergeStateWins(main, splits, trees)
     local wins = {}
@@ -35,18 +54,37 @@ function S.insertInSplits(splits, winID, vsplit)
     return splits
 end
 
-function S.getNbVerticalSplit(splits)
-    local nbVerticalSplit = 0
+-- returns `true` if all the state wins are still present in the active wins list.
+--
+-- @param checkSplits bool: checks for splits wins too when `true`.
+function S.stateWinsPresent(state, checkSplits)
+    local wins = vim.api.nvim_list_wins()
 
-    for _, split in pairs(splits) do
-        if split.vertical then
-            nbVerticalSplit = nbVerticalSplit + 1
+    for _, win in pairs(wins) do
+        local found = false
+
+        for _, mainWin in pairs(state.main) do
+            if win == mainWin then
+                found = true
+                break
+            end
+        end
+
+        if checkSplits then
+            for _, splitWin in pairs(state.splits) do
+                if win == splitWin then
+                    found = true
+                    break
+                end
+            end
+        end
+
+        if found == false then
+            return false
         end
     end
 
-    return nbVerticalSplit
+    return true
 end
-
-function S.deleteFromSplits(splits, winID) end
 
 return S
