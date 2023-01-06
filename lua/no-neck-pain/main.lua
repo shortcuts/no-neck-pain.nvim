@@ -130,12 +130,16 @@ function N.enable()
                 -- we need to add the side buffers to the width to properly compare with
                 -- the screen width.
                 -- note: due to floor/ceil, side widths might be off by 1, so we add it
-                if S.win.main.left ~= nil then
+                if S.win.main.left ~= nil and vim.api.nvim_win_is_valid(S.win.main.left) then
                     width = width + vim.api.nvim_win_get_width(S.win.main.left) + 1
+                else
+                    S.win.main.left = nil
                 end
 
-                if S.win.main.right ~= nil then
+                if S.win.main.right ~= nil and vim.api.nvim_win_is_valid(S.win.main.right) then
                     width = width + vim.api.nvim_win_get_width(S.win.main.right) + 1
+                else
+                    S.win.main.right = nil
                 end
 
                 D.log(p.event, "split found [%s/%s]", width, screenWidth)
