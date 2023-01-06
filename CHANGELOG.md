@@ -1,4 +1,12 @@
 <a name="0.2.3"></a>
+## [0.3.1](https://github.com/shortcuts/no-neck-pain.nvim/compare/v0.3.0...v0.3.1) (2023-01-06)
+
+
+### Bug Fixes
+
+* check if win is valid before using it ([#129](https://github.com/shortcuts/no-neck-pain.nvim/issues/129)) ([1b611f9](https://github.com/shortcuts/no-neck-pain.nvim/commit/1b611f9e7607faecd22cb3a1530419c0b0d9c2f3))
+* weird layout when enabling the plugin with vsplit(s) opened ([#126](https://github.com/shortcuts/no-neck-pain.nvim/issues/126)) ([713f958](https://github.com/shortcuts/no-neck-pain.nvim/commit/713f958e4949cf2a9606e2c83cd3c143908fee1e))
+
 ## [0.3.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/0.2.3...v0.3.0) (2023-01-05)
 
 
