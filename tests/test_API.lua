@@ -360,25 +360,28 @@ T["setup()"]["`common` options spreads it to `left` and `right` buffers"] = func
 end
 
 T["setup()"]["colorCode: map integration name to a value"] = function()
-    local integrationsMapping = {
-        { "catppuccin-frappe", "#303446" },
-        { "catppuccin-frappe-dark", "#292c3c" },
-        { "catppuccin-latte", "#eff1f5" },
-        { "catppuccin-latte-dark", "#e6e9ef" },
-        { "catppuccin-macchiato", "#24273a" },
-        { "catppuccin-macchiato-dark", "#1e2030" },
-        { "catppuccin-mocha", "#1e1e2e" },
-        { "catppuccin-mocha-dark", "#181825" },
-        { "tokyonight-day", "#16161e" },
-        { "tokyonight-moon", "#1e2030" },
-        { "tokyonight-storm", "#1f2335" },
-        { "tokyonight-night", "#16161e" },
-        { "rose-pine", "#191724" },
-        { "rose-pine-moon", "#232136" },
-        { "rose-pine-dawn", "#faf4ed" },
+    local integrationMapping = {
+        ["catppuccin-frappe"] = "#303446",
+        ["catppuccin-frappe-dark"] = "#292c3c",
+        ["catppuccin-latte"] = "#eff1f5",
+        ["catppuccin-latte-dark"] = "#e6e9ef",
+        ["catppuccin-macchiato"] = "#24273a",
+        ["catppuccin-macchiato-dark"] = "#1e2030",
+        ["catppuccin-mocha"] = "#1e1e2e",
+        ["catppuccin-mocha-dark"] = "#181825",
+        ["github-nvim-theme-dark"] = "#24292e",
+        ["github-nvim-theme-dimmed"] = "#22272e",
+        ["github-nvim-theme-light"] = "#ffffff",
+        ["tokyonight-day"] = "#16161e",
+        ["tokyonight-moon"] = "#1e2030",
+        ["tokyonight-night"] = "#16161e",
+        ["tokyonight-storm"] = "#1f2335",
+        ["rose-pine"] = "#191724",
+        ["rose-pine-moon"] = "#232136",
+        ["rose-pine-dawn"] = "#faf4ed",
     }
 
-    for _, integration in pairs(integrationsMapping) do
+    for integration, value in pairs(integrationMapping) do
         child.lua(string.format(
             [[require('no-neck-pain').setup({
                 buffers = {
@@ -387,12 +390,12 @@ T["setup()"]["colorCode: map integration name to a value"] = function()
                     right = { backgroundColor = "%s" },
                 },
             })]],
-            integration[1],
-            integration[1],
-            integration[1]
+            integration,
+            integration,
+            integration
         ))
         for _, scope in pairs(SCOPES) do
-            eq_config(child, "buffers." .. scope .. ".backgroundColor", integration[2])
+            eq_config(child, "buffers." .. scope .. ".backgroundColor", value)
         end
     end
 end
