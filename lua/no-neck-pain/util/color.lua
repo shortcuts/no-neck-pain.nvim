@@ -92,22 +92,19 @@ end
 
 function C.parseColors(buffers)
     buffers.backgroundColor = matchAndBlend(buffers.backgroundColor, buffers.blend)
-    buffers.left.backgroundColor = matchAndBlend(
-        buffers.left.backgroundColor,
-        buffers.left.blend or buffers.blend
-    ) or buffers.backgroundColor
-    buffers.right.backgroundColor = matchAndBlend(
-        buffers.right.backgroundColor,
-        buffers.right.blend or buffers.blend
-    ) or buffers.backgroundColor
+
+    for _, side in pairs({ "left", "right" }) do
+        buffers[side].backgroundColor = matchAndBlend(
+            buffers[side].backgroundColor,
+            buffers[side].blend or buffers.blend
+        ) or buffers.backgroundColor
+
+        buffers[side].textColor = buffers[side].textColor
+            or buffers.textColor
+            or matchAndBlend(buffers[side].backgroundColor, 0.5)
+    end
 
     buffers.textColor = buffers.textColor or buffers.backgroundColor
-    buffers.left.textColor = buffers.left.textColor
-        or buffers.textColor
-        or buffers.left.backgroundColor
-    buffers.right.textColor = buffers.right.textColor
-        or buffers.textColor
-        or buffers.right.backgroundColor
 
     return buffers
 end

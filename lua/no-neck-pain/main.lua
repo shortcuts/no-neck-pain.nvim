@@ -78,13 +78,6 @@ function N.enable()
                 local width = vim.api.nvim_list_uis()[1].width
 
                 if width > _G.NoNeckPain.config.width then
-                    D.log(
-                        p.event,
-                        "window's width %s is above the given `width` option %s",
-                        width,
-                        _G.NoNeckPain.config.width
-                    )
-
                     -- we create everything if side buffers are missing
                     if S.win.main.left == nil and S.win.main.right == nil then
                         return init()
