@@ -1,5 +1,25 @@
-local D = require("no-neck-pain.util.debug")
 local C = {}
+
+local integrationMapping = {
+    ["catppuccin-frappe"] = "#303446",
+    ["catppuccin-frappe-dark"] = "#292c3c",
+    ["catppuccin-latte"] = "#eff1f5",
+    ["catppuccin-latte-dark"] = "#e6e9ef",
+    ["catppuccin-macchiato"] = "#24273a",
+    ["catppuccin-macchiato-dark"] = "#1e2030",
+    ["catppuccin-mocha"] = "#1e1e2e",
+    ["catppuccin-mocha-dark"] = "#181825",
+    ["github-nvim-theme-dark"] = "#24292e",
+    ["github-nvim-theme-dimmed"] = "#22272e",
+    ["github-nvim-theme-light"] = "#ffffff",
+    ["tokyonight-day"] = "#16161e",
+    ["tokyonight-moon"] = "#1e2030",
+    ["tokyonight-night"] = "#16161e",
+    ["tokyonight-storm"] = "#1f2335",
+    ["rose-pine"] = "#191724",
+    ["rose-pine-moon"] = "#232136",
+    ["rose-pine-dawn"] = "#faf4ed",
+}
 
 -- converts an hex color code to RGB, values are returned independently.
 local function hexToRGB(hex)
@@ -44,36 +64,8 @@ local function matchAndBlend(colorCode, factor)
         )
     end
 
-    if colorCode == "catppuccin-frappe" then
-        colorCode = "#303446"
-    elseif colorCode == "catppuccin-frappe-dark" then
-        colorCode = "#292C3C"
-    elseif colorCode == "catppuccin-latte" then
-        colorCode = "#EFF1F5"
-    elseif colorCode == "catppuccin-latte-dark" then
-        colorCode = "#E6E9EF"
-    elseif colorCode == "catppuccin-macchiato" then
-        colorCode = "#24273A"
-    elseif colorCode == "catppuccin-macchiato-dark" then
-        colorCode = "#1E2030"
-    elseif colorCode == "catppuccin-mocha" then
-        colorCode = "#1E1E2E"
-    elseif colorCode == "catppuccin-mocha-dark" then
-        colorCode = "#181825"
-    elseif colorCode == "tokyonight-day" then
-        colorCode = "#16161e"
-    elseif colorCode == "tokyonight-moon" then
-        colorCode = "#1e2030"
-    elseif colorCode == "tokyonight-night" then
-        colorCode = "#16161e"
-    elseif colorCode == "tokyonight-storm" then
-        colorCode = "#1f2335"
-    elseif colorCode == "rose-pine" then
-        colorCode = "#191724"
-    elseif colorCode == "rose-pine-moon" then
-        colorCode = "#232136"
-    elseif colorCode == "rose-pine-dawn" then
-        colorCode = "#faf4ed"
+    if integrationMapping[colorCode] ~= nil then
+        colorCode = integrationMapping[colorCode]
     end
 
     local hexPattern = "^#" .. "[abcdef0-9]" .. ("[abcdef0-9]"):rep(5) .. "$"

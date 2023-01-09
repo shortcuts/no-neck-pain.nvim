@@ -19,6 +19,9 @@ NoNeckPain.bufferOptions = {
     -- - catppuccin-macchiato-dark
     -- - catppuccin-mocha
     -- - catppuccin-mocha-dark
+    -- - github-nvim-theme-dark
+    -- - github-nvim-theme-dimmed
+    -- - github-nvim-theme-light
     -- - tokyonight-day
     -- - tokyonight-moon
     -- - tokyonight-night
@@ -86,6 +89,9 @@ NoNeckPain.options = {
         -- - catppuccin-macchiato-dark
         -- - catppuccin-mocha
         -- - catppuccin-mocha-dark
+        -- - github-nvim-theme-dark
+        -- - github-nvim-theme-dimmed
+        -- - github-nvim-theme-light
         -- - tokyonight-day
         -- - tokyonight-moon
         -- - tokyonight-night
