@@ -154,20 +154,25 @@ function NoNeckPain.setup(options)
     options = options or {}
     options.buffers = options.buffers or {}
     NoNeckPain.options = vim.tbl_deep_extend("keep", options, NoNeckPain.options)
-    NoNeckPain.options.buffers.left = vim.tbl_deep_extend(
-        "keep",
-        options.buffers.left or NoNeckPain.options.buffers,
-        NoNeckPain.options.buffers.left
-    )
-    NoNeckPain.options.buffers.right = vim.tbl_deep_extend(
-        "keep",
-        options.buffers.right or NoNeckPain.options.buffers,
-        NoNeckPain.options.buffers.right
-    )
+
+    assert(NoNeckPain.options.width > 0, "`width` must be greater than 0.")
+
+    for _, side in pairs({ "left", "right" }) do
+        NoNeckPain.options.buffers[side] = vim.tbl_deep_extend(
+            "keep",
+            options.buffers[side] or NoNeckPain.options.buffers,
+            NoNeckPain.options.buffers[side]
+        )
+    end
 
     NoNeckPain.options.buffers = C.parseColors(NoNeckPain.options.buffers)
 
     if NoNeckPain.options.toggleMapping ~= false then
+        assert(
+            type(NoNeckPain.options.toggleMapping) == "string",
+            "`toggleMapping` must be a string"
+        )
+
         vim.api.nvim_set_keymap("n", NoNeckPain.options.toggleMapping, ":NoNeckPain<CR>", {
             silent = true,
         })
