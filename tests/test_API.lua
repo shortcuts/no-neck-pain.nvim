@@ -440,7 +440,7 @@ T["enable()"]["sets state"] = function()
     eq_type_global(child, "_G.NoNeckPain.state", "table")
 
     eq_state(child, "enabled", true)
-    eq_state(child, "augroup", 15)
+    eq_type_state(child, "augroup", "number")
 
     eq_type_state(child, "win", "table")
     eq_type_state(child, "win.main", "table")
@@ -472,7 +472,7 @@ T["disable()"]["resets state"] = function()
     eq_type_global(child, "_G.NoNeckPain.state", "table")
 
     eq_state(child, "enabled", false)
-    eq_state(child, "augroup", vim.NIL)
+    eq_type_state(child, "augroup", "nil")
 
     eq_type_state(child, "win", "table")
     eq_type_state(child, "win.main", "table")
@@ -507,7 +507,7 @@ T["toggle()"]["sets state and resets everything when toggled again"] = function(
     eq_type_global(child, "_G.NoNeckPain.state", "table")
 
     eq_state(child, "enabled", true)
-    eq_state(child, "augroup", 15)
+    eq_type_state(child, "augroup", "number")
 
     eq_type_state(child, "win", "table")
     eq_type_state(child, "win.main", "table")
