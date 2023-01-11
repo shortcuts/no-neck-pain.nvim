@@ -134,7 +134,7 @@ require("no-neck-pain").setup({
         -- When `true`, the side buffers will be named `no-neck-pain-left` and `no-neck-pain-right` respectively.
         setNames = false,
         -- Hexadecimal color code to override the current background color of the buffer. (e.g. #24273A)
-        -- popular theme are supported by their name:
+        -- See |NoNeckPain.bufferOptions| for more details.
         backgroundColor = nil,
         -- Brighten (positive) or darken (negative) the side buffers background color. Accepted values are [-1..1].
         blend = 0,
@@ -185,7 +185,7 @@ NoNeckPain.bufferOptions = {
     -- When `false`, the buffer won't be created.
     enabled = true,
     -- Hexadecimal color code to override the current background color of the buffer. (e.g. #24273A)
-    -- popular theme are supported by their name:
+    -- See |NoNeckPain.bufferOptions| for more details.
     backgroundColor = nil,
     -- Brighten (positive) or darken (negative) the side buffers background color. Accepted values are [-1..1].
     blend = 0,
