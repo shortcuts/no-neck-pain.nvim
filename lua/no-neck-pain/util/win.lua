@@ -162,6 +162,10 @@ function W.resizeSideBuffers(scope, wins)
     end
 end
 
+function W.isSideTree(fileType)
+    return fileType == "NvimTree" or fileType == "undotree"
+end
+
 function W.getSideTrees()
     local wins = vim.api.nvim_list_wins()
     local trees = {
@@ -177,7 +181,7 @@ function W.getSideTrees()
 
     for _, win in pairs(wins) do
         local fileType = vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(win), "filetype")
-        if fileType == "NvimTree" or fileType == "undotree" then
+        if W.isSideTree(fileType) then
             trees[fileType] = {
                 id = win,
                 width = vim.api.nvim_win_get_width(win) * 2,
@@ -192,13 +196,13 @@ end
 --
 -- @param trees list: the external trees supported with their `width` and `id`.
 function W.getPadding(side, trees)
-    local wins = vim.api.nvim_list_uis()
+    local uis = vim.api.nvim_list_uis()
 
-    if wins[1] == nil then
-        return D.log("W.getPadding", "attempted to get the padding of a non-existing window.")
+    if uis[1] == nil then
+        return error("W.getPadding - attempted to get the padding of a non-existing UI.")
     end
 
-    local width = wins[1].width
+    local width = uis[1].width
 
     if _G.NoNeckPain.config.width >= width then
         return 1
