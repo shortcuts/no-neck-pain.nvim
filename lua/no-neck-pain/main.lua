@@ -35,7 +35,7 @@ local S = {
 -- Toggle the plugin by calling the `enable`/`disable` methods respectively.
 function N.toggle()
     if S.enabled then
-        return N.disable()
+        return N.disable("N.toggle")
     end
 
     return N.enable()
@@ -71,33 +71,32 @@ function N.enable()
     vim.api.nvim_create_autocmd({ "VimResized" }, {
         callback = function(p)
             vim.schedule(function()
-                if E.skip(S.enabled, nil) then
+                if E.skip(S.enabled, S.win.main, nil) then
                     return
                 end
 
                 local width = vim.api.nvim_list_uis()[1].width
 
-                if width > _G.NoNeckPain.config.width then
-                    -- we create everything if side buffers are missing
-                    if S.win.main.left == nil and S.win.main.right == nil then
-                        return init()
-                    end
-
-                    return W.resizeSideBuffers(p.event, S.win)
+                -- we create everything if side buffers are missing
+                if
+                    width > _G.NoNeckPain.config.width
+                    and S.win.main.left == nil
+                    and S.win.main.right == nil
+                then
+                    return init()
                 end
 
-                -- window width below `options.width`
-                S.win.main.left, S.win.main.right = W.closeSideBuffers(p.event, S.win.main)
+                S.win.main.left, S.win.main.right = W.resizeOrCloseSideBuffers(p.event, S.win)
             end)
         end,
         group = "NoNeckPain",
-        desc = "Resizes side windows after shell has been resized",
+        desc = "Resizes side windows after terminal has been resized, closes them if not enough space left.",
     })
 
     vim.api.nvim_create_autocmd({ "WinEnter" }, {
         callback = function(p)
             vim.schedule(function()
-                if E.skip(S.enabled, nil) then
+                if E.skip(S.enabled, S.win.main, nil) then
                     return
                 end
 
@@ -105,12 +104,13 @@ function N.enable()
                 local buffers, total = W.listWinsExcept(S.win.main)
 
                 if total == 0 or not M.contains(buffers, focusedWin) then
-                    return D.log(p.event, "no valid buffers to handle, no split to handle")
+                    return D.log(p.event, "valid: %s - or no split to handle", total)
                 end
 
+                -- we skip side trees etc. as they are not part of the split manager.
                 local fileType = vim.api.nvim_buf_get_option(0, "filetype")
-                if fileType == "NvimTree" or fileType == "undotree" then
-                    return D.log(p.event, "encountered an external window")
+                if W.isSideTree(fileType) then
+                    return
                 end
 
                 -- start by saving the split, because steps below will trigger `WinClosed`
@@ -152,7 +152,7 @@ function N.enable()
     vim.api.nvim_create_autocmd({ "QuitPre", "BufDelete" }, {
         callback = function(p)
             vim.schedule(function()
-                if E.skip(S.enabled, nil) then
+                if E.skip(S.enabled, S.win.main, nil) then
                     return
                 end
 
@@ -184,7 +184,7 @@ function N.enable()
                     then
                         D.log(p.event, "found last `wipe` buffer in list, disabling...")
 
-                        return N.disable()
+                        return N.disable(p.event)
                     end
                 end
             end)
@@ -196,7 +196,7 @@ function N.enable()
     vim.api.nvim_create_autocmd({ "WinClosed", "BufDelete" }, {
         callback = function(p)
             vim.schedule(function()
-                if E.skip(S.enabled, nil) or S.win.main.split == nil then
+                if E.skip(S.enabled, S.win.main, nil) or S.win.main.split == nil then
                     return
                 end
 
@@ -251,7 +251,7 @@ function N.enable()
     vim.api.nvim_create_autocmd({ "WinEnter", "WinClosed" }, {
         callback = function(p)
             vim.schedule(function()
-                if E.skip(S.enabled, S.win.split) then
+                if E.skip(S.enabled, S.win.main, S.win.main.split) then
                     return
                 end
 
@@ -261,19 +261,26 @@ function N.enable()
                 -- we cycle over supported integrations to see which got closed or opened
                 for name, tree in pairs(S.win.external.trees) do
                     -- if there was a tree[name] but not anymore, we resize
-                    if tree.id ~= nil and not M.contains(wins, tree.id) then
+                    if tree ~= nil and tree.id ~= nil and not M.contains(wins, tree.id) then
+                        D.log(p.event, "%s have been closed, resizing", name)
+
                         S.win.external.trees[name] = {
                             id = nil,
                             width = 0,
                         }
 
-                        return W.resizeSideBuffers(p.event, S.win)
+                        return init()
                     end
 
                     -- we have a new tree registered, we can resize
-                    if S.win.external.trees[name].id == nil and trees[name].id ~= nil then
+                    if trees[name].id ~= S.win.external.trees[name].id then
+                        D.log(p.event, "%s have been opened, resizing", name)
+
                         S.win.external.trees = trees
-                        return W.resizeSideBuffers(p.event, S.win)
+                        S.win.main.left, S.win.main.right =
+                            W.resizeOrCloseSideBuffers(p.event, S.win)
+
+                        return
                     end
                 end
                 S.win.external.trees = trees

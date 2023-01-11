@@ -21,12 +21,18 @@ function E.abortEnable(state, filetype)
 end
 
 -- determines if we should skip the event.
-function E.skip(enabled, split)
+function E.skip(enabled, main, split)
     if not enabled then
         return true
     end
 
     if split ~= nil or W.isRelativeWindow() then
+        return true
+    end
+
+    local curr = vim.api.nvim_get_current_win()
+
+    if curr == main.left or curr == main.right then
         return true
     end
 
