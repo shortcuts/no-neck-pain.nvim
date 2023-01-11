@@ -7,7 +7,9 @@ local W = {}
 W.SIDES = { "left", "right" }
 
 -- Resizes a window if it's valid.
-local function resize(id, width)
+local function resize(id, width, side)
+    D.log(side, "resizing with padding %d", width)
+
     if vim.api.nvim_win_is_valid(id) then
         vim.api.nvim_win_set_width(id, width)
     end
@@ -61,7 +63,7 @@ function W.createSideBuffers(wins)
 
             if padding > 0 then
                 if wins.main[side] ~= nil then
-                    resize(wins.main[side], padding)
+                    resize(wins.main[side], padding, side)
                 else
                     vim.cmd(config[side].cmd)
 
@@ -154,6 +156,7 @@ function W.closeSideBuffers(scope, wins)
                 vim.cmd("new")
             end
 
+            -- when we have more than 1 window left, we can just close it
             close(scope, wins[side], side)
         end
     end
@@ -169,7 +172,7 @@ function W.resizeOrCloseSideBuffers(scope, wins)
             local padding = W.getPadding(side, wins.external.trees)
 
             if padding > 0 then
-                resize(wins.main[side], padding)
+                resize(wins.main[side], padding, side)
             else
                 close(scope, wins.main[side], side)
                 wins.main[side] = nil
@@ -178,10 +181,6 @@ function W.resizeOrCloseSideBuffers(scope, wins)
     end
 
     return wins.main.left, wins.main.right
-end
-
-function W.isSideTree(fileType)
-    return fileType == "NvimTree" or fileType == "undotree"
 end
 
 -- Determine the "padding" (width) of the buffer based on the `_G.NoNeckPain.config.width` and the width of the screen.
