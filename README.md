@@ -140,7 +140,7 @@ require("no-neck-pain").setup({
         blend = 0,
         -- Hexadecimal color code to override the current text color of the buffer. (e.g. #7480c2)
         textColor = nil,
-        -- vim buffer-scoped options: any `vim.bo` options is accepted here.
+        -- Vim buffer-scoped options: any `vim.bo` options is accepted here.
         bo = {
             filetype = "no-neck-pain",
             buftype = "nofile",
@@ -148,7 +148,7 @@ require("no-neck-pain").setup({
             buflisted = false,
             swapfile = false,
         },
-        -- vim window-scoped options: any `vim.wo` options is accepted here.
+        -- Vim window-scoped options: any `vim.wo` options is accepted here.
         wo = {
             cursorline = false,
             cursorcolumn = false,
@@ -166,7 +166,7 @@ require("no-neck-pain").setup({
         --- See |NoNeckPain.bufferOptions|.
         right = NoNeckPain.bufferOptions,
     },
-    -- lists supported integrations that might clash with `no-neck-pain.nvim`'s behavior
+    -- Supported integrations that might clash with `no-neck-pain.nvim`'s behavior.
     integrations = {
         -- https://github.com/nvim-tree/nvim-tree.lua
         NvimTree = {
@@ -191,7 +191,7 @@ NoNeckPain.bufferOptions = {
     blend = 0,
     -- Hexadecimal color code to override the current text color of the buffer. (e.g. #7480c2)
     textColor = nil,
-    -- vim buffer-scoped options: any `vim.bo` options is accepted here.
+    -- Vim buffer-scoped options: any `vim.bo` options is accepted here.
     bo = {
         filetype = "no-neck-pain",
         buftype = "nofile",
@@ -199,7 +199,7 @@ NoNeckPain.bufferOptions = {
         buflisted = false,
         swapfile = false,
     },
-    -- vim window-scoped options: any `vim.wo` options is accepted here.
+    -- Vim window-scoped options: any `vim.wo` options is accepted here.
     wo = {
         cursorline = false,
         cursorcolumn = false,

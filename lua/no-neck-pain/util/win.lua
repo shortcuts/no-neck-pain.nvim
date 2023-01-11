@@ -1,8 +1,10 @@
 local C = require("no-neck-pain.util.color")
 local D = require("no-neck-pain.util.debug")
 local M = require("no-neck-pain.util.map")
+
 local W = {}
-local SIDES = { "left", "right" }
+
+W.SIDES = { "left", "right" }
 
 -- Creates side buffers with the correct padding.
 --
@@ -22,7 +24,7 @@ function W.createSideBuffers(wins)
         },
     }
 
-    for _, side in pairs(SIDES) do
+    for _, side in pairs(W.SIDES) do
         if _G.NoNeckPain.config.buffers[side].enabled and wins.main[side] == nil then
             local padding = W.getPadding(side, wins.external.trees)
 
@@ -88,38 +90,9 @@ function W.listWinsExcept(list)
     return validWins, size
 end
 
--- returns the available buffers and their total number, without the `list` ones.
-function W.listBufsExcept(list)
-    local bufs = vim.api.nvim_list_bufs()
-    local validBufs = {}
-    local size = 0
-
-    for _, buf in pairs(bufs) do
-        if not M.contains(list, buf) then
-            table.insert(validBufs, buf)
-            size = size + 1
-        end
-    end
-
-    return validBufs, size
-end
-
--- gets the bufs of the given `wins` list, if win are valid.
-function W.winsGetBufs(wins)
-    local bufs = {}
-
-    for _, win in pairs(wins) do
-        if win ~= nil and vim.api.nvim_win_is_valid(win) then
-            table.insert(bufs, vim.api.nvim_win_get_buf(win))
-        end
-    end
-
-    return bufs
-end
-
 -- Closes side buffers, quits Neovim if there's no other window left.
 function W.closeSideBuffers(scope, wins)
-    for _, side in pairs(SIDES) do
+    for _, side in pairs(W.SIDES) do
         if wins[side] ~= nil then
             local _, wsize = W.listWinsExcept({ wins[side] })
 
@@ -151,7 +124,7 @@ end
 function W.resizeSideBuffers(scope, wins)
     D.log(scope, "resizing side buffers")
 
-    for _, side in pairs(SIDES) do
+    for _, side in pairs(W.SIDES) do
         if wins.main[side] ~= nil then
             local padding = W.getPadding(side, wins.external.trees)
 
@@ -162,43 +135,17 @@ function W.resizeSideBuffers(scope, wins)
     end
 end
 
-function W.getSideTrees()
-    local wins = vim.api.nvim_list_wins()
-    local trees = {
-        NvimTree = {
-            id = nil,
-            width = 0,
-        },
-        undotree = {
-            id = nil,
-            width = 0,
-        },
-    }
-
-    for _, win in pairs(wins) do
-        local fileType = vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(win), "filetype")
-        if fileType == "NvimTree" or fileType == "undotree" then
-            trees[fileType] = {
-                id = win,
-                width = vim.api.nvim_win_get_width(win) * 2,
-            }
-        end
-    end
-
-    return trees
-end
-
 -- Determine the "padding" (width) of the buffer based on the `_G.NoNeckPain.config.width` and the width of the screen.
 --
 -- @param trees list: the external trees supported with their `width` and `id`.
 function W.getPadding(side, trees)
-    local wins = vim.api.nvim_list_uis()
+    local uis = vim.api.nvim_list_uis()
 
-    if wins[1] == nil then
-        return D.log("W.getPadding", "attempted to get the padding of a non-existing window.")
+    if uis[1] == nil then
+        return error("W.getPadding - attempted to get the padding of a non-existing UI.")
     end
 
-    local width = wins[1].width
+    local width = uis[1].width
 
     if _G.NoNeckPain.config.width >= width then
         return 1
