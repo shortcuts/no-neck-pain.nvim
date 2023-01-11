@@ -30,10 +30,12 @@ function E.skip(enabled, main, split)
         return true
     end
 
-    local curr = vim.api.nvim_get_current_win()
+    if main ~= nil then
+        local curr = vim.api.nvim_get_current_win()
 
-    if curr == main.left or curr == main.right then
-        return true
+        if curr == main.left or curr == main.right then
+            return true
+        end
     end
 
     return false

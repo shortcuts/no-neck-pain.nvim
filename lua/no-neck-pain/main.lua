@@ -2,6 +2,7 @@ local D = require("no-neck-pain.util.debug")
 local E = require("no-neck-pain.util.event")
 local M = require("no-neck-pain.util.map")
 local W = require("no-neck-pain.util.win")
+local T = require("no-neck-pain.util.trees")
 
 local N = {}
 
@@ -50,7 +51,7 @@ local function init()
     end
 
     -- before creating side buffers, we determine if we should consider externals
-    S.win.external.trees = W.getSideTrees()
+    S.win.external.trees = T.getSideTrees()
     S.win.main.left, S.win.main.right = W.createSideBuffers(S.win)
 
     vim.fn.win_gotoid(S.win.main.curr)
@@ -109,8 +110,8 @@ function N.enable()
 
                 -- we skip side trees etc. as they are not part of the split manager.
                 local fileType = vim.api.nvim_buf_get_option(0, "filetype")
-                if W.isSideTree(fileType) then
-                    return
+                if T.isSideTree(fileType) then
+                    return D.log(p.event, "encountered an external window")
                 end
 
                 -- start by saving the split, because steps below will trigger `WinClosed`
@@ -152,7 +153,7 @@ function N.enable()
     vim.api.nvim_create_autocmd({ "QuitPre", "BufDelete" }, {
         callback = function(p)
             vim.schedule(function()
-                if E.skip(S.enabled, S.win.main, nil) then
+                if E.skip(S.enabled, nil, nil) then
                     return
                 end
 
@@ -256,7 +257,7 @@ function N.enable()
                 end
 
                 local wins = vim.api.nvim_list_wins()
-                local trees = W.getSideTrees()
+                local trees = T.getSideTrees()
 
                 -- we cycle over supported integrations to see which got closed or opened
                 for name, tree in pairs(S.win.external.trees) do

@@ -130,7 +130,7 @@ NoNeckPain.options = {
         --- See |NoNeckPain.bufferOptions|.
         right = NoNeckPain.bufferOptions,
     },
-    -- Supported integrations that might clash with `no-neck-pain.nvim`'s behavior
+    -- Supported integrations that might clash with `no-neck-pain.nvim`'s behavior.
     integrations = {
         -- By default, if NvimTree is open, we will close it and reopen it when enabling the plugin,
         -- this prevents having the side buffers wrongly positioned.
