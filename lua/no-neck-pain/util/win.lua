@@ -69,8 +69,6 @@ function W.createSideBuffers(wins)
 
                     local id = vim.api.nvim_get_current_win()
 
-                    vim.api.nvim_win_set_width(0, padding)
-
                     if _G.NoNeckPain.config.buffers.setNames then
                         vim.api.nvim_buf_set_name(0, "no-neck-pain-" .. side)
                     end
@@ -83,6 +81,8 @@ function W.createSideBuffers(wins)
                         vim.api.nvim_win_set_option(id, opt, val)
                     end
 
+                    resize(id, padding, side)
+
                     C.init(
                         id,
                         side,
@@ -93,16 +93,12 @@ function W.createSideBuffers(wins)
                     config[side].id = id
                 end
             end
-
-            -- if we've closed the user side tree but they still want it to be opened, we need to reopen it.
-            if
-                side == _G.NoNeckPain.config.integrations.NvimTree.position
-                and enabledExternals.NvimTree
-                and _G.NoNeckPain.config.integrations.NvimTree.reopen == true
-            then
-                vim.cmd("NvimTreeOpen")
-            end
         end
+    end
+
+    -- if we've closed the user side tree but they still want it to be opened.
+    if enabledExternals.NvimTree and _G.NoNeckPain.config.integrations.NvimTree.reopen == true then
+        vim.cmd("NvimTreeOpen")
     end
 
     return config.left.id, config.right.id
@@ -230,11 +226,7 @@ function W.getPadding(side, trees)
         end
     end
 
-    local padding = math.floor((width - paddingToSubstract - _G.NoNeckPain.config.width) / 2)
-
-    D.log("W.getPadding", "resizing %s with width %d", side, padding)
-
-    return padding
+    return math.floor((width - paddingToSubstract - _G.NoNeckPain.config.width) / 2)
 end
 
 return W

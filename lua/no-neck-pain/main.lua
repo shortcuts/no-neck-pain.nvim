@@ -101,17 +101,17 @@ function N.enable()
                     return
                 end
 
+                -- we skip side trees etc. as they are not part of the split manager.
+                local fileType = vim.api.nvim_buf_get_option(0, "filetype")
+                if T.isSideTree(fileType) then
+                    return D.log(p.event, "encountered an external window")
+                end
+
                 local focusedWin = vim.api.nvim_get_current_win()
                 local buffers, total = W.listWinsExcept(S.win.main)
 
                 if total == 0 or not M.contains(buffers, focusedWin) then
                     return D.log(p.event, "valid: %s - or no split to handle", total)
-                end
-
-                -- we skip side trees etc. as they are not part of the split manager.
-                local fileType = vim.api.nvim_buf_get_option(0, "filetype")
-                if T.isSideTree(fileType) then
-                    return D.log(p.event, "encountered an external window")
                 end
 
                 -- start by saving the split, because steps below will trigger `WinClosed`
@@ -253,6 +253,11 @@ function N.enable()
         callback = function(p)
             vim.schedule(function()
                 if E.skip(S.enabled, S.win.main, S.win.main.split) then
+                    return
+                end
+
+                local fileType = vim.api.nvim_buf_get_option(0, "filetype")
+                if not T.isSideTree(fileType) then
                     return
                 end
 
