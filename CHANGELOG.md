@@ -1,4 +1,18 @@
 <a name="0.2.3"></a>
+## [0.4.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v0.3.1...v0.4.0) (2023-01-12)
+
+
+### Features
+
+* add more default themes ([#130](https://github.com/shortcuts/no-neck-pain.nvim/issues/130)) ([58a39ff](https://github.com/shortcuts/no-neck-pain.nvim/commit/58a39ff29937dec7f33d816b94c1fb9b6229e434))
+* default text color ([#131](https://github.com/shortcuts/no-neck-pain.nvim/issues/131)) ([6df43ae](https://github.com/shortcuts/no-neck-pain.nvim/commit/6df43aec515aa68d266172934f849d01a2a4b8fd))
+
+
+### Bug Fixes
+
+* prevent unwanted event trigger ([#135](https://github.com/shortcuts/no-neck-pain.nvim/issues/135)) ([60edd76](https://github.com/shortcuts/no-neck-pain.nvim/commit/60edd768df9df0d232de3c5142fb8fa6a333e02c))
+* register command for nvim &lt;0.7 ([#138](https://github.com/shortcuts/no-neck-pain.nvim/issues/138)) ([b287cca](https://github.com/shortcuts/no-neck-pain.nvim/commit/b287cca9da5a6385f5d2c177c980563815383e39))
+
 ## [0.3.1](https://github.com/shortcuts/no-neck-pain.nvim/compare/v0.3.0...v0.3.1) (2023-01-06)
 
 
