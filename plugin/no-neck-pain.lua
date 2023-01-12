@@ -11,4 +11,3 @@ else
         require("no-neck-pain").toggle()
     end, {})
 end
-
