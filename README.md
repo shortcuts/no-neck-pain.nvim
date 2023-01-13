@@ -134,7 +134,6 @@ require("no-neck-pain").setup({
         -- When `true`, the side buffers will be named `no-neck-pain-left` and `no-neck-pain-right` respectively.
         setNames = false,
         -- Hexadecimal color code to override the current background color of the buffer. (e.g. #24273A)
-        -- See |NoNeckPain.bufferOptions| for more details.
         backgroundColor = nil,
         -- Brighten (positive) or darken (negative) the side buffers background color. Accepted values are [-1..1].
         blend = 0,
@@ -168,14 +167,20 @@ require("no-neck-pain").setup({
     },
     -- Supported integrations that might clash with `no-neck-pain.nvim`'s behavior.
     integrations = {
-        -- https://github.com/nvim-tree/nvim-tree.lua
+        -- By default, if NvimTree is open, we will close it and reopen it when enabling the plugin,
+        -- this prevents having the side buffers wrongly positioned.
+        -- @link https://github.com/nvim-tree/nvim-tree.lua
         NvimTree = {
-            -- the position of the tree, can be `left` or `right``
+            -- The position of the tree, either `left` or `right`.
             position = "left",
+            -- When `true`, we close NvimTree if it's currently open when enabling the plugin.
+            close = true,
+            -- Paired with the `close` parameter, when `false` we don't re-open the side tree.
+            reopen = true,
         },
-        -- https://github.com/mbbill/undotree
+        -- @link https://github.com/mbbill/undotree
         undotree = {
-            -- the position of the tree, can be `left` or `right``
+            -- The position of the tree, either `left` or `right`.
             position = "left",
         },
     },
@@ -185,7 +190,6 @@ NoNeckPain.bufferOptions = {
     -- When `false`, the buffer won't be created.
     enabled = true,
     -- Hexadecimal color code to override the current background color of the buffer. (e.g. #24273A)
-    -- See |NoNeckPain.bufferOptions| for more details.
     backgroundColor = nil,
     -- Brighten (positive) or darken (negative) the side buffers background color. Accepted values are [-1..1].
     blend = 0,
