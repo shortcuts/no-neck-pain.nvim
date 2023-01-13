@@ -163,6 +163,12 @@ function NoNeckPain.setup(options)
 
     assert(NoNeckPain.options.width > 0, "`width` must be greater than 0.")
 
+    assert(
+        NoNeckPain.options.integrations.NvimTree.position == "left"
+            or NoNeckPain.options.integrations.NvimTree.position == "right",
+        "NvimTree position can only be `left` or `right`"
+    )
+
     for _, side in pairs({ "left", "right" }) do
         NoNeckPain.options.buffers[side] = vim.tbl_deep_extend(
             "keep",

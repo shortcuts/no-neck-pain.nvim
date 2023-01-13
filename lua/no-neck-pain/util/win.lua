@@ -30,78 +30,63 @@ end
 --
 --@param wins list: the current wins state, useful to get `external` trees to consider the padding, and to know if the buffer already exists.
 function W.createSideBuffers(wins)
-    -- cmd: command to create the side buffer
-    -- moveTo: the destination of the side buffer
-    -- id: the id stored in the internal state
-    local config = {
-        left = {
-            cmd = "topleft vnew",
-            id = wins.main.left,
-        },
-        right = {
-            cmd = "botright vnew",
-            id = wins.main.right,
-        },
+    local cmd = {
+        left = { cmd = "topleft vnew", padding = 0 },
+        right = { cmd = "botright vnew", padding = 0 },
     }
 
-    local enabledExternals = {
+    local integrations = {
         NvimTree = false,
     }
 
     -- we close the side tree if it's already opened to prevent unwanted layout issue.
     if
-        _G.NoNeckPain.config.integrations.NvimTree.close
-        and wins.external.trees.NvimTree.id ~= nil
+        wins.external.trees.NvimTree.id ~= nil
+        and _G.NoNeckPain.config.integrations.NvimTree.close
     then
-        enabledExternals.NvimTree = true
+        integrations.NvimTree = true
         vim.cmd("NvimTreeClose")
     end
 
     for _, side in pairs(W.SIDES) do
         if _G.NoNeckPain.config.buffers[side].enabled then
-            local padding = W.getPadding(side, wins.external.trees)
+            cmd[side].padding = W.getPadding(side, wins.external.trees)
 
-            if padding > 0 then
-                if wins.main[side] ~= nil then
-                    resize(wins.main[side], padding, side)
-                else
-                    vim.cmd(config[side].cmd)
+            if cmd[side].padding > 0 and wins.main[side] == nil then
+                vim.cmd(cmd[side].cmd)
 
-                    local id = vim.api.nvim_get_current_win()
+                local id = vim.api.nvim_get_current_win()
 
-                    if _G.NoNeckPain.config.buffers.setNames then
-                        vim.api.nvim_buf_set_name(0, "no-neck-pain-" .. side)
-                    end
-
-                    for opt, val in pairs(_G.NoNeckPain.config.buffers[side].bo) do
-                        vim.api.nvim_buf_set_option(0, opt, val)
-                    end
-
-                    for opt, val in pairs(_G.NoNeckPain.config.buffers[side].wo) do
-                        vim.api.nvim_win_set_option(id, opt, val)
-                    end
-
-                    resize(id, padding, side)
-
-                    C.init(
-                        id,
-                        side,
-                        _G.NoNeckPain.config.buffers[side].backgroundColor,
-                        _G.NoNeckPain.config.buffers[side].textColor
-                    )
-
-                    config[side].id = id
+                if _G.NoNeckPain.config.buffers.setNames then
+                    vim.api.nvim_buf_set_name(0, "no-neck-pain-" .. side)
                 end
+
+                for opt, val in pairs(_G.NoNeckPain.config.buffers[side].bo) do
+                    vim.api.nvim_buf_set_option(0, opt, val)
+                end
+
+                for opt, val in pairs(_G.NoNeckPain.config.buffers[side].wo) do
+                    vim.api.nvim_win_set_option(id, opt, val)
+                end
+
+                C.init(
+                    id,
+                    side,
+                    _G.NoNeckPain.config.buffers[side].backgroundColor,
+                    _G.NoNeckPain.config.buffers[side].textColor
+                )
+
+                wins.main[side] = id
             end
         end
     end
 
     -- if we've closed the user side tree but they still want it to be opened.
-    if enabledExternals.NvimTree and _G.NoNeckPain.config.integrations.NvimTree.reopen == true then
+    if integrations.NvimTree and _G.NoNeckPain.config.integrations.NvimTree.reopen == true then
         vim.cmd("NvimTreeOpen")
     end
 
-    return config.left.id, config.right.id
+    return W.resizeOrCloseSideBuffers("W.createSideBuffers", wins)
 end
 
 -- returns true if the index 0 window or the current window is relative.
@@ -187,7 +172,9 @@ function W.getPadding(side, trees)
     local uis = vim.api.nvim_list_uis()
 
     if uis[1] == nil then
-        return error("W.getPadding - attempted to get the padding of a non-existing UI.")
+        error("W.getPadding - attempted to get the padding of a non-existing UI.")
+
+        return 0
     end
 
     local width = uis[1].width
