@@ -53,6 +53,8 @@ local function init()
     -- before creating side buffers, we determine if we should consider externals
     S.win.external.trees = T.getSideTrees()
     S.win.main.left, S.win.main.right = W.createSideBuffers(S.win)
+    -- we might have closed trees during the buffer creation process, we re-fetch the latest IDs to prevent inconsistencies
+    S.win.external.trees = T.getSideTrees()
 
     vim.fn.win_gotoid(S.win.main.curr)
 end
@@ -78,17 +80,16 @@ function N.enable()
 
                 local width = vim.api.nvim_list_uis()[1].width
 
-                if width > _G.NoNeckPain.config.width then
-                    -- we create everything if side buffers are missing
-                    if S.win.main.left == nil and S.win.main.right == nil then
-                        return init()
-                    end
-
-                    return W.resizeSideBuffers(p.event, S.win)
+                -- we create everything if side buffers are missing
+                if
+                    width > _G.NoNeckPain.config.width
+                    and S.win.main.left == nil
+                    and S.win.main.right == nil
+                then
+                    return init()
                 end
 
-                -- window width below `options.width`
-                S.win.main.left, S.win.main.right = W.closeSideBuffers(p.event, S.win.main)
+                S.win.main.left, S.win.main.right = W.resizeOrCloseSideBuffers(p.event, S.win)
             end)
         end,
         group = "NoNeckPain",
@@ -271,15 +272,18 @@ function N.enable()
                             width = 0,
                         }
 
-                        return W.resizeSideBuffers(p.event, S.win)
+                        return init()
                     end
 
                     -- we have a new tree registered, we can resize
-                    if S.win.external.trees[name].id == nil and trees[name].id ~= nil then
+                    if trees[name].id ~= S.win.external.trees[name].id then
                         D.log(p.event, "%s have been opened, resizing", name)
 
                         S.win.external.trees = trees
-                        return W.resizeSideBuffers(p.event, S.win)
+                        S.win.main.left, S.win.main.right =
+                            W.resizeOrCloseSideBuffers(p.event, S.win)
+
+                        return
                     end
                 end
                 S.win.external.trees = trees
