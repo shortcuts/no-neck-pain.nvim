@@ -111,6 +111,11 @@ T["setup()"]["sets exposed methods and default options value"] = function()
         eq_config(child, "buffers." .. scope .. ".wo.wrap", true)
         eq_config(child, "buffers." .. scope .. ".wo.linebreak", true)
     end
+
+    eq_config(child, "integrations.NvimTree.position", "left")
+    eq_config(child, "integrations.NvimTree.close", true)
+    eq_config(child, "integrations.NvimTree.reopen", true)
+    eq_config(child, "integrations.undotree.position", "left")
 end
 
 T["setup()"]["buffers: throws with wrong values"] = function()
@@ -132,6 +137,20 @@ T["setup()"]["buffers: throws with wrong values"] = function()
             ))
         end)
     end
+end
+
+T["setup()"]["integrations: NvimTree with wrong values"] = function()
+    helpers.expect.error(function()
+        child.lua([[
+                require('no-neck-pain').setup({
+                    integrations = {
+                        NvimTree = {
+                            "position": "nope"
+                        },
+                    },
+                })
+            ]])
+    end)
 end
 
 T["setup()"]["overrides default values"] = function()
@@ -209,6 +228,16 @@ T["setup()"]["overrides default values"] = function()
                 },
             },
         },
+        integrations = {
+            NvimTree = {
+                position = "right",
+                close = false,
+                reopen = false,
+            },
+            undotree = {
+                position = "right",
+            }
+        }
     })]])
 
     -- config
@@ -264,6 +293,11 @@ T["setup()"]["overrides default values"] = function()
         eq_config(child, "buffers." .. scope .. ".wo.wrap", false)
         eq_config(child, "buffers." .. scope .. ".wo.linebreak", false)
     end
+
+    eq_config(child, "integrations.NvimTree.position", "right")
+    eq_config(child, "integrations.NvimTree.close", false)
+    eq_config(child, "integrations.NvimTree.reopen", false)
+    eq_config(child, "integrations.undotree.position", "right")
 end
 
 T["setup()"]["`left` or `right` buffer options overrides `common` ones"] = function()
