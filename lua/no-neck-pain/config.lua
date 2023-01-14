@@ -22,13 +22,13 @@ NoNeckPain.bufferOptions = {
     -- - github-nvim-theme-dark
     -- - github-nvim-theme-dimmed
     -- - github-nvim-theme-light
+    -- - rose-pine
+    -- - rose-pine-dawn
+    -- - rose-pine-moon
     -- - tokyonight-day
     -- - tokyonight-moon
     -- - tokyonight-night
     -- - tokyonight-storm
-    -- - rose-pine
-    -- - rose-pine-moon
-    -- - rose-pine-dawn
     backgroundColor = nil,
     -- Brighten (positive) or darken (negative) the side buffers background color. Accepted values are [-1..1].
     blend = 0,
@@ -92,13 +92,13 @@ NoNeckPain.options = {
         -- - github-nvim-theme-dark
         -- - github-nvim-theme-dimmed
         -- - github-nvim-theme-light
+        -- - rose-pine
+        -- - rose-pine-dawn
+        -- - rose-pine-moon
         -- - tokyonight-day
         -- - tokyonight-moon
         -- - tokyonight-night
         -- - tokyonight-storm
-        -- - rose-pine
-        -- - rose-pine-moon
-        -- - rose-pine-dawn
         backgroundColor = nil,
         -- Brighten (positive) or darken (negative) the side buffers background color. Accepted values are [-1..1].
         blend = 0,
