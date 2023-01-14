@@ -106,13 +106,13 @@ Default values:
               -- When `true`, automatically sets the following options to the side buffers:
               -- - `autowriteall`
               -- - `autoread`.
-              -- - textColor is defaulted to a brighter shade of the background color.
               enabled = false,
-              -- the name of the generated file.
+              -- The name of the generated file. See `location` for more information.
+              -- @example: `no-neck-pain-left.norg`
               fileName = "no-neck-pain",
-              -- files are available at `$LOCATION/$FILENAME-$SIDE.$FILETYPE`, where `$SIDE` is either left or right.
-              -- the default filetype is `norg` (https://github.com/nvim-neorg/neorg), you can change it in `buffers.bo.filetype`.
-              location = "~/",
+              -- By default, files are saved at the same location as the current Neovim session. Filetype is defaulted to `norg` (https://github.com/nvim-neorg/neorg), but can be changed from the buffer options via `buffers.bo.filetype`, `buffers.left.bo.filetype` and `buffers.right.bo.filetype`.
+              -- @example: `no-neck-pain-left.norg`
+              location = nil,
           },
           -- Hexadecimal color code to override the current background color of the buffer. (e.g. #24273A)
           -- popular theme are supported by their name:
