@@ -78,7 +78,16 @@ function W.createSideBuffers(wins)
 
                 -- default options for scratchpad
                 if _G.NoNeckPain.config.buffers.scratchPad.enabled then
-                    local location = _G.NoNeckPain.config.buffers.scratchPad.location or ""
+                    local location =  ""
+
+                    if _G.NoNeckPain.config.buffers.scratchPad.location ~= nil then
+                        assert(
+                            type(_G.NoNeckPain.config.buffers.scratchPad.location) == "string",
+                            "`buffers.scratchPad.location` must be a nil or a string."
+                        )
+
+                        location = _G.NoNeckPain.config.buffers.scratchPad.location
+                    end
 
                     if location ~= "" and string.sub(location, -1) ~= "/" then
                         location = location .. "/"
