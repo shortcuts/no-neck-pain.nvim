@@ -79,7 +79,8 @@ NoNeckPain.options = {
     buffers = {
         -- When `true`, the side buffers will be named `no-neck-pain-left` and `no-neck-pain-right` respectively.
         setNames = false,
-        -- Options related to the scratch pad for the side buffers.
+        -- The scratchPad feature leverages the empty side buffers to take notes. It works like any Neovim buffer and will automatically save the content at the given `location`.
+        -- Quitting an unsaved scratchpad buffer is non-blocking, as it's auto-saved.
         scratchPad = {
             -- When `true`, automatically sets the following options to the side buffers:
             -- - `autowriteall`
