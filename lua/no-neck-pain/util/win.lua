@@ -84,7 +84,12 @@ function W.createSideBuffers(wins)
                         location = location .. "/"
                     end
 
-                    location = location .. _G.NoNeckPain.config.buffers.scratchPad.fileName .. "-" .. side .. "." .. _G.NoNeckPain.config.buffers[side].bo.filetype
+                    location = location
+                        .. _G.NoNeckPain.config.buffers.scratchPad.fileName
+                        .. "-"
+                        .. side
+                        .. "."
+                        .. _G.NoNeckPain.config.buffers[side].bo.filetype
 
                     -- we edit the file if it exists, otherwise we create it
                     if vim.fn.filereadable(location) then
