@@ -1,12 +1,14 @@
 local helpers = dofile("tests/helpers.lua")
 
 local child = helpers.new_child_neovim()
-local eq = helpers.expect.equality
-local eq_state, eq_buf_width = helpers.expect.state_equality, helpers.expect.buf_width_equality
+local eq, eq_config, eq_state, eq_buf_width =
+    helpers.expect.equality,
+    helpers.expect.config_equality,
+    helpers.expect.state_equality,
+    helpers.expect.buf_width_equality
+local eq_type_config = helpers.expect.config_type_equality
 
-local new_set = MiniTest.new_set
-
-local T = new_set({
+local T = MiniTest.new_set({
     hooks = {
         -- This will be executed before every (even nested) case
         pre_case = function()
@@ -18,7 +20,172 @@ local T = new_set({
     },
 })
 
-T["curr"] = new_set()
+local SCOPES = { "left", "right" }
+
+T["setup"] = MiniTest.new_set()
+
+T["setup"]["overrides default values"] = function()
+    child.lua([[require('no-neck-pain').setup({
+        buffers = {
+            setNames = true,
+            bo = {
+                filetype = "my-file-type",
+                buftype = "help",
+                bufhidden = "",
+                buflisted = true,
+                swapfile = true,
+            },
+            wo = {
+                cursorline = true,
+                cursorcolumn = true,
+                number = true,
+                relativenumber = true,
+                foldenable = true,
+                list = true,
+                wrap = false,
+                linebreak = false,
+            },
+            left = {
+                bo = {
+                    filetype = "my-file-type",
+                    buftype = "help",
+                    bufhidden = "",
+                    buflisted = true,
+                    swapfile = true,
+                },
+                wo = {
+                    cursorline = true,
+                    cursorcolumn = true,
+                    number = true,
+                    relativenumber = true,
+                    foldenable = true,
+                    list = true,
+                    wrap = false,
+                    linebreak = false,
+                },
+            },
+            right = {
+                bo = {
+                    filetype = "my-file-type",
+                    buftype = "help",
+                    bufhidden = "",
+                    buflisted = true,
+                    swapfile = true,
+                },
+                wo = {
+                    cursorline = true,
+                    cursorcolumn = true,
+                    number = true,
+                    relativenumber = true,
+                    foldenable = true,
+                    list = true,
+                    wrap = false,
+                    linebreak = false,
+                },
+            },
+        },
+    })]])
+
+    eq_type_config(child, "buffers", "table")
+    eq_type_config(child, "buffers.bo", "table")
+    eq_type_config(child, "buffers.wo", "table")
+
+    eq_config(child, "buffers.setNames", true)
+
+    eq_config(child, "buffers.bo.filetype", "my-file-type")
+    eq_config(child, "buffers.bo.buftype", "help")
+    eq_config(child, "buffers.bo.bufhidden", "")
+    eq_config(child, "buffers.bo.buflisted", true)
+    eq_config(child, "buffers.bo.swapfile", true)
+
+    eq_config(child, "buffers.wo.cursorline", true)
+    eq_config(child, "buffers.wo.cursorcolumn", true)
+    eq_config(child, "buffers.wo.number", true)
+    eq_config(child, "buffers.wo.relativenumber", true)
+    eq_config(child, "buffers.wo.foldenable", true)
+    eq_config(child, "buffers.wo.list", true)
+    eq_config(child, "buffers.wo.wrap", false)
+    eq_config(child, "buffers.wo.linebreak", false)
+
+    for _, scope in pairs(SCOPES) do
+        eq_config(child, "buffers." .. scope .. ".bo.filetype", "my-file-type")
+        eq_config(child, "buffers." .. scope .. ".bo.buftype", "help")
+        eq_config(child, "buffers." .. scope .. ".bo.bufhidden", "")
+        eq_config(child, "buffers." .. scope .. ".bo.buflisted", true)
+        eq_config(child, "buffers." .. scope .. ".bo.swapfile", true)
+
+        eq_config(child, "buffers." .. scope .. ".wo.cursorline", true)
+        eq_config(child, "buffers." .. scope .. ".wo.cursorcolumn", true)
+        eq_config(child, "buffers." .. scope .. ".wo.number", true)
+        eq_config(child, "buffers." .. scope .. ".wo.relativenumber", true)
+        eq_config(child, "buffers." .. scope .. ".wo.foldenable", true)
+        eq_config(child, "buffers." .. scope .. ".wo.list", true)
+        eq_config(child, "buffers." .. scope .. ".wo.wrap", false)
+        eq_config(child, "buffers." .. scope .. ".wo.linebreak", false)
+    end
+end
+
+T["setup"]["`left` or `right` buffer options overrides `common` ones"] = function()
+    child.lua([[require('no-neck-pain').setup({
+        buffers = {
+            bo = {
+                filetype = "TEST",
+            },
+            wo = {
+                cursorline = false,
+            },
+            left = {
+                bo = {
+                    filetype = "TEST-left",
+                },
+                wo = {
+                    cursorline = true,
+                },
+            },
+            right = {
+                bo = {
+                    filetype = "TEST-right",
+                },
+                wo = {
+                    number = true,
+                },
+            },
+        },
+    })]])
+
+    eq_config(child, "buffers.bo.filetype", "TEST")
+    eq_config(child, "buffers.wo.cursorline", false)
+
+    eq_config(child, "buffers.left.bo.filetype", "TEST-left")
+    eq_config(child, "buffers.right.bo.filetype", "TEST-right")
+
+    eq_config(child, "buffers.left.wo.cursorline", true)
+    eq_config(child, "buffers.right.wo.number", true)
+end
+
+T["setup"]["`common` options spreads it to `left` and `right` buffers"] = function()
+    child.lua([[require('no-neck-pain').setup({
+        buffers = {
+            bo = {
+                filetype = "TEST",
+            },
+            wo = {
+                number = true,
+            },
+        },
+    })]])
+
+    eq_config(child, "buffers.bo.filetype", "TEST")
+    eq_config(child, "buffers.wo.number", true)
+
+    eq_config(child, "buffers.left.wo.number", true)
+    eq_config(child, "buffers.right.wo.number", true)
+
+    eq_config(child, "buffers.left.bo.filetype", "TEST")
+    eq_config(child, "buffers.right.bo.filetype", "TEST")
+end
+
+T["curr"] = MiniTest.new_set()
 
 T["curr"]["have the default width"] = function()
     child.lua([[
@@ -57,7 +224,7 @@ T["curr"]["closing `curr` window without any other window quits Neovim"] = funct
     end)
 end
 
-T["left/right"] = new_set()
+T["left/right"] = MiniTest.new_set()
 
 T["left/right"]["have the same width"] = function()
     child.lua([[

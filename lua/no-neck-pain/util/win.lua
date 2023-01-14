@@ -78,7 +78,7 @@ function W.createSideBuffers(wins)
 
                 -- default options for scratchpad
                 if _G.NoNeckPain.config.buffers.scratchPad.enabled then
-                    local location =  ""
+                    local location = ""
 
                     if _G.NoNeckPain.config.buffers.scratchPad.location ~= nil then
                         assert(
