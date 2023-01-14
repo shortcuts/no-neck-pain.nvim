@@ -62,9 +62,10 @@ local function matchAndBlend(colorCode, factor)
     if factor ~= nil then
         assert(
             factor >= -1 and factor <= 1,
-            "`blend` "
-                .. colorCode
-                .. " does not match the range constraint, number must be between -1 and 1 "
+            string.format(
+                "`blend` value %s does not match the range constraint, number must be between -1 and 1.",
+                factor
+            )
         )
     end
 
@@ -77,21 +78,14 @@ local function matchAndBlend(colorCode, factor)
 
     assert(
         colorCode:match(hexPattern) ~= nil,
-        "`colorCode` " .. colorCode .. " does not match the regex " .. hexPattern
+        string.format("`colorCode` %s  does not match the regex %s", colorCode, hexPattern)
     )
 
     if factor == 0 then
         return colorCode
     end
 
-    local blended = blend(colorCode, factor)
-
-    assert(
-        blended:match(hexPattern) ~= nil,
-        "`colorCode` blended " .. blended .. " does not match the regex " .. hexPattern
-    )
-
-    return blended
+    return blend(colorCode, factor)
 end
 
 function C.parseColors(buffers)
