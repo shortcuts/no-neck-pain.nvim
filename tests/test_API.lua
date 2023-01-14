@@ -39,9 +39,9 @@ T["install"]["sets global loaded variable and provide toggle command"] = functio
     eq_state(child, "enabled", false)
 end
 
-T["setup()"] = MiniTest.new_set()
+T["setup"] = MiniTest.new_set()
 
-T["setup()"]["sets exposed methods and default options value"] = function()
+T["setup"]["sets exposed methods and default options value"] = function()
     child.lua([[require('no-neck-pain').setup()]])
 
     eq_type_global(child, "_G.NoNeckPain", "table")
@@ -118,20 +118,7 @@ T["setup()"]["sets exposed methods and default options value"] = function()
     eq_config(child, "integrations.undotree.position", "left")
 end
 
-T["setup()"]["integrations: NvimTree with wrong values"] = function()
-    helpers.expect.error(function()
-        child.lua([[ require('no-neck-pain').setup({
-                    integrations = {
-                        NvimTree = {
-                            "position": "nope"
-                        },
-                    },
-                })
-            ]])
-    end)
-end
-
-T["setup()"]["overrides default values"] = function()
+T["setup"]["overrides default values"] = function()
     child.lua([[require('no-neck-pain').setup({
         width = 42,
         enableOnVimEnter = true,
@@ -139,239 +126,17 @@ T["setup()"]["overrides default values"] = function()
         debug = true,
         disableOnLastBuffer = true,
         killAllBuffersOnDisable = true,
-        buffers = {
-            setNames = true,
-            backgroundColor = "catppuccin-frappe",
-            blend = 0.4,
-            textColor = "#7480c2",
-            bo = {
-                filetype = "my-file-type",
-                buftype = "help",
-                bufhidden = "",
-                buflisted = true,
-                swapfile = true,
-            },
-            wo = {
-                cursorline = true,
-                cursorcolumn = true,
-                number = true,
-                relativenumber = true,
-                foldenable = true,
-                list = true,
-                wrap = false,
-                linebreak = false,
-            },
-            left = {
-                backgroundColor = "catppuccin-frappe",
-                blend = 0.2,
-            	textColor = "#7480c2",
-                bo = {
-                    filetype = "my-file-type",
-                    buftype = "help",
-                    bufhidden = "",
-                    buflisted = true,
-                    swapfile = true,
-                },
-                wo = {
-                    cursorline = true,
-                    cursorcolumn = true,
-                    number = true,
-                    relativenumber = true,
-                    foldenable = true,
-                    list = true,
-                    wrap = false,
-                    linebreak = false,
-                },
-            },
-            right = {
-                backgroundColor = "catppuccin-frappe",
-                blend = 0.2,
-            	textColor = "#7480c2",
-                bo = {
-                    filetype = "my-file-type",
-                    buftype = "help",
-                    bufhidden = "",
-                    buflisted = true,
-                    swapfile = true,
-                },
-                wo = {
-                    cursorline = true,
-                    cursorcolumn = true,
-                    number = true,
-                    relativenumber = true,
-                    foldenable = true,
-                    list = true,
-                    wrap = false,
-                    linebreak = false,
-                },
-            },
-        },
-        integrations = {
-            NvimTree = {
-                position = "right",
-                close = false,
-                reopen = false,
-            },
-            undotree = {
-                position = "right",
-            }
-        }
     })]])
 
-    -- config
     eq_config(child, "width", 42)
     eq_config(child, "enableOnVimEnter", true)
     eq_config(child, "toggleMapping", "<Leader>kz")
     eq_config(child, "debug", true)
     eq_config(child, "disableOnLastBuffer", true)
     eq_config(child, "killAllBuffersOnDisable", true)
-
-    -- buffers
-    eq_type_config(child, "buffers", "table")
-    eq_type_config(child, "buffers.bo", "table")
-    eq_type_config(child, "buffers.wo", "table")
-
-    eq_config(child, "buffers.setNames", true)
-    eq_config(child, "buffers.backgroundColor", "#828590")
-    eq_config(child, "buffers.blend", 0.4)
-    eq_config(child, "buffers.textColor", "#7480c2")
-
-    eq_config(child, "buffers.bo.filetype", "my-file-type")
-    eq_config(child, "buffers.bo.buftype", "help")
-    eq_config(child, "buffers.bo.bufhidden", "")
-    eq_config(child, "buffers.bo.buflisted", true)
-    eq_config(child, "buffers.bo.swapfile", true)
-
-    eq_config(child, "buffers.wo.cursorline", true)
-    eq_config(child, "buffers.wo.cursorcolumn", true)
-    eq_config(child, "buffers.wo.number", true)
-    eq_config(child, "buffers.wo.relativenumber", true)
-    eq_config(child, "buffers.wo.foldenable", true)
-    eq_config(child, "buffers.wo.list", true)
-    eq_config(child, "buffers.wo.wrap", false)
-    eq_config(child, "buffers.wo.linebreak", false)
-
-    for _, scope in pairs(SCOPES) do
-        eq_config(child, "buffers." .. scope .. ".backgroundColor", "#595c6b")
-        eq_config(child, "buffers." .. scope .. ".blend", 0.2)
-        eq_config(child, "buffers." .. scope .. ".textColor", "#7480c2")
-
-        eq_config(child, "buffers." .. scope .. ".bo.filetype", "my-file-type")
-        eq_config(child, "buffers." .. scope .. ".bo.buftype", "help")
-        eq_config(child, "buffers." .. scope .. ".bo.bufhidden", "")
-        eq_config(child, "buffers." .. scope .. ".bo.buflisted", true)
-        eq_config(child, "buffers." .. scope .. ".bo.swapfile", true)
-
-        eq_config(child, "buffers." .. scope .. ".wo.cursorline", true)
-        eq_config(child, "buffers." .. scope .. ".wo.cursorcolumn", true)
-        eq_config(child, "buffers." .. scope .. ".wo.number", true)
-        eq_config(child, "buffers." .. scope .. ".wo.relativenumber", true)
-        eq_config(child, "buffers." .. scope .. ".wo.foldenable", true)
-        eq_config(child, "buffers." .. scope .. ".wo.list", true)
-        eq_config(child, "buffers." .. scope .. ".wo.wrap", false)
-        eq_config(child, "buffers." .. scope .. ".wo.linebreak", false)
-    end
-
-    eq_config(child, "integrations.NvimTree.position", "right")
-    eq_config(child, "integrations.NvimTree.close", false)
-    eq_config(child, "integrations.NvimTree.reopen", false)
-    eq_config(child, "integrations.undotree.position", "right")
 end
 
-T["setup()"]["`left` or `right` buffer options overrides `common` ones"] = function()
-    child.lua([[require('no-neck-pain').setup({
-        buffers = {
-            backgroundColor = "catppuccin-frappe",
-            blend = 0.1,
-            textColor = "#7480c2",
-            bo = {
-                filetype = "TEST",
-            },
-            wo = {
-                cursorline = false,
-            },
-            left = {
-                backgroundColor = "catppuccin-frappe-dark",
-                blend = -0.8,
-                textColor = "#123123",
-                bo = {
-                    filetype = "TEST-left",
-                },
-                wo = {
-                    cursorline = true,
-                },
-            },
-            right = {
-                backgroundColor = "catppuccin-latte",
-                blend = 1,
-                textColor = "#456456",
-                bo = {
-                    filetype = "TEST-right",
-                },
-                wo = {
-                    number = true,
-                },
-            },
-        },
-    })]])
-
-    eq_config(child, "buffers.backgroundColor", "#444858")
-    eq_config(child, "buffers.blend", 0.1)
-    eq_config(child, "buffers.textColor", "#7480c2")
-    eq_config(child, "buffers.bo.filetype", "TEST")
-    eq_config(child, "buffers.wo.cursorline", false)
-
-    eq_config(child, "buffers.left.backgroundColor", "#08080b")
-    eq_config(child, "buffers.right.backgroundColor", "#ffffff")
-
-    eq_config(child, "buffers.left.blend", -0.8)
-    eq_config(child, "buffers.right.blend", 1)
-
-    eq_config(child, "buffers.left.textColor", "#123123")
-    eq_config(child, "buffers.right.textColor", "#456456")
-
-    eq_config(child, "buffers.left.bo.filetype", "TEST-left")
-    eq_config(child, "buffers.right.bo.filetype", "TEST-right")
-
-    eq_config(child, "buffers.left.wo.cursorline", true)
-    eq_config(child, "buffers.right.wo.number", true)
-end
-
-T["setup()"]["`common` options spreads it to `left` and `right` buffers"] = function()
-    child.lua([[require('no-neck-pain').setup({
-        buffers = {
-            backgroundColor = "catppuccin-frappe",
-            blend = 1,
-            bo = {
-                filetype = "TEST",
-            },
-            wo = {
-                number = true,
-            },
-        },
-    })]])
-
-    eq_config(child, "buffers.backgroundColor", "#ffffff")
-    eq_config(child, "buffers.bo.filetype", "TEST")
-    eq_config(child, "buffers.wo.number", true)
-
-    eq_config(child, "buffers.left.backgroundColor", "#ffffff")
-    eq_config(child, "buffers.right.backgroundColor", "#ffffff")
-
-    eq_config(child, "buffers.left.blend", 1)
-    eq_config(child, "buffers.right.blend", 1)
-
-    eq_config(child, "buffers.left.textColor", "#ffffff")
-    eq_config(child, "buffers.right.textColor", "#ffffff")
-
-    eq_config(child, "buffers.left.wo.number", true)
-    eq_config(child, "buffers.right.wo.number", true)
-
-    eq_config(child, "buffers.left.bo.filetype", "TEST")
-    eq_config(child, "buffers.right.bo.filetype", "TEST")
-end
-
-T["setup()"]["enables the plugin with mapping"] = function()
+T["setup"]["enables the plugin with mapping"] = function()
     child.lua([[
         require('no-neck-pain').setup({width=50,toggleMapping="nn"})
     ]])
@@ -390,7 +155,7 @@ T["setup()"]["enables the plugin with mapping"] = function()
     eq_state(child, "enabled", false)
 end
 
-T["setup()"]["starts the plugin on VimEnter"] = function()
+T["setup"]["starts the plugin on VimEnter"] = function()
     child.restart({ "-u", "scripts/test_auto_open.lua" })
 
     eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1000, 1002 })
@@ -399,9 +164,9 @@ T["setup()"]["starts the plugin on VimEnter"] = function()
     child.stop()
 end
 
-T["enable()"] = MiniTest.new_set()
+T["enable"] = MiniTest.new_set()
 
-T["enable()"]["sets state"] = function()
+T["enable"]["sets state"] = function()
     child.lua([[
         require('no-neck-pain').setup({width=50})
         require('no-neck-pain').enable()
@@ -431,9 +196,9 @@ T["enable()"]["sets state"] = function()
     end
 end
 
-T["disable()"] = MiniTest.new_set()
+T["disable"] = MiniTest.new_set()
 
-T["disable()"]["resets state"] = function()
+T["disable"]["resets state"] = function()
     child.lua([[
         require('no-neck-pain').enable()
         require('no-neck-pain').disable()

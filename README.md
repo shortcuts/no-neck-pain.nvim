@@ -133,6 +133,20 @@ require("no-neck-pain").setup({
     buffers = {
         -- When `true`, the side buffers will be named `no-neck-pain-left` and `no-neck-pain-right` respectively.
         setNames = false,
+        -- The scratchPad feature leverages the empty side buffers to take notes. It works like any Neovim buffer and will automatically save the content at the given `location`.
+        -- Quitting an unsaved scratchpad buffer is non-blocking, as it's auto-saved.
+        scratchPad = {
+            -- When `true`, automatically sets the following options to the side buffers:
+            -- - `autowriteall`
+            -- - `autoread`.
+            enabled = false,
+            -- The name of the generated file. See `location` for more information.
+            -- @example: `no-neck-pain-left.norg`
+            fileName = "no-neck-pain",
+            -- By default, files are saved at the same location as the current Neovim session. Filetype is defaulted to `norg` (https://github.com/nvim-neorg/neorg), but can be changed from the buffer options via `buffers.bo.filetype`, `buffers.left.bo.filetype` and `buffers.right.bo.filetype`.
+            -- @example: `no-neck-pain-left.norg`
+            location = nil,
+        },
         -- Hexadecimal color code to override the current background color of the buffer. (e.g. #24273A)
         backgroundColor = nil,
         -- Brighten (positive) or darken (negative) the side buffers background color. Accepted values are [-1..1].
