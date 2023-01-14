@@ -406,13 +406,17 @@ T["setup()"]["colorCode: map integration name to a value"] = function()
         ["github-nvim-theme-dark"] = "#24292e",
         ["github-nvim-theme-dimmed"] = "#22272e",
         ["github-nvim-theme-light"] = "#ffffff",
+        ["onedark"] = "#282c34",
+        ["onedark-dark"] = "#000000",
+        ["onedark-vivid"] = "#282c34",
+        ["onelight"] = "#fafafa",
+        ["rose-pine"] = "#191724",
+        ["rose-pine-dawn"] = "#faf4ed",
+        ["rose-pine-moon"] = "#232136",
         ["tokyonight-day"] = "#16161e",
         ["tokyonight-moon"] = "#1e2030",
         ["tokyonight-night"] = "#16161e",
         ["tokyonight-storm"] = "#1f2335",
-        ["rose-pine"] = "#191724",
-        ["rose-pine-moon"] = "#232136",
-        ["rose-pine-dawn"] = "#faf4ed",
     }
 
     for integration, value in pairs(integrationMapping) do
