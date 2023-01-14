@@ -76,6 +76,29 @@ function W.createSideBuffers(wins)
                     _G.NoNeckPain.config.buffers[side].textColor
                 )
 
+                -- default options for scratchpad
+                if _G.NoNeckPain.config.buffers.scratchPad.enabled then
+                    local location = _G.NoNeckPain.config.buffers.scratchPad.location or ""
+
+                    if location ~= "" and string.sub(location, -1) ~= "/" then
+                        location = location .. "/"
+                    end
+
+                    location = location .. _G.NoNeckPain.config.buffers.scratchPad.fileName .. "-" .. side .. "." .. _G.NoNeckPain.config.buffers[side].bo.filetype
+
+                    -- we edit the file if it exists, otherwise we create it
+                    if vim.fn.filereadable(location) then
+                        vim.cmd(string.format("edit %s", location))
+                    else
+                        vim.api.nvim_buf_set_name(0, location)
+                    end
+
+                    vim.api.nvim_buf_set_option(0, "bufhidden", "")
+                    vim.api.nvim_buf_set_option(0, "buftype", "")
+                    vim.api.nvim_buf_set_option(0, "autoread", true)
+                    vim.o.autowriteall = true
+                end
+
                 wins.main[side] = id
             end
         end

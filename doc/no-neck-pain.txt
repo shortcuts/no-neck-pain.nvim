@@ -101,6 +101,19 @@ Default values:
       buffers = {
           -- When `true`, the side buffers will be named `no-neck-pain-left` and `no-neck-pain-right` respectively.
           setNames = false,
+          -- Options related to the scratch pad for the side buffers.
+          scratchPad = {
+              -- When `true`, automatically sets the following options to the side buffers:
+              -- - `autowriteall`
+              -- - `autoread`.
+              -- - textColor is defaulted to a brighter shade of the background color.
+              enabled = false,
+              -- the name of the generated file.
+              fileName = "no-neck-pain",
+              -- files are available at `$LOCATION/$FILENAME-$SIDE.$FILETYPE`, where `$SIDE` is either left or right.
+              -- the default filetype is `norg` (https://github.com/nvim-neorg/neorg), you can change it in `buffers.bo.filetype`.
+              location = "~/",
+          },
           -- Hexadecimal color code to override the current background color of the buffer. (e.g. #24273A)
           -- popular theme are supported by their name:
           -- - catppuccin-frappe
