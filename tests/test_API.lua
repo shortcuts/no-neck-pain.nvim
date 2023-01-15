@@ -113,7 +113,6 @@ T["setup"]["sets exposed methods and default options value"] = function()
     end
 
     eq_config(child, "integrations.NvimTree.position", "left")
-    eq_config(child, "integrations.NvimTree.close", true)
     eq_config(child, "integrations.NvimTree.reopen", true)
     eq_config(child, "integrations.undotree.position", "left")
 end
