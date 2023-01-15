@@ -55,14 +55,19 @@ T["scratchPad"]["default to `norg` fileType"] = function()
     eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1000, 1002 })
 
     local cwd = child.lua_get("vim.fn.getcwd()")
+    local left = cwd .. "/no-neck-pain-left.norg"
+    local right = cwd .. "/no-neck-pain-right.norg"
 
+    eq(child.lua_get("vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(1001))"), left)
     eq(
-        child.lua_get("vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(1001))"),
-        cwd .. "/no-neck-pain-left.norg"
+        child.lua_get("vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(1001), 'buflisted')"),
+        false
     )
+
+    eq(child.lua_get("vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(1002))"), right)
     eq(
-        child.lua_get("vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(1002))"),
-        cwd .. "/no-neck-pain-right.norg"
+        child.lua_get("vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(1002), 'buflisted')"),
+        false
     )
 end
 
@@ -90,14 +95,19 @@ T["scratchPad"]["override to md is reflected to the buffer"] = function()
     eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1000, 1002 })
 
     local cwd = child.lua_get("vim.fn.getcwd()")
+    local left = cwd .. "/no-neck-pain-left.md"
+    local right = cwd .. "/no-neck-pain-right.txt"
 
+    eq(child.lua_get("vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(1001))"), left)
     eq(
-        child.lua_get("vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(1001))"),
-        cwd .. "/no-neck-pain-left.md"
+        child.lua_get("vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(1001), 'buflisted')"),
+        false
     )
+
+    eq(child.lua_get("vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(1002))"), right)
     eq(
-        child.lua_get("vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(1002))"),
-        cwd .. "/no-neck-pain-right.txt"
+        child.lua_get("vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(1002), 'buflisted')"),
+        false
     )
 end
 
