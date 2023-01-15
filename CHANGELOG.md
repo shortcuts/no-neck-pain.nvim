@@ -1,4 +1,19 @@
 <a name="0.2.3"></a>
+## [0.5.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v0.4.0...v0.5.0) (2023-01-15)
+
+
+### Features
+
+* add `onedark` theme ([#140](https://github.com/shortcuts/no-neck-pain.nvim/issues/140)) ([9bf7ca5](https://github.com/shortcuts/no-neck-pain.nvim/commit/9bf7ca58176108d959912e068bc04702bc1686de))
+* add built-in scratchpad ([#141](https://github.com/shortcuts/no-neck-pain.nvim/issues/141)) ([d76812c](https://github.com/shortcuts/no-neck-pain.nvim/commit/d76812c2362c18c7b214fa8b4a6228c05dc3d834))
+* properly position buffers with NvimTree ([#134](https://github.com/shortcuts/no-neck-pain.nvim/issues/134)) ([c1f5f2a](https://github.com/shortcuts/no-neck-pain.nvim/commit/c1f5f2ad26de5a5c0e08793fc195a70de171bbf4))
+
+
+### Bug Fixes
+
+* set scratchpad buffers as `unlisted` ([#143](https://github.com/shortcuts/no-neck-pain.nvim/issues/143)) ([5e215cf](https://github.com/shortcuts/no-neck-pain.nvim/commit/5e215cfcefa0dde4b6c7643c9bb44bac8bb59866))
+* wrong size buffer width with NvimTree ([#144](https://github.com/shortcuts/no-neck-pain.nvim/issues/144)) ([cc388da](https://github.com/shortcuts/no-neck-pain.nvim/commit/cc388dac17abeca16a4a2184c839a741f28a6fef))
+
 ## [0.4.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v0.3.1...v0.4.0) (2023-01-12)
 
 
