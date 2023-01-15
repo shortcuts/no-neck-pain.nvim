@@ -109,6 +109,7 @@ function W.createSideBuffers(wins)
 
                     vim.api.nvim_buf_set_option(0, "bufhidden", "")
                     vim.api.nvim_buf_set_option(0, "buftype", "")
+                    vim.api.nvim_buf_set_option(0, "buflisted", false)
                     vim.api.nvim_buf_set_option(0, "autoread", true)
                     vim.o.autowriteall = true
                 end
