@@ -22,7 +22,6 @@ T["setup"]["overrides default values"] = function()
         integrations = {
             NvimTree = {
                 position = "right",
-                close = false,
                 reopen = false,
             },
             undotree = {
@@ -32,7 +31,6 @@ T["setup"]["overrides default values"] = function()
     })]])
 
     eq_config(child, "integrations.NvimTree.position", "right")
-    eq_config(child, "integrations.NvimTree.close", false)
     eq_config(child, "integrations.NvimTree.reopen", false)
     eq_config(child, "integrations.undotree.position", "right")
 end

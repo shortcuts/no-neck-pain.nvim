@@ -152,9 +152,7 @@ NoNeckPain.options = {
         NvimTree = {
             -- The position of the tree, either `left` or `right`.
             position = "left",
-            -- When `true`, we close NvimTree if it's currently open when enabling the plugin.
-            close = true,
-            -- Paired with the `close` parameter, when `false` we don't re-open the side tree.
+            -- When `true`, if the tree was opened before enabling the plugin, we will reopen it.
             reopen = true,
         },
         -- @link https://github.com/mbbill/undotree
