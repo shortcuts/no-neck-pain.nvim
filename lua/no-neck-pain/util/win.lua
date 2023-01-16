@@ -145,14 +145,17 @@ function W.isRelativeWindow(win)
     return false
 end
 
--- returns the available wins and their total number, without the `list` ones.
-function W.listWinsExcept(list)
+-- returns the available wins and their total number, without the `list` ones.p
+function W.winsExceptState(state, withTrees)
+    local mergedWins =
+        W.mergeState(state.main, state.splits, withTrees and state.external.trees or nil)
     local wins = vim.api.nvim_list_wins()
+
     local validWins = {}
     local size = 0
 
     for _, win in pairs(wins) do
-        if not M.contains(list, win) and not W.isRelativeWindow(win) then
+        if not M.contains(mergedWins, win) and not W.isRelativeWindow(win) then
             table.insert(validWins, win)
             size = size + 1
         end
@@ -165,10 +168,17 @@ end
 function W.closeSideBuffers(scope, wins)
     for _, side in pairs(W.SIDES) do
         if wins[side] ~= nil then
-            local _, wsize = W.listWinsExcept({ wins[side] })
+            local activeWins = vim.api.nvim_list_wins()
+            local haveOtherWins = false
+
+            for _, activeWin in pairs(activeWins) do
+                if wins[side] ~= activeWin and not W.isRelativeWindow(activeWin) then
+                    haveOtherWins = true
+                end
+            end
 
             -- we don't have any window left if we close this one
-            if wsize == 0 then
+            if not haveOtherWins then
                 -- either triggered by a :wq or quit event, we can just quit
                 if scope == "QuitPre" then
                     return vim.cmd("quit!")

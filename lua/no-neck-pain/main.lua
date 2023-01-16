@@ -100,7 +100,7 @@ function N.enable()
                 end
 
                 local focusedWin = vim.api.nvim_get_current_win()
-                local wins, total = W.listWinsExcept(W.mergeState(S.win.main, S.win.splits))
+                local wins, total = W.winsExceptState(S.win, false)
 
                 if total == 0 or not M.contains(wins, focusedWin) then
                     return
@@ -162,9 +162,7 @@ function N.enable()
                 end
 
                 if _G.NoNeckPain.config.disableOnLastBuffer then
-                    local _, remaining = W.listWinsExcept(
-                        W.mergeState(S.win.main, S.win.splits, S.win.external.trees)
-                    )
+                    local _, remaining = W.winsExceptState(S.win, true)
 
                     if
                         remaining == 0
@@ -222,7 +220,7 @@ function N.enable()
                 end
 
                 local focusedWin = vim.api.nvim_get_current_win()
-                local wins, total = W.listWinsExcept(W.mergeState(S.win.main, S.win.splits))
+                local wins, total = W.winsExceptState(S.win, false)
 
                 if total == 0 or not M.contains(wins, focusedWin) then
                     return
