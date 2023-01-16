@@ -47,7 +47,7 @@ function W.createSideBuffers(wins)
 
     for _, side in pairs(W.SIDES) do
         if _G.NoNeckPain.config.buffers[side].enabled then
-            cmd[side].padding = W.getPadding(side, wins.external.trees)
+            cmd[side].padding = W.getPadding(side, wins)
 
             if cmd[side].padding > 0 and wins.main[side] == nil then
                 vim.cmd(cmd[side].cmd)
@@ -192,7 +192,7 @@ end
 function W.resizeOrCloseSideBuffers(scope, wins)
     for _, side in pairs(W.SIDES) do
         if wins.main[side] ~= nil then
-            local padding = W.getPadding(side, wins.external.trees)
+            local padding = W.getPadding(side, wins)
 
             if padding > 0 then
                 resize(wins.main[side], padding, side)
@@ -210,7 +210,7 @@ end
 --
 -- @param side string: the side we are creating.
 -- @param trees list: the external trees supported with their `width` and `id`.
-function W.getPadding(side, trees)
+function W.getPadding(side, wins)
     local uis = vim.api.nvim_list_uis()
 
     if uis[1] == nil then
@@ -235,9 +235,34 @@ function W.getPadding(side, trees)
         return 0
     end
 
+    -- we need to see if there's enough space left to have side buffers
+    local nbVSplits = 1
+
+    if wins.splits ~= nil then
+        for _, split in pairs(wins.splits) do
+            if split.vertical then
+                nbVSplits = nbVSplits + 1
+            end
+        end
+    end
+
+    local occupied = _G.NoNeckPain.config.width * nbVSplits
+
+    -- if there's no space left according to the config width,
+    -- then we don't have to create side buffers.
+    if occupied >= width then
+        D.log(side, "%d vsplits - no space left to create side buffers", nbVSplits)
+
+        return 0
+    end
+
+    D.log(side, "%d occupied - checking trees", occupied)
+
+    -- now we need to determine how much we should substract from the remaining padding
+    -- if there's side trees open.
     local paddingToSubstract = 0
 
-    for name, tree in pairs(trees) do
+    for name, tree in pairs(wins.external.trees) do
         if
             tree ~= nil
             and tree.id ~= nil
@@ -255,7 +280,7 @@ function W.getPadding(side, trees)
         end
     end
 
-    return math.floor((width - paddingToSubstract - _G.NoNeckPain.config.width) / 2)
+    return math.floor((width - paddingToSubstract - (_G.NoNeckPain.config.width * nbVSplits)) / 2)
 end
 
 return W

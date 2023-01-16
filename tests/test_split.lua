@@ -32,11 +32,10 @@ T["split"]["only one side buffer, closing help doesn't close NNP"] = function()
     eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1002, 1000 })
     eq_state(child, "win.main.left", 1001)
     eq_state(child, "win.main.right", vim.NIL)
-    eq_state(child, "win.main.split", 1002)
+    eq_state(child, "win.splits", { { id = 1002, vertical = false } })
     eq_state(child, "win.main.curr", 1000)
-    eq_state(child, "vsplit", false)
 
-    child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.win.main.split)")
+    child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.win.splits[1].id)")
     child.cmd("q")
 
     eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1000 })
@@ -56,9 +55,8 @@ T["split"]["closing `curr` makes `split` the new `curr`"] = function()
     eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1003, 1000, 1002 })
     eq_state(child, "win.main.left", 1001)
     eq_state(child, "win.main.right", 1002)
-    eq_state(child, "win.main.split", 1003)
+    eq_state(child, "win.splits", { { id = 1003, vertical = false } })
     eq_state(child, "win.main.curr", 1000)
-    eq_state(child, "vsplit", false)
 
     child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.win.main.curr)")
     child.cmd("q")
@@ -79,10 +77,9 @@ T["split"]["keeps side buffers"] = function()
     eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1003, 1000, 1002 })
     eq_state(child, "win.main.left", 1001)
     eq_state(child, "win.main.right", 1002)
-    eq_state(child, "win.main.split", 1003)
-    eq_state(child, "vsplit", false)
+    eq_state(child, "win.splits", { { id = 1003, vertical = false } })
 
-    child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.win.main.split)")
+    child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.win.splits[1].id)")
     child.cmd("q")
 
     eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1000, 1002 })
@@ -106,6 +103,7 @@ T["vsplit"]["correctly position side buffers with vsplits already opened"] = fun
 end
 
 T["vsplit"]["closing `curr` makes `split` the new `curr`"] = function()
+    child.set_size(400, 400)
     child.lua([[
         require('no-neck-pain').setup({width=50})
         require('no-neck-pain').enable()
@@ -113,17 +111,17 @@ T["vsplit"]["closing `curr` makes `split` the new `curr`"] = function()
 
     child.cmd("vsplit")
 
-    eq(child.lua_get("vim.api.nvim_list_wins()"), { 1003, 1000 })
-    eq_state(child, "win.main.left", vim.NIL)
-    eq_state(child, "win.main.right", vim.NIL)
-    eq_state(child, "win.main.split", 1003)
+    eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1003, 1000, 1002 })
+    eq_state(child, "win.main.left", 1001)
+    eq_state(child, "win.main.right", 1002)
+    eq_state(child, "win.splits", { { id = 1003, vertical = false } })
     eq_state(child, "win.main.curr", 1000)
-    eq_state(child, "vsplit", true)
 
     child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.win.main.curr)")
     child.cmd("q")
 
-    eq(child.lua_get("vim.api.nvim_list_wins()"), { 1004, 1003, 1005 })
+    eq_state(child, "win.main.curr", 1003)
+    eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1003, 1002 })
     eq(child.lua_get("vim.api.nvim_get_current_win()"), 1003)
 end
 
@@ -138,17 +136,15 @@ T["vsplit"]["hides side buffers"] = function()
     eq(child.lua_get("vim.api.nvim_list_wins()"), { 1003, 1000 })
     eq_state(child, "win.main.left", vim.NIL)
     eq_state(child, "win.main.right", vim.NIL)
-    eq_state(child, "win.main.split", 1003)
-    eq_state(child, "vsplit", true)
+    eq_state(child, "win.splits", { { id = 1003, vertical = true } })
 
-    child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.win.main.split)")
+    child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.win.splits[1].id)")
     child.cmd("q")
 
     eq(child.lua_get("vim.api.nvim_list_wins()"), { 1004, 1000, 1005 })
     eq_state(child, "win.main.left", 1004)
     eq_state(child, "win.main.right", 1005)
-    eq_state(child, "win.main.split", vim.NIL)
-    eq_state(child, "vsplit", false)
+    eq_state(child, "win.splits", vim.NIL)
 end
 
 T["vsplit/split"] = new_set()
