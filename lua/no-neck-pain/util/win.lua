@@ -283,4 +283,56 @@ function W.getPadding(side, wins)
     return math.floor((width - paddingToSubstract - (_G.NoNeckPain.config.width * nbVSplits)) / 2)
 end
 
+-- mergeState returns all of the window ids of the state.
+function W.mergeState(main, splits, trees)
+    local wins = {}
+
+    for _, side in pairs(main) do
+        table.insert(wins, side)
+    end
+
+    if splits ~= nil then
+        for _, split in pairs(splits) do
+            table.insert(wins, split.id)
+        end
+    end
+
+    if trees ~= nil then
+        for _, tree in pairs(trees) do
+            table.insert(wins, tree.id)
+        end
+    end
+
+    return wins
+end
+
+-- returns `true` if all the state wins are still active in the wins list.
+--
+-- @param checkSplits bool: checks for splits wins too when `true`.
+function W.stateWinsActive(state, checkSplits)
+    local wins = vim.api.nvim_list_wins()
+    local swins = state.main
+
+    if checkSplits and state.splits ~= nil then
+        swins = W.mergeState(state.main, state.splits, nil)
+    end
+
+    for _, swin in pairs(swins) do
+        local found = false
+
+        for _, win in pairs(wins) do
+            if swin == win then
+                found = true
+                break
+            end
+        end
+
+        if not found then
+            return false
+        end
+    end
+
+    return true
+end
+
 return W

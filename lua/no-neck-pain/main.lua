@@ -3,7 +3,7 @@ local E = require("no-neck-pain.util.event")
 local M = require("no-neck-pain.util.map")
 local W = require("no-neck-pain.util.win")
 local T = require("no-neck-pain.util.trees")
-local ST = require("no-neck-pain.util.state")
+local Sp = require("no-neck-pain.util.split")
 
 local N = {}
 
@@ -100,7 +100,7 @@ function N.enable()
                 end
 
                 local focusedWin = vim.api.nvim_get_current_win()
-                local wins, total = W.listWinsExcept(ST.mergeStateWins(S.win.main, S.win.splits))
+                local wins, total = W.listWinsExcept(W.mergeState(S.win.main, S.win.splits))
 
                 if total == 0 or not M.contains(wins, focusedWin) then
                     return
@@ -135,7 +135,7 @@ function N.enable()
 
                 local vsplit = width < screenWidth
 
-                S.win.splits = ST.insertInSplits(S.win.splits, focusedWin, vsplit)
+                S.win.splits = Sp.insert(S.win.splits, focusedWin, vsplit)
 
                 if vsplit then
                     S.win.main.left, S.win.main.right = W.resizeOrCloseSideBuffers(p.event, S.win)
@@ -155,7 +155,7 @@ function N.enable()
 
                 -- if we are not in split view, we check if we killed one of the main buffers (curr, left, right) to disable NNP
                 -- TODO: make killed side buffer decision configurable, we can re-create it
-                if S.win.splits == nil and not ST.stateWinsPresent(S.win, false) then
+                if S.win.splits == nil and not W.stateWinsActive(S.win, false) then
                     D.log(p.event, "one of the NNP main buffers have been closed, disabling...")
 
                     return N.disable(p.event)
@@ -163,7 +163,7 @@ function N.enable()
 
                 if _G.NoNeckPain.config.disableOnLastBuffer then
                     local _, remaining = W.listWinsExcept(
-                        ST.mergeStateWins(S.win.main, S.win.splits, S.win.external.trees)
+                        W.mergeState(S.win.main, S.win.splits, S.win.external.trees)
                     )
 
                     if
@@ -190,11 +190,11 @@ function N.enable()
                     return
                 end
 
-                if ST.stateWinsPresent(S.win, true) then
+                if W.stateWinsActive(S.win, true) then
                     return D.log(p.event, "state wins are still active, no need to kill splits.")
                 end
 
-                S.win.splits = ST.refreshSplits(S.win.splits)
+                S.win.splits = Sp.refresh(S.win.splits)
 
                 -- if curr is not valid anymore, we focus the first valid split and remove it from the state
                 if not vim.api.nvim_win_is_valid(S.win.main.curr) then
@@ -204,7 +204,7 @@ function N.enable()
                     end
 
                     vim.fn.win_gotoid(S.win.splits[1].id)
-                    S.win.splits = ST.removeSplit(S.win.splits, S.win.splits[1].id)
+                    S.win.splits = Sp.remove(S.win.splits, S.win.splits[1].id)
                 end
 
                 init()
@@ -222,7 +222,7 @@ function N.enable()
                 end
 
                 local focusedWin = vim.api.nvim_get_current_win()
-                local wins, total = W.listWinsExcept(ST.mergeStateWins(S.win.main, S.win.splits))
+                local wins, total = W.listWinsExcept(W.mergeState(S.win.main, S.win.splits))
 
                 if total == 0 or not M.contains(wins, focusedWin) then
                     return
