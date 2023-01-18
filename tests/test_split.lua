@@ -89,36 +89,34 @@ end
 
 T["vsplit"] = new_set()
 
-T["vsplit"]["does not create side buffers with vsplits already opened, when there's not enough space"] =
-    function()
-        child.cmd("vsplit")
-        child.cmd("vsplit")
-        child.cmd("vsplit")
+T["vsplit"]["does not create side buffers when there's not enough space"] = function()
+    child.cmd("vsplit")
+    child.cmd("vsplit")
+    child.cmd("vsplit")
 
-        eq(child.lua_get("vim.api.nvim_list_wins()"), { 1003, 1002, 1001, 1000 })
+    eq(child.lua_get("vim.api.nvim_list_wins()"), { 1003, 1002, 1001, 1000 })
 
-        child.lua([[
+    child.lua([[
         require('no-neck-pain').setup({width=50})
         require('no-neck-pain').enable()
     ]])
 
-        eq(child.lua_get("vim.api.nvim_list_wins()"), { 1003, 1002, 1001, 1000 })
-    end
+    eq(child.lua_get("vim.api.nvim_list_wins()"), { 1003, 1002, 1001, 1000 })
+end
 
-T["vsplit"]["correctly position side buffers with vsplits already opened, when there's enough space"] =
-    function()
-        child.set_size(500, 500)
-        child.cmd("vsplit")
+T["vsplit"]["correctly position side buffers when there's enough space"] = function()
+    child.set_size(500, 500)
+    child.cmd("vsplit")
 
-        eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1000 })
+    eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1000 })
 
-        child.lua([[
+    child.lua([[
         require('no-neck-pain').setup({width=50})
         require('no-neck-pain').enable()
     ]])
 
-        eq(child.lua_get("vim.api.nvim_list_wins()"), { 1002, 1001, 1000, 1003 })
-    end
+    eq(child.lua_get("vim.api.nvim_list_wins()"), { 1002, 1001, 1000, 1003 })
+end
 
 T["vsplit"]["closing `curr` makes `split` the new `curr`"] = function()
     child.set_size(400, 400)
