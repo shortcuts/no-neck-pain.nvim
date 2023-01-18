@@ -48,6 +48,7 @@ local function init()
 
     -- before creating side buffers, we determine if we should consider externals
     S.win.external.trees = T.getSideTrees()
+    S.win.splits = Sp.getSplits(S.win)
     S.win.main.left, S.win.main.right = W.createSideBuffers(S.win)
     -- we might have closed trees during the buffer creation process, we re-fetch the latest IDs to prevent inconsistencies
     S.win.external.trees = T.getSideTrees()
