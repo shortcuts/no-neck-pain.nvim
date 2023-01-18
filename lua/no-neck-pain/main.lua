@@ -43,17 +43,18 @@ function N.toggle()
 end
 
 -- Creates side buffers and set the internal state considering potential external trees.
-local function init()
-    S.win.main.curr = vim.api.nvim_get_current_win()
+local function init(scope, goToCurr)
+    D.log(scope, "init called, %d is the current window", S.win.main.curr)
 
     -- before creating side buffers, we determine if we should consider externals
     S.win.external.trees = T.getSideTrees()
-    S.win.splits = Sp.getSplits(S.win)
     S.win.main.left, S.win.main.right = W.createSideBuffers(S.win)
     -- we might have closed trees during the buffer creation process, we re-fetch the latest IDs to prevent inconsistencies
     S.win.external.trees = T.getSideTrees()
 
-    vim.fn.win_gotoid(S.win.main.curr)
+    if goToCurr then
+        vim.fn.win_gotoid(S.win.main.curr)
+    end
 end
 
 -- Initializes the plugin, sets event listeners and internal state.
@@ -66,7 +67,10 @@ function N.enable()
         clear = true,
     })
 
-    init()
+    S.win.main.curr = vim.api.nvim_get_current_win()
+    S.win.splits = Sp.getSplits(S.win)
+
+    init("enable", true)
 
     vim.api.nvim_create_autocmd({ "VimResized" }, {
         callback = function(p)
@@ -75,18 +79,7 @@ function N.enable()
                     return
                 end
 
-                local width = vim.api.nvim_list_uis()[1].width
-
-                -- we create everything if side buffers are missing
-                if
-                    width > _G.NoNeckPain.config.width
-                    and S.win.main.left == nil
-                    and S.win.main.right == nil
-                then
-                    return init()
-                end
-
-                S.win.main.left, S.win.main.right = W.resizeOrCloseSideBuffers(p.event, S.win)
+                init(p.event)
             end)
         end,
         group = "NoNeckPain",
@@ -139,7 +132,7 @@ function N.enable()
                 S.win.splits = Sp.insert(S.win.splits, focusedWin, vsplit)
 
                 if vsplit then
-                    S.win.main.left, S.win.main.right = W.resizeOrCloseSideBuffers(p.event, S.win)
+                    init(p.event)
                 end
             end)
         end,
@@ -155,7 +148,6 @@ function N.enable()
                 end
 
                 -- if we are not in split view, we check if we killed one of the main buffers (curr, left, right) to disable NNP
-                -- TODO: make killed side buffer decision configurable, we can re-create it
                 if S.win.splits == nil and not W.stateWinsActive(S.win, false) then
                     D.log(p.event, "one of the NNP main buffers have been closed, disabling...")
 
@@ -202,11 +194,11 @@ function N.enable()
                         return N.disable(p.event)
                     end
 
-                    vim.fn.win_gotoid(S.win.splits[1].id)
+                    S.win.main.curr = S.win.splits[1].id
                     S.win.splits = Sp.remove(S.win.splits, S.win.splits[1].id)
                 end
 
-                init()
+                init(p.event, true)
             end)
         end,
         group = "NoNeckPain",
@@ -240,18 +232,14 @@ function N.enable()
                             width = 0,
                         }
 
-                        return init()
+                        return init(p.event)
                     end
 
                     -- we have a new tree registered, we can resize
                     if trees[name].id ~= S.win.external.trees[name].id then
                         D.log(p.event, "%s have been opened, resizing", name)
 
-                        S.win.external.trees = trees
-                        S.win.main.left, S.win.main.right =
-                            W.resizeOrCloseSideBuffers(p.event, S.win)
-
-                        return
+                        return init(p.event)
                     end
                 end
                 S.win.external.trees = trees

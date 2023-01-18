@@ -145,11 +145,11 @@ function W.isRelativeWindow(win)
     return false
 end
 
--- returns the available wins and their total number, without the `list` ones.p
+-- returns the available wins and their total number, without the `list` ones.
 function W.winsExceptState(state, withTrees)
+    local wins = vim.api.nvim_list_wins()
     local mergedWins =
         W.mergeState(state.main, state.splits, withTrees and state.external.trees or nil)
-    local wins = vim.api.nvim_list_wins()
 
     local validWins = {}
     local size = 0
@@ -250,7 +250,7 @@ function W.getPadding(side, wins)
 
     if wins.splits ~= nil then
         for _, split in pairs(wins.splits) do
-            if split.vertical then
+            if split.vertical == true then
                 nbVSplits = nbVSplits + 1
             end
         end
@@ -328,16 +328,7 @@ function W.stateWinsActive(state, checkSplits)
     end
 
     for _, swin in pairs(swins) do
-        local found = false
-
-        for _, win in pairs(wins) do
-            if swin == win then
-                found = true
-                break
-            end
-        end
-
-        if not found then
+        if not M.contains(wins, swin) then
             return false
         end
     end

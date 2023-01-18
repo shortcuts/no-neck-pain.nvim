@@ -13,6 +13,10 @@ end
 
 -- returns the size of a given `map`.
 function M.tsize(map)
+    if map == nil then
+        return 0
+    end
+
     local count = 0
 
     for _ in pairs(map) do
