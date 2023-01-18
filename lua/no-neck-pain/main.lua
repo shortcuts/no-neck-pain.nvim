@@ -227,11 +227,6 @@ function N.enable()
                     if tree ~= nil and tree.id ~= nil and not M.contains(wins, tree.id) then
                         D.log(p.event, "%s have been closed, resizing", name)
 
-                        S.win.external.trees[name] = {
-                            id = nil,
-                            width = 0,
-                        }
-
                         return init(p.event)
                     end
 
