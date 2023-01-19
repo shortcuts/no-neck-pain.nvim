@@ -21,12 +21,12 @@ function E.abortEnable(state, filetype)
 end
 
 -- determines if we should skip the event.
-function E.skip(enabled, main, split)
+function E.skip(enabled, main, splits)
     if not enabled then
         return true
     end
 
-    if split ~= nil or W.isRelativeWindow() then
+    if splits ~= nil or W.isRelativeWindow() then
         return true
     end
 

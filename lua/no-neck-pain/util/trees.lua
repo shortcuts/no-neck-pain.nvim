@@ -1,9 +1,11 @@
 local T = {}
 
+-- whether the given `fileType` matches a supported side tree or not.
 function T.isSideTree(fileType)
     return fileType == "NvimTree" or fileType == "undotree"
 end
 
+-- returns all of the side trees wins and their width.
 function T.getSideTrees()
     local wins = vim.api.nvim_list_wins()
     local trees = {
