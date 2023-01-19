@@ -198,7 +198,8 @@ function N.enable()
                     S.win.splits = Sp.remove(S.win.splits, S.win.splits[1].id)
                 end
 
-                init(p.event, true)
+                -- we only restore focus on curr if there's no split left
+                init(p.event, S.win.splits == nil)
             end)
         end,
         group = "NoNeckPain",

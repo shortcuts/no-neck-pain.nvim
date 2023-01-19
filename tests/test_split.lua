@@ -87,6 +87,34 @@ T["split"]["keeps side buffers"] = function()
     eq_buf_width(child, "main.right", 15)
 end
 
+T["split"]["keeps correct focus"] = function()
+    child.set_size(300, 300)
+    child.lua([[
+        require('no-neck-pain').setup({width=50})
+        require('no-neck-pain').enable()
+    ]])
+
+    eq(child.lua_get("vim.api.nvim_get_current_win()"), 1000)
+
+    child.cmd("split")
+    eq(child.lua_get("vim.api.nvim_get_current_win()"), 1003)
+
+    child.cmd("split")
+    eq(child.lua_get("vim.api.nvim_get_current_win()"), 1004)
+
+    child.cmd("split")
+    eq(child.lua_get("vim.api.nvim_get_current_win()"), 1005)
+
+    child.cmd("q")
+    eq(child.lua_get("vim.api.nvim_get_current_win()"), 1004)
+
+    child.cmd("q")
+    eq(child.lua_get("vim.api.nvim_get_current_win()"), 1003)
+
+    child.cmd("q")
+    eq(child.lua_get("vim.api.nvim_get_current_win()"), 1000)
+end
+
 T["vsplit"] = new_set()
 
 T["vsplit"]["does not create side buffers when there's not enough space"] = function()
@@ -199,6 +227,34 @@ T["vsplit"]["many vsplit leave side buffers open as long as there's space for it
 
     eq_state(child, "win.main.left", vim.NIL)
     eq_state(child, "win.main.right", vim.NIL)
+end
+
+T["vsplit"]["keeps correct focus"] = function()
+    child.set_size(400, 400)
+    child.lua([[
+        require('no-neck-pain').setup({width=50})
+        require('no-neck-pain').enable()
+    ]])
+
+    eq(child.lua_get("vim.api.nvim_get_current_win()"), 1000)
+
+    child.cmd("vsplit")
+    eq(child.lua_get("vim.api.nvim_get_current_win()"), 1003)
+
+    child.cmd("vsplit")
+    eq(child.lua_get("vim.api.nvim_get_current_win()"), 1004)
+
+    child.cmd("vsplit")
+    eq(child.lua_get("vim.api.nvim_get_current_win()"), 1005)
+
+    child.cmd("q")
+    eq(child.lua_get("vim.api.nvim_get_current_win()"), 1004)
+
+    child.cmd("q")
+    eq(child.lua_get("vim.api.nvim_get_current_win()"), 1003)
+
+    child.cmd("q")
+    eq(child.lua_get("vim.api.nvim_get_current_win()"), 1000)
 end
 
 T["vsplit/split"] = new_set()
