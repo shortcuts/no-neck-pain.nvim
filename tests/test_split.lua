@@ -280,7 +280,7 @@ T["vsplit/split"]["state is correctly sync'd even after many changes"] = functio
 end
 
 T["vsplit/split"]["closing side buffers because of splits restores focus"] = function()
-    child.set_size(150,150)
+    child.set_size(150, 150)
     child.lua([[
         require('no-neck-pain').setup({width=50})
         require('no-neck-pain').enable() 
