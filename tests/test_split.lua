@@ -279,4 +279,28 @@ T["vsplit/split"]["state is correctly sync'd even after many changes"] = functio
     eq(child.lua_get("vim.api.nvim_list_wins()"), { 1005, 1000, 1006 })
 end
 
+T["vsplit/split"]["closing side buffers because of splits restores focus"] = function()
+    child.set_size(150,150)
+    child.lua([[
+        require('no-neck-pain').setup({width=50})
+        require('no-neck-pain').enable() 
+    ]])
+
+    eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1000, 1002 })
+
+    child.cmd("vsplit")
+    eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1003, 1000, 1002 })
+
+    child.cmd("vsplit")
+    eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1004, 1003, 1000, 1002 })
+
+    child.cmd("vsplit")
+    eq(child.lua_get("vim.api.nvim_list_wins()"), { 1005, 1004, 1003, 1000 })
+
+    child.cmd("q")
+    eq(child.lua_get("vim.api.nvim_list_wins()"), { 1006, 1004, 1003, 1000, 1007 })
+
+    eq(child.lua_get("vim.api.nvim_get_current_win()"), 1000)
+end
+
 return T

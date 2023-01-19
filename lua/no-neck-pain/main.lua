@@ -46,6 +46,18 @@ end
 local function init(scope, goToCurr)
     D.log(scope, "init called, %d is the current window", S.win.main.curr)
 
+    -- re-creating side buffers will lately focus it, so if we are creating
+    -- side buffers, we must explicitely focus curr.
+    if
+        not goToCurr
+        and (
+            (S.win.main.left == nil and _G.NoNeckPain.config.buffers.left.enabled)
+            or (S.win.main.right == nil and _G.NoNeckPain.config.buffers.right.enabled)
+        )
+    then
+        goToCurr = true
+    end
+
     -- before creating side buffers, we determine if we should consider externals
     S.win.external.trees = T.getSideTrees()
     S.win.main.left, S.win.main.right = W.createSideBuffers(S.win)
