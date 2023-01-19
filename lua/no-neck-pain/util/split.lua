@@ -1,5 +1,3 @@
-local D = require("no-neck-pain.util.debug")
-local W = require("no-neck-pain.util.win")
 local M = require("no-neck-pain.util.map")
 local Sp = {}
 
@@ -87,6 +85,22 @@ function Sp.getSplits(state)
     end
 
     return splits
+end
+
+function Sp.nbVSplits(splits)
+    if splits == nil then
+        return 1
+    end
+
+    local nbVSplits = 1
+
+    for _, split in pairs(splits) do
+        if split.vertical then
+            nbVSplits = nbVSplits + 1
+        end
+    end
+
+    return nbVSplits
 end
 
 return Sp

@@ -1,3 +1,4 @@
+local Sp = require("no-neck-pain.util.split")
 local C = require("no-neck-pain.util.color")
 local D = require("no-neck-pain.util.debug")
 local M = require("no-neck-pain.util.map")
@@ -246,16 +247,7 @@ function W.getPadding(side, wins)
     end
 
     -- we need to see if there's enough space left to have side buffers
-    local nbVSplits = 1
-
-    if wins.splits ~= nil then
-        for _, split in pairs(wins.splits) do
-            if split.vertical == true then
-                nbVSplits = nbVSplits + 1
-            end
-        end
-    end
-
+    local nbVSplits = Sp.nbVSplits(wins.splits)
     local occupied = _G.NoNeckPain.config.width * nbVSplits
 
     -- if there's no space left according to the config width,

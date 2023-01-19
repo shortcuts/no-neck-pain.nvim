@@ -46,16 +46,13 @@ end
 local function init(scope, goToCurr)
     D.log(scope, "init called, %d is the current window", S.win.main.curr)
 
-    -- re-creating side buffers will lately focus it, so if we are creating
-    -- side buffers, we must explicitely focus curr.
+    -- if we do not have side buffers, we must ensure we only trigger a focus if we re-create them
+    local hadSideBuffers = true
     if
-        not goToCurr
-        and (
-            (S.win.main.left == nil and _G.NoNeckPain.config.buffers.left.enabled)
-            or (S.win.main.right == nil and _G.NoNeckPain.config.buffers.right.enabled)
-        )
+        (S.win.main.left == nil and _G.NoNeckPain.config.buffers.left.enabled)
+        or (S.win.main.right == nil and _G.NoNeckPain.config.buffers.right.enabled)
     then
-        goToCurr = true
+        hadSideBuffers = false
     end
 
     -- before creating side buffers, we determine if we should consider externals
@@ -64,7 +61,7 @@ local function init(scope, goToCurr)
     -- we might have closed trees during the buffer creation process, we re-fetch the latest IDs to prevent inconsistencies
     S.win.external.trees = T.getSideTrees()
 
-    if goToCurr then
+    if goToCurr or (not hadSideBuffers and (S.win.main.left ~= nil or S.win.main.right ~= nil)) then
         vim.fn.win_gotoid(S.win.main.curr)
     end
 end
@@ -118,28 +115,17 @@ function N.enable()
                     return D.log(p.event, "encountered an external window")
                 end
 
-                local screenWidth = vim.api.nvim_list_uis()[1].width
-                local width = vim.api.nvim_win_get_width(focusedWin)
+                -- -- note: due to floor, side widths might be off by 1, so we add it
+                local width = vim.api.nvim_win_get_width(focusedWin) + 1
+                local vsplit = width < _G.NoNeckPain.config.width
 
-                -- since the side buffer is still there when detecting a split
-                -- we need to add the side buffers to the width to properly compare with
-                -- the screen width.
-                -- note: due to floor, side widths might be off by 1, so we add it
-                if S.win.main.left ~= nil and vim.api.nvim_win_is_valid(S.win.main.left) then
-                    width = width + vim.api.nvim_win_get_width(S.win.main.left) + 1
-                else
-                    S.win.main.left = nil
-                end
-
-                if S.win.main.right ~= nil and vim.api.nvim_win_is_valid(S.win.main.right) then
-                    width = width + vim.api.nvim_win_get_width(S.win.main.right) + 1
-                else
-                    S.win.main.right = nil
-                end
-
-                D.log(p.event, "new split window found [%s/%s]", width, screenWidth)
-
-                local vsplit = width < screenWidth
+                D.log(
+                    p.event,
+                    "new split window found [%d / %d] = %s",
+                    width,
+                    _G.NoNeckPain.config.width,
+                    vsplit
+                )
 
                 S.win.splits = Sp.insert(S.win.splits, focusedWin, vsplit)
 
@@ -194,7 +180,7 @@ function N.enable()
                 end
 
                 if W.stateWinsActive(S.win, true) then
-                    return D.log(p.event, "state wins are still active, no need to kill splits.")
+                    return
                 end
 
                 S.win.splits = Sp.refresh(S.win.splits)

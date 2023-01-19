@@ -207,23 +207,7 @@ T["vsplit"]["many vsplit leave side buffers open as long as there's space for it
     child.cmd("vsplit")
     child.cmd("vsplit")
     child.cmd("vsplit")
-
-    eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1005, 1004, 1003, 1000, 1002 })
-
-    eq_state(child, "win.main.left", 1001)
-    eq_state(child, "win.main.right", 1002)
-
-    child.cmd("vsplit")
-    child.cmd("vsplit")
-    child.cmd("vsplit")
-    child.cmd("vsplit")
-    child.cmd("vsplit")
-    child.cmd("vsplit")
-
-    eq(
-        child.lua_get("vim.api.nvim_list_wins()"),
-        { 1011, 1010, 1009, 1008, 1007, 1006, 1005, 1004, 1003, 1000 }
-    )
+    eq(child.lua_get("vim.api.nvim_list_wins()"), { 1005, 1004, 1003, 1000 })
 
     eq_state(child, "win.main.left", vim.NIL)
     eq_state(child, "win.main.right", vim.NIL)
@@ -260,6 +244,7 @@ end
 T["vsplit/split"] = new_set()
 
 T["vsplit/split"]["state is correctly sync'd even after many changes"] = function()
+    child.set_size(100, 100)
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
 
     eq(child.lua_get("vim.api.nvim_list_wins()"), { 1000 })
@@ -292,13 +277,10 @@ T["vsplit/split"]["closing side buffers because of splits restores focus"] = fun
     eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1003, 1000, 1002 })
 
     child.cmd("vsplit")
-    eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1004, 1003, 1000, 1002 })
-
-    child.cmd("vsplit")
-    eq(child.lua_get("vim.api.nvim_list_wins()"), { 1005, 1004, 1003, 1000 })
+    eq(child.lua_get("vim.api.nvim_list_wins()"), { 1004, 1003, 1000 })
 
     child.cmd("q")
-    eq(child.lua_get("vim.api.nvim_list_wins()"), { 1006, 1004, 1003, 1000, 1007 })
+    eq(child.lua_get("vim.api.nvim_list_wins()"), { 1005, 1003, 1000, 1006 })
 
     eq(child.lua_get("vim.api.nvim_get_current_win()"), 1000)
 end
