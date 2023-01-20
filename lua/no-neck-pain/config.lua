@@ -197,7 +197,7 @@ function NoNeckPain.setup(options)
         end
     end
 
-    NoNeckPain.options.buffers = C.parseColors(NoNeckPain.options.buffers)
+    NoNeckPain.options.buffers = C.parse(NoNeckPain.options.buffers)
 
     if NoNeckPain.options.toggleMapping ~= false then
         assert(

@@ -88,7 +88,7 @@ local function matchAndBlend(colorCode, factor)
     return blend(colorCode, factor)
 end
 
-function C.parseColors(buffers)
+function C.parse(buffers)
     buffers.backgroundColor = matchAndBlend(buffers.backgroundColor, buffers.blend)
 
     for _, side in pairs({ "left", "right" }) do
