@@ -56,7 +56,7 @@ function Sp.insert(splits, winID, vsplit)
 end
 
 -- tries to get all of the active splits
-function Sp.getSplits(state)
+function Sp.get(state)
     local wins = vim.api.nvim_list_wins()
     local screenWidth = vim.api.nvim_list_uis()[1].width
 
@@ -87,6 +87,7 @@ function Sp.getSplits(state)
     return splits
 end
 
+-- returns the total number of vertical splits
 function Sp.nbVSplits(splits)
     if splits == nil then
         return 1

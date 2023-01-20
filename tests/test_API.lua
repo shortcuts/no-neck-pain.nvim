@@ -177,20 +177,20 @@ T["enable"]["sets state"] = function()
     eq_state(child, "enabled", true)
     eq_type_state(child, "augroup", "number")
 
-    eq_type_state(child, "win", "table")
-    eq_type_state(child, "win.main", "table")
-    eq_type_state(child, "win.external", "table")
+    eq_type_state(child, "wins", "table")
+    eq_type_state(child, "wins.main", "table")
+    eq_type_state(child, "wins.external", "table")
 
-    eq_state(child, "win.main.curr", 1000)
-    eq_state(child, "win.main.left", 1001)
-    eq_state(child, "win.main.right", 1002)
-    eq_state(child, "win.splits", vim.NIL)
+    eq_state(child, "wins.main.curr", 1000)
+    eq_state(child, "wins.main.left", 1001)
+    eq_state(child, "wins.main.right", 1002)
+    eq_state(child, "wins.splits", vim.NIL)
 
-    eq_type_state(child, "win.external.trees", "table")
+    eq_type_state(child, "wins.external.trees", "table")
 
     for _, external in pairs(EXTERNALS) do
-        eq_state(child, "win.external.trees." .. external .. ".id", vim.NIL)
-        eq_state(child, "win.external.trees." .. external .. ".width", 0)
+        eq_state(child, "wins.external.trees." .. external .. ".id", vim.NIL)
+        eq_state(child, "wins.external.trees." .. external .. ".width", 0)
     end
 end
 
@@ -208,20 +208,20 @@ T["disable"]["resets state"] = function()
     eq_state(child, "enabled", false)
     eq_type_state(child, "augroup", "nil")
 
-    eq_type_state(child, "win", "table")
-    eq_type_state(child, "win.main", "table")
-    eq_type_state(child, "win.external", "table")
+    eq_type_state(child, "wins", "table")
+    eq_type_state(child, "wins.main", "table")
+    eq_type_state(child, "wins.external", "table")
 
-    eq_state(child, "win.main.curr", vim.NIL)
-    eq_state(child, "win.main.left", vim.NIL)
-    eq_state(child, "win.main.right", vim.NIL)
-    eq_state(child, "win.splits", vim.NIL)
+    eq_state(child, "wins.main.curr", vim.NIL)
+    eq_state(child, "wins.main.left", vim.NIL)
+    eq_state(child, "wins.main.right", vim.NIL)
+    eq_state(child, "wins.splits", vim.NIL)
 
-    eq_type_state(child, "win.external.trees", "table")
+    eq_type_state(child, "wins.external.trees", "table")
 
     for _, external in pairs(EXTERNALS) do
-        eq_state(child, "win.external.trees." .. external .. ".id", vim.NIL)
-        eq_state(child, "win.external.trees." .. external .. ".width", 0)
+        eq_state(child, "wins.external.trees." .. external .. ".id", vim.NIL)
+        eq_state(child, "wins.external.trees." .. external .. ".width", 0)
     end
 end
 
@@ -242,45 +242,45 @@ T["toggle()"]["sets state and resets everything when toggled again"] = function(
     eq_state(child, "enabled", true)
     eq_type_state(child, "augroup", "number")
 
-    eq_type_state(child, "win", "table")
-    eq_type_state(child, "win.main", "table")
-    eq_type_state(child, "win.external", "table")
+    eq_type_state(child, "wins", "table")
+    eq_type_state(child, "wins.main", "table")
+    eq_type_state(child, "wins.external", "table")
 
-    eq_state(child, "win.main.curr", 1000)
-    eq_state(child, "win.main.left", 1001)
-    eq_state(child, "win.main.right", 1002)
-    eq_state(child, "win.splits", vim.NIL)
+    eq_state(child, "wins.main.curr", 1000)
+    eq_state(child, "wins.main.left", 1001)
+    eq_state(child, "wins.main.right", 1002)
+    eq_state(child, "wins.splits", vim.NIL)
 
-    eq_type_state(child, "win.external.trees", "table")
+    eq_type_state(child, "wins.external.trees", "table")
 
     for _, external in pairs(EXTERNALS) do
-        eq_state(child, "win.external.trees." .. external .. ".id", vim.NIL)
-        eq_state(child, "win.external.trees." .. external .. ".width", 0)
+        eq_state(child, "wins.external.trees." .. external .. ".id", vim.NIL)
+        eq_state(child, "wins.external.trees." .. external .. ".width", 0)
     end
 
     -- disable
     child.lua([[require('no-neck-pain').toggle()]])
 
     -- state
-    eq_type_state(child, "win", "table")
+    eq_type_state(child, "wins", "table")
 
     eq_state(child, "enabled", false)
     eq_state(child, "augroup", vim.NIL)
 
-    eq_type_state(child, "win", "table")
-    eq_type_state(child, "win.main", "table")
-    eq_type_state(child, "win.external", "table")
+    eq_type_state(child, "wins", "table")
+    eq_type_state(child, "wins.main", "table")
+    eq_type_state(child, "wins.external", "table")
 
-    eq_state(child, "win.main.curr", vim.NIL)
-    eq_state(child, "win.main.left", vim.NIL)
-    eq_state(child, "win.main.right", vim.NIL)
-    eq_state(child, "win.splits", vim.NIL)
+    eq_state(child, "wins.main.curr", vim.NIL)
+    eq_state(child, "wins.main.left", vim.NIL)
+    eq_state(child, "wins.main.right", vim.NIL)
+    eq_state(child, "wins.splits", vim.NIL)
 
-    eq_type_state(child, "win.external.trees", "table")
+    eq_type_state(child, "wins.external.trees", "table")
 
     for _, external in pairs(EXTERNALS) do
-        eq_state(child, "win.external.trees." .. external .. ".id", vim.NIL)
-        eq_state(child, "win.external.trees." .. external .. ".width", 0)
+        eq_state(child, "wins.external.trees." .. external .. ".id", vim.NIL)
+        eq_state(child, "wins.external.trees." .. external .. ".width", 0)
     end
 end
 

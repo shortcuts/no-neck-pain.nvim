@@ -12,7 +12,7 @@ Helpers.expect.buf_width_equality = MiniTest.new_expectation(
     "variable in child process matches",
     function(child, field, value)
         return Helpers.expect.equality(
-            child.lua_get("vim.api.nvim_win_get_width(_G.NoNeckPain.state.win." .. field .. ")"),
+            child.lua_get("vim.api.nvim_win_get_width(_G.NoNeckPain.state.wins." .. field .. ")"),
             value
         )
     end,

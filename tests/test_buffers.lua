@@ -214,7 +214,7 @@ T["curr"]["closing `curr` window without any other window quits Neovim"] = funct
     ]])
 
     eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1000, 1002 })
-    eq_state(child, "win.main.curr", 1000)
+    eq_state(child, "wins.main.curr", 1000)
 
     child.cmd("q")
 
@@ -242,8 +242,8 @@ T["left/right"]["only creates a `left` buffer when `right.enabled` is `false`"] 
         require('no-neck-pain').enable()
     ]])
 
-    eq_state(child, "win.main.left", 1001)
-    eq_state(child, "win.main.right", vim.NIL)
+    eq_state(child, "wins.main.left", 1001)
+    eq_state(child, "wins.main.right", vim.NIL)
 
     eq_buf_width(child, "main.left", 15)
 end
@@ -254,8 +254,8 @@ T["left/right"]["only creates a `right` buffer when `left.enabled` is `false`"] 
         require('no-neck-pain').enable()
     ]])
 
-    eq_state(child, "win.main.left", vim.NIL)
-    eq_state(child, "win.main.right", 1001)
+    eq_state(child, "wins.main.left", vim.NIL)
+    eq_state(child, "wins.main.right", 1001)
 
     eq_buf_width(child, "main.right", 15)
 end
@@ -267,10 +267,10 @@ T["left/right"]["closing the `left` buffer disables NNP"] = function()
     ]])
 
     eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1000, 1002 })
-    eq_state(child, "win.main.left", 1001)
-    eq_state(child, "win.main.right", 1002)
+    eq_state(child, "wins.main.left", 1001)
+    eq_state(child, "wins.main.right", 1002)
 
-    child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.win.main.left)")
+    child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.wins.main.left)")
     child.cmd("q")
 
     eq(child.lua_get("vim.api.nvim_list_wins()"), { 1000 })
@@ -285,10 +285,10 @@ T["left/right"]["closing the `right` buffer disables NNP"] = function()
     ]])
 
     eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1000, 1002 })
-    eq_state(child, "win.main.left", 1001)
-    eq_state(child, "win.main.right", 1002)
+    eq_state(child, "wins.main.left", 1001)
+    eq_state(child, "wins.main.right", 1002)
 
-    child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.win.main.right)")
+    child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.wins.main.right)")
     child.cmd("q")
 
     eq(child.lua_get("vim.api.nvim_list_wins()"), { 1000 })
