@@ -64,7 +64,7 @@ function N.enable()
     vim.api.nvim_create_autocmd({ "VimResized" }, {
         callback = function(p)
             vim.schedule(function()
-                if E.skip(S.enabled, S.wins.main, nil) then
+                if E.skip(S, false) then
                     return
                 end
 
@@ -78,7 +78,7 @@ function N.enable()
     vim.api.nvim_create_autocmd({ "WinEnter" }, {
         callback = function(p)
             vim.schedule(function()
-                if E.skip(S.enabled, S.wins.main, nil) then
+                if E.skip(S, false) then
                     return
                 end
 
@@ -121,7 +121,7 @@ function N.enable()
     vim.api.nvim_create_autocmd({ "QuitPre", "BufDelete" }, {
         callback = function(p)
             vim.schedule(function()
-                if E.skip(S.enabled, nil, nil) then
+                if E.skip(nil, false) then
                     return
                 end
 
@@ -155,7 +155,7 @@ function N.enable()
     vim.api.nvim_create_autocmd({ "WinClosed", "BufDelete" }, {
         callback = function(p)
             vim.schedule(function()
-                if E.skip(S.enabled, nil, nil) or S.wins.splits == nil then
+                if E.skip(nil, false) or S.wins.splits == nil then
                     return
                 end
 
@@ -187,7 +187,7 @@ function N.enable()
     vim.api.nvim_create_autocmd({ "WinEnter", "WinClosed" }, {
         callback = function(p)
             vim.schedule(function()
-                if E.skip(S.enabled, S.wins.main, S.wins.splits) then
+                if E.skip(S, true) then
                     return
                 end
 
