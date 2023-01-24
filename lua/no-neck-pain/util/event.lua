@@ -20,20 +20,24 @@ function E.abortEnable(state, filetype)
     return false
 end
 
--- determines if we should skip the event.
-function E.skip(enabled, main, splits)
-    if not enabled then
+-- skips the event if:
+-- - the plugin is not enabled
+-- - we have splits open (when `skipSplit` is `true`)
+-- - we are focusing a floating window
+-- - we are focusing one of the side buffer
+function E.skip(state, skipSplit)
+    if not _G.NoNeckPain.state.enabled then
         return true
     end
 
-    if splits ~= nil or W.isRelativeWindow() then
+    if skipSplit or W.isRelativeWindow() then
         return true
     end
 
-    if main ~= nil then
+    if state ~= nil then
         local curr = vim.api.nvim_get_current_win()
 
-        if curr == main.left or curr == main.right then
+        if curr == state.wins.main.left or curr == state.wins.main.right then
             return true
         end
     end
