@@ -1,5 +1,4 @@
 local M = require("no-neck-pain.main")
-local E = require("no-neck-pain.util.event")
 
 local NoNeckPain = {}
 
@@ -37,7 +36,16 @@ function NoNeckPain.setup(opts)
             pattern = "*",
             callback = function(p)
                 vim.schedule(function()
-                    if E.abortEnable(_G.NoNeckPain.state, vim.bo.filetype) then
+                    -- in the `enableOnVimEnter` hooks. It exists to prevent
+                    -- conflicts with other plugins:
+                    -- netrw: it works
+                    -- dashboard: we skip until we open an other buffer
+                    -- nvim-tree: we skip until we open an other buffer
+                    if _G.NoNeckPain.state ~= nil and _G.NoNeckPain.state.enabled == true then
+                        return
+                    end
+
+                    if vim.bo.filetype == "dashboard" or vim.bo.filetype == "NvimTree" then
                         return
                     end
 
