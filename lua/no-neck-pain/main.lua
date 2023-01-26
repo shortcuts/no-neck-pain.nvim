@@ -74,20 +74,6 @@ function N.enable()
         desc = "Resizes side windows after terminal has been resized, closes them if not enough space left.",
     })
 
-    vim.api.nvim_create_autocmd({ "TabLeave" }, {
-        callback = function()
-            vim.schedule(function()
-                if E.skip(S, false, false) then
-                    return
-                end
-
-                S.tabs = Ta.refresh(S.tabs)
-            end)
-        end,
-        group = "NoNeckPain",
-        desc = "Refreshes the tabs state",
-    })
-
     vim.api.nvim_create_autocmd({ "WinEnter" }, {
         callback = function(p)
             vim.schedule(function()

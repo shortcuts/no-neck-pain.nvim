@@ -17,7 +17,7 @@ local T = MiniTest.new_set({
 
 T["tabs"] = MiniTest.new_set()
 
-T["tabs"]["keeps track of the current tab page"] = function()
+T["tabs"]["keeps the enabled tab in state"] = function()
     child.lua([[
         require('no-neck-pain').setup({width=50})
         require('no-neck-pain').enable()
@@ -27,10 +27,10 @@ T["tabs"]["keeps track of the current tab page"] = function()
 
     child.cmd("tabnew")
 
-    eq_state(child, "tabs", 2)
+    eq_state(child, "tabs", 1)
 end
 
-T["tabs"]["tabnew closes side buffers"] = function()
+T["tabs"]["new tab doesn't have side buffers"] = function()
     child.lua([[
         require('no-neck-pain').setup({width=50})
         require('no-neck-pain').enable()
@@ -44,8 +44,11 @@ T["tabs"]["tabnew closes side buffers"] = function()
 
     child.cmd("tabnew")
 
-    eq(child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"), { 1003 })
-    eq_state(child, "tabs", 2)
+    eq(child.lua_get("vim.api.nvim_tabpage_list_wins(2)"), { 1003 })
+    eq(
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"),
+        { 1001, 1000, 1002 }
+    )
 end
 
 T["tabs"]["previous tab kept side buffers if enabled"] = function()
@@ -62,8 +65,7 @@ T["tabs"]["previous tab kept side buffers if enabled"] = function()
 
     child.cmd("tabnew")
 
-    eq(child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"), { 1003 })
-    eq_state(child, "tabs", 2)
+    eq(child.lua_get("vim.api.nvim_tabpage_list_wins(2)"), { 1003 })
 
     child.cmd("tabprevious")
 

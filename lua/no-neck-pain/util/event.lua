@@ -32,7 +32,7 @@ function E.skip(state, skipSplit, skipTab)
     end
 
     if state ~= nil and skipTab then
-        if Ta.refresh(state.tabs) ~= state.tabs then
+        if vim.api.nvim_win_get_tabpage(0) ~= state.tabs then
             return true
         end
     end
