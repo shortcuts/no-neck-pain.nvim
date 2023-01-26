@@ -3,6 +3,7 @@ local E = require("no-neck-pain.util.event")
 local M = require("no-neck-pain.util.map")
 local W = require("no-neck-pain.util.win")
 local T = require("no-neck-pain.util.trees")
+local Ta = require("no-neck-pain.util.tabs")
 local Sp = require("no-neck-pain.util.split")
 local St = require("no-neck-pain.util.state")
 
@@ -33,11 +34,12 @@ local function init(scope, goToCurr)
         hadSideBuffers = false
     end
 
+    S.tabs = Ta.refresh(S.tabs)
     -- before creating side buffers, we determine if we should consider externals
-    S.wins.external.trees = T.refresh()
+    S.wins.external.trees = T.refresh(S)
     S.wins.main.left, S.wins.main.right = W.createSideBuffers(S.wins)
     -- we might have closed trees during the buffer creation process, we re-fetch the latest IDs to prevent inconsistencies
-    S.wins.external.trees = T.refresh()
+    S.wins.external.trees = T.refresh(S)
 
     if
         goToCurr or (not hadSideBuffers and (S.wins.main.left ~= nil or S.wins.main.right ~= nil))
@@ -61,7 +63,7 @@ function N.enable()
     vim.api.nvim_create_autocmd({ "VimResized" }, {
         callback = function(p)
             vim.schedule(function()
-                if E.skip(S, false) then
+                if E.skip(S, false, false) then
                     return
                 end
 
@@ -72,10 +74,24 @@ function N.enable()
         desc = "Resizes side windows after terminal has been resized, closes them if not enough space left.",
     })
 
+    vim.api.nvim_create_autocmd({ "TabLeave" }, {
+        callback = function()
+            vim.schedule(function()
+                if E.skip(S, false, false) then
+                    return
+                end
+
+                S.tabs = Ta.refresh(S.tabs)
+            end)
+        end,
+        group = "NoNeckPain",
+        desc = "Refreshes the tabs state",
+    })
+
     vim.api.nvim_create_autocmd({ "WinEnter" }, {
         callback = function(p)
             vim.schedule(function()
-                if E.skip(S, false) then
+                if E.skip(S, false, true) then
                     return
                 end
 
@@ -118,7 +134,7 @@ function N.enable()
     vim.api.nvim_create_autocmd({ "QuitPre", "BufDelete" }, {
         callback = function(p)
             vim.schedule(function()
-                if E.skip(nil, false) then
+                if E.skip(nil, false, true) then
                     return
                 end
 
@@ -146,13 +162,17 @@ function N.enable()
             end)
         end,
         group = "NoNeckPain",
-        desc = "Handles the closure of main NNP windows and restoring the state correctly",
+        desc = "Handles the closure of main NNP windows",
     })
 
     vim.api.nvim_create_autocmd({ "WinClosed", "BufDelete" }, {
         callback = function(p)
             vim.schedule(function()
-                if E.skip(nil, false) or S.wins.splits == nil or W.stateWinsActive(S, true) then
+                if
+                    E.skip(nil, false, true)
+                    or S.wins.splits == nil
+                    or W.stateWinsActive(S, true)
+                then
                     return
                 end
 
@@ -180,7 +200,7 @@ function N.enable()
     vim.api.nvim_create_autocmd({ "WinEnter", "WinClosed" }, {
         callback = function(p)
             vim.schedule(function()
-                if E.skip(S, true) then
+                if E.skip(S, true, false) then
                     return
                 end
 
@@ -191,7 +211,7 @@ function N.enable()
                     return
                 end
 
-                local trees = T.refresh()
+                local trees = T.refresh(S)
 
                 -- we cycle over supported integrations to see which got closed or opened
                 for name, tree in pairs(S.wins.external.trees) do
@@ -247,11 +267,13 @@ function N.disable(scope)
         end
     end
 
+    -- determine if we should quit vim or just close the window
     for _, side in pairs(W.SIDES) do
         if S.wins.main[side] ~= nil then
-            local activeWins = vim.api.nvim_list_wins()
+            local activeWins = vim.api.nvim_tabpage_list_wins(S.tabs)
             local haveOtherWins = false
 
+            -- if we have other wins active and usable, we won't quit vim
             for _, activeWin in pairs(activeWins) do
                 if S.wins.main[side] ~= activeWin and not W.isRelativeWindow(activeWin) then
                     haveOtherWins = true

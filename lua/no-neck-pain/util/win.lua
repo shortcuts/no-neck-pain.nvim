@@ -148,7 +148,7 @@ end
 
 -- returns the available wins and their total number, without the `list` ones.
 function W.winsExceptState(state, withTrees)
-    local wins = vim.api.nvim_list_wins()
+    local wins = vim.api.nvim_tabpage_list_wins(state.tabs)
     local mergedWins = W.mergeState(
         state.wins.main,
         state.wins.splits,
@@ -282,7 +282,7 @@ end
 --
 -- @param checkSplits bool: checks for splits wins too when `true`.
 function W.stateWinsActive(state, checkSplits)
-    local wins = vim.api.nvim_list_wins()
+    local wins = vim.api.nvim_tabpage_list_wins(state.tabs)
     local swins = state.wins.main
 
     if checkSplits and state.wins.splits ~= nil then

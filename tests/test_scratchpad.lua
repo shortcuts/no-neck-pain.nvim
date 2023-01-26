@@ -52,7 +52,10 @@ T["scratchPad"]["default to `norg` fileType"] = function()
     })]])
     child.lua([[require('no-neck-pain').enable()]])
 
-    eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1000, 1002 })
+    eq(
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"),
+        { 1001, 1000, 1002 }
+    )
 
     local cwd = child.lua_get("vim.fn.getcwd()")
     local left = cwd .. "/no-neck-pain-left.norg"
@@ -92,7 +95,10 @@ T["scratchPad"]["override to md is reflected to the buffer"] = function()
     })]])
     child.lua([[require('no-neck-pain').enable()]])
 
-    eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1000, 1002 })
+    eq(
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"),
+        { 1001, 1000, 1002 }
+    )
 
     local cwd = child.lua_get("vim.fn.getcwd()")
     local left = cwd .. "/no-neck-pain-left.md"

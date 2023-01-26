@@ -213,14 +213,17 @@ T["curr"]["closing `curr` window without any other window quits Neovim"] = funct
         require('no-neck-pain').enable()
     ]])
 
-    eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1000, 1002 })
+    eq(
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"),
+        { 1001, 1000, 1002 }
+    )
     eq_state(child, "wins.main.curr", 1000)
 
     child.cmd("q")
 
     -- neovim is closed, so it errors
     helpers.expect.error(function()
-        child.lua_get("vim.api.nvim_list_wins()")
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)")
     end)
 end
 
@@ -266,14 +269,17 @@ T["left/right"]["closing the `left` buffer disables NNP"] = function()
         require('no-neck-pain').enable()
     ]])
 
-    eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1000, 1002 })
+    eq(
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"),
+        { 1001, 1000, 1002 }
+    )
     eq_state(child, "wins.main.left", 1001)
     eq_state(child, "wins.main.right", 1002)
 
     child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.wins.main.left)")
     child.cmd("q")
 
-    eq(child.lua_get("vim.api.nvim_list_wins()"), { 1000 })
+    eq(child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"), { 1000 })
 
     eq_state(child, "enabled", false)
 end
@@ -284,14 +290,17 @@ T["left/right"]["closing the `right` buffer disables NNP"] = function()
         require('no-neck-pain').enable()
     ]])
 
-    eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1000, 1002 })
+    eq(
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"),
+        { 1001, 1000, 1002 }
+    )
     eq_state(child, "wins.main.left", 1001)
     eq_state(child, "wins.main.right", 1002)
 
     child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.wins.main.right)")
     child.cmd("q")
 
-    eq(child.lua_get("vim.api.nvim_list_wins()"), { 1000 })
+    eq(child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"), { 1000 })
 
     eq_state(child, "enabled", false)
 end

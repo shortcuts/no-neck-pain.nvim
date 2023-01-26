@@ -6,8 +6,8 @@ function T.isSideTree(fileType)
 end
 
 -- returns all of the side trees wins and their width.
-function T.refresh()
-    local wins = vim.api.nvim_list_wins()
+function T.refresh(state)
+    local wins = vim.api.nvim_tabpage_list_wins(state.tabs)
     local trees = {
         NvimTree = {
             id = nil,
