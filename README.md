@@ -235,7 +235,7 @@ NoNeckPain.bufferOptions = {
 
 |   Command   |         Description        |
 |-------------|----------------------------|
-|`:NoNeckPain`| Toggle the `enabled` state.|
+|`:NoNeckPain`| Toggle the plugin state, between enable and disable.|
 
 ## ⌨ Contributing
 
