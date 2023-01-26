@@ -1,4 +1,5 @@
 local W = require("no-neck-pain.util.win")
+local Ta = require("no-neck-pain.util.tabs")
 
 local E = {}
 
@@ -25,9 +26,15 @@ end
 -- - we have splits open (when `skipSplit` is `true`)
 -- - we are focusing a floating window
 -- - we are focusing one of the side buffer
-function E.skip(state, skipSplit)
+function E.skip(state, skipSplit, skipTab)
     if not _G.NoNeckPain.state.enabled then
         return true
+    end
+
+    if state ~= nil and skipTab then
+        if vim.api.nvim_win_get_tabpage(0) ~= state.tabs then
+            return true
+        end
     end
 
     if skipSplit or W.isRelativeWindow() then

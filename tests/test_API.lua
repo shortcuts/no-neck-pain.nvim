@@ -140,24 +140,30 @@ T["setup"]["enables the plugin with mapping"] = function()
         require('no-neck-pain').setup({width=50,toggleMapping="nn"})
     ]])
 
-    eq(child.lua_get("vim.api.nvim_list_wins()"), { 1000 })
+    eq(child.lua_get("vim.api.nvim_tabpage_list_wins(1)"), { 1000 })
     eq_type_global(child, "_G.NoNeckPainLoaded", "boolean")
 
     child.lua("vim.api.nvim_input('nn')")
 
-    eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1000, 1002 })
+    eq(
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"),
+        { 1001, 1000, 1002 }
+    )
     eq_state(child, "enabled", true)
 
     child.lua("vim.api.nvim_input('nn')")
 
-    eq(child.lua_get("vim.api.nvim_list_wins()"), { 1000 })
+    eq(child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"), { 1000 })
     eq_state(child, "enabled", false)
 end
 
 T["setup"]["starts the plugin on VimEnter"] = function()
     child.restart({ "-u", "scripts/test_auto_open.lua" })
 
-    eq(child.lua_get("vim.api.nvim_list_wins()"), { 1001, 1000, 1002 })
+    eq(
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"),
+        { 1001, 1000, 1002 }
+    )
     eq_state(child, "enabled", true)
 
     child.stop()

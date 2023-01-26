@@ -57,7 +57,7 @@ end
 
 -- tries to get all of the active splits
 function Sp.get(state)
-    local wins = vim.api.nvim_list_wins()
+    local wins = vim.api.nvim_tabpage_list_wins(state.tabs)
     local screenWidth = vim.api.nvim_list_uis()[1].width
 
     local splits = {}
