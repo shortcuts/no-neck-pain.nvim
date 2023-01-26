@@ -1,7 +1,7 @@
 local helpers = dofile("tests/helpers.lua")
 
 local child = helpers.new_child_neovim()
-local eq, eq_state = helpers.expect.equality, helpers.expect.global_equality
+local eq, eq_state = helpers.expect.equality, helpers.expect.state_equality
 
 local T = MiniTest.new_set({
     hooks = {
