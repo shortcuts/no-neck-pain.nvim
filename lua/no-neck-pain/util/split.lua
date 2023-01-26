@@ -64,14 +64,14 @@ function Sp.get(state)
     local nbSplits = 0
 
     if state.splits ~= nil then
-        for _, split in pairs(state.splits) do
+        for _, split in pairs(state.wins.splits) do
             nbSplits = nbSplits + 1
             table.insert(splits, split)
         end
     end
 
     for _, win in pairs(wins) do
-        if not M.contains(state.main, win) then
+        if not M.contains(state.wins.main, win) then
             nbSplits = nbSplits + 1
             table.insert(splits, {
                 id = win,

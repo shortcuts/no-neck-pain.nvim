@@ -17,7 +17,7 @@ local function resize(id, width, side)
 end
 
 -- Closes a window if it's valid.
-local function close(scope, id, side)
+function W.close(scope, id, side)
     D.log(scope, "closing %s window", side)
 
     if vim.api.nvim_win_is_valid(id) then
@@ -149,8 +149,11 @@ end
 -- returns the available wins and their total number, without the `list` ones.
 function W.winsExceptState(state, withTrees)
     local wins = vim.api.nvim_list_wins()
-    local mergedWins =
-        W.mergeState(state.main, state.splits, withTrees and state.external.trees or nil)
+    local mergedWins = W.mergeState(
+        state.wins.main,
+        state.wins.splits,
+        withTrees and state.wins.external.trees or nil
+    )
 
     local validWins = {}
     local size = 0
@@ -165,39 +168,6 @@ function W.winsExceptState(state, withTrees)
     return validWins, size
 end
 
--- Closes side buffers, quits Neovim if there's no other window left.
-function W.closeSideBuffers(scope, wins)
-    for _, side in pairs(W.SIDES) do
-        if wins[side] ~= nil then
-            local activeWins = vim.api.nvim_list_wins()
-            local haveOtherWins = false
-
-            for _, activeWin in pairs(activeWins) do
-                if wins[side] ~= activeWin and not W.isRelativeWindow(activeWin) then
-                    haveOtherWins = true
-                end
-            end
-
-            -- we don't have any window left if we close this one
-            if not haveOtherWins then
-                -- either triggered by a :wq or quit event, we can just quit
-                if scope == "QuitPre" then
-                    return vim.cmd("quit!")
-                end
-
-                -- mostly triggered by :bd or similar
-                -- we will create a new window and close the other
-                vim.cmd("new")
-            end
-
-            -- when we have more than 1 window left, we can just close it
-            close(scope, wins[side], side)
-        end
-    end
-
-    return nil, nil
-end
-
 -- Resizes side buffers, considering the existing trees.
 -- Closes them if there's not enough space left.
 function W.resizeOrCloseSideBuffers(scope, wins)
@@ -208,7 +178,7 @@ function W.resizeOrCloseSideBuffers(scope, wins)
             if padding > 0 then
                 resize(wins.main[side], padding, side)
             else
-                close(scope, wins.main[side], side)
+                W.close(scope, wins.main[side], side)
                 wins.main[side] = nil
             end
         end
@@ -313,10 +283,10 @@ end
 -- @param checkSplits bool: checks for splits wins too when `true`.
 function W.stateWinsActive(state, checkSplits)
     local wins = vim.api.nvim_list_wins()
-    local swins = state.main
+    local swins = state.wins.main
 
-    if checkSplits and state.splits ~= nil then
-        swins = W.mergeState(state.main, state.splits, nil)
+    if checkSplits and state.wins.splits ~= nil then
+        swins = W.mergeState(state.wins.main, state.wins.splits, nil)
     end
 
     for _, swin in pairs(swins) do

@@ -52,12 +52,9 @@ function N.enable()
         return S
     end
 
-    S.augroup = vim.api.nvim_create_augroup("NoNeckPain", {
-        clear = true,
-    })
-
+    S.augroup = vim.api.nvim_create_augroup("NoNeckPain", { clear = true })
     S.wins.main.curr = vim.api.nvim_get_current_win()
-    S.wins.splits = Sp.get(S.wins)
+    S.wins.splits = Sp.get(S)
 
     init("enable", true)
 
@@ -83,7 +80,7 @@ function N.enable()
                 end
 
                 local focusedWin = vim.api.nvim_get_current_win()
-                local wins, total = W.winsExceptState(S.wins, false)
+                local wins, total = W.winsExceptState(S, false)
 
                 if total == 0 or not M.contains(wins, focusedWin) then
                     return
@@ -126,14 +123,14 @@ function N.enable()
                 end
 
                 -- if we are not in split view, we check if we killed one of the main buffers (curr, left, right) to disable NNP
-                if S.wins.splits == nil and not W.stateWinsActive(S.wins, false) then
+                if S.wins.splits == nil and not W.stateWinsActive(S, false) then
                     D.log(p.event, "one of the NNP main buffers have been closed, disabling...")
 
                     return N.disable(p.event)
                 end
 
                 if _G.NoNeckPain.config.disableOnLastBuffer then
-                    local _, remaining = W.winsExceptState(S.wins, true)
+                    local _, remaining = W.winsExceptState(S, true)
 
                     if
                         remaining == 0
@@ -155,11 +152,7 @@ function N.enable()
     vim.api.nvim_create_autocmd({ "WinClosed", "BufDelete" }, {
         callback = function(p)
             vim.schedule(function()
-                if E.skip(nil, false) or S.wins.splits == nil then
-                    return
-                end
-
-                if W.stateWinsActive(S.wins, true) then
+                if E.skip(nil, false) or S.wins.splits == nil or W.stateWinsActive(S, true) then
                     return
                 end
 
@@ -192,7 +185,7 @@ function N.enable()
                 end
 
                 local focusedWin = vim.api.nvim_get_current_win()
-                local wins, total = W.winsExceptState(S.wins, false)
+                local wins, total = W.winsExceptState(S, false)
 
                 if total == 0 or not M.contains(wins, focusedWin) then
                     return
@@ -254,7 +247,33 @@ function N.disable(scope)
         end
     end
 
-    W.closeSideBuffers(scope, S.wins.main)
+    for _, side in pairs(W.SIDES) do
+        if S.wins.main[side] ~= nil then
+            local activeWins = vim.api.nvim_list_wins()
+            local haveOtherWins = false
+
+            for _, activeWin in pairs(activeWins) do
+                if S.wins.main[side] ~= activeWin and not W.isRelativeWindow(activeWin) then
+                    haveOtherWins = true
+                end
+            end
+
+            -- we don't have any window left if we close this one
+            if not haveOtherWins then
+                -- either triggered by a :wq or quit event, we can just quit
+                if scope == "QuitPre" then
+                    return vim.cmd("quit!")
+                end
+
+                -- mostly triggered by :bd or similar
+                -- we will create a new window and close the other
+                vim.cmd("new")
+            end
+
+            -- when we have more than 1 window left, we can just close it
+            W.close(scope, S.wins.main[side], side)
+        end
+    end
 
     S = St.init()
 
