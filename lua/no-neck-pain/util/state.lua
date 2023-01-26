@@ -24,7 +24,7 @@ function St.init()
                 },
             },
         },
-        tabs = nil,
+        tabs = 0,
     }
 end
 
