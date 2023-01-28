@@ -8,7 +8,7 @@ function NoNeckPain.toggle()
         _G.NoNeckPain.config = require("no-neck-pain.config").options
     end
 
-    _G.NoNeckPain.state = M.toggle()
+    _G.NoNeckPain.state = M.toggle("publicAPI_toggle")
 end
 
 --- Initializes the plugin, sets event listeners and internal state.
@@ -17,12 +17,12 @@ function NoNeckPain.enable()
         _G.NoNeckPain.config = require("no-neck-pain.config").options
     end
 
-    _G.NoNeckPain.state = M.enable()
+    _G.NoNeckPain.state = M.enable("publicAPI_enable")
 end
 
 --- Disables the plugin, clear highlight groups and autocmds, closes side buffers and resets the internal state.
 function NoNeckPain.disable()
-    _G.NoNeckPain.state = M.disable()
+    _G.NoNeckPain.state = M.disable("publicAPI_disable")
 end
 
 -- setup NoNeckPain options and merge them with user provided ones.

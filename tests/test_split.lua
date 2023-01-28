@@ -30,7 +30,7 @@ T["split"]["only one side buffer, closing help doesn't close NNP"] = function()
     child.cmd("h")
 
     eq(
-        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"),
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
         { 1001, 1002, 1000 }
     )
     eq_state(child, "wins.main.left", 1001)
@@ -41,7 +41,10 @@ T["split"]["only one side buffer, closing help doesn't close NNP"] = function()
     child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.wins.splits[1].id)")
     child.cmd("q")
 
-    eq(child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"), { 1001, 1000 })
+    eq(
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
+        { 1001, 1000 }
+    )
     eq(child.lua_get("vim.api.nvim_get_current_win()"), 1000)
     eq_state(child, "enabled", true)
 end
@@ -56,7 +59,7 @@ T["split"]["closing `curr` makes `split` the new `curr`"] = function()
     child.cmd("split")
 
     eq(
-        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"),
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
         { 1001, 1003, 1000, 1002 }
     )
     eq_state(child, "wins.main.left", 1001)
@@ -68,7 +71,7 @@ T["split"]["closing `curr` makes `split` the new `curr`"] = function()
     child.cmd("q")
 
     eq(
-        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"),
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
         { 1001, 1003, 1002 }
     )
     eq(child.lua_get("vim.api.nvim_get_current_win()"), 1003)
@@ -84,7 +87,7 @@ T["split"]["keeps side buffers"] = function()
     child.cmd("split")
 
     eq(
-        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"),
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
         { 1001, 1003, 1000, 1002 }
     )
     eq_state(child, "wins.main.left", 1001)
@@ -95,7 +98,7 @@ T["split"]["keeps side buffers"] = function()
     child.cmd("q")
 
     eq(
-        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"),
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
         { 1001, 1000, 1002 }
     )
     eq_buf_width(child, "main.left", 15)
@@ -145,7 +148,7 @@ T["vsplit"]["does not create side buffers when there's not enough space"] = func
     ]])
 
     eq(
-        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"),
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
         { 1003, 1002, 1001, 1000 }
     )
 end
@@ -162,7 +165,7 @@ T["vsplit"]["correctly position side buffers when there's enough space"] = funct
     ]])
 
     eq(
-        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"),
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
         { 1002, 1001, 1000, 1003 }
     )
 end
@@ -177,7 +180,7 @@ T["vsplit"]["closing `curr` makes `split` the new `curr`"] = function()
     child.cmd("vsplit")
 
     eq(
-        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"),
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
         { 1001, 1003, 1000, 1002 }
     )
     eq_state(child, "wins.main.left", 1001)
@@ -190,7 +193,7 @@ T["vsplit"]["closing `curr` makes `split` the new `curr`"] = function()
 
     eq_state(child, "wins.main.curr", 1003)
     eq(
-        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"),
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
         { 1001, 1003, 1002 }
     )
     eq(child.lua_get("vim.api.nvim_get_current_win()"), 1003)
@@ -204,7 +207,10 @@ T["vsplit"]["hides side buffers"] = function()
 
     child.cmd("vsplit")
 
-    eq(child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"), { 1003, 1000 })
+    eq(
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
+        { 1003, 1000 }
+    )
     eq_state(child, "wins.main.left", vim.NIL)
     eq_state(child, "wins.main.right", vim.NIL)
     eq_state(child, "wins.splits", { { id = 1003, vertical = true } })
@@ -213,7 +219,7 @@ T["vsplit"]["hides side buffers"] = function()
     child.cmd("q")
 
     eq(
-        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"),
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
         { 1004, 1000, 1005 }
     )
     eq_state(child, "wins.main.left", 1004)
@@ -230,7 +236,7 @@ T["vsplit"]["many vsplit leave side buffers open as long as there's space for it
     child.lua([[ require('no-neck-pain').enable() ]])
 
     eq(
-        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"),
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
         { 1001, 1000, 1002 }
     )
 
@@ -241,7 +247,7 @@ T["vsplit"]["many vsplit leave side buffers open as long as there's space for it
     child.cmd("vsplit")
     child.cmd("vsplit")
     eq(
-        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"),
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
         { 1005, 1004, 1003, 1000 }
     )
 
@@ -288,23 +294,26 @@ T["vsplit/split"]["state is correctly sync'd even after many changes"] = functio
     child.lua([[ require('no-neck-pain').enable() ]])
 
     eq(
-        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"),
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
         { 1001, 1000, 1002 }
     )
 
     child.cmd("split")
     eq(
-        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"),
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
         { 1001, 1003, 1000, 1002 }
     )
     child.cmd("q")
 
     child.cmd("vsplit")
-    eq(child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"), { 1004, 1000 })
+    eq(
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
+        { 1004, 1000 }
+    )
     child.cmd("q")
 
     eq(
-        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"),
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
         { 1005, 1000, 1006 }
     )
 end
@@ -317,25 +326,25 @@ T["vsplit/split"]["closing side buffers because of splits restores focus"] = fun
     ]])
 
     eq(
-        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"),
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
         { 1001, 1000, 1002 }
     )
 
     child.cmd("vsplit")
     eq(
-        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"),
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
         { 1001, 1003, 1000, 1002 }
     )
 
     child.cmd("vsplit")
     eq(
-        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"),
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
         { 1004, 1003, 1000 }
     )
 
     child.cmd("q")
     eq(
-        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"),
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
         { 1005, 1003, 1000, 1006 }
     )
 

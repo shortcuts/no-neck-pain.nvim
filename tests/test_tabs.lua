@@ -37,7 +37,7 @@ T["tabs"]["new tab doesn't have side buffers"] = function()
     ]])
 
     eq(
-        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"),
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
         { 1001, 1000, 1002 }
     )
     eq_state(child, "tabs", 1)
@@ -46,7 +46,7 @@ T["tabs"]["new tab doesn't have side buffers"] = function()
 
     eq(child.lua_get("vim.api.nvim_tabpage_list_wins(2)"), { 1003 })
     eq(
-        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"),
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
         { 1001, 1000, 1002 }
     )
 end
@@ -58,7 +58,7 @@ T["tabs"]["previous tab kept side buffers if enabled"] = function()
     ]])
 
     eq(
-        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"),
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
         { 1001, 1000, 1002 }
     )
     eq_state(child, "tabs", 1)
@@ -70,7 +70,7 @@ T["tabs"]["previous tab kept side buffers if enabled"] = function()
     child.cmd("tabprevious")
 
     eq(
-        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"),
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
         { 1001, 1000, 1002 }
     )
     eq_state(child, "tabs", 1)

@@ -1,88 +1,105 @@
 local D = require("no-neck-pain.util.debug")
 local E = require("no-neck-pain.util.event")
 local M = require("no-neck-pain.util.map")
-local W = require("no-neck-pain.util.win")
-local T = require("no-neck-pain.util.trees")
-local Ta = require("no-neck-pain.util.tabs")
 local Sp = require("no-neck-pain.util.split")
-local St = require("no-neck-pain.util.state")
+local T = require("no-neck-pain.util.trees")
+local Ta = require("no-neck-pain.tabs")
+local W = require("no-neck-pain.util.win")
 
 local N = {}
-
--- state
-local S = St.init()
+local S = Ta.initState()
 
 -- Toggle the plugin by calling the `enable`/`disable` methods respectively.
-function N.toggle()
-    if S.enabled then
-        return N.disable("N.toggle")
+function N.toggle(scope)
+    local tab = Ta.exists(S.tabs)
+
+    if tab ~= nil then
+        return N.disable(scope)
     end
 
-    return N.enable()
+    return N.enable(scope)
 end
 
--- Creates side buffers and set the internal state considering potential external trees.
-local function init(scope, goToCurr)
-    D.log(scope, "init called, %d is the current window", S.wins.main.curr)
+-- Creates side buffers and set the tab state considering potential external trees.
+local function init(scope, tab, goToCurr)
+    D.log(scope, "init called on tab %d for current window %d", tab.id, tab.wins.main.curr)
 
     -- if we do not have side buffers, we must ensure we only trigger a focus if we re-create them
     local hadSideBuffers = true
     if
-        (S.wins.main.left == nil and _G.NoNeckPain.config.buffers.left.enabled)
-        or (S.wins.main.right == nil and _G.NoNeckPain.config.buffers.right.enabled)
+        (tab.wins.main.left == nil and _G.NoNeckPain.config.buffers.left.enabled)
+        or (tab.wins.main.right == nil and _G.NoNeckPain.config.buffers.right.enabled)
     then
         hadSideBuffers = false
     end
 
-    S.tabs = Ta.refresh(S.tabs)
     -- before creating side buffers, we determine if we should consider externals
-    S.wins.external.trees = T.refresh(S)
-    S.wins.main.left, S.wins.main.right = W.createSideBuffers(S.wins)
+    tab.wins.external.trees = T.refresh(tab)
+    tab.wins.main.left, tab.wins.main.right = W.createSideBuffers(tab.wins)
     -- we might have closed trees during the buffer creation process, we re-fetch the latest IDs to prevent inconsistencies
-    S.wins.external.trees = T.refresh(S)
+    tab.wins.external.trees = T.refresh(tab)
 
     if
-        goToCurr or (not hadSideBuffers and (S.wins.main.left ~= nil or S.wins.main.right ~= nil))
+        goToCurr
+        or (not hadSideBuffers and (tab.wins.main.left ~= nil or tab.wins.main.right ~= nil))
     then
-        vim.fn.win_gotoid(S.wins.main.curr)
+        vim.fn.win_gotoid(tab.wins.main.curr)
     end
 end
 
 -- Initializes the plugin, sets event listeners and internal state.
-function N.enable()
-    if S.enabled then
+function N.enable(scope)
+    local tab = Ta.exists(S.tabs)
+
+    -- if we already have a state for the current tab
+    if S.enabled and tab ~= nil then
         return S
     end
 
-    S.augroup = vim.api.nvim_create_augroup("NoNeckPain", { clear = true })
-    S.wins.main.curr = vim.api.nvim_get_current_win()
-    S.wins.splits = Sp.get(S)
+    D.log(scope, "calling enable for tab %d", S.activeTab)
 
-    init("enable", true)
+    S.tabs, tab = Ta.insert(S.tabs, S.activeTab)
+    tab.augroup = vim.api.nvim_create_augroup("NoNeckPain", { clear = true })
+    tab.wins.main.curr = vim.api.nvim_get_current_win()
+    tab.wins.splits = Sp.get(tab)
+
+    D.tprint(tab)
+
+    init(scope, tab, true)
 
     vim.api.nvim_create_autocmd({ "VimResized" }, {
         callback = function(p)
             vim.schedule(function()
-                if E.skip(S, false, false) then
+                if E.skip(tab, false) then
                     return
                 end
 
-                init(p.event)
+                init(p.event, tab)
             end)
         end,
         group = "NoNeckPain",
         desc = "Resizes side windows after terminal has been resized, closes them if not enough space left.",
     })
 
+    vim.api.nvim_create_autocmd({ "TabLeave" }, {
+        callback = function()
+            vim.schedule(function()
+                S.activeTab = Ta.refresh(S.activeTab)
+            end)
+        end,
+        group = "NoNeckPain",
+        desc = "Refreshes the active tab state",
+    })
+
     vim.api.nvim_create_autocmd({ "WinEnter" }, {
         callback = function(p)
             vim.schedule(function()
-                if E.skip(S, false, true) then
+                if E.skip(tab, false) then
                     return
                 end
 
                 local focusedWin = vim.api.nvim_get_current_win()
-                local wins, total = W.winsExceptState(S, false)
+                local wins, total = W.winsExceptState(tab, false)
 
                 if total == 0 or not M.contains(wins, focusedWin) then
                     return
@@ -106,10 +123,10 @@ function N.enable()
                     vsplit
                 )
 
-                S.wins.splits = Sp.insert(S.wins.splits, focusedWin, vsplit)
+                tab.wins.splits = Sp.insert(tab.wins.splits, focusedWin, vsplit)
 
                 if vsplit then
-                    init(p.event)
+                    init(p.event, tab)
                 end
             end)
         end,
@@ -120,19 +137,19 @@ function N.enable()
     vim.api.nvim_create_autocmd({ "QuitPre", "BufDelete" }, {
         callback = function(p)
             vim.schedule(function()
-                if E.skip(nil, false, true) then
+                if E.skip(nil, false) then
                     return
                 end
 
                 -- if we are not in split view, we check if we killed one of the main buffers (curr, left, right) to disable NNP
-                if S.wins.splits == nil and not W.stateWinsActive(S, false) then
+                if tab.wins.splits == nil and not W.stateWinsActive(tab, false) then
                     D.log(p.event, "one of the NNP main buffers have been closed, disabling...")
 
                     return N.disable(p.event)
                 end
 
                 if _G.NoNeckPain.config.disableOnLastBuffer then
-                    local _, remaining = W.winsExceptState(S, true)
+                    local _, remaining = W.winsExceptState(tab, true)
 
                     if
                         remaining == 0
@@ -154,29 +171,25 @@ function N.enable()
     vim.api.nvim_create_autocmd({ "WinClosed", "BufDelete" }, {
         callback = function(p)
             vim.schedule(function()
-                if
-                    E.skip(nil, false, true)
-                    or S.wins.splits == nil
-                    or W.stateWinsActive(S, true)
-                then
+                if E.skip(nil, false) or tab.wins.splits == nil or W.stateWinsActive(tab, true) then
                     return
                 end
 
-                S.wins.splits = Sp.refresh(S.wins.splits)
+                tab.wins.splits = Sp.refresh(tab.wins.splits)
 
                 -- if curr is not valid anymore, we focus the first valid split and remove it from the state
-                if not vim.api.nvim_win_is_valid(S.wins.main.curr) then
+                if not vim.api.nvim_win_is_valid(tab.wins.main.curr) then
                     -- if neither curr and splits are remaining valids, we just disable
-                    if S.wins.splits == nil then
+                    if tab.wins.splits == nil then
                         return N.disable(p.event)
                     end
 
-                    S.wins.main.curr = S.wins.splits[1].id
-                    S.wins.splits = Sp.remove(S.wins.splits, S.wins.splits[1].id)
+                    tab.wins.main.curr = tab.wins.splits[1].id
+                    tab.wins.splits = Sp.remove(tab.wins.splits, tab.wins.splits[1].id)
                 end
 
                 -- we only restore focus on curr if there's no split left
-                init(p.event, S.wins.splits == nil)
+                init(p.event, tab, tab.wins.splits == nil)
             end)
         end,
         group = "NoNeckPain",
@@ -186,36 +199,36 @@ function N.enable()
     vim.api.nvim_create_autocmd({ "WinEnter", "WinClosed" }, {
         callback = function(p)
             vim.schedule(function()
-                if E.skip(S, true, false) then
+                if E.skip(tab, true) then
                     return
                 end
 
                 local focusedWin = vim.api.nvim_get_current_win()
-                local wins, total = W.winsExceptState(S, false)
+                local wins, total = W.winsExceptState(tab, false)
 
                 if total == 0 or not M.contains(wins, focusedWin) then
                     return
                 end
 
-                local trees = T.refresh(S)
+                local trees = T.refresh(tab)
 
                 -- we cycle over supported integrations to see which got closed or opened
-                for name, tree in pairs(S.wins.external.trees) do
+                for name, tree in pairs(tab.wins.external.trees) do
                     -- if there was a tree[name] but not anymore, we resize
                     if tree ~= nil and tree.id ~= nil and not M.contains(wins, tree.id) then
                         D.log(p.event, "%s have been closed, resizing", name)
 
-                        return init(p.event)
+                        return init(p.event, tab)
                     end
 
                     -- we have a new tree registered, we can resize
-                    if trees[name].id ~= S.wins.external.trees[name].id then
+                    if trees[name].id ~= tab.wins.external.trees[name].id then
                         D.log(p.event, "%s have been opened, resizing", name)
 
-                        return init(p.event)
+                        return init(p.event, tab)
                     end
                 end
-                S.wins.external.trees = trees
+                tab.wins.external.trees = trees
             end)
         end,
         group = "NoNeckPain",
@@ -227,22 +240,23 @@ function N.enable()
     return S
 end
 
--- Disables the plugin, clear highlight groups and autocmds, closes side buffers and resets the internal state.
+-- Disables the plugin for the given tab, clear highlight groups and autocmds, closes side buffers and resets the internal state.
 function N.disable(scope)
-    if not S.enabled then
+    local tab = Ta.exists(S.tabs)
+
+    if not S.enabled or tab == nil then
         return S
     end
 
-    S.enabled = false
-    vim.api.nvim_del_augroup_by_id(S.augroup)
+    vim.api.nvim_del_augroup_by_id(tab.augroup)
 
     -- shutdowns gracefully by focusing the stored `curr` buffer
     if
-        S.wins.main.curr ~= nil
-        and vim.api.nvim_win_is_valid(S.wins.main.curr)
-        and S.wins.main.curr ~= vim.api.nvim_get_current_win()
+        tab.wins.main.curr ~= nil
+        and vim.api.nvim_win_is_valid(tab.wins.main.curr)
+        and tab.wins.main.curr ~= vim.api.nvim_get_current_win()
     then
-        vim.fn.win_gotoid(S.wins.main.curr)
+        vim.fn.win_gotoid(tab.wins.main.curr)
 
         if _G.NoNeckPain.config.killAllBuffersOnDisable then
             vim.cmd("only")
@@ -254,13 +268,13 @@ function N.disable(scope)
         vim.cmd(string.format("highlight! clear NNPBuffers_Background_%s NONE", side))
         vim.cmd(string.format("highlight! clear NNPBuffers_Text_%s NONE", side))
 
-        if S.wins.main[side] ~= nil then
-            local activeWins = vim.api.nvim_tabpage_list_wins(S.tabs)
+        if tab.wins.main[side] ~= nil then
+            local activeWins = vim.api.nvim_tabpage_list_wins(tab.id)
             local haveOtherWins = false
 
             -- if we have other wins active and usable, we won't quit vim
             for _, activeWin in pairs(activeWins) do
-                if S.wins.main[side] ~= activeWin and not W.isRelativeWindow(activeWin) then
+                if tab.wins.main[side] ~= activeWin and not W.isRelativeWindow(activeWin) then
                     haveOtherWins = true
                 end
             end
@@ -278,11 +292,16 @@ function N.disable(scope)
             end
 
             -- when we have more than 1 window left, we can just close it
-            W.close(scope, S.wins.main[side], side)
+            W.close(scope, tab.wins.main[side], side)
         end
     end
 
-    S = St.init()
+    local total = 0
+    S.tabs, total = Ta.remove(S.tabs, tab.id)
+
+    if total == 0 then
+        S = Ta.initState()
+    end
 
     return S
 end

@@ -55,23 +55,23 @@ function Sp.insert(splits, winID, vsplit)
     return splits
 end
 
--- tries to get all of the active splits
-function Sp.get(state)
-    local wins = vim.api.nvim_tabpage_list_wins(state.tabs)
+-- tries to get all of the active splits on the given tab.
+function Sp.get(tab)
+    local wins = vim.api.nvim_tabpage_list_wins(tab.id)
     local screenWidth = vim.api.nvim_list_uis()[1].width
 
     local splits = {}
     local nbSplits = 0
 
-    if state.splits ~= nil then
-        for _, split in pairs(state.wins.splits) do
+    if tab.wins.splits ~= nil then
+        for _, split in pairs(tab.wins.splits) do
             nbSplits = nbSplits + 1
             table.insert(splits, split)
         end
     end
 
     for _, win in pairs(wins) do
-        if not M.contains(state.wins.main, win) then
+        if not M.contains(tab.wins.main, win) then
             nbSplits = nbSplits + 1
             table.insert(splits, {
                 id = win,

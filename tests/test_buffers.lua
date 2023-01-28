@@ -214,7 +214,7 @@ T["curr"]["closing `curr` window without any other window quits Neovim"] = funct
     ]])
 
     eq(
-        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"),
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
         { 1001, 1000, 1002 }
     )
     eq_state(child, "wins.main.curr", 1000)
@@ -223,7 +223,7 @@ T["curr"]["closing `curr` window without any other window quits Neovim"] = funct
 
     -- neovim is closed, so it errors
     helpers.expect.error(function()
-        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)")
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)")
     end)
 end
 
@@ -270,7 +270,7 @@ T["left/right"]["closing the `left` buffer disables NNP"] = function()
     ]])
 
     eq(
-        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"),
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
         { 1001, 1000, 1002 }
     )
     eq_state(child, "wins.main.left", 1001)
@@ -279,7 +279,7 @@ T["left/right"]["closing the `left` buffer disables NNP"] = function()
     child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.wins.main.left)")
     child.cmd("q")
 
-    eq(child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"), { 1000 })
+    eq(child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"), { 1000 })
 
     eq_state(child, "enabled", false)
 end
@@ -291,7 +291,7 @@ T["left/right"]["closing the `right` buffer disables NNP"] = function()
     ]])
 
     eq(
-        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"),
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
         { 1001, 1000, 1002 }
     )
     eq_state(child, "wins.main.left", 1001)
@@ -300,7 +300,7 @@ T["left/right"]["closing the `right` buffer disables NNP"] = function()
     child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.wins.main.right)")
     child.cmd("q")
 
-    eq(child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"), { 1000 })
+    eq(child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"), { 1000 })
 
     eq_state(child, "enabled", false)
 end

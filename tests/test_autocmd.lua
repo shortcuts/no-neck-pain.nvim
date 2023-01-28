@@ -26,7 +26,7 @@ T["auto command"]["does not create side buffers window's width < options.width"]
         require('no-neck-pain').enable()
     ]])
 
-    eq(child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"), { 1000 })
+    eq(child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"), { 1000 })
     eq_state(child, "wins.main.curr", 1000)
     eq_state(child, "wins.main.left", vim.NIL)
     eq_state(child, "wins.main.right", vim.NIL)
@@ -40,7 +40,7 @@ T["auto command"]["does not shift using when opening/closing float window"] = fu
     ]])
 
     eq(
-        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"),
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
         { 1001, 1000, 1002 }
     )
     eq_state(child, "wins.main.left", 1001)
@@ -52,7 +52,7 @@ T["auto command"]["does not shift using when opening/closing float window"] = fu
     child.lua("vim.api.nvim_open_win(0,true, {width=100,height=100,relative='cursor',row=0,col=0})")
 
     eq(
-        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"),
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
         { 1001, 1000, 1002, 1003 }
     )
     eq_state(child, "wins.main.left", 1001)
@@ -66,7 +66,7 @@ T["auto command"]["does not shift using when opening/closing float window"] = fu
     child.cmd("q")
 
     eq(
-        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"),
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
         { 1001, 1000, 1002 }
     )
     eq_state(child, "wins.main.left", 1001)

@@ -53,7 +53,7 @@ T["scratchPad"]["default to `norg` fileType"] = function()
     child.lua([[require('no-neck-pain').enable()]])
 
     eq(
-        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"),
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
         { 1001, 1000, 1002 }
     )
 
@@ -96,7 +96,7 @@ T["scratchPad"]["override to md is reflected to the buffer"] = function()
     child.lua([[require('no-neck-pain').enable()]])
 
     eq(
-        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"),
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
         { 1001, 1000, 1002 }
     )
 
