@@ -59,11 +59,12 @@ function N.enable(scope)
     D.log(scope, "calling enable for tab %d", S.activeTab)
 
     S.tabs, tab = Ta.insert(S.tabs, S.activeTab)
-    tab.augroup = vim.api.nvim_create_augroup("NoNeckPain", { clear = true })
+
+    local augroupName = string.format("NoNeckPain-%d", S.activeTab)
+    tab.augroup = vim.api.nvim_create_augroup(augroupName, { clear = true })
+
     tab.wins.main.curr = vim.api.nvim_get_current_win()
     tab.wins.splits = Sp.get(tab)
-
-    D.tprint(tab)
 
     init(scope, tab, true)
 
@@ -77,7 +78,7 @@ function N.enable(scope)
                 init(p.event, tab)
             end)
         end,
-        group = "NoNeckPain",
+        group = augroupName,
         desc = "Resizes side windows after terminal has been resized, closes them if not enough space left.",
     })
 
@@ -87,7 +88,7 @@ function N.enable(scope)
                 S.activeTab = Ta.refresh(S.activeTab)
             end)
         end,
-        group = "NoNeckPain",
+        group = augroupName,
         desc = "Refreshes the active tab state",
     })
 
@@ -130,7 +131,7 @@ function N.enable(scope)
                 end
             end)
         end,
-        group = "NoNeckPain",
+        group = augroupName,
         desc = "WinEnter covers the split/vsplit management",
     })
 
@@ -164,7 +165,7 @@ function N.enable(scope)
                 end
             end)
         end,
-        group = "NoNeckPain",
+        group = augroupName,
         desc = "Handles the closure of main NNP windows",
     })
 
@@ -192,7 +193,7 @@ function N.enable(scope)
                 init(p.event, tab, tab.wins.splits == nil)
             end)
         end,
-        group = "NoNeckPain",
+        group = augroupName,
         desc = "Aims at restoring NNP enable state after closing a split/vsplit buffer or a main buffer",
     })
 
@@ -231,7 +232,7 @@ function N.enable(scope)
                 tab.wins.external.trees = trees
             end)
         end,
-        group = "NoNeckPain",
+        group = augroupName,
         desc = "Resize to apply on WinEnter/Closed of external windows",
     })
 
@@ -296,10 +297,9 @@ function N.disable(scope)
         end
     end
 
-    local total = 0
-    S.tabs, total = Ta.remove(S.tabs, tab.id)
+    S.tabs = Ta.remove(S.tabs, tab.id)
 
-    if total == 0 then
+    if S.tabs == nil then
         S = Ta.initState()
     end
 

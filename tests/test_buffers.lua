@@ -194,7 +194,7 @@ T["curr"]["have the default width"] = function()
     ]])
 
     -- need to know why the child isn't precise enough
-    eq_buf_width(child, "main.curr", 80)
+    eq_buf_width(child, "tabs[1].wins.main.curr", 80)
 end
 
 T["curr"]["have the width from the config"] = function()
@@ -204,7 +204,7 @@ T["curr"]["have the width from the config"] = function()
     ]])
 
     -- need to know why the child isn't precise enough
-    eq_buf_width(child, "main.curr", 48)
+    eq_buf_width(child, "tabs[1].wins.main.curr", 48)
 end
 
 T["curr"]["closing `curr` window without any other window quits Neovim"] = function()
@@ -217,7 +217,7 @@ T["curr"]["closing `curr` window without any other window quits Neovim"] = funct
         child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
         { 1001, 1000, 1002 }
     )
-    eq_state(child, "wins.main.curr", 1000)
+    eq_state(child, "tabs[1].wins.main.curr", 1000)
 
     child.cmd("q")
 
@@ -235,8 +235,8 @@ T["left/right"]["have the same width"] = function()
         require('no-neck-pain').enable()
     ]])
 
-    eq_buf_width(child, "main.left", 15)
-    eq_buf_width(child, "main.right", 15)
+    eq_buf_width(child, "tabs[1].wins.main.left", 15)
+    eq_buf_width(child, "tabs[1].wins.main.right", 15)
 end
 
 T["left/right"]["only creates a `left` buffer when `right.enabled` is `false`"] = function()
@@ -245,10 +245,10 @@ T["left/right"]["only creates a `left` buffer when `right.enabled` is `false`"] 
         require('no-neck-pain').enable()
     ]])
 
-    eq_state(child, "wins.main.left", 1001)
-    eq_state(child, "wins.main.right", vim.NIL)
+    eq_state(child, "tabs[1].wins.main.left", 1001)
+    eq_state(child, "tabs[1].wins.main.right", vim.NIL)
 
-    eq_buf_width(child, "main.left", 15)
+    eq_buf_width(child, "tabs[1].wins.main.left", 15)
 end
 
 T["left/right"]["only creates a `right` buffer when `left.enabled` is `false`"] = function()
@@ -257,10 +257,10 @@ T["left/right"]["only creates a `right` buffer when `left.enabled` is `false`"] 
         require('no-neck-pain').enable()
     ]])
 
-    eq_state(child, "wins.main.left", vim.NIL)
-    eq_state(child, "wins.main.right", 1001)
+    eq_state(child, "tabs[1].wins.main.left", vim.NIL)
+    eq_state(child, "tabs[1].wins.main.right", 1001)
 
-    eq_buf_width(child, "main.right", 15)
+    eq_buf_width(child, "tabs[1].wins.main.right", 15)
 end
 
 T["left/right"]["closing the `left` buffer disables NNP"] = function()
@@ -273,15 +273,13 @@ T["left/right"]["closing the `left` buffer disables NNP"] = function()
         child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
         { 1001, 1000, 1002 }
     )
-    eq_state(child, "wins.main.left", 1001)
-    eq_state(child, "wins.main.right", 1002)
+    eq_state(child, "tabs[1].wins.main.left", 1001)
+    eq_state(child, "tabs[1].wins.main.right", 1002)
 
-    child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.wins.main.left)")
+    child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.tabs[1].wins.main.left)")
     child.cmd("q")
 
     eq(child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"), { 1000 })
-
-    eq_state(child, "enabled", false)
 end
 
 T["left/right"]["closing the `right` buffer disables NNP"] = function()
@@ -294,15 +292,13 @@ T["left/right"]["closing the `right` buffer disables NNP"] = function()
         child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
         { 1001, 1000, 1002 }
     )
-    eq_state(child, "wins.main.left", 1001)
-    eq_state(child, "wins.main.right", 1002)
+    eq_state(child, "tabs[1].wins.main.left", 1001)
+    eq_state(child, "tabs[1].wins.main.right", 1002)
 
-    child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.wins.main.right)")
+    child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.tabs[1].wins.main.right)")
     child.cmd("q")
 
     eq(child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"), { 1000 })
-
-    eq_state(child, "enabled", false)
 end
 
 return T

@@ -57,7 +57,7 @@ function Ta.insert(tabs, id)
     return tabs, newTab
 end
 
--- removes the tab with the given `id` and returns the new `tabs` list, and the total of elements in it.
+-- removes the tab with the given `id` and returns the new `tabs` list.
 function Ta.remove(tabs, id)
     local newTabs = {}
     local total = 0
@@ -70,10 +70,10 @@ function Ta.remove(tabs, id)
     end
 
     if total == 0 then
-        return nil, total
+        return nil
     end
 
-    return newTabs, total
+    return newTabs
 end
 
 -- returns the tab with the given `id`.
@@ -97,14 +97,7 @@ function Ta.exists(tabs)
         return nil
     end
 
-    local tabPage = vim.api.nvim_get_current_tabpage()
-    local tab = Ta.get(tabs, tabPage)
-
-    if tab == nil then
-        return nil
-    end
-
-    return tab
+    return Ta.get(tabs, vim.api.nvim_get_current_tabpage())
 end
 
 -- replace the tab of the given `id` in the `tabs` list with the `updatedTab`.
