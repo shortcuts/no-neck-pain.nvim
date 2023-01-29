@@ -1,4 +1,5 @@
-local C = require("no-neck-pain.util.color")
+local C = require("no-neck-pain.color")
+local Co = require("no-neck-pain.util.constants")
 
 local NoNeckPain = {}
 
@@ -186,7 +187,7 @@ function NoNeckPain.setup(options)
     )
 
     -- set default side buffers options
-    for _, side in pairs({ "left", "right" }) do
+    for _, side in pairs(Co.SIDES) do
         NoNeckPain.options.buffers[side] = vim.tbl_deep_extend(
             "keep",
             options.buffers[side] or NoNeckPain.options.buffers,

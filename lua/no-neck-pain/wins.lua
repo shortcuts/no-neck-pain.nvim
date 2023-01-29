@@ -1,11 +1,10 @@
-local Sp = require("no-neck-pain.util.split")
-local C = require("no-neck-pain.util.color")
+local C = require("no-neck-pain.color")
+local Co = require("no-neck-pain.util.constants")
 local D = require("no-neck-pain.util.debug")
-local M = require("no-neck-pain.util.map")
+local Sp = require("no-neck-pain.splits")
+local T = require("no-neck-pain.trees")
 
 local W = {}
-
-W.SIDES = { "left", "right" }
 
 -- Resizes a window if it's valid.
 local function resize(id, width, side)
@@ -25,12 +24,15 @@ function W.close(scope, id, side)
     end
 end
 
--- Creates side buffers with the correct padding.
+-- Creates side buffers with the correct padding, considering the side trees.
 -- A side buffer is not created if there's not enough space.
 -- If it already exists, we resize it.
 --
---@param wins list: the current wins state, useful to get `external` trees to consider the padding, and to know if the buffer already exists.
-function W.createSideBuffers(wins)
+--@param tab list: the current tab state.
+function W.createSideBuffers(tab)
+    -- before creating side buffers, we determine if we should consider externals
+    tab.wins.external.trees = T.refresh(tab)
+
     local cmd = {
         left = { cmd = "topleft vnew" },
         right = { cmd = "botright vnew" },
@@ -41,19 +43,20 @@ function W.createSideBuffers(wins)
     }
 
     -- we close the side tree if it's already opened to prevent unwanted layout issue.
-    if wins.external.trees.NvimTree.id ~= nil then
+    if tab.wins.external.trees.NvimTree.id ~= nil then
         integrations.NvimTree = true
         vim.cmd("NvimTreeClose")
     end
 
-    for _, side in pairs(W.SIDES) do
+    for _, side in pairs(Co.SIDES) do
         if _G.NoNeckPain.config.buffers[side].enabled then
-            local valid = wins.main[side] ~= nil and vim.api.nvim_win_is_valid(wins.main[side])
-            if W.getPadding(side, wins) > 0 and not valid then
+            local valid = tab.wins.main[side] ~= nil
+                and vim.api.nvim_win_is_valid(tab.wins.main[side])
+
+            if W.getPadding(side, tab.wins) > 0 and not valid then
                 vim.cmd(cmd[side].cmd)
 
                 local id = vim.api.nvim_get_current_win()
-                local tabId = vim.api.nvim_get_current_tabpage()
 
                 if _G.NoNeckPain.config.buffers.setNames then
                     vim.api.nvim_buf_set_name(0, "no-neck-pain-" .. side)
@@ -67,7 +70,7 @@ function W.createSideBuffers(wins)
                     vim.api.nvim_win_set_option(id, opt, val)
                 end
 
-                C.init(id, tabId, side)
+                C.init(id, tab.id, side)
 
                 -- default options for scratchpad
                 if _G.NoNeckPain.config.buffers.scratchPad.enabled then
@@ -107,24 +110,23 @@ function W.createSideBuffers(wins)
                     vim.o.autowriteall = true
                 end
 
-                wins.main[side] = id
+                tab.wins.main[side] = id
             end
         end
     end
 
     -- if we've closed the user side tree but they still want it to be opened.
-    if integrations.NvimTree then
-        if _G.NoNeckPain.config.integrations.NvimTree.reopen == true then
-            vim.cmd("NvimTreeOpen")
-        else
-            wins.external.trees.NvimTree = {
-                id = nil,
-                width = 0,
-            }
-        end
+    if integrations.NvimTree and _G.NoNeckPain.config.integrations.NvimTree.reopen == true then
+        vim.cmd("NvimTreeOpen")
     end
 
-    return W.resizeOrCloseSideBuffers("W.createSideBuffers", wins)
+    -- we might have closed trees during the buffer creation process, we re-fetch the latest IDs to prevent inconsistencies
+    tab.wins.external.trees = T.refresh(tab)
+
+    tab.wins.main.left, tab.wins.main.right =
+        W.resizeOrCloseSideBuffers("W.createSideBuffers", tab.wins)
+
+    return tab
 end
 
 -- returns true if the index 0 window or the current window is relative.
@@ -151,7 +153,7 @@ function W.winsExceptState(tab, withTrees)
     local size = 0
 
     for _, win in pairs(wins) do
-        if not M.contains(mergedWins, win) and not W.isRelativeWindow(win) then
+        if not vim.tbl_contains(mergedWins, win) and not W.isRelativeWindow(win) then
             table.insert(validWins, win)
             size = size + 1
         end
@@ -163,7 +165,7 @@ end
 -- Resizes side buffers, considering the existing trees.
 -- Closes them if there's not enough space left.
 function W.resizeOrCloseSideBuffers(scope, wins)
-    for _, side in pairs(W.SIDES) do
+    for _, side in pairs(Co.SIDES) do
         if wins.main[side] ~= nil then
             local padding = W.getPadding(side, wins)
 
@@ -282,7 +284,7 @@ function W.stateWinsActive(tab, checkSplits)
     end
 
     for _, swin in pairs(swins) do
-        if not M.contains(wins, swin) then
+        if not vim.tbl_contains(wins, swin) then
             return false
         end
     end

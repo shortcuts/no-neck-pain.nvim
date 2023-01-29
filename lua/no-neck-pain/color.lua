@@ -1,29 +1,6 @@
-local C = {}
+local Co = require("no-neck-pain.util.constants")
 
-local integrationMapping = {
-    ["catppuccin-frappe"] = "#303446",
-    ["catppuccin-frappe-dark"] = "#292c3c",
-    ["catppuccin-latte"] = "#eff1f5",
-    ["catppuccin-latte-dark"] = "#e6e9ef",
-    ["catppuccin-macchiato"] = "#24273a",
-    ["catppuccin-macchiato-dark"] = "#1e2030",
-    ["catppuccin-mocha"] = "#1e1e2e",
-    ["catppuccin-mocha-dark"] = "#181825",
-    ["github-nvim-theme-dark"] = "#24292e",
-    ["github-nvim-theme-dimmed"] = "#22272e",
-    ["github-nvim-theme-light"] = "#ffffff",
-    ["onedark"] = "#282c34",
-    ["onedark-dark"] = "#000000",
-    ["onedark-vivid"] = "#282c34",
-    ["onelight"] = "#fafafa",
-    ["rose-pine"] = "#191724",
-    ["rose-pine-dawn"] = "#faf4ed",
-    ["rose-pine-moon"] = "#232136",
-    ["tokyonight-day"] = "#16161e",
-    ["tokyonight-moon"] = "#1e2030",
-    ["tokyonight-night"] = "#16161e",
-    ["tokyonight-storm"] = "#1f2335",
-}
+local C = {}
 
 -- converts an hex color code to RGB, values are returned independently.
 local function hexToRGB(hex)
@@ -39,6 +16,7 @@ local function blend(colorCode, factor)
 
     if factor < 0 then
         factor = 1 + factor
+
         return string.lower(string.format(format, r * factor, g * factor, b * factor))
     end
 
@@ -69,8 +47,8 @@ local function matchAndBlend(colorCode, factor)
         )
     end
 
-    if integrationMapping[colorCode] ~= nil then
-        colorCode = integrationMapping[colorCode]
+    if Co.INTEGRATIONS[colorCode] ~= nil then
+        colorCode = Co.INTEGRATIONS[colorCode]
     end
 
     local hexPattern = "^#" .. "[abcdef0-9]" .. ("[abcdef0-9]"):rep(5) .. "$"
@@ -91,7 +69,7 @@ end
 function C.parse(buffers)
     buffers.backgroundColor = matchAndBlend(buffers.backgroundColor, buffers.blend)
 
-    for _, side in pairs({ "left", "right" }) do
+    for _, side in pairs(Co.SIDES) do
         buffers[side].backgroundColor = matchAndBlend(
             buffers[side].backgroundColor,
             buffers[side].blend or buffers.blend

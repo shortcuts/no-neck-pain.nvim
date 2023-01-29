@@ -1,4 +1,5 @@
 local helpers = dofile("tests/helpers.lua")
+local Co = require("no-neck-pain.util.constants")
 
 local child = helpers.new_child_neovim()
 local eq, eq_config, eq_state, eq_buf_width =
@@ -19,8 +20,6 @@ local T = MiniTest.new_set({
         post_once = child.stop,
     },
 })
-
-local SCOPES = { "left", "right" }
 
 T["setup"] = MiniTest.new_set()
 
@@ -107,7 +106,7 @@ T["setup"]["overrides default values"] = function()
     eq_config(child, "buffers.wo.wrap", false)
     eq_config(child, "buffers.wo.linebreak", false)
 
-    for _, scope in pairs(SCOPES) do
+    for _, scope in pairs(Co.SIDES) do
         eq_config(child, "buffers." .. scope .. ".bo.filetype", "my-file-type")
         eq_config(child, "buffers." .. scope .. ".bo.buftype", "help")
         eq_config(child, "buffers." .. scope .. ".bo.bufhidden", "")
