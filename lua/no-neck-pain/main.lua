@@ -266,8 +266,14 @@ function N.disable(scope)
 
     -- determine if we should quit vim or just close the window
     for _, side in pairs(W.SIDES) do
-        vim.cmd(string.format("highlight! clear NNPBuffers_Background_%s NONE", side))
-        vim.cmd(string.format("highlight! clear NNPBuffers_Text_%s NONE", side))
+        vim.cmd(
+            string.format(
+                "highlight! clear NoNeckPain_background_tab_%s_side_%s NONE",
+                tab.id,
+                side
+            )
+        )
+        vim.cmd(string.format("highlight! clear NoNeckPain_text_tab_%s_side_%s NONE", tab.id, side))
 
         if tab.wins.main[side] ~= nil then
             local activeWins = vim.api.nvim_tabpage_list_wins(tab.id)

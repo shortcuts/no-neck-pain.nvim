@@ -107,22 +107,24 @@ function C.parse(buffers)
     return buffers
 end
 
--- creates two highlight groups for a given `win` named `NNPBuffers_Background_$NAME` and `NNPBuffers_Text_$NAME`.
--- `cmd` is used instead of native commands for backward compatibility with Neovim 0.7
-function C.init(win, name, backgroundColor, textColor)
-    local backgroundGroup = "NNPBuffers_Background_" .. name
-    local textGroup = "NNPBuffers_Text_" .. name
+-- Creates highlight groups for a given `win` in a `tab` named:
+-- - `NoNeckPain_background_tab_$ID_side_$SIDE` for the background colors.
+-- - `NoNeckPain_text_tab_$ID_side_$SIDE` for the text colors.
+-- note: `cmd` is used instead of native commands for backward compatibility with Neovim 0.7
+function C.init(win, tab, side)
+    local backgroundGroup = string.format("NoNeckPain_background_tab_%s_side_%s", tab, side)
+    local textGroup = string.format("NoNeckPain_text_tab_%s_side_%s", tab, side)
+
     local defaultBackground = vim.api.nvim_get_hl_by_name("Normal", true).background
 
-    -- check if the user has a transparent background or not
+    -- check if the user has a transparent background.
     if defaultBackground == nil then
         defaultBackground = "NONE"
     else
-        -- if it's not transparent, get the user's current background color
         defaultBackground = string.format("#%06X", defaultBackground)
     end
 
-    backgroundColor = backgroundColor or defaultBackground
+    local backgroundColor = _G.NoNeckPain.config.buffers[side].backgroundColor or defaultBackground
 
     -- clear groups
     vim.cmd(string.format("highlight! clear %s NONE", backgroundGroup))
@@ -139,7 +141,14 @@ function C.init(win, name, backgroundColor, textColor)
     )
 
     -- create group for text
-    vim.cmd(string.format("highlight! %s guifg=%s guibg=%s", textGroup, textColor, backgroundColor))
+    vim.cmd(
+        string.format(
+            "highlight! %s guifg=%s guibg=%s",
+            textGroup,
+            _G.NoNeckPain.config.buffers[side].textColor,
+            backgroundColor
+        )
+    )
 
     vim.api.nvim_win_set_option(
         win,

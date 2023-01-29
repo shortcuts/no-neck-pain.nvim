@@ -53,6 +53,7 @@ function W.createSideBuffers(wins)
                 vim.cmd(cmd[side].cmd)
 
                 local id = vim.api.nvim_get_current_win()
+                local tabId = vim.api.nvim_get_current_tabpage()
 
                 if _G.NoNeckPain.config.buffers.setNames then
                     vim.api.nvim_buf_set_name(0, "no-neck-pain-" .. side)
@@ -66,12 +67,7 @@ function W.createSideBuffers(wins)
                     vim.api.nvim_win_set_option(id, opt, val)
                 end
 
-                C.init(
-                    id,
-                    side,
-                    _G.NoNeckPain.config.buffers[side].backgroundColor,
-                    _G.NoNeckPain.config.buffers[side].textColor
-                )
+                C.init(id, tabId, side)
 
                 -- default options for scratchpad
                 if _G.NoNeckPain.config.buffers.scratchPad.enabled then
