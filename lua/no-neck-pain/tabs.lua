@@ -78,6 +78,8 @@ end
 
 -- returns the tab with the given `id`.
 function Ta.get(tabs, id)
+    id = id or vim.api.nvim_get_current_tabpage()
+
     if tabs == nil then
         return nil
     end
@@ -89,15 +91,6 @@ function Ta.get(tabs, id)
     end
 
     return nil
-end
-
--- returns the tab's state if the currently focused tab is registered
-function Ta.exists(tabs)
-    if tabs == nil then
-        return nil
-    end
-
-    return Ta.get(tabs, vim.api.nvim_get_current_tabpage())
 end
 
 -- replace the tab of the given `id` in the `tabs` list with the `updatedTab`.

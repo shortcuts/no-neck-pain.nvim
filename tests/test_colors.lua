@@ -1,4 +1,5 @@
 local helpers = dofile("tests/helpers.lua")
+local Co = require("no-neck-pain.util.constants")
 
 local child = helpers.new_child_neovim()
 local eq_config = helpers.expect.config_equality
@@ -14,8 +15,6 @@ local T = MiniTest.new_set({
         post_once = child.stop,
     },
 })
-
-local SCOPES = { "left", "right" }
 
 T["setup"] = MiniTest.new_set()
 
@@ -42,7 +41,7 @@ T["setup"]["overrides default values"] = function()
     eq_config(child, "buffers.blend", 0.4)
     eq_config(child, "buffers.textColor", "#7480c2")
 
-    for _, scope in pairs(SCOPES) do
+    for _, scope in pairs(Co.SIDES) do
         eq_config(child, "buffers." .. scope .. ".backgroundColor", "#595c6b")
         eq_config(child, "buffers." .. scope .. ".blend", 0.2)
         eq_config(child, "buffers." .. scope .. ".textColor", "#7480c2")
@@ -107,32 +106,7 @@ end
 T["color"] = MiniTest.new_set()
 
 T["color"]["map integration name to a value"] = function()
-    local integrationMapping = {
-        ["catppuccin-frappe"] = "#303446",
-        ["catppuccin-frappe-dark"] = "#292c3c",
-        ["catppuccin-latte"] = "#eff1f5",
-        ["catppuccin-latte-dark"] = "#e6e9ef",
-        ["catppuccin-macchiato"] = "#24273a",
-        ["catppuccin-macchiato-dark"] = "#1e2030",
-        ["catppuccin-mocha"] = "#1e1e2e",
-        ["catppuccin-mocha-dark"] = "#181825",
-        ["github-nvim-theme-dark"] = "#24292e",
-        ["github-nvim-theme-dimmed"] = "#22272e",
-        ["github-nvim-theme-light"] = "#ffffff",
-        ["onedark"] = "#282c34",
-        ["onedark-dark"] = "#000000",
-        ["onedark-vivid"] = "#282c34",
-        ["onelight"] = "#fafafa",
-        ["rose-pine"] = "#191724",
-        ["rose-pine-dawn"] = "#faf4ed",
-        ["rose-pine-moon"] = "#232136",
-        ["tokyonight-day"] = "#16161e",
-        ["tokyonight-moon"] = "#1e2030",
-        ["tokyonight-night"] = "#16161e",
-        ["tokyonight-storm"] = "#1f2335",
-    }
-
-    for integration, value in pairs(integrationMapping) do
+    for integration, value in pairs(Co.INTEGRATIONS) do
         child.lua(string.format(
             [[ require('no-neck-pain').setup({
                 buffers = {
@@ -145,7 +119,7 @@ T["color"]["map integration name to a value"] = function()
             integration,
             integration
         ))
-        for _, scope in pairs(SCOPES) do
+        for _, scope in pairs(Co.SIDES) do
             eq_config(child, "buffers." .. scope .. ".backgroundColor", value)
         end
     end

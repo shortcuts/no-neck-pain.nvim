@@ -1,17 +1,17 @@
+local Co = require("no-neck-pain.util.constants")
 local D = require("no-neck-pain.util.debug")
 local E = require("no-neck-pain.util.event")
-local M = require("no-neck-pain.util.map")
-local Sp = require("no-neck-pain.util.split")
-local T = require("no-neck-pain.util.trees")
+local Sp = require("no-neck-pain.splits")
+local T = require("no-neck-pain.trees")
 local Ta = require("no-neck-pain.tabs")
-local W = require("no-neck-pain.util.win")
+local W = require("no-neck-pain.wins")
 
 local N = {}
 local S = Ta.initState()
 
 -- Toggle the plugin by calling the `enable`/`disable` methods respectively.
 function N.toggle(scope)
-    local tab = Ta.exists(S.tabs)
+    local tab = Ta.get(S.tabs)
 
     if tab ~= nil then
         return N.disable(scope)
@@ -20,7 +20,7 @@ function N.toggle(scope)
     return N.enable(scope)
 end
 
--- Creates side buffers and set the tab state considering potential external trees.
+-- Creates side buffers and set the tab state, focuses the `curr` window if required.
 local function init(scope, tab, goToCurr)
     D.log(scope, "init called on tab %d for current window %d", tab.id, tab.wins.main.curr)
 
@@ -33,11 +33,7 @@ local function init(scope, tab, goToCurr)
         hadSideBuffers = false
     end
 
-    -- before creating side buffers, we determine if we should consider externals
-    tab.wins.external.trees = T.refresh(tab)
-    tab.wins.main.left, tab.wins.main.right = W.createSideBuffers(tab.wins)
-    -- we might have closed trees during the buffer creation process, we re-fetch the latest IDs to prevent inconsistencies
-    tab.wins.external.trees = T.refresh(tab)
+    tab = W.createSideBuffers(tab)
 
     if
         goToCurr
@@ -49,15 +45,16 @@ end
 
 -- Initializes the plugin, sets event listeners and internal state.
 function N.enable(scope)
-    local tab = Ta.exists(S.tabs)
+    local tab = Ta.get(S.tabs)
 
-    -- if we already have a state for the current tab
+    -- skip if we already have a state for the current tab.
     if S.enabled and tab ~= nil then
         return S
     end
 
     D.log(scope, "calling enable for tab %d", S.activeTab)
 
+    -- register the new tab.
     S.tabs, tab = Ta.insert(S.tabs, S.activeTab)
 
     local augroupName = string.format("NoNeckPain-%d", S.activeTab)
@@ -102,7 +99,7 @@ function N.enable(scope)
                 local focusedWin = vim.api.nvim_get_current_win()
                 local wins, total = W.winsExceptState(tab, false)
 
-                if total == 0 or not M.contains(wins, focusedWin) then
+                if total == 0 or not vim.tbl_contains(wins, focusedWin) then
                     return
                 end
 
@@ -207,7 +204,7 @@ function N.enable(scope)
                 local focusedWin = vim.api.nvim_get_current_win()
                 local wins, total = W.winsExceptState(tab, false)
 
-                if total == 0 or not M.contains(wins, focusedWin) then
+                if total == 0 or not vim.tbl_contains(wins, focusedWin) then
                     return
                 end
 
@@ -216,7 +213,7 @@ function N.enable(scope)
                 -- we cycle over supported integrations to see which got closed or opened
                 for name, tree in pairs(tab.wins.external.trees) do
                     -- if there was a tree[name] but not anymore, we resize
-                    if tree ~= nil and tree.id ~= nil and not M.contains(wins, tree.id) then
+                    if tree ~= nil and tree.id ~= nil and not vim.tbl_contains(wins, tree.id) then
                         D.log(p.event, "%s have been closed, resizing", name)
 
                         return init(p.event, tab)
@@ -243,7 +240,7 @@ end
 
 -- Disables the plugin for the given tab, clear highlight groups and autocmds, closes side buffers and resets the internal state.
 function N.disable(scope)
-    local tab = Ta.exists(S.tabs)
+    local tab = Ta.get(S.tabs)
 
     if not S.enabled or tab == nil then
         return S
@@ -265,7 +262,7 @@ function N.disable(scope)
     end
 
     -- determine if we should quit vim or just close the window
-    for _, side in pairs(W.SIDES) do
+    for _, side in pairs(Co.SIDES) do
         vim.cmd(
             string.format(
                 "highlight! clear NoNeckPain_background_tab_%s_side_%s NONE",
