@@ -60,27 +60,28 @@ NoNeckPain.bufferOptions = {
 --- Default values:
 ---@eval return MiniDoc.afterlines_to_code(MiniDoc.current.eval_section)
 NoNeckPain.options = {
-    -- Prints useful logs about what event are triggered, and reasons actions are executed.
+    -- Prints useful logs about triggered events, and reasons actions are executed.
     debug = false,
     -- When `true`, enables the plugin when you start Neovim.
     enableOnVimEnter = false,
-    -- The width of the focused buffer when enabling NNP.
-    -- If the available window size is less than `width`, the buffer will take the whole screen.
+    -- The width of the focused window that will be centered:
+    -- - Any integer > 0 is accepted.
+    -- When the terminal width is less than the `width` option, the side buffers won't be created.
     width = 100,
-    -- Set globally to Neovim, it allows you to toggle the enable/disable state.
+    -- Sets a global mapping to Neovim, which allows you to toggle the plugin.
     -- When `false`, the mapping is not created.
     toggleMapping = "<Leader>np",
-    -- Disables NNP if the last valid buffer in the list has been closed.
+    -- Disables the plugin if the last valid buffer in the list have been closed.
     disableOnLastBuffer = false,
-    -- When `true`, disabling NNP kills every split/vsplit buffers except the main NNP buffer.
+    -- When `true`, disabling the plugin closes every other windows except the initially focused one.
     killAllBuffersOnDisable = false,
-    --- Common options that are set to both buffers, for option scoped to the `left` and/or `right` buffer, see `buffers.left` and `buffers.right`.
-    --- See |NoNeckPain.bufferOptions|.
+    --- Common options that are set to both side buffers.
+    --- See |NoNeckPain.bufferOptions| for option scoped to the `left` and/or `right` buffer.
     buffers = {
         -- When `true`, the side buffers will be named `no-neck-pain-left` and `no-neck-pain-right` respectively.
         setNames = false,
-        -- The scratchPad feature leverages the empty side buffers to take notes. It works like any Neovim buffer and will automatically save the content at the given `location`.
-        -- Quitting an unsaved scratchpad buffer is non-blocking, as it's auto-saved.
+        -- Leverages the side buffers as notepads, which work like any Neovim buffer and automatically save the content at the given `location`.
+        -- note: quitting an unsaved scratchpad buffer is non-blocking.
         scratchPad = {
             -- When `true`, automatically sets the following options to the side buffers:
             -- - `autowriteall`
@@ -89,7 +90,8 @@ NoNeckPain.options = {
             -- The name of the generated file. See `location` for more information.
             -- @example: `no-neck-pain-left.norg`
             fileName = "no-neck-pain",
-            -- By default, files are saved at the same location as the current Neovim session. Filetype is defaulted to `norg` (https://github.com/nvim-neorg/neorg), but can be changed from the buffer options via `buffers.bo.filetype`, `buffers.left.bo.filetype` and `buffers.right.bo.filetype`.
+            -- By default, files are saved at the same location as the current Neovim session.
+            -- note: filetype is defaulted to `norg` (https://github.com/nvim-neorg/neorg), but can be changed from the buffer options globally `buffers.bo.filetype` or see |NoNeckPain.bufferOptions| for option scoped to the `left` and/or `right` buffer.
             -- @example: `no-neck-pain-left.norg`
             location = nil,
         },
@@ -173,14 +175,17 @@ function NoNeckPain.setup(options)
     options.buffers = options.buffers or {}
     NoNeckPain.options = vim.tbl_deep_extend("keep", options, NoNeckPain.options)
 
+    -- assert `width` values
     assert(NoNeckPain.options.width > 0, "`width` must be greater than 0.")
 
+    -- assert `integrations` values
     assert(
         NoNeckPain.options.integrations.NvimTree.position == "left"
             or NoNeckPain.options.integrations.NvimTree.position == "right",
         "NvimTree position can only be `left` or `right`"
     )
 
+    -- set default side buffers options
     for _, side in pairs({ "left", "right" }) do
         NoNeckPain.options.buffers[side] = vim.tbl_deep_extend(
             "keep",
@@ -197,6 +202,7 @@ function NoNeckPain.setup(options)
         end
     end
 
+    -- set theme options
     NoNeckPain.options.buffers = C.parse(NoNeckPain.options.buffers)
 
     if NoNeckPain.options.toggleMapping ~= false then
