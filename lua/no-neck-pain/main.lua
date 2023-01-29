@@ -109,8 +109,14 @@ function N.enable(scope)
                     return D.log(p.event, "encountered an external window")
                 end
 
-                -- -- note: due to floor, side widths might be off by 1, so we add it
-                local width = vim.api.nvim_win_get_width(focusedWin) + 1
+                -- note: due to floor, side widths might be off by 1 on each side buffer so we add it
+                local width = vim.api.nvim_win_get_width(focusedWin)
+                for _, side in pairs(Co.SIDES) do
+                    if tab.wins.main[side] and _G.NoNeckPain.config.buffers[side].enabled then
+                        width = width + 1
+                    end
+                end
+
                 local vsplit = width < _G.NoNeckPain.config.width
 
                 D.log(
