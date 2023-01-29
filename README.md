@@ -21,6 +21,8 @@ _[GIF version of the showcase video for mobile users](https://github.com/shortcu
 _Creates evenly sized empty buffers on each side of your focused buffer, which acts as padding for your window._
 
 - Plug and play, no configuration required
+- Seamless experience with your workflow.
+- Multiple tabs support
 - [Highly customizable experience](https://github.com/shortcuts/no-neck-pain.nvim#configuration)
 - [Themed side buffers](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase#custom-background-color)
 - [Support split/vsplit windows](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase#window-layout-support)
@@ -109,32 +111,33 @@ No configuration/setup steps needed! Sit back, relax and call `:NoNeckPain`.
 <summary>Click to unfold the full list of options with their default values</summary>
 
 > **Note**: The options are also available in Neovim by using:
-> - `:h NoNeckPain.options` to see the plugin options.
-> - `:h NoNeckPain.bufferOptions` to see the buffer options.
+> - `:h NoNeckPain.options` to see the global plugin options.
+> - `:h NoNeckPain.bufferOptions` to see the side buffer options.
 
 ```lua
 require("no-neck-pain").setup({
-    -- Prints useful logs about what event are triggered, and reasons actions are executed.
+    -- Prints useful logs about triggered events, and reasons actions are executed.
     debug = false,
     -- When `true`, enables the plugin when you start Neovim.
     enableOnVimEnter = false,
-    -- The width of the focused buffer when enabling NNP.
-    -- If the available window size is less than `width`, the buffer will take the whole screen.
+    -- The width of the focused window that will be centered:
+    -- - Any integer > 0 is accepted.
+    -- When the terminal width is less than the `width` option, the side buffers won't be created.
     width = 100,
-    -- Set globally to Neovim, it allows you to toggle the enable/disable state.
+    -- Sets a global mapping to Neovim, which allows you to toggle the plugin.
     -- When `false`, the mapping is not created.
     toggleMapping = "<Leader>np",
-    -- Disables NNP if the last valid buffer in the list has been closed.
+    -- Disables the plugin if the last valid buffer in the list have been closed.
     disableOnLastBuffer = false,
-    -- When `true`, disabling NNP kills every split/vsplit buffers except the main NNP buffer.
+    -- When `true`, disabling the plugin closes every other windows except the initially focused one.
     killAllBuffersOnDisable = false,
-    --- Common options that are set to both buffers, for option scoped to the `left` and/or `right` buffer, see `buffers.left` and `buffers.right`.
-    --- See |NoNeckPain.bufferOptions|.
+    --- Common options that are set to both side buffers.
+    --- See |NoNeckPain.bufferOptions| for option scoped to the `left` and/or `right` buffer.
     buffers = {
         -- When `true`, the side buffers will be named `no-neck-pain-left` and `no-neck-pain-right` respectively.
         setNames = false,
-        -- The scratchPad feature leverages the empty side buffers to take notes. It works like any Neovim buffer and will automatically save the content at the given `location`.
-        -- Quitting an unsaved scratchpad buffer is non-blocking, as it's auto-saved.
+        -- Leverages the side buffers as notepads, which work like any Neovim buffer and automatically save the content at the given `location`.
+        -- note: quitting an unsaved scratchpad buffer is non-blocking.
         scratchPad = {
             -- When `true`, automatically sets the following options to the side buffers:
             -- - `autowriteall`
@@ -143,7 +146,8 @@ require("no-neck-pain").setup({
             -- The name of the generated file. See `location` for more information.
             -- @example: `no-neck-pain-left.norg`
             fileName = "no-neck-pain",
-            -- By default, files are saved at the same location as the current Neovim session. Filetype is defaulted to `norg` (https://github.com/nvim-neorg/neorg), but can be changed from the buffer options via `buffers.bo.filetype`, `buffers.left.bo.filetype` and `buffers.right.bo.filetype`.
+            -- By default, files are saved at the same location as the current Neovim session.
+            -- note: filetype is defaulted to `norg` (https://github.com/nvim-neorg/neorg), but can be changed from the buffer options globally `buffers.bo.filetype` or see |NoNeckPain.bufferOptions| for option scoped to the `left` and/or `right` buffer.
             -- @example: `no-neck-pain-left.norg`
             location = nil,
         },
@@ -235,7 +239,7 @@ NoNeckPain.bufferOptions = {
 
 |   Command   |         Description        |
 |-------------|----------------------------|
-|`:NoNeckPain`| Toggle the plugin state, between enable and disable.|
+|`:NoNeckPain`| Toggles the plugin state, between enable and disable.|
 
 ## ⌨ Contributing
 
@@ -249,4 +253,4 @@ You can find guides and showcase of the plugin on [the Wiki](https://github.com/
 
 Although there's other (amazing!) alternatives that provide a zen-distraction-free-center mode, they usually make assumptions that might alter your workflow, or at least require some configuration to suit your needs.
 
-`no-neck-pain.nvim` aims at providing a non-opinionated buffer centering experience, while being super customizable.
+`no-neck-pain.nvim` aims at providing a seamless non-opinionated buffer centering experience, while being super customizable.
