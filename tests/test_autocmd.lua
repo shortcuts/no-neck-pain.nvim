@@ -26,10 +26,10 @@ T["auto command"]["does not create side buffers window's width < options.width"]
         require('no-neck-pain').enable()
     ]])
 
-    eq(child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"), { 1000 })
-    eq_state(child, "wins.main.curr", 1000)
-    eq_state(child, "wins.main.left", vim.NIL)
-    eq_state(child, "wins.main.right", vim.NIL)
+    eq(child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"), { 1000 })
+    eq_state(child, "tabs[1].wins.main.curr", 1000)
+    eq_state(child, "tabs[1].wins.main.left", vim.NIL)
+    eq_state(child, "tabs[1].wins.main.right", vim.NIL)
 end
 
 T["auto command"]["does not shift using when opening/closing float window"] = function()
@@ -40,40 +40,40 @@ T["auto command"]["does not shift using when opening/closing float window"] = fu
     ]])
 
     eq(
-        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"),
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
         { 1001, 1000, 1002 }
     )
-    eq_state(child, "wins.main.left", 1001)
-    eq_state(child, "wins.main.right", 1002)
+    eq_state(child, "tabs[1].wins.main.left", 1001)
+    eq_state(child, "tabs[1].wins.main.right", 1002)
 
-    eq_buf_width(child, "main.left", 15)
-    eq_buf_width(child, "main.right", 15)
+    eq_buf_width(child, "tabs[1].wins.main.left", 15)
+    eq_buf_width(child, "tabs[1].wins.main.right", 15)
 
     child.lua("vim.api.nvim_open_win(0,true, {width=100,height=100,relative='cursor',row=0,col=0})")
 
     eq(
-        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"),
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
         { 1001, 1000, 1002, 1003 }
     )
-    eq_state(child, "wins.main.left", 1001)
-    eq_state(child, "wins.main.right", 1002)
+    eq_state(child, "tabs[1].wins.main.left", 1001)
+    eq_state(child, "tabs[1].wins.main.right", 1002)
 
-    eq_buf_width(child, "main.left", 15)
-    eq_buf_width(child, "main.right", 15)
+    eq_buf_width(child, "tabs[1].wins.main.left", 15)
+    eq_buf_width(child, "tabs[1].wins.main.right", 15)
 
     -- Close float window keeps the buffer here with the same width
     child.lua("vim.fn.win_gotoid(1003)")
     child.cmd("q")
 
     eq(
-        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"),
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
         { 1001, 1000, 1002 }
     )
-    eq_state(child, "wins.main.left", 1001)
-    eq_state(child, "wins.main.right", 1002)
+    eq_state(child, "tabs[1].wins.main.left", 1001)
+    eq_state(child, "tabs[1].wins.main.right", 1002)
 
-    eq_buf_width(child, "main.left", 15)
-    eq_buf_width(child, "main.right", 15)
+    eq_buf_width(child, "tabs[1].wins.main.left", 15)
+    eq_buf_width(child, "tabs[1].wins.main.right", 15)
 end
 
 return T

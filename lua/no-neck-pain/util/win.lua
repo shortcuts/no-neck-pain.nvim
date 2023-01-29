@@ -9,7 +9,7 @@ W.SIDES = { "left", "right" }
 
 -- Resizes a window if it's valid.
 local function resize(id, width, side)
-    D.log(side, "resizing with padding %d", width)
+    D.log(side, "resizing %d with padding %d", id, width)
 
     if vim.api.nvim_win_is_valid(id) then
         vim.api.nvim_win_set_width(id, width)
@@ -32,8 +32,8 @@ end
 --@param wins list: the current wins state, useful to get `external` trees to consider the padding, and to know if the buffer already exists.
 function W.createSideBuffers(wins)
     local cmd = {
-        left = { cmd = "topleft vnew", padding = 0 },
-        right = { cmd = "botright vnew", padding = 0 },
+        left = { cmd = "topleft vnew" },
+        right = { cmd = "botright vnew" },
     }
 
     local integrations = {
@@ -48,12 +48,12 @@ function W.createSideBuffers(wins)
 
     for _, side in pairs(W.SIDES) do
         if _G.NoNeckPain.config.buffers[side].enabled then
-            cmd[side].padding = W.getPadding(side, wins)
-
-            if cmd[side].padding > 0 and wins.main[side] == nil then
+            local valid = wins.main[side] ~= nil and vim.api.nvim_win_is_valid(wins.main[side])
+            if W.getPadding(side, wins) > 0 and not valid then
                 vim.cmd(cmd[side].cmd)
 
                 local id = vim.api.nvim_get_current_win()
+                local tabId = vim.api.nvim_get_current_tabpage()
 
                 if _G.NoNeckPain.config.buffers.setNames then
                     vim.api.nvim_buf_set_name(0, "no-neck-pain-" .. side)
@@ -67,12 +67,7 @@ function W.createSideBuffers(wins)
                     vim.api.nvim_win_set_option(id, opt, val)
                 end
 
-                C.init(
-                    id,
-                    side,
-                    _G.NoNeckPain.config.buffers[side].backgroundColor,
-                    _G.NoNeckPain.config.buffers[side].textColor
-                )
+                C.init(id, tabId, side)
 
                 -- default options for scratchpad
                 if _G.NoNeckPain.config.buffers.scratchPad.enabled then
@@ -146,14 +141,11 @@ function W.isRelativeWindow(win)
     return false
 end
 
--- returns the available wins and their total number, without the `list` ones.
-function W.winsExceptState(state, withTrees)
-    local wins = vim.api.nvim_tabpage_list_wins(state.tabs)
-    local mergedWins = W.mergeState(
-        state.wins.main,
-        state.wins.splits,
-        withTrees and state.wins.external.trees or nil
-    )
+-- returns the available wins of the `tab.id` and their total number, without the `list` ones.
+function W.winsExceptState(tab, withTrees)
+    local wins = vim.api.nvim_tabpage_list_wins(tab.id)
+    local mergedWins =
+        W.mergeState(tab.wins.main, tab.wins.splits, withTrees and tab.wins.external.trees or nil)
 
     local validWins = {}
     local size = 0
@@ -278,15 +270,15 @@ function W.mergeState(main, splits, trees)
     return wins
 end
 
--- returns `true` if all the state wins are still active in the wins list.
+-- returns `true` if all the `tab.id` wins are still active in the wins list.
 --
 -- @param checkSplits bool: checks for splits wins too when `true`.
-function W.stateWinsActive(state, checkSplits)
-    local wins = vim.api.nvim_tabpage_list_wins(state.tabs)
-    local swins = state.wins.main
+function W.stateWinsActive(tab, checkSplits)
+    local wins = vim.api.nvim_tabpage_list_wins(tab.id)
+    local swins = tab.wins.main
 
-    if checkSplits and state.wins.splits ~= nil then
-        swins = W.mergeState(state.wins.main, state.wins.splits, nil)
+    if checkSplits and tab.wins.splits ~= nil then
+        swins = W.mergeState(tab.wins.main, tab.wins.splits, nil)
     end
 
     for _, swin in pairs(swins) do

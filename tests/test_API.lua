@@ -146,14 +146,14 @@ T["setup"]["enables the plugin with mapping"] = function()
     child.lua("vim.api.nvim_input('nn')")
 
     eq(
-        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"),
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
         { 1001, 1000, 1002 }
     )
     eq_state(child, "enabled", true)
 
     child.lua("vim.api.nvim_input('nn')")
 
-    eq(child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"), { 1000 })
+    eq(child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"), { 1000 })
     eq_state(child, "enabled", false)
 end
 
@@ -161,7 +161,7 @@ T["setup"]["starts the plugin on VimEnter"] = function()
     child.restart({ "-u", "scripts/test_auto_open.lua" })
 
     eq(
-        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.tabs)"),
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
         { 1001, 1000, 1002 }
     )
     eq_state(child, "enabled", true)
@@ -171,7 +171,7 @@ end
 
 T["enable"] = MiniTest.new_set()
 
-T["enable"]["sets state"] = function()
+T["enable"]["(single tab) sets state"] = function()
     child.lua([[
         require('no-neck-pain').setup({width=50})
         require('no-neck-pain').enable()
@@ -181,113 +181,141 @@ T["enable"]["sets state"] = function()
     eq_type_global(child, "_G.NoNeckPain.state", "table")
 
     eq_state(child, "enabled", true)
-    eq_type_state(child, "augroup", "number")
+    eq_state(child, "activeTab", 1)
 
-    eq_type_state(child, "wins", "table")
-    eq_type_state(child, "wins.main", "table")
-    eq_type_state(child, "wins.external", "table")
+    eq_type_state(child, "tabs", "table")
 
-    eq_state(child, "wins.main.curr", 1000)
-    eq_state(child, "wins.main.left", 1001)
-    eq_state(child, "wins.main.right", 1002)
-    eq_state(child, "wins.splits", vim.NIL)
+    eq_type_state(child, "tabs[1].wins", "table")
+    eq_type_state(child, "tabs[1].wins.main", "table")
+    eq_type_state(child, "tabs[1].wins.external", "table")
 
-    eq_type_state(child, "wins.external.trees", "table")
+    eq_state(child, "tabs[1].wins.main.curr", 1000)
+    eq_state(child, "tabs[1].wins.main.left", 1001)
+    eq_state(child, "tabs[1].wins.main.right", 1002)
+    eq_state(child, "tabs[1].wins.splits", vim.NIL)
+
+    eq_type_state(child, "tabs[1].wins.external.trees", "table")
 
     for _, external in pairs(EXTERNALS) do
-        eq_state(child, "wins.external.trees." .. external .. ".id", vim.NIL)
-        eq_state(child, "wins.external.trees." .. external .. ".width", 0)
+        eq_state(child, "tabs[1].wins.external.trees." .. external .. ".id", vim.NIL)
+        eq_state(child, "tabs[1].wins.external.trees." .. external .. ".width", 0)
+    end
+end
+
+T["enable"]["(multiple tab) sets state"] = function()
+    child.lua([[
+        require('no-neck-pain').setup({width=50})
+        require('no-neck-pain').enable()
+    ]])
+
+    -- tab 1
+    eq_type_global(child, "_G.NoNeckPain.state", "table")
+
+    eq_state(child, "enabled", true)
+    eq_state(child, "activeTab", 1)
+
+    eq_type_state(child, "tabs", "table")
+
+    eq_type_state(child, "tabs[1].wins", "table")
+    eq_type_state(child, "tabs[1].wins.main", "table")
+    eq_type_state(child, "tabs[1].wins.external", "table")
+
+    eq_state(child, "tabs[1].wins.main.curr", 1000)
+    eq_state(child, "tabs[1].wins.main.left", 1001)
+    eq_state(child, "tabs[1].wins.main.right", 1002)
+    eq_state(child, "tabs[1].wins.splits", vim.NIL)
+
+    eq_type_state(child, "tabs[1].wins.external.trees", "table")
+
+    for _, external in pairs(EXTERNALS) do
+        eq_state(child, "tabs[1].wins.external.trees." .. external .. ".id", vim.NIL)
+        eq_state(child, "tabs[1].wins.external.trees." .. external .. ".width", 0)
+    end
+
+    -- tab 2
+    child.cmd("tabnew")
+    child.lua([[ require('no-neck-pain').enable() ]])
+
+    eq_state(child, "enabled", true)
+    eq_state(child, "activeTab", 2)
+
+    eq_type_state(child, "tabs", "table")
+
+    eq_type_state(child, "tabs[2].wins", "table")
+    eq_type_state(child, "tabs[2].wins.main", "table")
+    eq_type_state(child, "tabs[2].wins.external", "table")
+
+    eq_state(child, "tabs[2].wins.main.curr", 1003)
+    eq_state(child, "tabs[2].wins.main.left", 1004)
+    eq_state(child, "tabs[2].wins.main.right", 1005)
+    eq_state(child, "tabs[2].wins.splits", vim.NIL)
+
+    eq_type_state(child, "tabs[2].wins.external.trees", "table")
+
+    for _, external in pairs(EXTERNALS) do
+        eq_state(child, "tabs[2].wins.external.trees." .. external .. ".id", vim.NIL)
+        eq_state(child, "tabs[2].wins.external.trees." .. external .. ".width", 0)
     end
 end
 
 T["disable"] = MiniTest.new_set()
 
-T["disable"]["resets state"] = function()
-    child.lua([[
-        require('no-neck-pain').enable()
-        require('no-neck-pain').disable()
-    ]])
+T["disable"]["(single tab) resets state"] = function()
+    child.lua([[ require('no-neck-pain').enable() ]])
 
-    -- state
-    eq_type_global(child, "_G.NoNeckPain.state", "table")
-
-    eq_state(child, "enabled", false)
-    eq_type_state(child, "augroup", "nil")
-
-    eq_type_state(child, "wins", "table")
-    eq_type_state(child, "wins.main", "table")
-    eq_type_state(child, "wins.external", "table")
-
-    eq_state(child, "wins.main.curr", vim.NIL)
-    eq_state(child, "wins.main.left", vim.NIL)
-    eq_state(child, "wins.main.right", vim.NIL)
-    eq_state(child, "wins.splits", vim.NIL)
-
-    eq_type_state(child, "wins.external.trees", "table")
-
-    for _, external in pairs(EXTERNALS) do
-        eq_state(child, "wins.external.trees." .. external .. ".id", vim.NIL)
-        eq_state(child, "wins.external.trees." .. external .. ".width", 0)
-    end
-end
-
-T["toggle()"] = MiniTest.new_set()
-
-T["toggle()"]["sets state and resets everything when toggled again"] = function()
-    child.lua([[
-        require('no-neck-pain').setup({width=50})
-        require('no-neck-pain').enable()
-    ]])
-
-    -- config -- shouldn't reset
-    eq_type_global(child, "_G.NoNeckPain.config", "table")
-
-    -- state
     eq_type_global(child, "_G.NoNeckPain.state", "table")
 
     eq_state(child, "enabled", true)
-    eq_type_state(child, "augroup", "number")
+    eq_state(child, "activeTab", 1)
 
-    eq_type_state(child, "wins", "table")
-    eq_type_state(child, "wins.main", "table")
-    eq_type_state(child, "wins.external", "table")
+    eq_type_state(child, "tabs", "table")
 
-    eq_state(child, "wins.main.curr", 1000)
-    eq_state(child, "wins.main.left", 1001)
-    eq_state(child, "wins.main.right", 1002)
-    eq_state(child, "wins.splits", vim.NIL)
+    child.lua([[ require('no-neck-pain').disable() ]])
 
-    eq_type_state(child, "wins.external.trees", "table")
-
-    for _, external in pairs(EXTERNALS) do
-        eq_state(child, "wins.external.trees." .. external .. ".id", vim.NIL)
-        eq_state(child, "wins.external.trees." .. external .. ".width", 0)
-    end
-
-    -- disable
-    child.lua([[require('no-neck-pain').toggle()]])
-
-    -- state
-    eq_type_state(child, "wins", "table")
+    eq_type_global(child, "_G.NoNeckPain.state", "table")
 
     eq_state(child, "enabled", false)
-    eq_state(child, "augroup", vim.NIL)
+    eq_state(child, "activeTab", 1)
 
-    eq_type_state(child, "wins", "table")
-    eq_type_state(child, "wins.main", "table")
-    eq_type_state(child, "wins.external", "table")
+    eq_state(child, "tabs", vim.NIL)
+end
 
-    eq_state(child, "wins.main.curr", vim.NIL)
-    eq_state(child, "wins.main.left", vim.NIL)
-    eq_state(child, "wins.main.right", vim.NIL)
-    eq_state(child, "wins.splits", vim.NIL)
+T["disable"]["(multiple tab) resets state"] = function()
+    child.lua([[ require('no-neck-pain').enable() ]])
 
-    eq_type_state(child, "wins.external.trees", "table")
+    eq_type_global(child, "_G.NoNeckPain.state", "table")
 
-    for _, external in pairs(EXTERNALS) do
-        eq_state(child, "wins.external.trees." .. external .. ".id", vim.NIL)
-        eq_state(child, "wins.external.trees." .. external .. ".width", 0)
-    end
+    eq_state(child, "enabled", true)
+    eq_state(child, "activeTab", 1)
+
+    eq_type_state(child, "tabs", "table")
+
+    child.cmd("tabnew")
+    child.lua([[ require('no-neck-pain').enable() ]])
+
+    eq_type_global(child, "_G.NoNeckPain.state", "table")
+
+    eq_state(child, "enabled", true)
+    eq_state(child, "activeTab", 2)
+
+    eq_type_state(child, "tabs", "table")
+
+    -- disable tab 2
+    child.lua([[ require('no-neck-pain').disable() ]])
+
+    eq_state(child, "enabled", true)
+    eq_state(child, "activeTab", 2)
+
+    eq_type_state(child, "tabs", "table")
+
+    -- disable tab 1
+    child.cmd("tabprevious")
+    child.lua([[ require('no-neck-pain').disable() ]])
+
+    eq_state(child, "enabled", false)
+    eq_state(child, "activeTab", 1)
+
+    eq_state(child, "tabs", vim.NIL)
 end
 
 return T
