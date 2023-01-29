@@ -120,11 +120,11 @@ function W.createSideBuffers(tab)
         vim.cmd("NvimTreeOpen")
     end
 
-    -- we might have closed trees during the buffer creation process, we re-fetch the latest IDs to prevent inconsistencies
-    tab.wins.external.trees = T.refresh(tab)
-
     tab.wins.main.left, tab.wins.main.right =
         W.resizeOrCloseSideBuffers("W.createSideBuffers", tab.wins)
+
+    -- we might have closed trees during the buffer creation process, we re-fetch the latest IDs to prevent inconsistencies
+    tab.wins.external.trees = T.refresh(tab)
 
     return tab
 end
