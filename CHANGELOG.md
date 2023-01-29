@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [0.6.1](https://github.com/shortcuts/no-neck-pain.nvim/compare/v0.6.0...v0.6.1) (2023-01-29)
+
+
+### Bug Fixes
+
+* split/vsplit computing ([#159](https://github.com/shortcuts/no-neck-pain.nvim/issues/159)) ([737c64f](https://github.com/shortcuts/no-neck-pain.nvim/commit/737c64f29ea5d5aa89cb17eab2a3d954066e737a))
+
 ## [0.6.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v0.5.0...v0.6.0) (2023-01-29)
 
 
