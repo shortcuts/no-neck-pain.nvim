@@ -86,9 +86,19 @@ Default values:
       debug = false,
       -- When `true`, enables the plugin when you start Neovim.
       enableOnVimEnter = false,
+<<<<<<< HEAD
       -- The width of the focused window that will be centered:
       -- - Any integer > 0 is accepted.
       -- When the terminal width is less than the `width` option, the side buffers won't be created.
+||||||| parent of 1891c14 (feat: make `width` support `textwidth` when defined)
+      -- The width of the focused buffer when enabling NNP.
+      -- If the available window size is less than `width`, the buffer will take the whole screen.
+=======
+      -- The width of the focused window that will be centered:
+      -- - Any integer > 0 is accepted.
+      -- - Setting `width="textwidth"` retrieves the value of the `vim.bo.textwidth` option.
+      -- When the terminal width is less than the `width` option, the side buffers won't be created.
+>>>>>>> 1891c14 (feat: make `width` support `textwidth` when defined)
       width = 100,
       -- Sets a global mapping to Neovim, which allows you to toggle the plugin.
       -- When `false`, the mapping is not created.
