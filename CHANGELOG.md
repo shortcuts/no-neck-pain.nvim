@@ -1,4 +1,26 @@
 <a name="0.2.3"></a>
+## [0.6.1](https://github.com/shortcuts/no-neck-pain.nvim/compare/v0.6.0...v0.6.1) (2023-01-29)
+
+
+### Bug Fixes
+
+* split/vsplit computing ([#159](https://github.com/shortcuts/no-neck-pain.nvim/issues/159)) ([737c64f](https://github.com/shortcuts/no-neck-pain.nvim/commit/737c64f29ea5d5aa89cb17eab2a3d954066e737a))
+
+## [0.6.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v0.5.0...v0.6.0) (2023-01-29)
+
+
+### Features
+
+* handle multiple tabs ([#154](https://github.com/shortcuts/no-neck-pain.nvim/issues/154)) ([3f0efca](https://github.com/shortcuts/no-neck-pain.nvim/commit/3f0efcab8b8b4d4eda91a238601879054bf30b43))
+* keep side buffers on vsplit ([#145](https://github.com/shortcuts/no-neck-pain.nvim/issues/145)) ([0029fee](https://github.com/shortcuts/no-neck-pain.nvim/commit/0029fee8c840f495cbc887e95f5d8d6e07d735ad))
+* keeps side buffers for current tab ([#150](https://github.com/shortcuts/no-neck-pain.nvim/issues/150)) ([e513dc3](https://github.com/shortcuts/no-neck-pain.nvim/commit/e513dc3e8f18e4cfe6ee1ebab6995110c7d57108))
+
+
+### Bug Fixes
+
+* cleanup after tab feature ([#158](https://github.com/shortcuts/no-neck-pain.nvim/issues/158)) ([5fe00a0](https://github.com/shortcuts/no-neck-pain.nvim/commit/5fe00a0e65197ff0c483b02fd3494eb2e93d1bfc))
+* right color group never deleted ([#153](https://github.com/shortcuts/no-neck-pain.nvim/issues/153)) ([fce7bcb](https://github.com/shortcuts/no-neck-pain.nvim/commit/fce7bcbd82419d2b1b2e968385cdffa36c331484))
+
 ## [0.5.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v0.4.0...v0.5.0) (2023-01-15)
 
 

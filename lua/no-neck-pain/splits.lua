@@ -1,4 +1,3 @@
-local M = require("no-neck-pain.util.map")
 local Sp = {}
 
 -- returns only the list of registered splits that are still active.
@@ -71,7 +70,12 @@ function Sp.get(tab)
     end
 
     for _, win in pairs(wins) do
-        if not M.contains(tab.wins.main, win) then
+        if
+            not vim.tbl_contains(
+                { tab.wins.main.curr, tab.wins.main.left, tab.wins.main.right },
+                win
+            )
+        then
             nbSplits = nbSplits + 1
             table.insert(splits, {
                 id = win,
