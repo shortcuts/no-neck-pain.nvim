@@ -1,3 +1,4 @@
+local D = require("no-neck-pain.util.debug")
 local M = require("no-neck-pain.main")
 
 local NoNeckPain = {}
@@ -9,6 +10,27 @@ function NoNeckPain.toggle()
     end
 
     _G.NoNeckPain.state = M.toggle("publicAPI_toggle")
+end
+
+--- Sets the config `width` to the given `width` value and resizes the NoNeckPain windows.
+---
+--- @param width number: any positive integer superior to 0.
+function NoNeckPain.resize(width)
+    if not _G.NoNeckPain.state.enabled then
+        error("no-neck-pain.nvim must be enabled, run `NoNeckPain` first.")
+    end
+
+    width = tonumber(width) or 0
+
+    if _G.NoNeckPain.config.width == width then
+        return
+    end
+
+    if width > 0 then
+        _G.NoNeckPain.config = vim.tbl_deep_extend("keep", { width = width }, _G.NoNeckPain.config)
+    end
+
+    _G.NoNeckPain.state = M.init("publicAPI_resize", nil, false)
 end
 
 --- Initializes the plugin, sets event listeners and internal state.

@@ -239,7 +239,8 @@ NoNeckPain.bufferOptions = {
 
 |   Command   |         Description        |
 |-------------|----------------------------|
-|`:NoNeckPain`| Toggles the plugin state, between enable and disable.|
+|`:NoNeckPain`| Toggles the plugin state, between enable and disable. |
+|`:NoNeckPainResize INT`| Updates the config `width` with the given `INT` value and resizes the no-neck-pain windows. |
 
 ## ⌨ Contributing
 

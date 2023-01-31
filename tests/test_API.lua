@@ -1,11 +1,12 @@
 local helpers = dofile("tests/helpers.lua")
 
 local child = helpers.new_child_neovim()
-local eq, eq_global, eq_config, eq_state =
+local eq, eq_global, eq_config, eq_state, eq_buf_width =
     helpers.expect.equality,
     helpers.expect.global_equality,
     helpers.expect.config_equality,
-    helpers.expect.state_equality
+    helpers.expect.state_equality,
+    helpers.expect.buf_width_equality
 local eq_type_global, eq_type_config, eq_type_state =
     helpers.expect.global_type_equality,
     helpers.expect.config_type_equality,
@@ -28,15 +29,37 @@ local EXTERNALS = { "NvimTree", "undotree" }
 
 T["install"] = MiniTest.new_set()
 
-T["install"]["sets global loaded variable and provide toggle command"] = function()
+T["install"]["sets global loaded variable and provide public commands"] = function()
     eq_type_global(child, "_G.NoNeckPainLoaded", "boolean")
     eq_global(child, "_G.NoNeckPain", vim.NIL)
 
     child.cmd("NoNeckPain")
     eq_state(child, "enabled", true)
 
+    eq_global(child, "_G.NoNeckPain.config.width", 100)
+
+    child.cmd("NoNeckPainResize 20")
+
+    eq_global(child, "_G.NoNeckPain.config.width", 20)
+
     child.cmd("NoNeckPain")
     eq_state(child, "enabled", false)
+end
+
+T["install"]["calling `NoNeckPainResize` resizes the main window"] = function()
+    child.cmd("NoNeckPain")
+
+    eq_global(child, "_G.NoNeckPain.config.width", 100)
+
+    -- need to know why the child isn't precise enough
+    eq_buf_width(child, "tabs[1].wins.main.curr", 80)
+
+    child.cmd("NoNeckPainResize 20")
+
+    eq_global(child, "_G.NoNeckPain.config.width", 20)
+
+    -- need to know why the child isn't precise enough
+    eq_buf_width(child, "tabs[1].wins.main.curr", 20)
 end
 
 T["setup"] = MiniTest.new_set()

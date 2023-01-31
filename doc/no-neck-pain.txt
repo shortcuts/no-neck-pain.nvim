@@ -5,6 +5,13 @@
 Toggle the plugin by calling the `enable`/`disable` methods respectively.
 
 ------------------------------------------------------------------------------
+                                                           *NoNeckPain.resize()*
+                          `NoNeckPain.resize`({width})
+Sets the config `width` to the given `width` value and resizes the NoNeckPain windows.
+
+@param width number: any positive integer superior to 0.
+
+------------------------------------------------------------------------------
                                                            *NoNeckPain.enable()*
                              `NoNeckPain.enable`()
 Initializes the plugin, sets event listeners and internal state.
