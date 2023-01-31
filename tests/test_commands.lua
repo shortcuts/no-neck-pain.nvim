@@ -2,9 +2,7 @@ local helpers = dofile("tests/helpers.lua")
 
 local child = helpers.new_child_neovim()
 local eq_global, eq_state, eq_buf_width =
-    helpers.expect.global_equality,
-    helpers.expect.state_equality,
-    helpers.expect.buf_width_equality
+    helpers.expect.global_equality, helpers.expect.state_equality, helpers.expect.buf_width_equality
 
 local T = MiniTest.new_set({
     hooks = {
