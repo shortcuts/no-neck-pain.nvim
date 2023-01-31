@@ -1,4 +1,3 @@
-local D = require("no-neck-pain.util.debug")
 local M = require("no-neck-pain.main")
 
 local NoNeckPain = {}
