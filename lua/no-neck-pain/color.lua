@@ -146,7 +146,6 @@ function C.init(win, tab, side)
             Cursor = backgroundGroup,
             LineNr = backgroundGroup,
         })
-
     end
 
     local stringGroups = {}
