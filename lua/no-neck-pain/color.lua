@@ -93,6 +93,10 @@ function C.init(win, tab, side)
     local backgroundGroup = string.format("NoNeckPain_background_tab_%s_side_%s", tab, side)
     local textGroup = string.format("NoNeckPain_text_tab_%s_side_%s", tab, side)
 
+    -- clear groups
+    vim.cmd(string.format("highlight! clear %s NONE", backgroundGroup))
+    vim.cmd(string.format("highlight! clear %s NONE", textGroup))
+
     local defaultBackground = vim.api.nvim_get_hl_by_name("Normal", true).background
 
     -- check if the user has a transparent background.
@@ -103,10 +107,6 @@ function C.init(win, tab, side)
     end
 
     local backgroundColor = _G.NoNeckPain.config.buffers[side].backgroundColor or defaultBackground
-
-    -- clear groups
-    vim.cmd(string.format("highlight! clear %s NONE", backgroundGroup))
-    vim.cmd(string.format("highlight! clear %s NONE", textGroup))
 
     -- create group for background
     vim.cmd(
@@ -131,19 +131,22 @@ function C.init(win, tab, side)
     local groups = {
         Normal = textGroup,
         NormalNC = textGroup,
-        CursorColumn = backgroundGroup,
-        CursorLineNr = backgroundGroup,
-        NonText = backgroundGroup,
-        SignColumn = backgroundGroup,
-        Cursor = backgroundGroup,
-        LineNr = backgroundGroup,
     }
 
     -- on transparent backgrounds we don't set those two to prevent white lines.
     if backgroundColor ~= "NONE" then
-        groups.WinSeparator = backgroundGroup
-        groups.VertSplit = backgroundGroup
-        groups.EndOfBuffer = backgroundGroup
+        groups = vim.tbl_extend("keep", groups, {
+            WinSeparator = backgroundGroup,
+            VertSplit = backgroundGroup,
+            EndOfBuffer = backgroundGroup,
+            CursorColumn = backgroundGroup,
+            CursorLineNr = backgroundGroup,
+            NonText = backgroundGroup,
+            SignColumn = backgroundGroup,
+            Cursor = backgroundGroup,
+            LineNr = backgroundGroup,
+        })
+
     end
 
     local stringGroups = {}
