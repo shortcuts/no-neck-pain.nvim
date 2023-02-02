@@ -128,24 +128,31 @@ function C.init(win, tab, side)
         )
     )
 
-    vim.api.nvim_win_set_option(
-        win,
-        "winhl",
-        string.format(
-            "Normal:%s,NormalNC:%s,CursorColumn:%s,CursorLineNr:%s,NonText:%s,SignColumn:%s,Cursor:%s,LineNr:%s,EndOfBuffer:%s,WinSeparator:%s,VertSplit:%s",
-            textGroup,
-            textGroup,
-            backgroundGroup,
-            backgroundGroup,
-            backgroundGroup,
-            backgroundGroup,
-            backgroundGroup,
-            backgroundGroup,
-            backgroundGroup,
-            backgroundGroup,
-            backgroundGroup
-        )
-    )
+    local groups = {
+        Normal = textGroup,
+        NormalNC = textGroup,
+        CursorColumn = backgroundGroup,
+        CursorLineNr = backgroundGroup,
+        NonText = backgroundGroup,
+        SignColumn = backgroundGroup,
+        Cursor = backgroundGroup,
+        LineNr = backgroundGroup,
+    }
+
+    -- on transparent backgrounds we don't set those two to prevent white lines.
+    if backgroundColor ~= "NONE" then
+        groups.WinSeparator = backgroundGroup
+        groups.VertSplit = backgroundGroup
+        groups.EndOfBuffer = backgroundGroup
+    end
+
+    local stringGroups = {}
+
+    for hl, group in pairs(groups) do
+        table.insert(stringGroups, string.format("%s:%s", hl, group))
+    end
+
+    vim.api.nvim_win_set_option(win, "winhl", table.concat(stringGroups, ","))
 end
 
 return C
