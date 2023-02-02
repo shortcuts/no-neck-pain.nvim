@@ -1,4 +1,16 @@
 <a name="0.2.3"></a>
+## [0.7.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v0.6.1...v0.7.0) (2023-02-02)
+
+
+### Features
+
+* add `NoNeckPainResize` command ([#162](https://github.com/shortcuts/no-neck-pain.nvim/issues/162)) ([3fc9c82](https://github.com/shortcuts/no-neck-pain.nvim/commit/3fc9c82add7e8cf4960d4140ea73ee2eb2c516b7))
+
+
+### Bug Fixes
+
+* transparent background support ([#164](https://github.com/shortcuts/no-neck-pain.nvim/issues/164)) ([f25795a](https://github.com/shortcuts/no-neck-pain.nvim/commit/f25795a31fc10642c63469f79a834c581895cce5))
+
 ## [0.6.1](https://github.com/shortcuts/no-neck-pain.nvim/compare/v0.6.0...v0.6.1) (2023-01-29)
 
 
