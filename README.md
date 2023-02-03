@@ -120,8 +120,10 @@ require("no-neck-pain").setup({
     debug = false,
     -- When `true`, enables the plugin when you start Neovim.
     enableOnVimEnter = false,
-    -- The width of the focused window that will be centered:
-    -- - Any integer > 0 is accepted.
+    -- The width of the focused window that will be centered, accepted values are:
+    -- - Any integer > 0.
+    -- - "textwidth", which retrieves the value of the `vim.bo.textwidth` option.
+    -- - "colorcolumn", which retrieves the value of the `vim.opt.colorcolumn` option.
     -- When the terminal width is less than the `width` option, the side buffers won't be created.
     width = 100,
     -- Sets a global mapping to Neovim, which allows you to toggle the plugin.

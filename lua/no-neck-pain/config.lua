@@ -66,8 +66,10 @@ NoNeckPain.options = {
     debug = false,
     -- When `true`, enables the plugin when you start Neovim.
     enableOnVimEnter = false,
-    -- The width of the focused window that will be centered:
-    -- - Any integer > 0 is accepted.
+    -- The width of the focused window that will be centered, accepted values are:
+    -- - Any integer > 0.
+    -- - "textwidth", which retrieves the value of the `vim.bo.textwidth` option.
+    -- - "colorcolumn", which retrieves the value of the `vim.opt.colorcolumn` option.
     -- When the terminal width is less than the `width` option, the side buffers won't be created.
     width = 100,
     -- Sets a global mapping to Neovim, which allows you to toggle the plugin.
@@ -178,7 +180,17 @@ function NoNeckPain.setup(options)
     options.buffers = options.buffers or {}
     NoNeckPain.options = vim.tbl_deep_extend("keep", options, NoNeckPain.options)
 
-    -- assert `width` values
+    -- assert `width` values through vim options
+    if NoNeckPain.options.width == "textwidth" then
+        NoNeckPain.options.width = tonumber(vim.api.nvim_buf_get_option(0, "textwidth")) or 0
+    end
+
+    if NoNeckPain.options.width == "colorcolumn" then
+        NoNeckPain.options.width = tonumber(
+            vim.api.nvim_get_option_value("colorcolumn", { scope = "global" })
+        ) or 0
+    end
+
     assert(NoNeckPain.options.width > 0, "`width` must be greater than 0.")
 
     -- assert `integrations` values

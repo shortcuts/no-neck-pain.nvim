@@ -129,6 +129,30 @@ T["setup"]["overrides default values"] = function()
     eq_config(child, "killAllBuffersOnDisable", true)
 end
 
+T["setup"]["width - defaults to the `textwidth` when specified"] = function()
+    child.cmd("set textwidth=30")
+    child.lua([[require('no-neck-pain').setup({
+        width = "textwidth"
+    })]])
+
+    eq_config(child, "width", 30)
+end
+
+T["setup"]["width - defaults to the `textwidth` when specified"] = function()
+    child.cmd("set colorcolumn=65")
+    child.lua([[require('no-neck-pain').setup({
+        width = "colorcolumn"
+    })]])
+
+    eq_config(child, "width", 65)
+end
+
+T["setup"]["width - throws with non-supported string"] = function()
+    helpers.expect.error(function()
+        child.lua([[require('no-neck-pain').setup({ width = "foo" })]])
+    end)
+end
+
 T["setup"]["enables the plugin with mapping"] = function()
     child.lua([[
         require('no-neck-pain').setup({width=50,toggleMapping="nn"})
