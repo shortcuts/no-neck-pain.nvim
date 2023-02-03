@@ -186,7 +186,6 @@ function NoNeckPain.setup(options)
     end
 
     if NoNeckPain.options.width == "colorcolumn" then
-        -- NoNeckPain.options.width = vim.opt.colorcolumn
         NoNeckPain.options.width = tonumber(
             vim.api.nvim_get_option_value("colorcolumn", { scope = "global" })
         ) or 0
