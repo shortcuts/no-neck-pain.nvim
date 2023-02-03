@@ -10,7 +10,8 @@ local NoNeckPain = {}
 NoNeckPain.bufferOptions = {
     -- When `false`, the buffer won't be created.
     enabled = true,
-    -- Hexadecimal color code to override the current background color of the buffer. (e.g. #24273A)
+    -- Hexadecimal color code to override the current background color of the buffer. (e.g. #24273A).
+    -- Transparent backgrounds are supported by default.
     -- popular theme are supported by their name:
     -- - catppuccin-frappe
     -- - catppuccin-frappe-dark
@@ -98,6 +99,7 @@ NoNeckPain.options = {
             location = nil,
         },
         -- Hexadecimal color code to override the current background color of the buffer. (e.g. #24273A)
+        -- Transparent backgrounds are supported by default.
         -- popular theme are supported by their name:
         -- - catppuccin-frappe
         -- - catppuccin-frappe-dark

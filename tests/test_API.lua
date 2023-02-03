@@ -1,3 +1,4 @@
+local Co = require("no-neck-pain.util.constants")
 local helpers = dofile("tests/helpers.lua")
 
 local child = helpers.new_child_neovim()
@@ -23,20 +24,13 @@ local T = MiniTest.new_set({
     },
 })
 
-local SCOPES = { "left", "right" }
 local EXTERNALS = { "NvimTree", "undotree" }
 
 T["install"] = MiniTest.new_set()
 
-T["install"]["sets global loaded variable and provide toggle command"] = function()
+T["install"]["sets global loaded variable"] = function()
     eq_type_global(child, "_G.NoNeckPainLoaded", "boolean")
     eq_global(child, "_G.NoNeckPain", vim.NIL)
-
-    child.cmd("NoNeckPain")
-    eq_state(child, "enabled", true)
-
-    child.cmd("NoNeckPain")
-    eq_state(child, "enabled", false)
 end
 
 T["setup"] = MiniTest.new_set()
@@ -87,7 +81,7 @@ T["setup"]["sets exposed methods and default options value"] = function()
     eq_config(child, "buffers.wo.wrap", true)
     eq_config(child, "buffers.wo.linebreak", true)
 
-    for _, scope in pairs(SCOPES) do
+    for _, scope in pairs(Co.SIDES) do
         eq_type_config(child, "buffers." .. scope, "table")
         eq_type_config(child, "buffers." .. scope .. ".bo", "table")
         eq_type_config(child, "buffers." .. scope .. ".wo", "table")

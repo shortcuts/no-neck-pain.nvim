@@ -21,7 +21,15 @@ function N.toggle(scope)
 end
 
 -- Creates side buffers and set the tab state, focuses the `curr` window if required.
-local function init(scope, tab, goToCurr)
+function N.init(scope, tab, goToCurr)
+    if tab == nil then
+        tab = Ta.get(S.tabs)
+
+        if tab == nil then
+            error("called the internal `init` method on a `nil` tab.")
+        end
+    end
+
     D.log(scope, "init called on tab %d for current window %d", tab.id, tab.wins.main.curr)
 
     -- if we do not have side buffers, we must ensure we only trigger a focus if we re-create them
@@ -41,6 +49,8 @@ local function init(scope, tab, goToCurr)
     then
         vim.fn.win_gotoid(tab.wins.main.curr)
     end
+
+    return S
 end
 
 -- Initializes the plugin, sets event listeners and internal state.
@@ -63,7 +73,7 @@ function N.enable(scope)
     tab.wins.main.curr = vim.api.nvim_get_current_win()
     tab.wins.splits = Sp.get(tab)
 
-    init(scope, tab, true)
+    N.init(scope, tab, true)
 
     vim.api.nvim_create_autocmd({ "VimResized" }, {
         callback = function(p)
@@ -72,7 +82,7 @@ function N.enable(scope)
                     return
                 end
 
-                init(p.event, tab)
+                N.init(p.event, tab)
             end)
         end,
         group = augroupName,
@@ -130,7 +140,7 @@ function N.enable(scope)
                 tab.wins.splits = Sp.insert(tab.wins.splits, focusedWin, vsplit)
 
                 if vsplit then
-                    init(p.event, tab)
+                    N.init(p.event, tab)
                 end
             end)
         end,
@@ -193,7 +203,7 @@ function N.enable(scope)
                 end
 
                 -- we only restore focus on curr if there's no split left
-                init(p.event, tab, tab.wins.splits == nil)
+                N.init(p.event, tab, tab.wins.splits == nil)
             end)
         end,
         group = augroupName,
@@ -222,14 +232,14 @@ function N.enable(scope)
                     if tree ~= nil and tree.id ~= nil and not vim.tbl_contains(wins, tree.id) then
                         D.log(p.event, "%s have been closed, resizing", name)
 
-                        return init(p.event, tab)
+                        return N.init(p.event, tab)
                     end
 
                     -- we have a new tree registered, we can resize
                     if trees[name].id ~= tab.wins.external.trees[name].id then
                         D.log(p.event, "%s have been opened, resizing", name)
 
-                        return init(p.event, tab)
+                        return N.init(p.event, tab)
                     end
                 end
                 tab.wins.external.trees = trees

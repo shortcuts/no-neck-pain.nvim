@@ -2,5 +2,6 @@ NoNeckPain.bufferOptions	no-neck-pain.txt	/*NoNeckPain.bufferOptions*
 NoNeckPain.disable()	no-neck-pain.txt	/*NoNeckPain.disable()*
 NoNeckPain.enable()	no-neck-pain.txt	/*NoNeckPain.enable()*
 NoNeckPain.options	no-neck-pain.txt	/*NoNeckPain.options*
+NoNeckPain.resize()	no-neck-pain.txt	/*NoNeckPain.resize()*
 NoNeckPain.setup()	no-neck-pain.txt	/*NoNeckPain.setup()*
 NoNeckPain.toggle()	no-neck-pain.txt	/*NoNeckPain.toggle()*

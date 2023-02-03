@@ -153,6 +153,7 @@ require("no-neck-pain").setup({
             location = nil,
         },
         -- Hexadecimal color code to override the current background color of the buffer. (e.g. #24273A)
+        -- Transparent backgrounds are supported by default.
         backgroundColor = nil,
         -- Brighten (positive) or darken (negative) the side buffers background color. Accepted values are [-1..1].
         blend = 0,
@@ -207,6 +208,7 @@ NoNeckPain.bufferOptions = {
     -- When `false`, the buffer won't be created.
     enabled = true,
     -- Hexadecimal color code to override the current background color of the buffer. (e.g. #24273A)
+    -- Transparent backgrounds are supported by default.
     backgroundColor = nil,
     -- Brighten (positive) or darken (negative) the side buffers background color. Accepted values are [-1..1].
     blend = 0,
@@ -240,7 +242,8 @@ NoNeckPain.bufferOptions = {
 
 |   Command   |         Description        |
 |-------------|----------------------------|
-|`:NoNeckPain`| Toggles the plugin state, between enable and disable.|
+|`:NoNeckPain`| Toggles the plugin state, between enable and disable. |
+|`:NoNeckPainResize INT`| Updates the config `width` with the given `INT` value and resizes the no-neck-pain windows. |
 
 ## ⌨ Contributing
 
