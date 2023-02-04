@@ -1,4 +1,12 @@
 <a name="0.2.3"></a>
+## [0.8.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v0.7.0...v0.8.0) (2023-02-04)
+
+
+### Features
+
+* support `textwidth` and `colorcolumn` values for `width` ([#156](https://github.com/shortcuts/no-neck-pain.nvim/issues/156)) ([6456975](https://github.com/shortcuts/no-neck-pain.nvim/commit/6456975dab7b463f51feb274393eb00d0228ab63))
+* **tabs:** provide an option to automatically enable the plugin ([#166](https://github.com/shortcuts/no-neck-pain.nvim/issues/166)) ([87fac46](https://github.com/shortcuts/no-neck-pain.nvim/commit/87fac462e29ea2eefc6edf0e06a60fc0cd51f9c4))
+
 ## [0.7.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v0.6.1...v0.7.0) (2023-02-02)
 
 
