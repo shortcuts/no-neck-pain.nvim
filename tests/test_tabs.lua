@@ -113,4 +113,71 @@ T["tabs"]["previous tab kept side buffers if enabled"] = function()
     eq_state(child, "activeTab", 1)
 end
 
+T["TabNewEntered"] = MiniTest.new_set()
+
+T["TabNewEntered"]["starts the plugin on new tab"] = function()
+    child.restart({ "-u", "scripts/test_auto_open.lua" })
+
+    eq_state(child, "enabled", true)
+
+    -- tab 1
+    eq(
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
+        { 1001, 1000, 1002 }
+    )
+
+    eq_state(child, "activeTab", 1)
+
+    -- tab 2
+    child.cmd("tabnew")
+    eq_state(child, "activeTab", 2)
+
+    eq(
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
+        { 1004, 1003, 1005 }
+    )
+
+    child.stop()
+end
+
+T["TabNewEntered"]["does not re-enable if the user disables it"] = function()
+    child.restart({ "-u", "scripts/test_auto_open.lua" })
+
+    eq_state(child, "enabled", true)
+
+    -- tab 1
+    eq(
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
+        { 1001, 1000, 1002 }
+    )
+
+    eq_state(child, "activeTab", 1)
+
+    -- tab 2
+    child.cmd("tabnew")
+    eq_state(child, "activeTab", 2)
+
+    eq(
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
+        { 1004, 1003, 1005 }
+    )
+
+    child.cmd("NoNeckPain")
+
+    eq(child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"), { 1003 })
+    eq_state(child, "activeTab", 2)
+
+    -- tab 1
+    child.cmd("tabprevious")
+    eq_state(child, "activeTab", 1)
+
+    -- tab 2
+    child.cmd("tabnext")
+    eq_state(child, "activeTab", 2)
+
+    eq(child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"), { 1003 })
+
+    child.stop()
+end
+
 return T

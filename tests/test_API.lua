@@ -51,6 +51,7 @@ T["setup"]["sets exposed methods and default options value"] = function()
 
     eq_config(child, "width", 100)
     eq_config(child, "enableOnVimEnter", false)
+    eq_config(child, "enableOnTabEnter", false)
     eq_config(child, "toggleMapping", "<Leader>np")
     eq_config(child, "debug", false)
     eq_config(child, "disableOnLastBuffer", false)
@@ -115,6 +116,7 @@ T["setup"]["overrides default values"] = function()
     child.lua([[require('no-neck-pain').setup({
         width = 42,
         enableOnVimEnter = true,
+        enableOnTabEnter = true,
         toggleMapping = "<Leader>kz",
         debug = true,
         disableOnLastBuffer = true,
@@ -123,6 +125,7 @@ T["setup"]["overrides default values"] = function()
 
     eq_config(child, "width", 42)
     eq_config(child, "enableOnVimEnter", true)
+    eq_config(child, "enableOnTabEnter", true)
     eq_config(child, "toggleMapping", "<Leader>kz")
     eq_config(child, "debug", true)
     eq_config(child, "disableOnLastBuffer", true)
