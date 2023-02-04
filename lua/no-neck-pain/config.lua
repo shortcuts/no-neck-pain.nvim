@@ -66,6 +66,9 @@ NoNeckPain.options = {
     debug = false,
     -- When `true`, enables the plugin when you start Neovim.
     enableOnVimEnter = false,
+    -- When `true`, enables the plugin when you enter a new Tab.
+    -- note: it does not trigger if it's an existing tab, to prevent unwanted interfer with user's decisions.
+    enableOnTabEnter = false,
     -- The width of the focused window that will be centered, accepted values are:
     -- - Any integer > 0.
     -- - "textwidth", which retrieves the value of the `vim.bo.textwidth` option.

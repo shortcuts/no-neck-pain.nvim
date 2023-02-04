@@ -50,18 +50,15 @@ end
 function NoNeckPain.setup(opts)
     _G.NoNeckPain.config = require("no-neck-pain.config").setup(opts)
 
+    if _G.NoNeckPain.config.enableOnVimEnter or _G.NoNeckPain.config.enableOnTabEnter then
+        vim.api.nvim_create_augroup("NoNeckPainAutocmd", { clear = true })
+    end
+
     if _G.NoNeckPain.config.enableOnVimEnter then
-        vim.api.nvim_create_augroup("NoNeckPainBufWinEnter", { clear = true })
         vim.api.nvim_create_autocmd({ "BufWinEnter" }, {
-            group = "NoNeckPainBufWinEnter",
             pattern = "*",
             callback = function(p)
                 vim.schedule(function()
-                    -- in the `enableOnVimEnter` hooks. It exists to prevent
-                    -- conflicts with other plugins:
-                    -- netrw: it works
-                    -- dashboard: we skip until we open an other buffer
-                    -- nvim-tree: we skip until we open an other buffer
                     if _G.NoNeckPain.state ~= nil and _G.NoNeckPain.state.enabled == true then
                         return
                     end
@@ -74,7 +71,24 @@ function NoNeckPain.setup(opts)
                     vim.api.nvim_del_autocmd(p.id)
                 end)
             end,
+            group = "NoNeckPainAutocmd",
             desc = "Triggers until it find the correct moment/buffer to enable the plugin.",
+        })
+    end
+
+    if _G.NoNeckPain.config.enableOnTabEnter then
+        vim.api.nvim_create_autocmd({ "TabNewEntered" }, {
+            callback = function()
+                vim.schedule(function()
+                    if vim.bo.filetype == "dashboard" or vim.bo.filetype == "NvimTree" then
+                        return
+                    end
+
+                    NoNeckPain.enable()
+                end)
+            end,
+            group = "NoNeckPainAutocmd",
+            desc = "Enables the plugin when entering a new tab.",
         })
     end
 end
