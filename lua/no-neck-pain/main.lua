@@ -1,3 +1,4 @@
+local A = require("no-neck-pain.util.api")
 local Co = require("no-neck-pain.util.constants")
 local D = require("no-neck-pain.util.debug")
 local E = require("no-neck-pain.util.event")
@@ -67,8 +68,8 @@ function N.enable(scope)
     -- register the new tab.
     S.tabs, tab = Ta.insert(S.tabs, S.activeTab)
 
-    local augroupName = string.format("NoNeckPain-%d", S.activeTab)
-    tab.augroup = vim.api.nvim_create_augroup(augroupName, { clear = true })
+    tab.augroup = string.format("NoNeckPain-%d", S.activeTab)
+    A.augroup(tab.augroup)
 
     tab.wins.main.curr = vim.api.nvim_get_current_win()
     tab.wins.splits = Sp.get(tab)
@@ -85,7 +86,7 @@ function N.enable(scope)
                 N.init(p.event, tab)
             end)
         end,
-        group = augroupName,
+        group = tab.augroup,
         desc = "Resizes side windows after terminal has been resized, closes them if not enough space left.",
     })
 
@@ -95,7 +96,7 @@ function N.enable(scope)
                 S.activeTab = Ta.refresh(S.activeTab)
             end)
         end,
-        group = augroupName,
+        group = tab.augroup,
         desc = "Refreshes the active tab state",
     })
 
@@ -144,7 +145,7 @@ function N.enable(scope)
                 end
             end)
         end,
-        group = augroupName,
+        group = tab.augroup,
         desc = "WinEnter covers the split/vsplit management",
     })
 
@@ -178,7 +179,7 @@ function N.enable(scope)
                 end
             end)
         end,
-        group = augroupName,
+        group = tab.augroup,
         desc = "Handles the closure of main NNP windows",
     })
 
@@ -206,7 +207,7 @@ function N.enable(scope)
                 N.init(p.event, tab, tab.wins.splits == nil)
             end)
         end,
-        group = augroupName,
+        group = tab.augroup,
         desc = "Aims at restoring NNP enable state after closing a split/vsplit buffer or a main buffer",
     })
 
@@ -245,7 +246,7 @@ function N.enable(scope)
                 tab.wins.external.trees = trees
             end)
         end,
-        group = augroupName,
+        group = tab.augroup,
         desc = "Resize to apply on WinEnter/Closed of external windows",
     })
 
@@ -262,7 +263,7 @@ function N.disable(scope)
         return S
     end
 
-    vim.api.nvim_del_augroup_by_id(tab.augroup)
+    vim.api.nvim_del_augroup_by_name(tab.augroup)
 
     -- shutdowns gracefully by focusing the stored `curr` buffer
     if

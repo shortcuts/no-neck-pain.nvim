@@ -1,3 +1,4 @@
+local A = require("no-neck-pain.util.api")
 local M = require("no-neck-pain.main")
 
 local NoNeckPain = {}
@@ -51,7 +52,7 @@ function NoNeckPain.setup(opts)
     _G.NoNeckPain.config = require("no-neck-pain.config").setup(opts)
 
     if _G.NoNeckPain.config.enableOnVimEnter or _G.NoNeckPain.config.enableOnTabEnter then
-        vim.api.nvim_create_augroup("NoNeckPainAutocmd", { clear = true })
+        A.augroup("NoNeckPainAutocmd")
     end
 
     if _G.NoNeckPain.config.enableOnVimEnter then
