@@ -64,4 +64,42 @@ T["commands"]["NoNeckPainResize does nothing with the same widht"] = function()
     eq_buf_width(child, "tabs[1].wins.main.curr", 80)
 end
 
+T["commands"]["NoNeckPainWidthUp increases the width by 5"] = function()
+    child.cmd("NoNeckPain")
+
+    eq_global(child, "_G.NoNeckPain.config.width", 100)
+
+    child.cmd("NoNeckPainWidthUp")
+    child.cmd("NoNeckPainWidthUp")
+    child.cmd("NoNeckPainWidthUp")
+    child.cmd("NoNeckPainWidthUp")
+    child.cmd("NoNeckPainWidthUp")
+    child.cmd("NoNeckPainWidthUp")
+    child.cmd("NoNeckPainWidthUp")
+    child.cmd("NoNeckPainWidthUp")
+    child.cmd("NoNeckPainWidthUp")
+    child.cmd("NoNeckPainWidthUp")
+
+    eq_global(child, "_G.NoNeckPain.config.width", 150)
+end
+
+T["commands"]["NoNeckPainWidthUp decreases the width by 5"] = function()
+    child.cmd("NoNeckPain")
+
+    eq_global(child, "_G.NoNeckPain.config.width", 100)
+
+    child.cmd("NoNeckPainWidthDown")
+    child.cmd("NoNeckPainWidthDown")
+    child.cmd("NoNeckPainWidthDown")
+    child.cmd("NoNeckPainWidthDown")
+    child.cmd("NoNeckPainWidthDown")
+    child.cmd("NoNeckPainWidthDown")
+    child.cmd("NoNeckPainWidthDown")
+    child.cmd("NoNeckPainWidthDown")
+    child.cmd("NoNeckPainWidthDown")
+    child.cmd("NoNeckPainWidthDown")
+
+    eq_global(child, "_G.NoNeckPain.config.width", 50)
+end
+
 return T

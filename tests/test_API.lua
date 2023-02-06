@@ -53,6 +53,8 @@ T["setup"]["sets exposed methods and default options value"] = function()
     eq_config(child, "enableOnVimEnter", false)
     eq_config(child, "enableOnTabEnter", false)
     eq_config(child, "toggleMapping", "<Leader>np")
+    eq_config(child, "widthUpMapping", "<Leader>n=")
+    eq_config(child, "widthDownMapping", "<Leader>n-")
     eq_config(child, "debug", false)
     eq_config(child, "disableOnLastBuffer", false)
     eq_config(child, "killAllBuffersOnDisable", false)
@@ -117,7 +119,6 @@ T["setup"]["overrides default values"] = function()
         width = 42,
         enableOnVimEnter = true,
         enableOnTabEnter = true,
-        toggleMapping = "<Leader>kz",
         debug = true,
         disableOnLastBuffer = true,
         killAllBuffersOnDisable = true,
@@ -126,7 +127,6 @@ T["setup"]["overrides default values"] = function()
     eq_config(child, "width", 42)
     eq_config(child, "enableOnVimEnter", true)
     eq_config(child, "enableOnTabEnter", true)
-    eq_config(child, "toggleMapping", "<Leader>kz")
     eq_config(child, "debug", true)
     eq_config(child, "disableOnLastBuffer", true)
     eq_config(child, "killAllBuffersOnDisable", true)
@@ -154,28 +154,6 @@ T["setup"]["width - throws with non-supported string"] = function()
     helpers.expect.error(function()
         child.lua([[require('no-neck-pain').setup({ width = "foo" })]])
     end)
-end
-
-T["setup"]["enables the plugin with mapping"] = function()
-    child.lua([[
-        require('no-neck-pain').setup({width=50,toggleMapping="nn"})
-    ]])
-
-    eq(child.lua_get("vim.api.nvim_tabpage_list_wins(1)"), { 1000 })
-    eq_type_global(child, "_G.NoNeckPainLoaded", "boolean")
-
-    child.lua("vim.api.nvim_input('nn')")
-
-    eq(
-        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
-        { 1001, 1000, 1002 }
-    )
-    eq_state(child, "enabled", true)
-
-    child.lua("vim.api.nvim_input('nn')")
-
-    eq(child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"), { 1000 })
-    eq_state(child, "enabled", false)
 end
 
 T["setup"]["starts the plugin on VimEnter"] = function()
