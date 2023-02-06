@@ -132,6 +132,12 @@ require("no-neck-pain").setup({
     -- Sets a global mapping to Neovim, which allows you to toggle the plugin.
     -- When `false`, the mapping is not created.
     toggleMapping = "<Leader>np",
+    -- Sets a global mapping to Neovim, which allows you to increase the width (+5) of the main window.
+    -- When `false`, the mapping is not created.
+    widthUpMapping = "<Leader>n=",
+    -- Sets a global mapping to Neovim, which allows you to decrease the width (-5) of the main window.
+    -- When `false`, the mapping is not created.
+    widthDownMapping = "<Leader>n-",
     -- Disables the plugin if the last valid buffer in the list have been closed.
     disableOnLastBuffer = false,
     -- When `true`, disabling the plugin closes every other windows except the initially focused one.
@@ -248,6 +254,8 @@ NoNeckPain.bufferOptions = {
 |-------------|----------------------------|
 |`:NoNeckPain`| Toggles the plugin state, between enable and disable. |
 |`:NoNeckPainResize INT`| Updates the config `width` with the given `INT` value and resizes the no-neck-pain windows. |
+|`:NoNeckPainWidthUp`| Increases the config `width` by 5 and resizes the no-neck-pain windows. |
+|`:NoNeckPainWidthDown`| Decreases the config `width` by 5 and resizes the no-neck-pain windows. |
 
 ## ⌨ Contributing
 

@@ -3,6 +3,16 @@ local Co = require("no-neck-pain.util.constants")
 
 local NoNeckPain = {}
 
+local function registerMapping(options, mapping, fn)
+    if options[mapping] == false then
+        return
+    end
+
+    assert(type(options[mapping]) == "string", string.format("`%s` must be a string", mapping))
+
+    vim.api.nvim_set_keymap("n", options[mapping], fn, { silent = true })
+end
+
 --- NoNeckPain buffer options
 ---
 --- Default values:
@@ -78,6 +88,12 @@ NoNeckPain.options = {
     -- Sets a global mapping to Neovim, which allows you to toggle the plugin.
     -- When `false`, the mapping is not created.
     toggleMapping = "<Leader>np",
+    -- Sets a global mapping to Neovim, which allows you to increase the width (+5) of the main window.
+    -- When `false`, the mapping is not created.
+    widthUpMapping = "<Leader>n=",
+    -- Sets a global mapping to Neovim, which allows you to decrease the width (-5) of the main window.
+    -- When `false`, the mapping is not created.
+    widthDownMapping = "<Leader>n-",
     -- Disables the plugin if the last valid buffer in the list have been closed.
     disableOnLastBuffer = false,
     -- When `true`, disabling the plugin closes every other windows except the initially focused one.
@@ -223,16 +239,17 @@ function NoNeckPain.setup(options)
     -- set theme options
     NoNeckPain.options.buffers = C.parse(NoNeckPain.options.buffers)
 
-    if NoNeckPain.options.toggleMapping ~= false then
-        assert(
-            type(NoNeckPain.options.toggleMapping) == "string",
-            "`toggleMapping` must be a string"
-        )
-
-        vim.api.nvim_set_keymap("n", NoNeckPain.options.toggleMapping, ":NoNeckPain<CR>", {
-            silent = true,
-        })
-    end
+    registerMapping(NoNeckPain.options, "toggleMapping", ":NoNeckPain<CR>")
+    registerMapping(
+        NoNeckPain.options,
+        "widthUpMapping",
+        ":lua require('no-neck-pain').resize(_G.NoNeckPain.config.width + 5)<CR>"
+    )
+    registerMapping(
+        NoNeckPain.options,
+        "widthDownMapping",
+        ":lua require('no-neck-pain').resize(_G.NoNeckPain.config.width - 5)<CR>"
+    )
 
     return NoNeckPain.options
 end
