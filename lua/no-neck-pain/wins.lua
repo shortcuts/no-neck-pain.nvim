@@ -53,7 +53,9 @@ function W.createSideBuffers(tab)
             local valid = tab.wins.main[side] ~= nil
                 and vim.api.nvim_win_is_valid(tab.wins.main[side])
 
-            if W.getPadding(side, tab.wins) > 0 and not valid then
+            if
+                W.getPadding(side, tab.wins) > _G.NoNeckPain.config.minSidebufferWidth and not valid
+            then
                 vim.cmd(cmd[side].cmd)
 
                 local id = vim.api.nvim_get_current_win()
@@ -169,7 +171,7 @@ function W.resizeOrCloseSideBuffers(scope, wins)
         if wins.main[side] ~= nil then
             local padding = W.getPadding(side, wins)
 
-            if padding > 0 then
+            if padding > _G.NoNeckPain.config.minSidebufferWidth then
                 resize(wins.main[side], padding, side)
             else
                 W.close(scope, wins.main[side], side)
@@ -199,13 +201,7 @@ function W.getPadding(side, wins)
     -- if the available screen size is lower than the config width,
     -- we don't have to create side buffers.
     if _G.NoNeckPain.config.width >= width then
-        D.log(
-            "W.getPadding",
-            "[%s] - ui %s | cfg %s - no space left to create side buffers",
-            side,
-            width,
-            _G.NoNeckPain.config.width
-        )
+        D.log("W.getPadding", "[%s] - ui %s - no space left to create side buffers", side, width)
 
         return 0
     end

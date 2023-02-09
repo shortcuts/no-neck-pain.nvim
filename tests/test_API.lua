@@ -50,6 +50,7 @@ T["setup"]["sets exposed methods and default options value"] = function()
     eq_type_config(child, "buffers", "table")
 
     eq_config(child, "width", 100)
+    eq_config(child, "minSidebufferWidth", 5)
     eq_config(child, "enableOnVimEnter", false)
     eq_config(child, "enableOnTabEnter", false)
     eq_config(child, "toggleMapping", "<Leader>np")
@@ -117,6 +118,7 @@ end
 T["setup"]["overrides default values"] = function()
     child.lua([[require('no-neck-pain').setup({
         width = 42,
+        minSidebufferWidth = 0,
         enableOnVimEnter = true,
         enableOnTabEnter = true,
         debug = true,
@@ -125,6 +127,7 @@ T["setup"]["overrides default values"] = function()
     })]])
 
     eq_config(child, "width", 42)
+    eq_config(child, "minSidebufferWidth", 0)
     eq_config(child, "enableOnVimEnter", true)
     eq_config(child, "enableOnTabEnter", true)
     eq_config(child, "debug", true)
