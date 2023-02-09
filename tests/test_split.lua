@@ -229,7 +229,7 @@ end
 
 T["vsplit"]["many vsplit leave side buffers open as long as there's space for it"] = function()
     child.set_size(300, 300)
-    child.lua([[ require('no-neck-pain').setup({width=70}) ]])
+    child.lua([[ require('no-neck-pain').setup({width=70,minSidebufferWidth=0}) ]])
 
     eq(child.lua_get("vim.api.nvim_tabpage_list_wins(1)"), { 1000 })
 
