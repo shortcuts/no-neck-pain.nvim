@@ -57,9 +57,8 @@ end
 function N.enable(scope)
     local tab = Ta.get(S.tabs)
 
-    -- skip if we already have a state for the current tab.
-    if S.enabled and tab ~= nil then
-        return S
+    if E.skipEnable(tab) then
+        return nil
     end
 
     D.log(scope, "calling enable for tab %d", S.activeTab)
@@ -74,6 +73,8 @@ function N.enable(scope)
     tab.wins.splits = Sp.get(tab)
 
     N.init(scope, tab, true)
+
+    S.enabled = true
 
     vim.api.nvim_create_autocmd({ "VimResized" }, {
         callback = function(p)
@@ -213,23 +214,17 @@ function N.enable(scope)
     vim.api.nvim_create_autocmd({ "WinEnter", "WinClosed" }, {
         callback = function(p)
             vim.schedule(function()
-                if E.skip(tab, true) then
+                if E.skip(tab, false) then
                     return
                 end
 
-                local focusedWin = vim.api.nvim_get_current_win()
-                local wins, total = W.winsExceptState(tab, false)
-
-                if total == 0 or not vim.tbl_contains(wins, focusedWin) then
-                    return
-                end
-
+                local wins, _ = W.winsExceptState(tab, false)
                 local trees = T.refresh(tab)
 
                 -- we cycle over supported integrations to see which got closed or opened
                 for name, tree in pairs(tab.wins.external.trees) do
                     -- if there was a tree[name] but not anymore, we resize
-                    if tree ~= nil and tree.id ~= nil and not vim.tbl_contains(wins, tree.id) then
+                    if tree.id ~= nil and not vim.tbl_contains(wins, tree.id) then
                         D.log(p.event, "%s have been closed, resizing", name)
 
                         return N.init(p.event, tab)
@@ -249,8 +244,6 @@ function N.enable(scope)
         desc = "Resize to apply on WinEnter/Closed of external windows",
     })
 
-    S.enabled = true
-
     return S
 end
 
@@ -258,8 +251,17 @@ end
 function N.disable(scope)
     local tab = Ta.get(S.tabs)
 
-    if not S.enabled or tab == nil then
+    if tab == nil then
         return S
+    end
+
+    D.log(scope, "calling disable for tab %d", S.activeTab)
+
+    -- we first remove the tab and reset the state if necessary, so there's no side effects of later actions.
+    S.tabs = Ta.remove(S.tabs, tab.id)
+
+    if S.tabs == nil then
+        S = Ta.initState()
     end
 
     vim.api.nvim_del_augroup_by_id(tab.augroup)
@@ -314,12 +316,6 @@ function N.disable(scope)
             -- when we have more than 1 window left, we can just close it
             W.close(scope, tab.wins.main[side], side)
         end
-    end
-
-    S.tabs = Ta.remove(S.tabs, tab.id)
-
-    if S.tabs == nil then
-        S = Ta.initState()
     end
 
     return S

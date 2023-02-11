@@ -1,3 +1,5 @@
+local D = require("no-neck-pain.util.debug")
+local T = require("no-neck-pain.trees")
 local W = require("no-neck-pain.wins")
 
 local E = {}
@@ -26,6 +28,28 @@ function E.skip(tab, skipSplit)
         if curr == tab.wins.main.left or curr == tab.wins.main.right then
             return true
         end
+    end
+
+    return false
+end
+
+-- determines if we should skip the enabling of the plugin
+-- 1. if a tab definition already exists in the state
+-- 2. if we are focusing a relative window
+-- 3. if we are focusing a side tree or a dashboard
+function E.skipEnable(tab)
+    if tab ~= nil then
+        return true
+    end
+
+    if W.isRelativeWindow() then
+        return true
+    end
+
+    local fileType = vim.bo.filetype
+
+    if T.isSideTree(fileType) or fileType == "dashboard" then
+        return true
     end
 
     return false

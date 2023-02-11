@@ -1,3 +1,4 @@
+local D = require("no-neck-pain.util.debug")
 local M = require("no-neck-pain.main")
 
 local NoNeckPain = {}
@@ -38,7 +39,13 @@ function NoNeckPain.enable()
         _G.NoNeckPain.config = require("no-neck-pain.config").options
     end
 
-    _G.NoNeckPain.state = M.enable("publicAPI_enable")
+    local state = M.enable("publicAPI_enable")
+
+    if state ~= nil then
+        _G.NoNeckPain.state = state
+    end
+
+    return state
 end
 
 --- Disables the plugin, clear highlight groups and autocmds, closes side buffers and resets the internal state.
@@ -55,24 +62,23 @@ function NoNeckPain.setup(opts)
     end
 
     if _G.NoNeckPain.config.enableOnVimEnter then
-        vim.api.nvim_create_autocmd({ "BufWinEnter" }, {
+        vim.api.nvim_create_autocmd({ "BufEnter" }, {
             pattern = "*",
             callback = function(p)
                 vim.schedule(function()
-                    if _G.NoNeckPain.state ~= nil and _G.NoNeckPain.state.enabled == true then
+                    if _G.NoNeckPain.state ~= nil and _G.NoNeckPain.state.enabled then
                         return
                     end
 
-                    if vim.bo.filetype == "dashboard" or vim.bo.filetype == "NvimTree" then
-                        return
-                    end
+                    local state = NoNeckPain.enable()
 
-                    NoNeckPain.enable()
-                    vim.api.nvim_del_autocmd(p.id)
+                    if state ~= nil then
+                        vim.api.nvim_del_autocmd(p.id)
+                    end
                 end)
             end,
             group = "NoNeckPainAutocmd",
-            desc = "Triggers until it find the correct moment/buffer to enable the plugin.",
+            desc = "Triggers until it finds the correct moment/buffer to enable the plugin.",
         })
     end
 
@@ -80,10 +86,6 @@ function NoNeckPain.setup(opts)
         vim.api.nvim_create_autocmd({ "TabNewEntered" }, {
             callback = function()
                 vim.schedule(function()
-                    if vim.bo.filetype == "dashboard" or vim.bo.filetype == "NvimTree" then
-                        return
-                    end
-
                     NoNeckPain.enable()
                 end)
             end,
