@@ -1,3 +1,4 @@
+local D = require("no-neck-pain.util.debug")
 local C = require("no-neck-pain.color")
 local Co = require("no-neck-pain.util.constants")
 
