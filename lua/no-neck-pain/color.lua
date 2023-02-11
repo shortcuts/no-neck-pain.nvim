@@ -67,20 +67,39 @@ local function matchAndBlend(colorCode, factor)
 end
 
 function C.parse(buffers)
-    buffers.backgroundColor = matchAndBlend(buffers.backgroundColor, buffers.blend)
+    local defaultBackground = vim.api.nvim_get_hl_by_name("Normal", true).background
 
-    for _, side in pairs(Co.SIDES) do
-        buffers[side].backgroundColor = matchAndBlend(
-            buffers[side].backgroundColor,
-            buffers[side].blend or buffers.blend
-        ) or buffers.backgroundColor
-
-        buffers[side].textColor = buffers[side].textColor
-            or buffers.textColor
-            or matchAndBlend(buffers[side].backgroundColor, 0.5)
+    -- if the user has transparent bg and did not provided a custom one
+    if defaultBackground == nil then
+        buffers.backgroundColor = "NONE"
+        buffers.textColor = "#ffffff"
+    else
+        buffers.backgroundColor = matchAndBlend(
+            buffers.backgroundColor or string.format("#%06X", defaultBackground),
+            buffers.blend
+        )
     end
 
-    buffers.textColor = buffers.textColor or buffers.backgroundColor
+    for _, side in pairs(Co.SIDES) do
+        if buffers[side].enabled then
+            buffers[side].backgroundColor = matchAndBlend(
+                buffers[side].backgroundColor,
+                buffers[side].blend or buffers.blend
+            ) or buffers.backgroundColor
+
+            local defaultTextColor = buffers[side].backgroundColor
+
+            -- if we have a transparent bg we won't be able,
+            -- to default a text color so we set it to white
+            if buffers[side].backgroundColor == "NONE" then
+                defaultTextColor = "#ffffff"
+            end
+
+            buffers[side].textColor = buffers[side].textColor
+                or buffers.textColor
+                or matchAndBlend(defaultTextColor, 0.5)
+        end
+    end
 
     return buffers
 end
@@ -97,24 +116,13 @@ function C.init(win, tab, side)
     vim.cmd(string.format("highlight! clear %s NONE", backgroundGroup))
     vim.cmd(string.format("highlight! clear %s NONE", textGroup))
 
-    local defaultBackground = vim.api.nvim_get_hl_by_name("Normal", true).background
-
-    -- check if the user has a transparent background.
-    if defaultBackground == nil then
-        defaultBackground = "NONE"
-    else
-        defaultBackground = string.format("#%06X", defaultBackground)
-    end
-
-    local backgroundColor = _G.NoNeckPain.config.buffers[side].backgroundColor or defaultBackground
-
     -- create group for background
     vim.cmd(
         string.format(
             "highlight! %s guifg=%s guibg=%s",
             backgroundGroup,
-            backgroundColor,
-            backgroundColor
+            _G.NoNeckPain.config.buffers[side].backgroundColor,
+            _G.NoNeckPain.config.buffers[side].backgroundColor
         )
     )
 
@@ -124,7 +132,7 @@ function C.init(win, tab, side)
             "highlight! %s guifg=%s guibg=%s",
             textGroup,
             _G.NoNeckPain.config.buffers[side].textColor,
-            backgroundColor
+            _G.NoNeckPain.config.buffers[side].backgroundColor
         )
     )
 
@@ -134,7 +142,7 @@ function C.init(win, tab, side)
     }
 
     -- on transparent backgrounds we don't set those two to prevent white lines.
-    if backgroundColor ~= "NONE" then
+    if _G.NoNeckPain.config.buffers[side].backgroundColor ~= "NONE" then
         groups = vim.tbl_extend("keep", groups, {
             WinSeparator = backgroundGroup,
             VertSplit = backgroundGroup,

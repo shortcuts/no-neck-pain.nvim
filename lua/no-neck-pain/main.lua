@@ -115,8 +115,7 @@ function N.enable(scope)
                 end
 
                 -- we skip side trees etc. as they are not part of the split manager.
-                local fileType = vim.api.nvim_buf_get_option(0, "filetype")
-                if T.isSideTree(fileType) then
+                if T.isSideTree(vim.api.nvim_buf_get_option(0, "filetype")) then
                     return D.log(p.event, "encountered an external window")
                 end
 

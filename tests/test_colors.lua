@@ -18,7 +18,23 @@ local T = MiniTest.new_set({
 
 T["setup"] = MiniTest.new_set()
 
+T["setup"]["supports transparent bgs"] = function()
+    child.lua([[require('no-neck-pain').setup()]])
+
+    eq_config(child, "buffers.backgroundColor", "NONE")
+    eq_config(child, "buffers.textColor", "#ffffff")
+
+    for _, scope in pairs(Co.SIDES) do
+        eq_config(child, "buffers." .. scope .. ".backgroundColor", "NONE")
+        eq_config(child, "buffers." .. scope .. ".textColor", "#ffffff")
+    end
+end
+
 T["setup"]["overrides default values"] = function()
+    child.cmd([[
+        highlight Normal guibg=black guifg=white
+        set background=dark
+    ]])
     child.lua([[require('no-neck-pain').setup({
         buffers = {
             backgroundColor = "catppuccin-frappe",
@@ -49,6 +65,10 @@ T["setup"]["overrides default values"] = function()
 end
 
 T["setup"]["`left` or `right` buffer options overrides `common` ones"] = function()
+    child.cmd([[
+        highlight Normal guibg=black guifg=white
+        set background=dark
+    ]])
     child.lua([[require('no-neck-pain').setup({
         buffers = {
             backgroundColor = "catppuccin-frappe",
@@ -82,6 +102,10 @@ T["setup"]["`left` or `right` buffer options overrides `common` ones"] = functio
 end
 
 T["setup"]["`common` options spreads it to `left` and `right` buffers"] = function()
+    child.cmd([[
+        highlight Normal guibg=black guifg=white
+        set background=dark
+    ]])
     child.lua([[require('no-neck-pain').setup({
         buffers = {
             backgroundColor = "catppuccin-frappe",
