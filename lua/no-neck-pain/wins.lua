@@ -54,7 +54,7 @@ function W.createSideBuffers(tab)
                 and vim.api.nvim_win_is_valid(tab.wins.main[side])
 
             if
-                W.getPadding(side, tab.wins) > _G.NoNeckPain.config.minSidebufferWidth and not valid
+                W.getPadding(side, tab.wins) > _G.NoNeckPain.config.minSideBufferWidth and not valid
             then
                 vim.cmd(cmd[side].cmd)
 
@@ -171,7 +171,7 @@ function W.resizeOrCloseSideBuffers(scope, wins)
         if wins.main[side] ~= nil then
             local padding = W.getPadding(side, wins)
 
-            if padding > _G.NoNeckPain.config.minSidebufferWidth then
+            if padding > _G.NoNeckPain.config.minSideBufferWidth then
                 resize(wins.main[side], padding, side)
             else
                 W.close(scope, wins.main[side], side)
