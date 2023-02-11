@@ -1,4 +1,19 @@
 <a name="0.2.3"></a>
+## [0.9.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v0.8.0...v0.9.0) (2023-02-11)
+
+
+### Features
+
+* add `minSidebufferWidth` ([#173](https://github.com/shortcuts/no-neck-pain.nvim/issues/173)) ([a64f5ec](https://github.com/shortcuts/no-neck-pain.nvim/commit/a64f5ecf2140b8932c52a9788dafc150a7b4ad9c))
+* add up/down commands and mappings ([#168](https://github.com/shortcuts/no-neck-pain.nvim/issues/168)) ([4334618](https://github.com/shortcuts/no-neck-pain.nvim/commit/4334618121ac236c18b0d1fee95816e799108db2))
+* support `blend` without background color ([#178](https://github.com/shortcuts/no-neck-pain.nvim/issues/178)) ([72c109e](https://github.com/shortcuts/no-neck-pain.nvim/commit/72c109eb164e695179f68b7d12ee1a66b72034fd))
+
+
+### Bug Fixes
+
+* `minSidebufferWidth` casing ([#177](https://github.com/shortcuts/no-neck-pain.nvim/issues/177)) ([edc68e5](https://github.com/shortcuts/no-neck-pain.nvim/commit/edc68e5cd721eed6bd9b0cd3073d24403a3c2fff))
+* wrong side buffer width when toggling NvimTree ([#176](https://github.com/shortcuts/no-neck-pain.nvim/issues/176)) ([380df96](https://github.com/shortcuts/no-neck-pain.nvim/commit/380df965f452f3060fb0dcfce069a2eaf2257d4b))
+
 ## [0.8.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v0.7.0...v0.8.0) (2023-02-04)
 
 
