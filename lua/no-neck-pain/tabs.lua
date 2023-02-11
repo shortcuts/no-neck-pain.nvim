@@ -78,11 +78,11 @@ end
 
 -- returns the tab with the given `id`.
 function Ta.get(tabs, id)
-    id = id or vim.api.nvim_get_current_tabpage()
-
     if tabs == nil then
         return nil
     end
+
+    id = id or vim.api.nvim_get_current_tabpage()
 
     for _, tab in pairs(tabs) do
         if tab.id == id then
