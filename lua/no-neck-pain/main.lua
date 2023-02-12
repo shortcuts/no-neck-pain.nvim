@@ -50,6 +50,8 @@ function N.init(scope, tab, goToCurr)
         vim.fn.win_gotoid(tab.wins.main.curr)
     end
 
+    S.tabs = Ta.update(S.tabs, tab.id, tab)
+
     return S
 end
 
@@ -72,7 +74,7 @@ function N.enable(scope)
     tab.wins.main.curr = vim.api.nvim_get_current_win()
     tab.wins.splits = Sp.get(tab)
 
-    N.init(scope, tab, true)
+    S = N.init(scope, tab, true)
 
     S.enabled = true
 

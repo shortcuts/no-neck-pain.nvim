@@ -33,9 +33,9 @@ function W.createSideBuffers(tab)
     -- before creating side buffers, we determine if we should consider externals
     tab.wins.external.trees = T.refresh(tab)
 
-    local cmd = {
-        left = { cmd = "topleft vnew" },
-        right = { cmd = "botright vnew" },
+    local wins = {
+        left = { cmd = "topleft vnew", padding = 0 },
+        right = { cmd = "botright vnew", padding = 0 },
     }
 
     local integrations = {
@@ -53,10 +53,10 @@ function W.createSideBuffers(tab)
             local valid = tab.wins.main[side] ~= nil
                 and vim.api.nvim_win_is_valid(tab.wins.main[side])
 
-            if
-                W.getPadding(side, tab.wins) > _G.NoNeckPain.config.minSideBufferWidth and not valid
-            then
-                vim.cmd(cmd[side].cmd)
+            wins[side].padding = W.getPadding(side, tab.wins)
+
+            if wins[side].padding > _G.NoNeckPain.config.minSideBufferWidth and not valid then
+                vim.cmd(wins[side].cmd)
 
                 local id = vim.api.nvim_get_current_win()
 
@@ -123,7 +123,7 @@ function W.createSideBuffers(tab)
     end
 
     tab.wins.main.left, tab.wins.main.right =
-        W.resizeOrCloseSideBuffers("W.createSideBuffers", tab.wins)
+        W.resizeOrCloseSideBuffers("W.createSideBuffers", tab.wins, wins)
 
     -- we might have closed trees during the buffer creation process, we re-fetch the latest IDs to prevent inconsistencies
     tab.wins.external.trees = T.refresh(tab)
@@ -166,10 +166,16 @@ end
 
 -- Resizes side buffers, considering the existing trees.
 -- Closes them if there's not enough space left.
-function W.resizeOrCloseSideBuffers(scope, wins)
+function W.resizeOrCloseSideBuffers(scope, wins, paddings)
     for _, side in pairs(Co.SIDES) do
         if wins.main[side] ~= nil then
-            local padding = W.getPadding(side, wins)
+            local padding = 0
+
+            if paddings ~= nil then
+                padding = paddings[side].padding
+            else
+                padding = W.getPadding(side, wins)
+            end
 
             if padding > _G.NoNeckPain.config.minSideBufferWidth then
                 resize(wins.main[side], padding, side)
