@@ -50,6 +50,8 @@ function N.init(scope, tab, goToCurr)
         vim.fn.win_gotoid(tab.wins.main.curr)
     end
 
+    S.tabs = Ta.update(S.tabs, tab.id, tab)
+
     return S
 end
 
@@ -72,7 +74,16 @@ function N.enable(scope)
     tab.wins.main.curr = vim.api.nvim_get_current_win()
     tab.wins.splits = Sp.get(tab)
 
-    N.init(scope, tab, true)
+    S = N.init(scope, tab, true)
+
+    -- at this point we should know if the plugin is being enabled for a side tree,
+    -- if it happens, we just disable it
+    if T.isSideTree(vim.bo.filetype) then
+        N.disable("enable")
+        vim.cmd("NvimTreeClose")
+
+        return nil
+    end
 
     S.enabled = true
 

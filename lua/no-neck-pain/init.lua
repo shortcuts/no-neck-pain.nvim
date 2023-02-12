@@ -15,7 +15,7 @@ end
 ---
 --- @param width number: any positive integer superior to 0.
 function NoNeckPain.resize(width)
-    if not _G.NoNeckPain.state.enabled then
+    if _G.NoNeckPain.state == nil or not _G.NoNeckPain.state.enabled then
         error("no-neck-pain.nvim must be enabled, run `NoNeckPain` first.")
     end
 
