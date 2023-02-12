@@ -2,6 +2,10 @@ local D = require("no-neck-pain.util.debug")
 
 local Ta = {}
 
+---Initializes the state for the first tab, called when enabling or disabling the plugin.
+---
+---@return table: the initialied state
+---@private
 function Ta.initState()
     return {
         enabled = false,
@@ -10,7 +14,10 @@ function Ta.initState()
     }
 end
 
--- returns the current tabpage.
+---Gets the current tab page ID.
+---
+---@return number: the current tab page ID.
+---@private
 function Ta.refresh(curr)
     local new = vim.api.nvim_win_get_tabpage(0)
 
@@ -23,7 +30,12 @@ function Ta.refresh(curr)
     return new
 end
 
--- inserts a tab in the given `tabs` list with the given `id`.
+---Inserts a new tab to the `tabs` state, with the given `id`.
+---
+---@param tabs table|nil: the `tabs` state list.
+---@return table: the updated tabs state.
+---@return table: the newly initialized tab.
+---@private
 function Ta.insert(tabs, id)
     tabs = tabs or {}
 
@@ -57,7 +69,12 @@ function Ta.insert(tabs, id)
     return tabs, newTab
 end
 
--- removes the tab with the given `id` and returns the new `tabs` list.
+---Remove the tab with the given `id` from the tabs state.
+---
+---@param tabs table: the `tabs` state list.
+---@param id number: the id of the tab to remove.
+---@return table|nil: the updated tabs state list or nil if there's no remaining tabs active.
+---@private
 function Ta.remove(tabs, id)
     local newTabs = {}
     local total = 0
@@ -76,7 +93,12 @@ function Ta.remove(tabs, id)
     return newTabs
 end
 
--- returns the tab with the given `id`.
+---Gets the tab with the given `id` for the state
+---
+---@param tabs table|nil: the `tabs` state list.
+---@param id number: the id of the tab to get.
+---@return table|nil: the `tab` information, or `nil` if it's not found.
+---@private
 function Ta.get(tabs, id)
     if tabs == nil then
         return nil
@@ -93,7 +115,13 @@ function Ta.get(tabs, id)
     return nil
 end
 
--- replace the tab of the given `id` in the `tabs` list with the `updatedTab`.
+---Replaces the tab with the given `id` by the `updatedTab`
+---
+---@param tabs table: the `tabs` state list.
+---@param id number: the id of the tab to update.
+---@param updatedTab table: the table where the updated tab information are stored.
+---@return table|nil: the `tab` information, or `nil` if it's not found.
+---@private
 function Ta.update(tabs, id, updatedTab)
     local updatedTabs = {}
 
