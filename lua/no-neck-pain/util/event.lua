@@ -9,7 +9,7 @@ local E = {}
 --- - we are focusing a floating window
 --- - we are focusing one of the side buffer
 ---
----@param tab table|nil: the table where the tab information are stored.
+---@param tab table?: the table where the tab information are stored.
 ---@param skipSplit boolean: whether we should consider a relative window or not.
 ---@private
 function E.skip(tab, skipSplit)
@@ -45,7 +45,7 @@ end
 --- - we are focusing a floating window
 --- - we are focusing one of the side buffer
 ---
----@param tab table|nil: the table where the tab information are stored.
+---@param tab table?: the table where the tab information are stored.
 ---@private
 function E.skipEnable(tab)
     if tab ~= nil then

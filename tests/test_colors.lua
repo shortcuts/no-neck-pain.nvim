@@ -18,18 +18,6 @@ local T = MiniTest.new_set({
 
 T["setup"] = MiniTest.new_set()
 
-T["setup"]["supports transparent bgs"] = function()
-    child.lua([[require('no-neck-pain').setup()]])
-
-    eq_config(child, "buffers.backgroundColor", "NONE")
-    eq_config(child, "buffers.textColor", "#ffffff")
-
-    for _, scope in pairs(Co.SIDES) do
-        eq_config(child, "buffers." .. scope .. ".backgroundColor", "NONE")
-        eq_config(child, "buffers." .. scope .. ".textColor", "#ffffff")
-    end
-end
-
 T["setup"]["overrides default values"] = function()
     child.cmd([[
         highlight Normal guibg=black guifg=white
@@ -125,6 +113,30 @@ T["setup"]["`common` options spreads it to `left` and `right` buffers"] = functi
 
     eq_config(child, "buffers.left.textColor", "#000000")
     eq_config(child, "buffers.right.textColor", "#000000")
+end
+
+T["setup"]["supports transparent bgs"] = function()
+    child.lua([[require('no-neck-pain').setup()]])
+
+    eq_config(child, "buffers.backgroundColor", "NONE")
+    eq_config(child, "buffers.textColor", "#ffffff")
+
+    for _, scope in pairs(Co.SIDES) do
+        eq_config(child, "buffers." .. scope .. ".backgroundColor", "NONE")
+        eq_config(child, "buffers." .. scope .. ".textColor", "#ffffff")
+    end
+end
+
+T["setup"]["backgroundColor overrides a nil background when defined"] = function()
+    child.lua([[require('no-neck-pain').setup({buffers={backgroundColor="#abcabc"}})]])
+
+    eq_config(child, "buffers.backgroundColor", "#abcabc")
+    eq_config(child, "buffers.textColor", vim.NIL)
+
+    for _, scope in pairs(Co.SIDES) do
+        eq_config(child, "buffers." .. scope .. ".backgroundColor", "#abcabc")
+        eq_config(child, "buffers." .. scope .. ".textColor", "#d5e4dd")
+    end
 end
 
 T["color"] = MiniTest.new_set()

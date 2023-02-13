@@ -32,7 +32,7 @@ end
 
 ---Inserts a new tab to the `tabs` state, with the given `id`.
 ---
----@param tabs table|nil: the `tabs` state list.
+---@param tabs table?: the `tabs` state list.
 ---@return table: the updated tabs state.
 ---@return table: the newly initialized tab.
 ---@private
@@ -73,7 +73,7 @@ end
 ---
 ---@param tabs table: the `tabs` state list.
 ---@param id number: the id of the tab to remove.
----@return table|nil: the updated tabs state list or nil if there's no remaining tabs active.
+---@return table?: the updated tabs state list or nil if there's no remaining tabs active.
 ---@private
 function Ta.remove(tabs, id)
     local newTabs = {}
@@ -95,9 +95,9 @@ end
 
 ---Gets the tab with the given `id` for the state
 ---
----@param tabs table|nil: the `tabs` state list.
----@param id number: the id of the tab to get.
----@return table|nil: the `tab` information, or `nil` if it's not found.
+---@param tabs table?: the `tabs` state list.
+---@param id number?: the id of the tab to get, fallbacks to the current page when `nil`.
+---@return table?: the `tab` information, or `nil` if it's not found.
 ---@private
 function Ta.get(tabs, id)
     if tabs == nil then
@@ -120,7 +120,7 @@ end
 ---@param tabs table: the `tabs` state list.
 ---@param id number: the id of the tab to update.
 ---@param updatedTab table: the table where the updated tab information are stored.
----@return table|nil: the `tab` information, or `nil` if it's not found.
+---@return table?: the `tab` information, or `nil` if it's not found.
 ---@private
 function Ta.update(tabs, id, updatedTab)
     local updatedTabs = {}
