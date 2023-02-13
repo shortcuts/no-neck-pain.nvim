@@ -2,14 +2,25 @@ local Co = require("no-neck-pain.util.constants")
 
 local C = {}
 
--- converts an hex color code to RGB, values are returned independently.
+---Converts an hex color code to RGB, values are returned independently.
+---
+---@param hex string: the hex color to conver to rgb.
+---@return number?: the r color
+---@return number?: the g color
+---@return number?: the b color
+---@private
 local function hexToRGB(hex)
     local r, g, b = hex:sub(2, 3), hex:sub(4, 5), hex:sub(6, 7)
 
     return tonumber("0x" .. r), tonumber("0x" .. g), tonumber("0x" .. b)
 end
 
--- blend the given `colorCode` RGB for the given `factor`.
+---Blend the given `colorCode` RGB for the given `factor`.
+---
+---@param colorCode string: the color code string, e.g. #ffffff.
+---@param factor number: Brighten (positive) or darken (negative) the side buffers background color. Accepted values are [-1..1].
+---@return string: the blended color code.
+---@private
 local function blend(colorCode, factor)
     local r, g, b = hexToRGB(colorCode)
     local format = "#%02x%02x%02x"
@@ -30,8 +41,13 @@ local function blend(colorCode, factor)
     )
 end
 
--- tries to match the given `colorCode` to an integration name, defaults to the given `colorCode` if not found.
--- if a `factor` is provided, the color will be blended (brighten/darken) before being returned.
+---Tries to match the given `colorCode` to an integration name, defaults to the given `colorCode` if not found.
+---if a `factor` is provided, the color will be blended (brighten/darken) before being returned.
+---
+---@param colorCode string: the color code string, e.g. #ffffff.
+---@param factor number: Brighten (positive) or darken (negative) the side buffers background color. Accepted values are [-1..1].
+---@return string?: the blended color code.
+---@private
 local function matchAndBlend(colorCode, factor)
     if colorCode == nil then
         return nil
@@ -63,14 +79,23 @@ local function matchAndBlend(colorCode, factor)
         return colorCode
     end
 
-    return blend(colorCode, factor)
+    return blend(colorCode, factor or 0)
 end
 
+---Parses to color for each buffer parameters, considering transparent backgrounds.
+---
+---@param buffers table: the buffers table to parse.
+---@return table: the parsed buffers.
+---@private
 function C.parse(buffers)
     local defaultBackground = vim.api.nvim_get_hl_by_name("Normal", true).background
 
-    -- if the user has transparent bg and did not provided a custom one
-    if defaultBackground == nil then
+    -- if the user did not provided a custom background color, and have a transparent bg,
+    -- we set it to the global options and let the loop do the spread below.
+    if
+        buffers.backgroundColor == nil
+        and (defaultBackground == nil or string.lower(defaultBackground) == "none")
+    then
         buffers.backgroundColor = "NONE"
         buffers.textColor = "#ffffff"
     else
@@ -82,6 +107,7 @@ function C.parse(buffers)
 
     for _, side in pairs(Co.SIDES) do
         if buffers[side].enabled then
+            -- if the side buffer backgroundColor is not defined, we fallback to the common option.
             buffers[side].backgroundColor = matchAndBlend(
                 buffers[side].backgroundColor,
                 buffers[side].blend or buffers.blend
@@ -104,10 +130,15 @@ function C.parse(buffers)
     return buffers
 end
 
--- Creates highlight groups for a given `win` in a `tab` named:
--- - `NoNeckPain_background_tab_$ID_side_$SIDE` for the background colors.
--- - `NoNeckPain_text_tab_$ID_side_$SIDE` for the text colors.
--- note: `cmd` is used instead of native commands for backward compatibility with Neovim 0.7
+---Creates highlight groups for a given `win` in a `tab` named:
+---- `NoNeckPain_background_tab_$ID_side_$SIDE` for the background colors.
+---- `NoNeckPain_text_tab_$ID_side_$SIDE` for the text colors.
+---note: `cmd` is used instead of native commands for backward compatibility with Neovim 0.7
+---
+---@param win number: the id of the win to init.
+---@param tab table: the table where the tab information are stored.
+---@param side "left"|"right": the side of the window being resized, used for logging only.
+---@private
 function C.init(win, tab, side)
     local backgroundGroup = string.format("NoNeckPain_background_tab_%s_side_%s", tab, side)
     local textGroup = string.format("NoNeckPain_text_tab_%s_side_%s", tab, side)

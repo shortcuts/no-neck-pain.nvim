@@ -145,7 +145,7 @@ end
 
 ---Determines if the given `win` or the current window is relative.
 ---
----@param win number|nil: the id of the window.
+---@param win number?: the id of the window.
 ---@return boolean: true if the window is relative.
 ---@private
 function W.isRelativeWindow(win)
@@ -192,8 +192,8 @@ end
 ---@param scope string: the scope from where this function is called.
 ---@param wins table: the state wins for the current tab.
 ---@param paddings table: the paddings of each side window.
----@return number|nil: the left window id.
----@return number|nil: the right window id.
+---@return number?: the left window id.
+---@return number?: the right window id.
 ---@private
 function W.resizeOrCloseSideBuffers(scope, wins, paddings)
     for _, side in pairs(Co.SIDES) do
@@ -286,7 +286,7 @@ end
 ---
 ---@param main table: the `main` window state.
 ---@param splits table: the `splits` window state.
----@param trees table|nil: the `external.trees` window state.
+---@param trees table?: the `external.trees` window state.
 ---@return table: the state window IDs.
 ---@private
 function W.mergeState(main, splits, trees)
