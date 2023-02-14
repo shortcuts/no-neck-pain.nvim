@@ -1,7 +1,13 @@
 local C = {}
 
+---Sides where the buffers are created.
+---
+---@private
 C.SIDES = { "left", "right" }
 
+---Available color integrations aliases.
+---
+---@private
 C.INTEGRATIONS = {
     ["catppuccin-frappe"] = "#303446",
     ["catppuccin-frappe-dark"] = "#292c3c",

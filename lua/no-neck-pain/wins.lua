@@ -6,7 +6,12 @@ local T = require("no-neck-pain.trees")
 
 local W = {}
 
--- Resizes a window if it's valid.
+---Resizes a window if it's valid.
+---
+---@param id number: the id of the window.
+---@param width number: the width to apply to the window.
+---@param side "left"|"right": the side of the window being resized, used for logging only.
+---@private
 local function resize(id, width, side)
     D.log(side, "resizing %d with padding %d", id, width)
 
@@ -15,7 +20,12 @@ local function resize(id, width, side)
     end
 end
 
--- Closes a window if it's valid.
+---Closes a window if it's valid.
+---
+---@param scope string: the scope from where this function is called.
+---@param id number: the id of the window.
+---@param side "left"|"right": the side of the window being resized, used for logging only.
+---@private
 function W.close(scope, id, side)
     D.log(scope, "closing %s window", side)
 
@@ -24,11 +34,13 @@ function W.close(scope, id, side)
     end
 end
 
--- Creates side buffers with the correct padding, considering the side trees.
--- A side buffer is not created if there's not enough space.
--- If it already exists, we resize it.
---
---@param tab list: the current tab state.
+---Creates side buffers with the correct padding, considering the side trees.
+--- - A side buffer is not created if there's not enough space.
+--- - If it already exists, we resize it.
+---
+---@param tab table: the table where the tab information are stored.
+---@return table: the updated tab.
+---@private
 function W.createSideBuffers(tab)
     -- before creating side buffers, we determine if we should consider externals
     tab.wins.external.trees = T.refresh(tab)
@@ -131,7 +143,11 @@ function W.createSideBuffers(tab)
     return tab
 end
 
--- returns true if the index 0 window or the current window is relative.
+---Determines if the given `win` or the current window is relative.
+---
+---@param win number?: the id of the window.
+---@return boolean: true if the window is relative.
+---@private
 function W.isRelativeWindow(win)
     win = win or vim.api.nvim_get_current_win()
 
@@ -145,7 +161,13 @@ function W.isRelativeWindow(win)
     return false
 end
 
--- returns the available wins of the `tab.id` and their total number, without the `list` ones.
+---Gets all wins that are not already registered in the given `tab`, we consider side trees if provided.
+---
+---@param tab table: the table where the tab information are stored.
+---@param withTrees boolean: whether we should consider external windows or not.
+---@return table: the wins that are not in `tab`.
+---@return number: the total number of `wins`.
+---@private
 function W.winsExceptState(tab, withTrees)
     local wins = vim.api.nvim_tabpage_list_wins(tab.id)
     local mergedWins =
@@ -164,8 +186,15 @@ function W.winsExceptState(tab, withTrees)
     return validWins, size
 end
 
--- Resizes side buffers, considering the existing trees.
--- Closes them if there's not enough space left.
+---Resizes side buffers, considering the existing trees.
+---Closes them if there's not enough space left.
+---
+---@param scope string: the scope from where this function is called.
+---@param wins table: the state wins for the current tab.
+---@param paddings table: the paddings of each side window.
+---@return number?: the left window id.
+---@return number?: the right window id.
+---@private
 function W.resizeOrCloseSideBuffers(scope, wins, paddings)
     for _, side in pairs(Co.SIDES) do
         if wins.main[side] ~= nil then
@@ -189,10 +218,12 @@ function W.resizeOrCloseSideBuffers(scope, wins, paddings)
     return wins.main.left, wins.main.right
 end
 
--- Determine the "padding" (width) of the buffer based on the `_G.NoNeckPain.config.width` and the width of the screen.
---
--- @param side string: the side we are creating.
--- @param trees list: the external trees supported with their `width` and `id`.
+---Determine the "padding" (width) of the buffer based on the `_G.NoNeckPain.config.width` and the width of the screen.
+---
+---@param side "left"|"right": the side of the window.
+---@param wins table: the state wins for the current tab.
+---@return number: the width of the side window.
+---@private
 function W.getPadding(side, wins)
     local uis = vim.api.nvim_list_uis()
 
@@ -251,7 +282,13 @@ function W.getPadding(side, wins)
     return math.floor((width - paddingToSubstract - (_G.NoNeckPain.config.width * nbVSplits)) / 2)
 end
 
--- mergeState returns all of the window ids of the state.
+---Merges the state windows in a single table containing all of their IDs.
+---
+---@param main table: the `main` window state.
+---@param splits table: the `splits` window state.
+---@param trees table?: the `external.trees` window state.
+---@return table: the state window IDs.
+---@private
 function W.mergeState(main, splits, trees)
     local wins = {}
 
@@ -274,9 +311,12 @@ function W.mergeState(main, splits, trees)
     return wins
 end
 
--- returns `true` if all the `tab.id` wins are still active in the wins list.
---
--- @param checkSplits bool: checks for splits wins too when `true`.
+---Determine if the tab wins are still active and valid.
+---
+---@param tab table: the table where the tab information are stored.
+---@param checkSplits boolean: whether splits state should be considered or not.
+---@return boolean: whether all windows are active and valid or not.
+---@private
 function W.stateWinsActive(tab, checkSplits)
     local wins = vim.api.nvim_tabpage_list_wins(tab.id)
     local swins = tab.wins.main

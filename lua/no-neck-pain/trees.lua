@@ -1,11 +1,19 @@
 local T = {}
 
--- whether the given `fileType` matches a supported side tree or not.
+---Whether the given `fileType` matches a supported side tree or not.
+---
+---@param fileType string: the fileType of the buffer.
+---@return boolean
+---@private
 function T.isSideTree(fileType)
     return fileType == "NvimTree" or fileType == "undotree"
 end
 
--- returns all of the side trees wins and their width.
+---Scans the current tab wins to update registered side trees.
+---
+---@param tab table: the table where the tab information are stored.
+---@return table: the update state trees table.
+---@private
 function T.refresh(tab)
     local wins = vim.api.nvim_tabpage_list_wins(tab.id)
     local trees = {
