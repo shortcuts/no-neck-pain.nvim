@@ -73,6 +73,12 @@ function W.createSideBuffers(tab)
                 local id = vim.api.nvim_get_current_win()
 
                 if _G.NoNeckPain.config.buffers.setNames then
+                    local exist = vim.fn.bufnr("no-neck-pain-" .. side)
+
+                    if exist ~= -1 then
+                        vim.api.nvim_buf_delete(exist, { force = true })
+                    end
+
                     vim.api.nvim_buf_set_name(0, "no-neck-pain-" .. side)
                 end
 
