@@ -13,7 +13,7 @@ local E = {}
 ---@param skipSplit boolean: whether we should consider a relative window or not.
 ---@private
 function E.skip(tab, skipSplit)
-    if not _G.NoNeckPain.state.enabled then
+    if _G.NoNeckPain.state == nil or not _G.NoNeckPain.state.enabled then
         return true
     end
 
