@@ -228,6 +228,23 @@ end
 
 T["left/right"] = MiniTest.new_set()
 
+T["left/right"]["setNames doesn't throw when re-creating side buffers"] = function()
+    child.lua([[require('no-neck-pain').setup({width=50, buffers={setNames=true}})]])
+
+    -- enable
+    child.cmd([[NoNeckPain]])
+
+    eq_buf_width(child, "tabs[1].wins.main.left", 15)
+    eq_buf_width(child, "tabs[1].wins.main.right", 15)
+
+    -- toggle
+    child.cmd([[NoNeckPain]])
+    child.cmd([[NoNeckPain]])
+
+    eq_buf_width(child, "tabs[1].wins.main.left", 15)
+    eq_buf_width(child, "tabs[1].wins.main.right", 15)
+end
+
 T["left/right"]["have the same width"] = function()
     child.lua([[
         require('no-neck-pain').setup({width=50})
