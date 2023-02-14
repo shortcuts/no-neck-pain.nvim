@@ -1,4 +1,13 @@
 <a name="0.2.3"></a>
+## [0.9.1](https://github.com/shortcuts/no-neck-pain.nvim/compare/v0.9.0...v0.9.1) (2023-02-14)
+
+
+### Bug Fixes
+
+* events triggering multiple times ([#181](https://github.com/shortcuts/no-neck-pain.nvim/issues/181)) ([3890632](https://github.com/shortcuts/no-neck-pain.nvim/commit/389063273c96dd313cc15b471e18cd5b4be5e243))
+* nil event check ([83e4990](https://github.com/shortcuts/no-neck-pain.nvim/commit/83e4990b9c5aa35863e8eaf4c55265c21f8c2750))
+* transparent background with custom backgroundColor ([#185](https://github.com/shortcuts/no-neck-pain.nvim/issues/185)) ([6dde6dd](https://github.com/shortcuts/no-neck-pain.nvim/commit/6dde6dda0854e2facb7a841e17aa833287ac529d))
+
 ## [0.9.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v0.8.0...v0.9.0) (2023-02-11)
 
 
