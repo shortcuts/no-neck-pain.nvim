@@ -245,7 +245,6 @@ T["left/right"]["setNames doesn't throw when re-creating side buffers"] = functi
     eq_buf_width(child, "tabs[1].wins.main.right", 15)
 end
 
-
 T["left/right"]["have the same width"] = function()
     child.lua([[
         require('no-neck-pain').setup({width=50})
