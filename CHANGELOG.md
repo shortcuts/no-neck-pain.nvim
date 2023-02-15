@@ -1,4 +1,12 @@
 <a name="0.2.3"></a>
+## [0.9.2](https://github.com/shortcuts/no-neck-pain.nvim/compare/v0.9.1...v0.9.2) (2023-02-15)
+
+
+### Bug Fixes
+
+* prevent duplicate buffer name error with `setNames` ([#186](https://github.com/shortcuts/no-neck-pain.nvim/issues/186)) ([27b3167](https://github.com/shortcuts/no-neck-pain.nvim/commit/27b3167008e6c2ecdd6cf0dcf0100cf0e5241ad7))
+* textColor blending ([#188](https://github.com/shortcuts/no-neck-pain.nvim/issues/188)) ([c2b8467](https://github.com/shortcuts/no-neck-pain.nvim/commit/c2b8467f9f51253a726c6232539280b4b486cd86))
+
 ## [0.9.1](https://github.com/shortcuts/no-neck-pain.nvim/compare/v0.9.0...v0.9.1) (2023-02-14)
 
 
