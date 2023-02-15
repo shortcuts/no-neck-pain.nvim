@@ -117,7 +117,7 @@ function C.parse(buffers)
 
             -- if we have a transparent bg we won't be able,
             -- to default a text color so we set it to white
-            if buffers[side].backgroundColor == "NONE" then
+            if string.lower(buffers[side].backgroundColor) == "none" then
                 defaultTextColor = "#ffffff"
             end
 
