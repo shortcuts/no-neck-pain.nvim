@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [0.9.3](https://github.com/shortcuts/no-neck-pain.nvim/compare/v0.9.2...v0.9.3) (2023-02-15)
+
+
+### Bug Fixes
+
+* wrong focus when closing the main window ([#189](https://github.com/shortcuts/no-neck-pain.nvim/issues/189)) ([5067cfd](https://github.com/shortcuts/no-neck-pain.nvim/commit/5067cfdd0e3f33c659fa50c710785a2da70ca306))
+
 ## [0.9.2](https://github.com/shortcuts/no-neck-pain.nvim/compare/v0.9.1...v0.9.2) (2023-02-15)
 
 
