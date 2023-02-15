@@ -261,7 +261,7 @@ function W.getPadding(side, wins)
         return 0
     end
 
-    D.log(side, "%d occupied - checking trees", occupied)
+    D.log(side, "%d currently occupied - checking for external trees", occupied)
 
     -- now we need to determine how much we should substract from the remaining padding
     -- if there's side trees open.

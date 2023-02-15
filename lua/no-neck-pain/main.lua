@@ -85,7 +85,7 @@ function N.enable(scope)
                     return
                 end
 
-                N.init(p.event, tab)
+                S = N.init(p.event, tab)
             end)
         end,
         group = augroupName,
@@ -133,7 +133,7 @@ function N.enable(scope)
 
                 D.log(
                     p.event,
-                    "new split window found [%d / %d] = %s",
+                    "new split window [%d / %d], vertical: %s",
                     width,
                     _G.NoNeckPain.config.width,
                     vsplit
@@ -142,7 +142,7 @@ function N.enable(scope)
                 tab.wins.splits = Sp.insert(tab.wins.splits, focusedWin, vsplit)
 
                 if vsplit then
-                    N.init(p.event, tab)
+                    S = N.init(p.event, tab)
                 end
             end)
         end,
@@ -191,6 +191,10 @@ function N.enable(scope)
                     return
                 end
 
+                -- we keep track if curr have been closed because if it's the case,
+                -- the focus will be on a side buffer which is wrong
+                local haveCloseCurr = false
+
                 tab.wins.splits = Sp.refresh(tab.wins.splits)
 
                 -- if curr is not valid anymore, we focus the first valid split and remove it from the state
@@ -200,12 +204,14 @@ function N.enable(scope)
                         return N.disable(p.event)
                     end
 
+                    haveCloseCurr = true
+
                     tab.wins.main.curr = tab.wins.splits[1].id
                     tab.wins.splits = Sp.remove(tab.wins.splits, tab.wins.splits[1].id)
                 end
 
                 -- we only restore focus on curr if there's no split left
-                N.init(p.event, tab, tab.wins.splits == nil)
+                S = N.init(p.event, tab, haveCloseCurr or tab.wins.splits == nil)
             end)
         end,
         group = augroupName,
@@ -228,14 +234,18 @@ function N.enable(scope)
                     if tree.id ~= nil and not vim.tbl_contains(wins, tree.id) then
                         D.log(p.event, "%s have been closed, resizing", name)
 
-                        return N.init(p.event, tab)
+                        S = N.init(p.event, tab)
+
+                        return
                     end
 
                     -- we have a new tree registered, we can resize
                     if trees[name].id ~= tab.wins.external.trees[name].id then
                         D.log(p.event, "%s have been opened, resizing", name)
 
-                        return N.init(p.event, tab)
+                        S = N.init(p.event, tab)
+
+                        return
                     end
                 end
                 tab.wins.external.trees = trees
