@@ -224,7 +224,6 @@ require("no-neck-pain").setup({
             -- The position of the tree, either `left` or `right`.
             position = "left",
         },
-
     },
 })
 
