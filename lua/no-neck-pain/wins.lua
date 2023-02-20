@@ -50,15 +50,7 @@ function W.createSideBuffers(tab)
         right = { cmd = "botright vnew", padding = 0 },
     }
 
-    local integrations = {
-        NvimTree = false,
-    }
-
-    -- we close the side tree if it's already opened to prevent unwanted layout issue.
-    if tab.wins.external.trees.NvimTree.id ~= nil then
-        integrations.NvimTree = true
-        vim.cmd("NvimTreeClose")
-    end
+    local integrations = T.close(tab)
 
     for _, side in pairs(Co.SIDES) do
         if _G.NoNeckPain.config.buffers[side].enabled then
@@ -135,10 +127,7 @@ function W.createSideBuffers(tab)
         end
     end
 
-    -- if we've closed the user side tree but they still want it to be opened.
-    if integrations.NvimTree and _G.NoNeckPain.config.integrations.NvimTree.reopen == true then
-        vim.cmd("NvimTreeOpen")
-    end
+    T.reopen(integrations)
 
     tab.wins.main.left, tab.wins.main.right =
         W.resizeOrCloseSideBuffers("W.createSideBuffers", tab.wins, wins)

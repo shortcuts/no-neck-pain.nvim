@@ -24,7 +24,7 @@ local T = MiniTest.new_set({
     },
 })
 
-local EXTERNALS = { "NvimTree", "undotree" }
+local EXTERNALS = { "NvimTree", "NeoTree", "undotree" }
 
 T["install"] = MiniTest.new_set()
 
@@ -116,6 +116,8 @@ T["setup"]["sets exposed methods and default options value"] = function()
 
     eq_config(child, "integrations.NvimTree.position", "left")
     eq_config(child, "integrations.NvimTree.reopen", true)
+    eq_config(child, "integrations.NeoTree.position", "left")
+    eq_config(child, "integrations.NeoTree.reopen", true)
     eq_config(child, "integrations.undotree.position", "left")
 end
 

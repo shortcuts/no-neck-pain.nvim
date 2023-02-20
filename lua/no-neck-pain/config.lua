@@ -185,6 +185,15 @@ NoNeckPain.options = {
             -- When `true`, if the tree was opened before enabling the plugin, we will reopen it.
             reopen = true,
         },
+        -- By default, if NeoTree is open, we will close it and reopen it when enabling the plugin,
+        -- this prevents having the side buffers wrongly positioned.
+        -- @link https://github.com/nvim-neo-tree/neo-tree.nvim
+        NeoTree = {
+            -- The position of the tree, either `left` or `right`.
+            position = "left",
+            -- When `true`, if the tree was opened before enabling the plugin, we will reopen it.
+            reopen = true,
+        },
         -- @link https://github.com/mbbill/undotree
         undotree = {
             -- The position of the tree, either `left` or `right`.
@@ -222,11 +231,13 @@ function NoNeckPain.setup(options)
     )
 
     -- assert `integrations` values
-    assert(
-        NoNeckPain.options.integrations.NvimTree.position == "left"
-            or NoNeckPain.options.integrations.NvimTree.position == "right",
-        "NvimTree position can only be `left` or `right`"
-    )
+    for _, tree in pairs({ "NvimTree", "NeoTree" }) do
+        assert(
+            NoNeckPain.options.integrations[tree].position == "left"
+                or NoNeckPain.options.integrations[tree].position == "right",
+            string.format("%s position can only be `left` or `right`", tree)
+        )
+    end
 
     -- set default side buffers options
     for _, side in pairs(Co.SIDES) do

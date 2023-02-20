@@ -210,11 +210,21 @@ require("no-neck-pain").setup({
             -- When `true`, if the tree was opened before enabling the plugin, we will reopen it.
             reopen = true,
         },
+        -- By default, if NeoTree is open, we will close it and reopen it when enabling the plugin,
+        -- this prevents having the side buffers wrongly positioned.
+        -- @link https://github.com/nvim-neo-tree/neo-tree.nvim
+        NeoTree = {
+            -- The position of the tree, either `left` or `right`.
+            position = "left",
+            -- When `true`, if the tree was opened before enabling the plugin, we will reopen it.
+            reopen = true,
+        },
         -- @link https://github.com/mbbill/undotree
         undotree = {
             -- The position of the tree, either `left` or `right`.
             position = "left",
         },
+
     },
 })
 
