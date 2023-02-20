@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [0.10.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v0.9.3...v0.10.0) (2023-02-20)
+
+
+### Features
+
+* support neo-tree ([#192](https://github.com/shortcuts/no-neck-pain.nvim/issues/192)) ([755f466](https://github.com/shortcuts/no-neck-pain.nvim/commit/755f4663bf037331ce04d3c60cfc84f5ca26921d))
+
 ## [0.9.3](https://github.com/shortcuts/no-neck-pain.nvim/compare/v0.9.2...v0.9.3) (2023-02-15)
 
 
