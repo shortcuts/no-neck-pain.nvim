@@ -26,7 +26,7 @@ _Creates evenly sized empty buffers on each side of your focused buffer, which a
 - [Highly customizable experience](https://github.com/shortcuts/no-neck-pain.nvim#configuration)
 - [Themed side buffers](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase#custom-background-color)
 - [Support split/vsplit windows](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase#window-layout-support)
-- [Fully integrates with side trees, tmux, and more!](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase#window-layout-support)
+- Fully integrates with [neo-tree.nvim](https://github.com/nvim-neo-tree/neo-tree.nvim), [nvim-tree.lua](https://github.com/nvim-tree/nvim-tree.lua), [undotree](https://github.com/mbbill/undotree), [tmux, and more!](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase#window-layout-support)
 - Keep your workflow intact
 - Neovim >= 0.5 support
 
