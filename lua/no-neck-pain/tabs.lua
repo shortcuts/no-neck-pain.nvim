@@ -55,6 +55,10 @@ function Ta.insert(tabs, id)
                         id = nil,
                         width = 0,
                     },
+                    NeoTree = {
+                        id = nil,
+                        width = 0,
+                    },
                     undotree = {
                         id = nil,
                         width = 0,
@@ -123,6 +127,10 @@ end
 ---@return table?: the `tab` information, or `nil` if it's not found.
 ---@private
 function Ta.update(tabs, id, updatedTab)
+    if tabs == nil then
+        return nil
+    end
+
     local updatedTabs = {}
 
     for _, tab in pairs(tabs) do
