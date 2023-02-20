@@ -1,5 +1,18 @@
 local T = {}
 
+local INTEGRATIONS = {
+    NvimTree = {
+        enabled = false,
+        close = "NvimTreeClose",
+        open = "NvimTreeOpen",
+    },
+    NeoTree = {
+        enabled = false,
+        close = "NeoTreeClose",
+        open = "NeoTreeReveal",
+    },
+}
+
 ---Whether the given `fileType` matches a supported side tree or not.
 ---
 ---@param fileType string: the fileType of the buffer.
@@ -50,22 +63,14 @@ end
 ---@return table: the integrations mapping with a boolean set to true, if we closed one of them.
 ---@private
 function T.close(tab)
-    local integrations = {
-        NvimTree = false,
-        NeoTree = false,
-    }
-
-    if tab.wins.external.trees.NvimTree.id ~= nil then
-        integrations.NvimTree = true
-        vim.cmd("NvimTreeClose")
+    for tree, opts in pairs(INTEGRATIONS) do
+        if tab.wins.external.trees[tree].id ~= nil then
+            INTEGRATIONS[tree].enabled = true
+            vim.cmd(opts.close)
+        end
     end
 
-    if tab.wins.external.trees.NeoTree.id ~= nil then
-        integrations.NeoTree = true
-        vim.cmd("NeoTreeClose")
-    end
-
-    return integrations
+    return INTEGRATIONS
 end
 
 ---Reopens the tree if it was previously closed.
@@ -73,12 +78,10 @@ end
 ---@param integrations table: the integrations mappings with their associated boolean value, `true` if we closed it previously.
 ---@private
 function T.reopen(integrations)
-    if integrations.NvimTree and _G.NoNeckPain.config.integrations.NvimTree.reopen == true then
-        vim.cmd("NvimTreeOpen")
-    end
-
-    if integrations.NeoTree and _G.NoNeckPain.config.integrations.NeoTree.reopen == true then
-        vim.cmd("NeoTreeReveal")
+    for tree, opts in pairs(integrations) do
+        if opts.enabled and _G.NoNeckPain.config.integrations[tree].reopen == true then
+            vim.cmd(opts.open)
+        end
     end
 end
 
