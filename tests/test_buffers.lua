@@ -37,6 +37,7 @@ T["setup"]["overrides default values"] = function()
             wo = {
                 cursorline = true,
                 cursorcolumn = true,
+                colorcolumn = "90",
                 number = true,
                 relativenumber = true,
                 foldenable = true,
@@ -55,6 +56,7 @@ T["setup"]["overrides default values"] = function()
                 wo = {
                     cursorline = true,
                     cursorcolumn = true,
+                    colorcolumn = "30",
                     number = true,
                     relativenumber = true,
                     foldenable = true,
@@ -74,6 +76,7 @@ T["setup"]["overrides default values"] = function()
                 wo = {
                     cursorline = true,
                     cursorcolumn = true,
+                    colorcolumn = "30",
                     number = true,
                     relativenumber = true,
                     foldenable = true,
@@ -99,6 +102,7 @@ T["setup"]["overrides default values"] = function()
 
     eq_config(child, "buffers.wo.cursorline", true)
     eq_config(child, "buffers.wo.cursorcolumn", true)
+    eq_config(child, "buffers.wo.colorcolumn", "90")
     eq_config(child, "buffers.wo.number", true)
     eq_config(child, "buffers.wo.relativenumber", true)
     eq_config(child, "buffers.wo.foldenable", true)
@@ -115,6 +119,7 @@ T["setup"]["overrides default values"] = function()
 
         eq_config(child, "buffers." .. scope .. ".wo.cursorline", true)
         eq_config(child, "buffers." .. scope .. ".wo.cursorcolumn", true)
+        eq_config(child, "buffers." .. scope .. ".wo.colorcolumn", "30")
         eq_config(child, "buffers." .. scope .. ".wo.number", true)
         eq_config(child, "buffers." .. scope .. ".wo.relativenumber", true)
         eq_config(child, "buffers." .. scope .. ".wo.foldenable", true)
