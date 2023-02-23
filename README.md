@@ -185,6 +185,7 @@ require("no-neck-pain").setup({
         wo = {
             cursorline = false,
             cursorcolumn = false,
+            colorcolumn = "0",
             number = false,
             relativenumber = false,
             foldenable = false,
@@ -249,6 +250,7 @@ NoNeckPain.bufferOptions = {
     wo = {
         cursorline = false,
         cursorcolumn = false,
+        colorcolumn = "0",
         number = false,
         relativenumber = false,
         foldenable = false,

@@ -71,6 +71,7 @@ Default values:
       wo = {
           cursorline = false,
           cursorcolumn = false,
+          colorcolumn = "0",
           number = false,
           relativenumber = false,
           foldenable = false,
@@ -178,6 +179,7 @@ Default values:
           wo = {
               cursorline = false,
               cursorcolumn = false,
+              colorcolumn = "0",
               number = false,
               relativenumber = false,
               foldenable = false,
