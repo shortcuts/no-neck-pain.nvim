@@ -170,6 +170,28 @@ T["vsplit"]["correctly position side buffers when there's enough space"] = funct
     )
 end
 
+T["vsplit"]["preserve vsplit width when having side buffers"] = function()
+    child.set_size(500, 500)
+    child.lua([[
+        require('no-neck-pain').setup({width=50,buffers={right={enabled=false}}})
+        require('no-neck-pain').enable()
+    ]])
+
+    eq(
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
+        { 1001, 1000 }
+    )
+
+    child.cmd("vsplit")
+
+    eq(
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
+        { 1001, 1002, 1000 }
+    )
+
+    eq_buf_width(child, "tabs[1].wins.splits[1].id", 242)
+end
+
 T["vsplit"]["closing `curr` makes `split` the new `curr`"] = function()
     child.set_size(400, 400)
     child.lua([[
