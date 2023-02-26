@@ -10,7 +10,7 @@ local W = {}
 ---
 ---@param id number: the id of the window.
 ---@param width number: the width to apply to the window.
----@param side "left"|"right": the side of the window being resized, used for logging only.
+---@param side "left"|"right"|"split": the side of the window being resized, used for logging only.
 ---@private
 local function resize(id, width, side)
     D.log(side, "resizing %d with padding %d", id, width)
@@ -132,6 +132,16 @@ function W.createSideBuffers(tab)
     tab.wins.main.left, tab.wins.main.right =
         W.resizeOrCloseSideBuffers("W.createSideBuffers", tab.wins, wins)
 
+    -- if we still have side buffers open at this point, and we have vsplit opened,
+    -- there might be width issues so we the opened vsplits.
+    if (tab.wins.main.left ~= nil or tab.wins.main.right ~= nil) and tab.wins.splits ~= nil then
+        for _, split in pairs(tab.wins.splits) do
+            if split.vertical then
+                resize(split.id, _G.NoNeckPain.config.width, "split")
+            end
+        end
+    end
+
     -- we might have closed trees during the buffer creation process, we re-fetch the latest IDs to prevent inconsistencies
     tab.wins.external.trees = T.refresh(tab)
 
@@ -193,13 +203,7 @@ end
 function W.resizeOrCloseSideBuffers(scope, wins, paddings)
     for _, side in pairs(Co.SIDES) do
         if wins.main[side] ~= nil then
-            local padding = 0
-
-            if paddings ~= nil then
-                padding = paddings[side].padding
-            else
-                padding = W.getPadding(side, wins)
-            end
+            local padding = paddings[side].padding or W.getPadding(side, wins)
 
             if padding > _G.NoNeckPain.config.minSideBufferWidth then
                 resize(wins.main[side], padding, side)
