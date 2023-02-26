@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [0.10.1](https://github.com/shortcuts/no-neck-pain.nvim/compare/v0.10.0...v0.10.1) (2023-02-23)
+
+
+### Bug Fixes
+
+* hide `colorcolumn` for side buffers by default ([#196](https://github.com/shortcuts/no-neck-pain.nvim/issues/196)) ([c101d4e](https://github.com/shortcuts/no-neck-pain.nvim/commit/c101d4e46f95516ce63fab104e87b631c3ed57b2))
+
 ## [0.10.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v0.9.3...v0.10.0) (2023-02-20)
 
 

@@ -10,7 +10,7 @@ about: It helps making the plugin more stable.
 ## Steps to reproduce
 
 1. I did the command `...`
-1. Then I saw `...`
+2. Then I saw `...`
 3. Error
 
 ## Expected behavior
