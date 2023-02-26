@@ -32,7 +32,7 @@ end
 ---prints the table if debug is true.
 ---
 ---@param table table: the table to print.
----@param indent number: the default indent value, starts at 0.
+---@param indent number?: the default indent value, starts at 0.
 ---@private
 function D.tprint(table, indent)
     if _G.NoNeckPain.config ~= nil and not _G.NoNeckPain.config.debug then
