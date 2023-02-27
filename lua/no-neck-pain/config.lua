@@ -14,6 +14,7 @@ local function registerMapping(options, mapping, fn)
 end
 
 --- NoNeckPain's buffer `vim.wo` options.
+--- @see window options `:h vim.wo`
 ---
 ---@type table
 ---Default values:
@@ -40,6 +41,7 @@ NoNeckPain.bufferOptionsWo = {
 }
 
 --- NoNeckPain's buffer `vim.bo` options.
+--- @see buffer options `:h vim.bo`
 ---
 ---@type table
 ---Default values:
@@ -103,8 +105,11 @@ NoNeckPain.bufferOptions = {
     -- When `false`, the buffer won't be created.
     --- @type boolean
     enabled = true,
+    --- @see NoNeckPain.bufferOptionsColors `:h NoNeckPain.bufferOptionsColors`
     colors = NoNeckPain.bufferOptionsColors,
+    --- @see NoNeckPain.bufferOptionsBo `:h NoNeckPain.bufferOptionsBo`
     bo = NoNeckPain.bufferOptionsBo,
+    --- @see NoNeckPain.bufferOptionsWo `:h NoNeckPain.bufferOptionsWo`
     wo = NoNeckPain.bufferOptionsWo,
 }
 
@@ -193,16 +198,16 @@ NoNeckPain.options = {
         --- see |NoNeckPain.bufferOptionsColors|
         colors = NoNeckPain.bufferOptionsColors,
         -- Vim buffer-scoped options: any `vim.bo` options is accepted here.
-        --- see |NoNeckPain.bufferOptionsBo|
+        --- @see NoNeckPain.bufferOptionsBo `:h NoNeckPain.bufferOptionsBo`
         bo = NoNeckPain.bufferOptionsBo,
         -- Vim window-scoped options: any `vim.wo` options is accepted here.
-        --- see |NoNeckPain.bufferOptionsWo|
+        --- @see NoNeckPain.bufferOptionsWo `:h NoNeckPain.bufferOptionsWo`
         wo = NoNeckPain.bufferOptionsWo,
         --- Options applied to the `left` buffer, options defined here overrides the `buffers` ones.
-        --- See |NoNeckPain.bufferOptions|.
+        --- @see NoNeckPain.bufferOptions `:h NoNeckPain.bufferOptions`
         left = NoNeckPain.bufferOptions,
         --- Options applied to the `right` buffer, options defined here overrides the `buffers` ones.
-        --- See |NoNeckPain.bufferOptions|.
+        --- @see NoNeckPain.bufferOptions `:h NoNeckPain.bufferOptions`
         right = NoNeckPain.bufferOptions,
     },
     -- Supported integrations that might clash with `no-neck-pain.nvim`'s behavior.
