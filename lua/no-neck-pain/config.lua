@@ -3,14 +3,14 @@ local Co = require("no-neck-pain.util.constants")
 
 local NoNeckPain = {}
 
-local function registerMapping(options, mapping, fn)
-    if options[mapping] == false then
+local function registerMapping(mappings, name, fn)
+    if mappings[name] == false then
         return
     end
 
-    assert(type(options[mapping]) == "string", string.format("`%s` must be a string", mapping))
+    assert(type(mappings[name]) == "string", string.format("`%s` must be a string", name))
 
-    vim.api.nvim_set_keymap("n", options[mapping], fn, { silent = true })
+    vim.api.nvim_set_keymap("n", mappings[name], fn, { silent = true })
 end
 
 --- NoNeckPain's buffer `vim.wo` options.
@@ -301,15 +301,15 @@ function NoNeckPain.setup(options)
     -- set theme options
     NoNeckPain.options.buffers = C.parse(NoNeckPain.options.buffers)
 
-    registerMapping(NoNeckPain.options, "toggleMapping", ":NoNeckPain<CR>")
+    registerMapping(NoNeckPain.options.mappings, "toggle", ":NoNeckPain<CR>")
     registerMapping(
-        NoNeckPain.options,
-        "widthUpMapping",
+        NoNeckPain.options.mappings,
+        "widthUp",
         ":lua require('no-neck-pain').resize(_G.NoNeckPain.config.width + 5)<CR>"
     )
     registerMapping(
-        NoNeckPain.options,
-        "widthDownMapping",
+        NoNeckPain.options.mappings,
+        "widthDown",
         ":lua require('no-neck-pain').resize(_G.NoNeckPain.config.width - 5)<CR>"
     )
 

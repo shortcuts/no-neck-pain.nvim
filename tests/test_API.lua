@@ -55,11 +55,15 @@ T["setup"]["sets exposed methods and default options value"] = function()
 
     eq_config(child, "width", 100)
     eq_config(child, "minSideBufferWidth", 5)
+
     eq_config(child, "autocmds.enableOnVimEnter", false)
     eq_config(child, "autocmds.enableOnTabEnter", false)
-    eq_config(child, "toggleMapping", "<Leader>np")
-    eq_config(child, "widthUpMapping", "<Leader>n=")
-    eq_config(child, "widthDownMapping", "<Leader>n-")
+
+    eq_config(child, "mappings.enabled", false)
+    eq_config(child, "mappings.toggle", "<Leader>np")
+    eq_config(child, "mappings.widthUp", "<Leader>n=")
+    eq_config(child, "mappings.widthDown", "<Leader>n-")
+
     eq_config(child, "debug", false)
     eq_config(child, "disableOnLastBuffer", false)
     eq_config(child, "killAllBuffersOnDisable", false)
