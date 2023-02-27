@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [0.10.2](https://github.com/shortcuts/no-neck-pain.nvim/compare/v0.10.1...v0.10.2) (2023-02-26)
+
+
+### Bug Fixes
+
+* vsplit wrongly sized ([#198](https://github.com/shortcuts/no-neck-pain.nvim/issues/198)) ([0d88b4a](https://github.com/shortcuts/no-neck-pain.nvim/commit/0d88b4a3fc89f80989cbf973797939dcb994f05c))
+
 ## [0.10.1](https://github.com/shortcuts/no-neck-pain.nvim/compare/v0.10.0...v0.10.1) (2023-02-23)
 
 
