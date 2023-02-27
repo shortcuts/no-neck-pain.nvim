@@ -56,11 +56,14 @@ end
 function NoNeckPain.setup(opts)
     _G.NoNeckPain.config = require("no-neck-pain.config").setup(opts)
 
-    if _G.NoNeckPain.config.enableOnVimEnter or _G.NoNeckPain.config.enableOnTabEnter then
+    if
+        _G.NoNeckPain.config.autocmds.enableOnVimEnter
+        or _G.NoNeckPain.config.autocmds.enableOnTabEnter
+    then
         vim.api.nvim_create_augroup("NoNeckPainAutocmd", { clear = true })
     end
 
-    if _G.NoNeckPain.config.enableOnVimEnter then
+    if _G.NoNeckPain.config.autocmds.enableOnVimEnter then
         vim.api.nvim_create_autocmd({ "BufEnter" }, {
             pattern = "*",
             callback = function(p)
@@ -81,7 +84,7 @@ function NoNeckPain.setup(opts)
         })
     end
 
-    if _G.NoNeckPain.config.enableOnTabEnter then
+    if _G.NoNeckPain.config.autocmds.enableOnTabEnter then
         vim.api.nvim_create_autocmd({ "TabNewEntered" }, {
             callback = function()
                 vim.schedule(function()
