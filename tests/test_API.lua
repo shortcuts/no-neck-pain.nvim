@@ -70,9 +70,9 @@ T["setup"]["sets exposed methods and default options value"] = function()
     eq_type_config(child, "buffers.wo", "table")
 
     eq_config(child, "buffers.setNames", false)
-    eq_config(child, "buffers.backgroundColor", "#000000")
+    eq_config(child, "buffers.colors.background", "#000000")
     eq_config(child, "buffers.blend", 0)
-    eq_config(child, "buffers.textColor", vim.NIL)
+    eq_config(child, "buffers.colors.text", vim.NIL)
 
     eq_config(child, "buffers.bo.filetype", "no-neck-pain")
     eq_config(child, "buffers.bo.buftype", "nofile")
@@ -95,9 +95,9 @@ T["setup"]["sets exposed methods and default options value"] = function()
         eq_type_config(child, "buffers." .. scope .. ".bo", "table")
         eq_type_config(child, "buffers." .. scope .. ".wo", "table")
 
-        eq_config(child, "buffers." .. scope .. ".backgroundColor", "#000000")
+        eq_config(child, "buffers." .. scope .. ".colors.background", "#000000")
         eq_config(child, "buffers." .. scope .. ".blend", 0)
-        eq_config(child, "buffers." .. scope .. ".textColor", "#7f7f7f")
+        eq_config(child, "buffers." .. scope .. ".colors.text", "#7f7f7f")
 
         eq_config(child, "buffers." .. scope .. ".bo.filetype", "no-neck-pain")
         eq_config(child, "buffers." .. scope .. ".bo.buftype", "nofile")
