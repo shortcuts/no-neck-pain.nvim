@@ -25,24 +25,30 @@ T["setup"]["overrides default values"] = function()
     ]])
     child.lua([[require('no-neck-pain').setup({
         buffers = {
-            colors.background = "catppuccin-frappe",
-            blend = 0.4,
-            colors.text = "#7480c2",
+            colors = {
+                background = "catppuccin-frappe",
+                blend = 0.4,
+                text = "#7480c2",
+            }
             left = {
-                colors.background = "catppuccin-frappe",
-                blend = 0.2,
-            	colors.text = "#7480c2",
+                colors = {
+                    background = "catppuccin-frappe",
+                    blend = 0.2,
+            	    text = "#7480c2",
+                }
             },
             right = {
-                colors.background = "catppuccin-frappe",
-                blend = 0.2,
-            	colors.text = "#7480c2",
+                colors = {
+                    background = "catppuccin-frappe",
+                    blend = 0.2,
+            	    text = "#7480c2",
+                },
             },
         },
     })]])
 
     eq_config(child, "buffers.colors.background", "#828590")
-    eq_config(child, "buffers.blend", 0.4)
+    eq_config(child, "buffers.colors.blend", 0.4)
     eq_config(child, "buffers.colors.text", "#7480c2")
 
     for _, scope in pairs(Co.SIDES) do
@@ -59,31 +65,37 @@ T["setup"]["`left` or `right` buffer options overrides `common` ones"] = functio
     ]])
     child.lua([[require('no-neck-pain').setup({
         buffers = {
-            colors.background = "catppuccin-frappe",
-            blend = 0.1,
-            colors.text = "#7480c2",
+            colors = {
+                background = "catppuccin-frappe",
+                blend = 0.1,
+                text = "#7480c2",
+            }
             left = {
-                colors.background = "catppuccin-frappe-dark",
-                blend = -0.8,
-                colors.text = "#123123",
+                colors = {
+                    background = "catppuccin-frappe-dark",
+                    blend = -0.8,
+                    text = "#123123",
+                }
             },
             right = {
-                colors.background = "catppuccin-latte",
-                blend = 1,
-                colors.text = "#456456",
+                colors = {
+                    background = "catppuccin-latte",
+                    blend = 1,
+                    text = "#456456",
+                },
             },
         },
     })]])
 
     eq_config(child, "buffers.colors.background", "#444858")
-    eq_config(child, "buffers.blend", 0.1)
+    eq_config(child, "buffers.colors.blend", 0.1)
     eq_config(child, "buffers.colors.text", "#7480c2")
 
     eq_config(child, "buffers.left.colors.background", "#08080b")
     eq_config(child, "buffers.right.colors.background", "#ffffff")
 
-    eq_config(child, "buffers.left.blend", -0.8)
-    eq_config(child, "buffers.right.blend", 1)
+    eq_config(child, "buffers.left.colors.blend", -0.8)
+    eq_config(child, "buffers.right.colors.blend", 1)
 
     eq_config(child, "buffers.left.colors.text", "#123123")
     eq_config(child, "buffers.right.colors.text", "#456456")
@@ -96,9 +108,11 @@ T["setup"]["`common` options spreads it to `left` and `right` buffers"] = functi
     ]])
     child.lua([[require('no-neck-pain').setup({
         buffers = {
-            colors.background = "catppuccin-frappe",
-            blend = 1,
-            colors.text = "#000000",
+            colors = {
+                background = "catppuccin-frappe",
+                blend = 1,
+                text = "#000000",
+            },
         },
     })]])
 
@@ -108,8 +122,8 @@ T["setup"]["`common` options spreads it to `left` and `right` buffers"] = functi
     eq_config(child, "buffers.left.colors.background", "#ffffff")
     eq_config(child, "buffers.right.colors.background", "#ffffff")
 
-    eq_config(child, "buffers.left.blend", 1)
-    eq_config(child, "buffers.right.blend", 1)
+    eq_config(child, "buffers.left.colors.blend", 1)
+    eq_config(child, "buffers.right.colors.blend", 1)
 
     eq_config(child, "buffers.left.colors.text", "#000000")
     eq_config(child, "buffers.right.colors.text", "#000000")
@@ -146,9 +160,11 @@ T["color"]["map integration name to a value"] = function()
         child.lua(string.format(
             [[ require('no-neck-pain').setup({
                 buffers = {
-                    colors.background = "%s",
-                    left = { colors.background = "%s" },
-                    right = { colors.background = "%s" },
+                    colors = {
+                        background = "%s",
+                        left = { colors = { background = "%s"} },
+                        right = { colors = { background = "%s"} },
+                    },
                 },
             })]],
             integration,
@@ -163,7 +179,7 @@ end
 
 T["color"]["buffers: throws with wrong values"] = function()
     local keyValueSetupErrors = {
-        { "colors.background", "no-neck-pain" },
+        { "background", "no-neck-pain" },
         { "blend", 30 },
     }
 
@@ -172,7 +188,9 @@ T["color"]["buffers: throws with wrong values"] = function()
             child.lua(string.format(
                 [[require('no-neck-pain').setup({
                     buffers = {
-                        %s = "%s",
+                        colors = {
+                            %s = "%s",
+                        },
                     },
                 })]],
                 keyValueSetupError[1],
