@@ -53,7 +53,7 @@ T["setup"]["overrides default values"] = function()
 
     for _, scope in pairs(Co.SIDES) do
         eq_config(child, "buffers." .. scope .. ".colors.background", "#595c6b")
-        eq_config(child, "buffers." .. scope .. ".blend", 0.2)
+        eq_config(child, "buffers." .. scope .. ".colors.blend", 0.2)
         eq_config(child, "buffers." .. scope .. ".colors.text", "#7480c2")
     end
 end
