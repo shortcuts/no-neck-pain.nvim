@@ -29,13 +29,13 @@ T["setup"]["overrides default values"] = function()
                 background = "catppuccin-frappe",
                 blend = 0.4,
                 text = "#7480c2",
-            }
+            },
             left = {
                 colors = {
                     background = "catppuccin-frappe",
                     blend = 0.2,
             	    text = "#7480c2",
-                }
+                },
             },
             right = {
                 colors = {
@@ -69,13 +69,13 @@ T["setup"]["`left` or `right` buffer options overrides `common` ones"] = functio
                 background = "catppuccin-frappe",
                 blend = 0.1,
                 text = "#7480c2",
-            }
+            },
             left = {
                 colors = {
                     background = "catppuccin-frappe-dark",
                     blend = -0.8,
                     text = "#123123",
-                }
+                },
             },
             right = {
                 colors = {
@@ -142,7 +142,7 @@ T["setup"]["supports transparent bgs"] = function()
 end
 
 T["setup"]["colors.background overrides a nil background when defined"] = function()
-    child.lua([[require('no-neck-pain').setup({buffers={colors.background="#abcabc"}})]])
+    child.lua([[require('no-neck-pain').setup({buffers={colors={background="#abcabc"}}})]])
 
     eq_config(child, "buffers.colors.background", "#abcabc")
     eq_config(child, "buffers.colors.text", vim.NIL)
@@ -160,11 +160,9 @@ T["color"]["map integration name to a value"] = function()
         child.lua(string.format(
             [[ require('no-neck-pain').setup({
                 buffers = {
-                    colors = {
-                        background = "%s",
-                        left = { colors = { background = "%s"} },
-                        right = { colors = { background = "%s"} },
-                    },
+                    colors = { background = "%s" },
+                    left = { colors = { background = "%s" } },
+                    right = { colors = { background = "%s" } },
                 },
             })]],
             integration,
@@ -176,7 +174,7 @@ T["color"]["map integration name to a value"] = function()
         end
     end
 end
-
+--
 T["color"]["buffers: throws with wrong values"] = function()
     local keyValueSetupErrors = {
         { "background", "no-neck-pain" },

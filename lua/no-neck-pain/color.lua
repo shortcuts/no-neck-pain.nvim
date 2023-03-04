@@ -1,3 +1,4 @@
+local D = require("no-neck-pain.util.debug")
 local Co = require("no-neck-pain.util.constants")
 
 local C = {}
@@ -49,7 +50,7 @@ end
 ---@return string?: the blended color code.
 ---@private
 local function matchAndBlend(colorCode, factor)
-    if colorCode == nil then
+    if colorCode == nil or string.lower(colorCode) == "none" then
         return nil
     end
 
