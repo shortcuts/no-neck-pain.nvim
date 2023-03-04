@@ -98,6 +98,10 @@ require("lazy").setup({"shortcuts/no-neck-pain.nvim"})
 </table>
 </div>
 
+## 🏗 v1.0.0 breaking changes
+
+See [the release description](https://github.com/shortcuts/no-neck-pain.nvim/pull/201) for the full list of breaking changes.
+
 ## ☄ Getting started
 
 No configuration/setup steps needed! Sit back, relax and call `:NoNeckPain`.
