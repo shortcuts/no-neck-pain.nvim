@@ -6,6 +6,25 @@
 
 * v1.0.0 - API breaking changes ([#201](https://github.com/shortcuts/no-neck-pain.nvim/issues/201))
 
+If you were using the below options, make sure to move them to their new location when calling the `setup` method:
+
+|   Before   |         After        |
+|-------------|----------------------------|
+|`enableOnVimEnter`|`autocmds.enableOnVimEnter`|
+|`enableOnTabEnter`|`autocmds.enableOnTabEnter`|
+|`toggleMapping`|`mappings.toggle`|
+|`widthUpMapping`|`mappings.widthUp`|
+|`widthDownMapping`|`mappings.widthDown`|
+|`backgroundColor`|`colors.background`|
+|`textColor`|`colors.text`|
+|`blend`|`colors.blend`|
+|`left.backgroundColor`|`left.colors.background`|
+|`left.textColor`|`left.colors.text`|
+|`left.blend`|`left.colors.blend`|
+|`right.backgroundColor`|`right.colors.background`|
+|`right.textColor`|`right.colors.text`|
+|`right.blend`|`right.colors.blend`|
+
 ### Features
 
 * v1.0.0 - API breaking changes ([#201](https://github.com/shortcuts/no-neck-pain.nvim/issues/201)) ([2b6cb3c](https://github.com/shortcuts/no-neck-pain.nvim/commit/2b6cb3c5e541b8cb58b6a1a593e7d7929b9eb61c))
