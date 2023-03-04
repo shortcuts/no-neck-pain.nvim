@@ -1,4 +1,3 @@
-local D = require("no-neck-pain.util.debug")
 local Co = require("no-neck-pain.util.constants")
 
 local C = {}
