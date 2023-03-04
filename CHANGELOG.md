@@ -1,4 +1,15 @@
 <a name="0.2.3"></a>
+## [1.0.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v0.10.2...v1.0.0) (2023-03-04)
+
+
+### ⚠ BREAKING CHANGES
+
+* v1.0.0 - API breaking changes ([#201](https://github.com/shortcuts/no-neck-pain.nvim/issues/201))
+
+### Features
+
+* v1.0.0 - API breaking changes ([#201](https://github.com/shortcuts/no-neck-pain.nvim/issues/201)) ([2b6cb3c](https://github.com/shortcuts/no-neck-pain.nvim/commit/2b6cb3c5e541b8cb58b6a1a593e7d7929b9eb61c))
+
 ## [0.10.2](https://github.com/shortcuts/no-neck-pain.nvim/compare/v0.10.1...v0.10.2) (2023-02-26)
 
 
