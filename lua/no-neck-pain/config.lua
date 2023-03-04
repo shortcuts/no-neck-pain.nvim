@@ -1,3 +1,4 @@
+local D = require("no-neck-pain.util.debug")
 local C = require("no-neck-pain.color")
 local Co = require("no-neck-pain.util.constants")
 
@@ -253,6 +254,8 @@ function NoNeckPain.setup(options)
     options = options or {}
     options.buffers = options.buffers or {}
     NoNeckPain.options = vim.tbl_deep_extend("keep", options, NoNeckPain.options)
+
+    D.warnDeprecation(NoNeckPain.options)
 
     -- assert `width` values through vim options
     if NoNeckPain.options.width == "textwidth" then
