@@ -55,11 +55,15 @@ T["setup"]["sets exposed methods and default options value"] = function()
 
     eq_config(child, "width", 100)
     eq_config(child, "minSideBufferWidth", 5)
-    eq_config(child, "enableOnVimEnter", false)
-    eq_config(child, "enableOnTabEnter", false)
-    eq_config(child, "toggleMapping", "<Leader>np")
-    eq_config(child, "widthUpMapping", "<Leader>n=")
-    eq_config(child, "widthDownMapping", "<Leader>n-")
+
+    eq_config(child, "autocmds.enableOnVimEnter", false)
+    eq_config(child, "autocmds.enableOnTabEnter", false)
+
+    eq_config(child, "mappings.enabled", false)
+    eq_config(child, "mappings.toggle", "<Leader>np")
+    eq_config(child, "mappings.widthUp", "<Leader>n=")
+    eq_config(child, "mappings.widthDown", "<Leader>n-")
+
     eq_config(child, "debug", false)
     eq_config(child, "disableOnLastBuffer", false)
     eq_config(child, "killAllBuffersOnDisable", false)
@@ -70,9 +74,9 @@ T["setup"]["sets exposed methods and default options value"] = function()
     eq_type_config(child, "buffers.wo", "table")
 
     eq_config(child, "buffers.setNames", false)
-    eq_config(child, "buffers.backgroundColor", "#000000")
-    eq_config(child, "buffers.blend", 0)
-    eq_config(child, "buffers.textColor", vim.NIL)
+    eq_config(child, "buffers.colors.background", "#000000")
+    eq_config(child, "buffers.colors.blend", 0)
+    eq_config(child, "buffers.colors.text", vim.NIL)
 
     eq_config(child, "buffers.bo.filetype", "no-neck-pain")
     eq_config(child, "buffers.bo.buftype", "nofile")
@@ -95,9 +99,9 @@ T["setup"]["sets exposed methods and default options value"] = function()
         eq_type_config(child, "buffers." .. scope .. ".bo", "table")
         eq_type_config(child, "buffers." .. scope .. ".wo", "table")
 
-        eq_config(child, "buffers." .. scope .. ".backgroundColor", "#000000")
-        eq_config(child, "buffers." .. scope .. ".blend", 0)
-        eq_config(child, "buffers." .. scope .. ".textColor", "#7f7f7f")
+        eq_config(child, "buffers." .. scope .. ".colors.background", "#000000")
+        eq_config(child, "buffers." .. scope .. ".colors.blend", 0)
+        eq_config(child, "buffers." .. scope .. ".colors.text", "#7f7f7f")
 
         eq_config(child, "buffers." .. scope .. ".bo.filetype", "no-neck-pain")
         eq_config(child, "buffers." .. scope .. ".bo.buftype", "nofile")
@@ -127,8 +131,10 @@ T["setup"]["overrides default values"] = function()
     child.lua([[require('no-neck-pain').setup({
         width = 42,
         minSideBufferWidth = 0,
-        enableOnVimEnter = true,
-        enableOnTabEnter = true,
+        autocmds = {
+            enableOnVimEnter = true,
+            enableOnTabEnter = true,
+        },
         debug = true,
         disableOnLastBuffer = true,
         killAllBuffersOnDisable = true,
@@ -136,8 +142,8 @@ T["setup"]["overrides default values"] = function()
 
     eq_config(child, "width", 42)
     eq_config(child, "minSideBufferWidth", 0)
-    eq_config(child, "enableOnVimEnter", true)
-    eq_config(child, "enableOnTabEnter", true)
+    eq_config(child, "autocmds.enableOnVimEnter", true)
+    eq_config(child, "autocmds.enableOnTabEnter", true)
     eq_config(child, "debug", true)
     eq_config(child, "disableOnLastBuffer", true)
     eq_config(child, "killAllBuffersOnDisable", true)

@@ -1,16 +1,8 @@
-local Co = require("no-neck-pain.util.constants")
 local helpers = dofile("tests/helpers.lua")
 
 local child = helpers.new_child_neovim()
-local eq, eq_global, eq_config, eq_state =
-    helpers.expect.equality,
-    helpers.expect.global_equality,
-    helpers.expect.config_equality,
-    helpers.expect.state_equality
-local eq_type_global, eq_type_config, eq_type_state =
-    helpers.expect.global_type_equality,
-    helpers.expect.config_type_equality,
-    helpers.expect.state_type_equality
+local eq, eq_global, eq_config =
+    helpers.expect.equality, helpers.expect.global_equality, helpers.expect.config_equality
 
 local T = MiniTest.new_set({
     hooks = {
@@ -28,19 +20,23 @@ T["setup"] = MiniTest.new_set()
 
 T["setup"]["overrides default values"] = function()
     child.lua([[require('no-neck-pain').setup({
-        toggleMapping = "<Leader>kz",
-        widthUpMapping = "<Leader>k-",
-        widthDownMapping = "<Leader>k=",
+        mappings = {
+            enabled = true,
+            toggle = "<Leader>kz",
+            widthUp = "<Leader>k-",
+            widthDown = "<Leader>k=",
+        }
     })]])
 
-    eq_config(child, "toggleMapping", "<Leader>kz")
-    eq_config(child, "widthUpMapping", "<Leader>k-")
-    eq_config(child, "widthDownMapping", "<Leader>k=")
+    eq_config(child, "mappings.enabled", true)
+    eq_config(child, "mappings.toggle", "<Leader>kz")
+    eq_config(child, "mappings.widthUp", "<Leader>k-")
+    eq_config(child, "mappings.widthDown", "<Leader>k=")
 end
 
 T["setup"]["increase the width with mapping"] = function()
     child.lua([[
-        require('no-neck-pain').setup({width=50,widthUpMapping="nn"})
+        require('no-neck-pain').setup({width=50,mappings={widthUp="nn"}})
         require('no-neck-pain').enable()
     ]])
 
@@ -60,7 +56,7 @@ end
 
 T["setup"]["decrease the width with mapping"] = function()
     child.lua([[
-        require('no-neck-pain').setup({width=50,widthDownMapping="nn"})
+        require('no-neck-pain').setup({width=50,mappings={widthDown="nn"}})
         require('no-neck-pain').enable()
     ]])
 

@@ -49,7 +49,7 @@ end
 ---@return string?: the blended color code.
 ---@private
 local function matchAndBlend(colorCode, factor)
-    if colorCode == nil then
+    if colorCode == nil or string.lower(colorCode) == "none" then
         return nil
     end
 
@@ -93,36 +93,36 @@ function C.parse(buffers)
     -- if the user did not provided a custom background color, and have a transparent bg,
     -- we set it to the global options and let the loop do the spread below.
     if
-        buffers.backgroundColor == nil
+        buffers.colors.background == nil
         and (defaultBackground == nil or string.lower(defaultBackground) == "none")
     then
-        buffers.backgroundColor = "NONE"
-        buffers.textColor = "#ffffff"
+        buffers.colors.background = "NONE"
+        buffers.colors.text = "#ffffff"
     else
-        buffers.backgroundColor = matchAndBlend(
-            buffers.backgroundColor or string.format("#%06X", defaultBackground),
-            buffers.blend
+        buffers.colors.background = matchAndBlend(
+            buffers.colors.background or string.format("#%06X", defaultBackground),
+            buffers.colors.blend
         )
     end
 
     for _, side in pairs(Co.SIDES) do
         if buffers[side].enabled then
-            -- if the side buffer backgroundColor is not defined, we fallback to the common option.
-            buffers[side].backgroundColor = matchAndBlend(
-                buffers[side].backgroundColor,
-                buffers[side].blend or buffers.blend
-            ) or buffers.backgroundColor
+            -- if the side buffer colors.background is not defined, we fallback to the common option.
+            buffers[side].colors.background = matchAndBlend(
+                buffers[side].colors.background,
+                buffers[side].colors.blend or buffers.colors.blend
+            ) or buffers.colors.background
 
-            local defaultTextColor = buffers[side].backgroundColor
+            local defaultTextColor = buffers[side].colors.background
 
             -- if we have a transparent bg we won't be able,
             -- to default a text color so we set it to white
-            if string.lower(buffers[side].backgroundColor) == "none" then
+            if string.lower(buffers[side].colors.background) == "none" then
                 defaultTextColor = "#ffffff"
             end
 
-            buffers[side].textColor = buffers[side].textColor
-                or buffers.textColor
+            buffers[side].colors.text = buffers[side].colors.text
+                or buffers.colors.text
                 or matchAndBlend(defaultTextColor, 0.5)
         end
     end
@@ -152,8 +152,8 @@ function C.init(win, tab, side)
         string.format(
             "highlight! %s guifg=%s guibg=%s",
             backgroundGroup,
-            _G.NoNeckPain.config.buffers[side].backgroundColor,
-            _G.NoNeckPain.config.buffers[side].backgroundColor
+            _G.NoNeckPain.config.buffers[side].colors.background,
+            _G.NoNeckPain.config.buffers[side].colors.background
         )
     )
 
@@ -162,8 +162,8 @@ function C.init(win, tab, side)
         string.format(
             "highlight! %s guifg=%s guibg=%s",
             textGroup,
-            _G.NoNeckPain.config.buffers[side].textColor,
-            _G.NoNeckPain.config.buffers[side].backgroundColor
+            _G.NoNeckPain.config.buffers[side].colors.text,
+            _G.NoNeckPain.config.buffers[side].colors.background
         )
     )
 
@@ -173,7 +173,7 @@ function C.init(win, tab, side)
     }
 
     -- on transparent backgrounds we don't set those two to prevent white lines.
-    if _G.NoNeckPain.config.buffers[side].backgroundColor ~= "NONE" then
+    if _G.NoNeckPain.config.buffers[side].colors.background ~= "NONE" then
         groups = vim.tbl_extend("keep", groups, {
             WinSeparator = backgroundGroup,
             VertSplit = backgroundGroup,
