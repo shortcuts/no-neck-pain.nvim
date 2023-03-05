@@ -48,7 +48,7 @@ T["commands"]["NoNeckPainResize throws with the plugin disabled"] = function()
     end)
 end
 
-T["commands"]["NoNeckPainResize does nothing with the same widht"] = function()
+T["commands"]["NoNeckPainResize does nothing with the same width"] = function()
     child.cmd("NoNeckPain")
 
     eq_global(child, "_G.NoNeckPain.config.width", 100)
