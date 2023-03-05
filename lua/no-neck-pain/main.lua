@@ -10,6 +10,7 @@ local N = {}
 local S = Ta.initState()
 
 -- Toggle the plugin by calling the `enable`/`disable` methods respectively.
+---@private
 function N.toggle(scope)
     local tab = Ta.get(S.tabs)
 
@@ -20,7 +21,8 @@ function N.toggle(scope)
     return N.enable(scope)
 end
 
---- Toggles the scratchPad feature of the plugin..
+--- Toggles the scratchPad feature of the plugin.
+---@private
 function N.toggleScratchPad()
     local tab = Ta.get(S.tabs)
 
@@ -41,7 +43,8 @@ function N.toggleScratchPad()
     return S
 end
 
--- Creates side buffers and set the tab state, focuses the `curr` window if required.
+--- Creates side buffers and set the tab state, focuses the `curr` window if required.
+---@private
 function N.init(scope, tab, goToCurr)
     if tab == nil then
         tab = Ta.get(S.tabs)
@@ -76,7 +79,8 @@ function N.init(scope, tab, goToCurr)
     return S
 end
 
--- Initializes the plugin, sets event listeners and internal state.
+--- Initializes the plugin, sets event listeners and internal state.
+---@private
 function N.enable(scope)
     local tab = Ta.get(S.tabs)
 
@@ -279,7 +283,8 @@ function N.enable(scope)
     return S
 end
 
--- Disables the plugin for the given tab, clear highlight groups and autocmds, closes side buffers and resets the internal state.
+--- Disables the plugin for the given tab, clear highlight groups and autocmds, closes side buffers and resets the internal state.
+---@private
 function N.disable(scope)
     local tab = Ta.get(S.tabs)
 
