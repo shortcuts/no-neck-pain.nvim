@@ -38,7 +38,7 @@ function N.toggleScratchPad()
     tab.scratchPadEnabled = not tab.scratchPadEnabled
     S.tabs = Ta.update(S.tabs, tab.id, tab)
 
-    D.tprint(tab)
+    return S
 end
 
 -- Creates side buffers and set the tab state, focuses the `curr` window if required.
