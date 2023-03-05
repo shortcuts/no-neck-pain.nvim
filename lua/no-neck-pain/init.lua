@@ -11,6 +11,19 @@ function NoNeckPain.toggle()
     _G.NoNeckPain.state = M.toggle("publicAPI_toggle")
 end
 
+--- Toggles the scratchPad feature of the plugin..
+function NoNeckPain.toggleScratchPad()
+    if _G.NoNeckPain.state == nil or not _G.NoNeckPain.state.enabled then
+        error("no-neck-pain.nvim must be enabled, run `NoNeckPain` first.")
+    end
+
+    if _G.NoNeckPain.config == nil then
+        _G.NoNeckPain.config = require("no-neck-pain.config").options
+    end
+
+    _G.NoNeckPain.state = M.toggleScratchPad()
+end
+
 --- Sets the config `width` to the given `width` value and resizes the NoNeckPain windows.
 ---
 --- @param width number: any positive integer superior to 0.

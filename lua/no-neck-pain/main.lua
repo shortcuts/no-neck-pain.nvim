@@ -20,6 +20,27 @@ function N.toggle(scope)
     return N.enable(scope)
 end
 
+--- Toggles the scratchPad feature of the plugin..
+function N.toggleScratchPad()
+    local tab = Ta.get(S.tabs)
+
+    if tab == nil then
+        return
+    end
+
+    for _, side in pairs(Co.SIDES) do
+        vim.fn.win_gotoid(tab.wins.main[side])
+        W.initScratchPad(side, tab.scratchPadEnabled)
+    end
+
+    vim.fn.win_gotoid(tab.wins.main.curr)
+
+    tab.scratchPadEnabled = not tab.scratchPadEnabled
+    S.tabs = Ta.update(S.tabs, tab.id, tab)
+
+    D.tprint(tab)
+end
+
 -- Creates side buffers and set the tab state, focuses the `curr` window if required.
 function N.init(scope, tab, goToCurr)
     if tab == nil then
