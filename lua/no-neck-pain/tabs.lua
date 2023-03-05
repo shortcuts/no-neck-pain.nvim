@@ -42,6 +42,7 @@ function Ta.insert(tabs, id)
     local newTab = {
         id = id,
         augroup = nil,
+        scratchPadEnabled = false,
         wins = {
             main = {
                 curr = nil,

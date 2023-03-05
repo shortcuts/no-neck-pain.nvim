@@ -13,6 +13,7 @@ if vim.fn.has("nvim-0.7") == 0 then
     vim.cmd(
         "command! NoNeckPainWidthDown lua require('no-neck-pain').resize(_G.NoNeckPain.config.width - 5)"
     )
+    vim.cmd("command! NoNeckPainScratchPad lua require('no-neck-pain').toggleScratchPad()")
 else
     vim.api.nvim_create_user_command("NoNeckPain", function()
         require("no-neck-pain").toggle()
@@ -29,4 +30,8 @@ else
     vim.api.nvim_create_user_command("NoNeckPainWidthDown", function()
         require("no-neck-pain").resize(_G.NoNeckPain.config.width - 5)
     end, { desc = "Decrease the width of the main window by 5." })
+
+    vim.api.nvim_create_user_command("NoNeckPainScratchPad", function()
+        require("no-neck-pain").toggleScratchPad()
+    end, { desc = "Toggles the scratchPad feature of the plugin." })
 end

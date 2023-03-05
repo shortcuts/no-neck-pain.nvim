@@ -1,17 +1,24 @@
 local D = require("no-neck-pain.util.debug")
-local C = require("no-neck-pain.color")
+local C = require("no-neck-pain.colors")
 local Co = require("no-neck-pain.util.constants")
 
 local NoNeckPain = {}
 
-local function registerMapping(mappings, name, fn)
-    if mappings[name] == false then
+local function registerMappings(options, mappings)
+    -- all of the mappings are disabled
+    if not options.enabled then
         return
     end
 
-    assert(type(mappings[name]) == "string", string.format("`%s` must be a string", name))
+    for name, command in pairs(mappings) do
+        -- this specific mapping is disabled
+        if not options[name] then
+            return
+        end
 
-    vim.api.nvim_set_keymap("n", mappings[name], fn, { silent = true })
+        assert(type(options[name]) == "string", string.format("`%s` must be a string", name))
+        vim.api.nvim_set_keymap("n", options[name], command, { silent = true })
+    end
 end
 
 --- NoNeckPain's buffer `vim.wo` options.
@@ -168,6 +175,10 @@ NoNeckPain.options = {
         -- When `false`, the mapping is not created.
         --- @type string
         widthDown = "<Leader>n-",
+        -- Sets a global mapping to Neovim, which allows you to toggle the scratchpad feature.
+        -- When `false`, the mapping is not created.
+        --- @type string
+        scratchPad = "<Leader>ns",
     },
     --- Common options that are set to both side buffers.
     --- See |NoNeckPain.bufferOptions| for option scoped to the `left` and/or `right` buffer.
@@ -304,17 +315,12 @@ function NoNeckPain.setup(options)
     -- set theme options
     NoNeckPain.options.buffers = C.parse(NoNeckPain.options.buffers)
 
-    registerMapping(NoNeckPain.options.mappings, "toggle", ":NoNeckPain<CR>")
-    registerMapping(
-        NoNeckPain.options.mappings,
-        "widthUp",
-        ":lua require('no-neck-pain').resize(_G.NoNeckPain.config.width + 5)<CR>"
-    )
-    registerMapping(
-        NoNeckPain.options.mappings,
-        "widthDown",
-        ":lua require('no-neck-pain').resize(_G.NoNeckPain.config.width - 5)<CR>"
-    )
+    registerMappings(NoNeckPain.options.mappings, {
+        toggle = ":NoNeckPain<CR>",
+        widthUp = ":NoNeckPainWidthUp<CR>",
+        widthDown = ":NoNeckPainWidthDown<CR>",
+        scratchPad = ":NoNeckPainScratchPad<CR>",
+    })
 
     return NoNeckPain.options
 end

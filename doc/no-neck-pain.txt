@@ -5,6 +5,11 @@
 Toggle the plugin by calling the `enable`/`disable` methods respectively.
 
 ------------------------------------------------------------------------------
+                                                 *NoNeckPain.toggleScratchPad()*
+                        `NoNeckPain.toggleScratchPad`()
+Toggles the scratchPad feature of the plugin.
+
+------------------------------------------------------------------------------
                                                            *NoNeckPain.resize()*
                           `NoNeckPain.resize`({width})
 Sets the config `width` to the given `width` value and resizes the NoNeckPain windows.
@@ -205,6 +210,10 @@ values:
           -- When `false`, the mapping is not created.
           --- @type string
           widthDown = "<Leader>n-",
+          -- Sets a global mapping to Neovim, which allows you to toggle the scratchpad feature.
+          -- When `false`, the mapping is not created.
+          --- @type string
+          scratchPad = "<Leader>ns",
       },
       --- Common options that are set to both side buffers.
       --- See |NoNeckPain.bufferOptions| for option scoped to the `left` and/or `right` buffer.

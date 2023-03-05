@@ -1,4 +1,4 @@
-local C = require("no-neck-pain.color")
+local C = require("no-neck-pain.colors")
 local Co = require("no-neck-pain.util.constants")
 local D = require("no-neck-pain.util.debug")
 local Sp = require("no-neck-pain.splits")
@@ -32,6 +32,67 @@ function W.close(scope, id, side)
     if vim.api.nvim_win_is_valid(id) then
         vim.api.nvim_win_close(id, false)
     end
+end
+
+---Sets options to the side buffers to toggle the scratchPad.
+---
+---@param side "left"|"right": the side of the window being resized, used for logging only.
+---@param cleanup boolean?: cleanup the given buffer
+---@private
+function W.initScratchPad(side, cleanup)
+    if not _G.NoNeckPain.config.buffers[side].enabled then
+        return
+    end
+
+    -- on cleanup we open a new buffer and set the default options
+    if cleanup then
+        vim.cmd("enew")
+
+        for opt, val in pairs(_G.NoNeckPain.config.buffers[side].bo) do
+            vim.api.nvim_buf_set_option(0, opt, val)
+        end
+
+        for opt, val in pairs(_G.NoNeckPain.config.buffers[side].wo) do
+            vim.api.nvim_win_set_option(0, opt, val)
+        end
+
+        return
+    end
+
+    local location = ""
+
+    if _G.NoNeckPain.config.buffers.scratchPad.location ~= nil then
+        assert(
+            type(_G.NoNeckPain.config.buffers.scratchPad.location) == "string",
+            "`buffers.scratchPad.location` must be a nil or a string."
+        )
+
+        location = _G.NoNeckPain.config.buffers.scratchPad.location
+    end
+
+    if location ~= "" and string.sub(location, -1) ~= "/" then
+        location = location .. "/"
+    end
+
+    location = location
+        .. _G.NoNeckPain.config.buffers.scratchPad.fileName
+        .. "-"
+        .. side
+        .. "."
+        .. _G.NoNeckPain.config.buffers[side].bo.filetype
+
+    -- we edit the file if it exists, otherwise we create it
+    if vim.fn.filereadable(location) then
+        vim.cmd(string.format("edit %s", location))
+    else
+        vim.api.nvim_buf_set_name(0, location)
+    end
+
+    vim.api.nvim_buf_set_option(0, "bufhidden", "")
+    vim.api.nvim_buf_set_option(0, "buftype", "")
+    vim.api.nvim_buf_set_option(0, "buflisted", false)
+    vim.api.nvim_buf_set_option(0, "autoread", true)
+    vim.o.autowriteall = true
 end
 
 ---Creates side buffers with the correct padding, considering the side trees.
@@ -84,42 +145,9 @@ function W.createSideBuffers(tab)
 
                 C.init(id, tab.id, side)
 
-                -- default options for scratchpad
                 if _G.NoNeckPain.config.buffers.scratchPad.enabled then
-                    local location = ""
-
-                    if _G.NoNeckPain.config.buffers.scratchPad.location ~= nil then
-                        assert(
-                            type(_G.NoNeckPain.config.buffers.scratchPad.location) == "string",
-                            "`buffers.scratchPad.location` must be a nil or a string."
-                        )
-
-                        location = _G.NoNeckPain.config.buffers.scratchPad.location
-                    end
-
-                    if location ~= "" and string.sub(location, -1) ~= "/" then
-                        location = location .. "/"
-                    end
-
-                    location = location
-                        .. _G.NoNeckPain.config.buffers.scratchPad.fileName
-                        .. "-"
-                        .. side
-                        .. "."
-                        .. _G.NoNeckPain.config.buffers[side].bo.filetype
-
-                    -- we edit the file if it exists, otherwise we create it
-                    if vim.fn.filereadable(location) then
-                        vim.cmd(string.format("edit %s", location))
-                    else
-                        vim.api.nvim_buf_set_name(0, location)
-                    end
-
-                    vim.api.nvim_buf_set_option(0, "bufhidden", "")
-                    vim.api.nvim_buf_set_option(0, "buftype", "")
-                    vim.api.nvim_buf_set_option(0, "buflisted", false)
-                    vim.api.nvim_buf_set_option(0, "autoread", true)
-                    vim.o.autowriteall = true
+                    W.initScratchPad(side)
+                    tab.scratchPadEnabled = true
                 end
 
                 tab.wins.main[side] = id
