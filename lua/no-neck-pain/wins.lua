@@ -44,7 +44,18 @@ function W.initScratchPad(side, cleanup)
         return
     end
 
+    -- on cleanup we open a new buffer and set the default options
     if cleanup then
+        vim.cmd("enew")
+
+        for opt, val in pairs(_G.NoNeckPain.config.buffers[side].bo) do
+            vim.api.nvim_buf_set_option(0, opt, val)
+        end
+
+        for opt, val in pairs(_G.NoNeckPain.config.buffers[side].wo) do
+            vim.api.nvim_win_set_option(0, opt, val)
+        end
+
         return
     end
 

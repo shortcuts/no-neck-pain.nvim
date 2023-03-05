@@ -30,13 +30,19 @@ function N.toggleScratchPad()
         return
     end
 
+    -- store the current win to later restore focus
+    local currWin = vim.api.nvim_get_current_win()
+
+    -- map over both sides and let the init method either setup or cleanup the side buffers
     for _, side in pairs(Co.SIDES) do
         vim.fn.win_gotoid(tab.wins.main[side])
         W.initScratchPad(side, tab.scratchPadEnabled)
     end
 
-    vim.fn.win_gotoid(tab.wins.main.curr)
+    -- restore focus
+    vim.fn.win_gotoid(currWin)
 
+    -- save new state of the scratchpad and update tabs
     tab.scratchPadEnabled = not tab.scratchPadEnabled
     S.tabs = Ta.update(S.tabs, tab.id, tab)
 
