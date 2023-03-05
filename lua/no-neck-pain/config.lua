@@ -5,11 +5,17 @@ local Co = require("no-neck-pain.util.constants")
 local NoNeckPain = {}
 
 local function registerMappings(options, mappings)
+    -- all of the mappings are disabled
     if not options.enabled then
         return
     end
 
     for name, command in pairs(mappings) do
+        -- this specific mapping is disabled
+        if not options[name] then
+            return
+        end
+
         assert(type(options[name]) == "string", string.format("`%s` must be a string", name))
         vim.api.nvim_set_keymap("n", options[name], command, { silent = true })
     end
