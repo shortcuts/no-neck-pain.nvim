@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [1.1.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.0.0...v1.1.0) (2023-03-05)
+
+
+### Features
+
+* add toggle scratchPad mappings ([#203](https://github.com/shortcuts/no-neck-pain.nvim/issues/203)) ([475a34a](https://github.com/shortcuts/no-neck-pain.nvim/commit/475a34adf617d818c900e782cc7ccfd57ea9580f))
+
 ## [1.0.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v0.10.2...v1.0.0) (2023-03-04)
 
 
