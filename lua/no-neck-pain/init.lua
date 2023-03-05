@@ -11,7 +11,7 @@ function NoNeckPain.toggle()
     _G.NoNeckPain.state = M.toggle("publicAPI_toggle")
 end
 
---- Toggles the scratchPad feature of the plugin..
+--- Toggles the scratchPad feature of the plugin.
 function NoNeckPain.toggleScratchPad()
     if _G.NoNeckPain.state == nil or not _G.NoNeckPain.state.enabled then
         error("no-neck-pain.nvim must be enabled, run `NoNeckPain` first.")
