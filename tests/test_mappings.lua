@@ -36,7 +36,7 @@ end
 
 T["setup"]["increase the width with mapping"] = function()
     child.lua([[
-        require('no-neck-pain').setup({width=50,mappings={widthUp="nn"}})
+        require('no-neck-pain').setup({width=50,mappings={enabled=true,widthUp="nn"}})
         require('no-neck-pain').enable()
     ]])
 
@@ -56,7 +56,7 @@ end
 
 T["setup"]["decrease the width with mapping"] = function()
     child.lua([[
-        require('no-neck-pain').setup({width=50,mappings={widthDown="nn"}})
+        require('no-neck-pain').setup({width=50,mappings={enabled=true,widthDown="nn"}})
         require('no-neck-pain').enable()
     ]])
 
