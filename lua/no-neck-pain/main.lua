@@ -284,10 +284,7 @@ function N.enable(scope)
                         -- if we have an id in the state but it's not active anymore
                         (tree.id ~= nil and not vim.tbl_contains(treesIDs, tree.id))
                         -- we have a new tree registered, we can resize
-                        or (
-                            trees[name].id ~= nil
-                            and trees[name].id ~= tab.wins.external.trees[name].id
-                        )
+                        or (trees[name].id ~= nil and trees[name].id ~= tree.id)
                     then
                         D.log(p.event, "%s have changed, resizing", name)
 
