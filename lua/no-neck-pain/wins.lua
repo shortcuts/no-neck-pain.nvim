@@ -100,9 +100,10 @@ end
 --- - If it already exists, we resize it.
 ---
 ---@param tab table: the table where the tab information are stored.
+---@param skipTrees boolean?: skip trees action when true.
 ---@return table: the updated tab.
 ---@private
-function W.createSideBuffers(tab)
+function W.createSideBuffers(tab, skipTrees)
     -- before creating side buffers, we determine if we should consider externals
     tab.wins.external.trees = T.refresh(tab)
 
@@ -111,7 +112,11 @@ function W.createSideBuffers(tab)
         right = { cmd = "botright vnew", padding = 0 },
     }
 
-    local integrations = T.close(tab)
+    local integrations = nil
+
+    if not skipTrees then
+        integrations = T.close(tab)
+    end
 
     for _, side in pairs(Co.SIDES) do
         if _G.NoNeckPain.config.buffers[side].enabled then
@@ -155,7 +160,9 @@ function W.createSideBuffers(tab)
         end
     end
 
-    T.reopen(integrations)
+    if not skipTrees then
+        T.reopen(integrations)
+    end
 
     tab.wins.main.left, tab.wins.main.right =
         W.resizeOrCloseSideBuffers("W.createSideBuffers", tab.wins, wins)
@@ -311,16 +318,18 @@ end
 
 ---Merges the state windows in a single table containing all of their IDs.
 ---
----@param main table: the `main` window state.
----@param splits table: the `splits` window state.
+---@param main table?: the `main` window state.
+---@param splits table?: the `splits` window state.
 ---@param trees table?: the `external.trees` window state.
 ---@return table: the state window IDs.
 ---@private
 function W.mergeState(main, splits, trees)
     local wins = {}
 
-    for _, side in pairs(main) do
-        table.insert(wins, side)
+    if main ~= nil then
+        for _, side in pairs(main) do
+            table.insert(wins, side)
+        end
     end
 
     if splits ~= nil then

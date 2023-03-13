@@ -47,6 +47,11 @@ function T.refresh(tab)
     for _, win in pairs(wins) do
         local fileType = vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(win), "filetype")
         if T.isSideTree(fileType) then
+            -- NeoTree filetype is cased differently than the plugin name
+            if fileType == "neo-tree" then
+                fileType = "NeoTree"
+            end
+
             trees[fileType] = {
                 id = win,
                 width = vim.api.nvim_win_get_width(win) * 2,

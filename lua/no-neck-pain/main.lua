@@ -51,7 +51,7 @@ end
 
 --- Creates side buffers and set the tab state, focuses the `curr` window if required.
 ---@private
-function N.init(scope, tab, goToCurr)
+function N.init(scope, tab, goToCurr, skipTrees)
     if tab == nil then
         tab = Ta.get(S.tabs)
 
@@ -71,7 +71,7 @@ function N.init(scope, tab, goToCurr)
         hadSideBuffers = false
     end
 
-    tab = W.createSideBuffers(tab)
+    tab = W.createSideBuffers(tab, skipTrees)
 
     if
         goToCurr
@@ -256,25 +256,39 @@ function N.enable(scope)
                     return
                 end
 
-                local wins, _ = W.winsExceptState(tab, false)
+                local fileType = vim.api.nvim_buf_get_option(0, "filetype")
+
+                -- We can skip enter hooks that are not on a side tree
+                if p.event == "WinEnter" and not T.isSideTree(fileType) then
+                    D.log(p.event, "skipping %s, not a side tree", fileType)
+
+                    return
+                end
+
+                -- if a buffer have been closed but we don't have trees in the state
+                if
+                    p.event == "WinClosed"
+                    and vim.tbl_count(W.mergeState(nil, nil, tab.wins.external.trees)) == 0
+                then
+                    D.log(p.event, "skipping tree event, no trees in state")
+
+                    return
+                end
+
                 local trees = T.refresh(tab)
+                local treesIDs = W.mergeState(nil, nil, trees)
 
                 -- we cycle over supported integrations to see which got closed or opened
                 for name, tree in pairs(tab.wins.external.trees) do
-                    -- if there was a tree[name] but not anymore, we resize
-                    if tree.id ~= nil and not vim.tbl_contains(wins, tree.id) then
-                        D.log(p.event, "%s have been closed, resizing", name)
+                    if
+                        -- if we have an id in the state but it's not active anymore
+                        (tree.id ~= nil and not vim.tbl_contains(treesIDs, tree.id))
+                        -- we have a new tree registered, we can resize
+                        or (trees[name].id ~= nil and trees[name].id ~= tree.id)
+                    then
+                        D.log(p.event, "%s have changed, resizing", name)
 
-                        S = N.init(p.event, tab)
-
-                        return
-                    end
-
-                    -- we have a new tree registered, we can resize
-                    if trees[name].id ~= tab.wins.external.trees[name].id then
-                        D.log(p.event, "%s have been opened, resizing", name)
-
-                        S = N.init(p.event, tab)
+                        S = N.init(p.event, tab, false, true)
 
                         return
                     end
