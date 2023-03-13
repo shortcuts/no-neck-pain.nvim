@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [1.1.1](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.1.0...v1.1.1) (2023-03-13)
+
+
+### Bug Fixes
+
+* side trees infinite polling ([#205](https://github.com/shortcuts/no-neck-pain.nvim/issues/205)) ([9af5a22](https://github.com/shortcuts/no-neck-pain.nvim/commit/9af5a22ba3e7be6ea5b11712c0c2d118f6807cb8))
+
 ## [1.1.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.0.0...v1.1.0) (2023-03-05)
 
 
