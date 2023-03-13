@@ -51,7 +51,7 @@ end
 
 --- Creates side buffers and set the tab state, focuses the `curr` window if required.
 ---@private
-function N.init(scope, tab, goToCurr)
+function N.init(scope, tab, goToCurr, skipTrees)
     if tab == nil then
         tab = Ta.get(S.tabs)
 
@@ -71,7 +71,7 @@ function N.init(scope, tab, goToCurr)
         hadSideBuffers = false
     end
 
-    tab = W.createSideBuffers(tab)
+    tab = W.createSideBuffers(tab, skipTrees)
 
     if
         goToCurr
@@ -288,7 +288,7 @@ function N.enable(scope)
                     then
                         D.log(p.event, "%s have changed, resizing", name)
 
-                        S.tabs = Ta.update(S.tabs, tab.id, W.createSideBuffers(tab, true))
+                        S = N.init(p.event, tab, false, true)
 
                         return
                     end
