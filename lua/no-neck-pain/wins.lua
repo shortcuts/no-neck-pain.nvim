@@ -61,13 +61,13 @@ function W.initScratchPad(side, cleanup)
 
     local location = ""
 
-    if _G.NoNeckPain.config.buffers.scratchPad.location ~= nil then
+    if _G.NoNeckPain.config.buffers[side].scratchPad.location ~= nil then
         assert(
-            type(_G.NoNeckPain.config.buffers.scratchPad.location) == "string",
+            type(_G.NoNeckPain.config.buffers[side].scratchPad.location) == "string",
             "`buffers.scratchPad.location` must be a nil or a string."
         )
 
-        location = _G.NoNeckPain.config.buffers.scratchPad.location
+        location = _G.NoNeckPain.config.buffers[side].scratchPad.location
     end
 
     if location ~= "" and string.sub(location, -1) ~= "/" then
@@ -75,7 +75,7 @@ function W.initScratchPad(side, cleanup)
     end
 
     location = location
-        .. _G.NoNeckPain.config.buffers.scratchPad.fileName
+        .. _G.NoNeckPain.config.buffers[side].scratchPad.fileName
         .. "-"
         .. side
         .. "."
