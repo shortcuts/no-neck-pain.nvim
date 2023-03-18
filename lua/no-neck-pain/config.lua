@@ -4,6 +4,12 @@ local Co = require("no-neck-pain.util.constants")
 
 local NoNeckPain = {}
 
+--- Registers the plugin mappings if the option is enabled.
+---
+---@param options table The mappins provided by the user.
+---@param mappings table A key value map of the mapping name and its command.
+---
+---@private
 local function registerMappings(options, mappings)
     -- all of the mappings are disabled
     if not options.enabled then
@@ -67,6 +73,31 @@ NoNeckPain.bufferOptionsBo = {
     swapfile = false,
 }
 
+--- NoNeckPain's scratchpad buffer options.
+---
+--- Leverages the side buffers as notepads, which work like any Neovim buffer and automatically saves its content at the given `location`.
+--- note: quitting an unsaved scratchpad buffer is non-blocking, and the content is still saved.
+---
+---@type table
+---Default values:
+---@eval return MiniDoc.afterlines_to_code(MiniDoc.current.eval_section)
+NoNeckPain.bufferOptionsScratchpad = {
+    -- When `true`, automatically sets the following options to the side buffers:
+    -- - `autowriteall`
+    -- - `autoread`.
+    --- @type boolean
+    enabled = false,
+    -- The name of the generated file. See `location` for more information.
+    --- @type string
+    --- @example: `no-neck-pain-left.norg`
+    fileName = "no-neck-pain",
+    -- By default, files are saved at the same location as the current Neovim session.
+    -- note: filetype is defaulted to `norg` (https://github.com/nvim-neorg/neorg), but can be changed in `buffers.bo.filetype` or |NoNeckPain.bufferOptions| for option scoped to the `left` and/or `right` buffer.
+    --- @type string?
+    --- @example: `no-neck-pain-left.norg`
+    location = nil,
+}
+
 --- NoNeckPain's buffer color options.
 ---
 ---@type table
@@ -119,6 +150,8 @@ NoNeckPain.bufferOptions = {
     bo = NoNeckPain.bufferOptionsBo,
     --- @see NoNeckPain.bufferOptionsWo `:h NoNeckPain.bufferOptionsWo`
     wo = NoNeckPain.bufferOptionsWo,
+    --- @see NoNeckPain.bufferOptionsScratchpad `:h NoNeckPain.bufferOptionsScratchpad`
+    scratchPad = NoNeckPain.bufferOptionsScratchpad,
 }
 
 --- NoNeckPain's plugin config.
@@ -189,23 +222,8 @@ NoNeckPain.options = {
         setNames = false,
         -- Leverages the side buffers as notepads, which work like any Neovim buffer and automatically saves its content at the given `location`.
         -- note: quitting an unsaved scratchpad buffer is non-blocking, and the content is still saved.
-        --- @type table
-        scratchPad = {
-            -- When `true`, automatically sets the following options to the side buffers:
-            -- - `autowriteall`
-            -- - `autoread`.
-            --- @type boolean
-            enabled = false,
-            -- The name of the generated file. See `location` for more information.
-            --- @type string
-            --- @example: `no-neck-pain-left.norg`
-            fileName = "no-neck-pain",
-            -- By default, files are saved at the same location as the current Neovim session.
-            -- note: filetype is defaulted to `norg` (https://github.com/nvim-neorg/neorg), but can be changed in `buffers.bo.filetype` or |NoNeckPain.bufferOptions| for option scoped to the `left` and/or `right` buffer.
-            --- @type string?
-            --- @example: `no-neck-pain-left.norg`
-            location = nil,
-        },
+        --- see |NoNeckPain.bufferOptionsScratchpad|
+        scratchPad = NoNeckPain.bufferOptionsScratchpad,
         -- colors to apply to both side buffers, for buffer scopped options @see |NoNeckPain.bufferOptions|
         --- see |NoNeckPain.bufferOptionsColors|
         colors = NoNeckPain.bufferOptionsColors,
@@ -264,7 +282,31 @@ NoNeckPain.options = {
 function NoNeckPain.setup(options)
     options = options or {}
     options.buffers = options.buffers or {}
-    NoNeckPain.options = vim.tbl_deep_extend("keep", options, NoNeckPain.options)
+
+    local tde = function(t1, t2)
+        return vim.tbl_deep_extend("keep", t1 or {}, t2 or {})
+    end
+
+    for _, side in pairs(Co.SIDES) do
+        options.buffers[side] = options.buffers[side] or {}
+
+        options.buffers[side].bo = tde(options.buffers[side].bo, options.buffers.bo)
+        options.buffers[side].wo = tde(options.buffers[side].wo, options.buffers.wo)
+        options.buffers[side].colors = tde(options.buffers[side].colors, options.buffers.colors)
+        options.buffers[side].scratchPad =
+            tde(options.buffers[side].scratchPad, options.buffers.scratchPad)
+
+        -- if the user wants scratchpads, but did not provided a custom filetype, we default to `norg`.
+        if
+            options.buffers[side].scratchPad.enabled
+            and (options.buffers[side].bo == nil or options.buffers[side].bo.filetype == nil)
+        then
+            options.buffers[side].bo = options.buffers[side].bo or {}
+            options.buffers[side].bo.filetype = "norg"
+        end
+    end
+
+    NoNeckPain.options = tde(options, NoNeckPain.options)
 
     D.warnDeprecation(NoNeckPain.options)
 
@@ -293,23 +335,6 @@ function NoNeckPain.setup(options)
                 or NoNeckPain.options.integrations[tree].position == "right",
             string.format("%s position can only be `left` or `right`", tree)
         )
-    end
-
-    -- set default side buffers options
-    for _, side in pairs(Co.SIDES) do
-        NoNeckPain.options.buffers[side] = vim.tbl_deep_extend(
-            "keep",
-            options.buffers[side] or NoNeckPain.options.buffers,
-            NoNeckPain.options.buffers[side]
-        )
-
-        -- if the user wants scratchpads, but did not provided a custom filetype, we default to `norg`.
-        if
-            NoNeckPain.options.buffers.scratchPad.enabled
-            and NoNeckPain.options.buffers[side].bo.filetype == "no-neck-pain"
-        then
-            NoNeckPain.options.buffers[side].bo.filetype = "norg"
-        end
     end
 
     -- set theme options
