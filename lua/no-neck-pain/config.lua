@@ -274,13 +274,12 @@ NoNeckPain.options = {
     },
 }
 
---- Spreads the user provided options to the default options, and spreads the global buffer options to the non-defined side buffer options.
+--- Define your no-neck-pain setup.
 ---
 ---@param options table Module config table. See |NoNeckPain.options|.
----@return table Module config table. See |NoNeckPain.options|.
 ---
----@private
-local function default(options)
+---@usage `require("no-neck-pain").setup()` (add `{}` with your |NoNeckPain.options| table)
+function NoNeckPain.setup(options)
     options = options or {}
     options.buffers = options.buffers or {}
 
@@ -307,16 +306,7 @@ local function default(options)
         end
     end
 
-    return tde(options, NoNeckPain.options)
-end
-
---- Define your no-neck-pain setup.
----
----@param options table Module config table. See |NoNeckPain.options|.
----
----@usage `require("no-neck-pain").setup()` (add `{}` with your |NoNeckPain.options| table)
-function NoNeckPain.setup(options)
-    NoNeckPain.options = default(options)
+    NoNeckPain.options = tde(options, NoNeckPain.options)
 
     D.warnDeprecation(NoNeckPain.options)
 
