@@ -64,7 +64,7 @@ function W.initScratchPad(side, cleanup)
     if _G.NoNeckPain.config.buffers[side].scratchPad.location ~= nil then
         assert(
             type(_G.NoNeckPain.config.buffers[side].scratchPad.location) == "string",
-            "`buffers.scratchPad.location` must be a nil or a string."
+            "`scratchPad.location` must be a nil or a string."
         )
 
         location = _G.NoNeckPain.config.buffers[side].scratchPad.location
@@ -150,7 +150,7 @@ function W.createSideBuffers(tab, skipTrees)
 
                 C.init(id, tab.id, side)
 
-                if _G.NoNeckPain.config.buffers.scratchPad.enabled then
+                if _G.NoNeckPain.config.buffers[side].scratchPad.enabled then
                     W.initScratchPad(side)
                     tab.scratchPadEnabled = true
                 end

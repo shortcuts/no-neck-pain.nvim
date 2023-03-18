@@ -260,8 +260,6 @@ function N.enable(scope)
 
                 -- We can skip enter hooks that are not on a side tree
                 if p.event == "WinEnter" and not T.isSideTree(fileType) then
-                    D.log(p.event, "skipping %s, not a side tree", fileType)
-
                     return
                 end
 
@@ -270,8 +268,6 @@ function N.enable(scope)
                     p.event == "WinClosed"
                     and vim.tbl_count(W.mergeState(nil, nil, tab.wins.external.trees)) == 0
                 then
-                    D.log(p.event, "skipping tree event, no trees in state")
-
                     return
                 end
 

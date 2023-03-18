@@ -4,6 +4,12 @@ local Co = require("no-neck-pain.util.constants")
 
 local NoNeckPain = {}
 
+--- Registers the plugin mappings if the option is enabled.
+---
+---@param options table The mappins provided by the user.
+---@param mappings table A key value map of the mapping name and its command.
+---
+---@private
 local function registerMappings(options, mappings)
     -- all of the mappings are disabled
     if not options.enabled then
@@ -268,15 +274,49 @@ NoNeckPain.options = {
     },
 }
 
+--- Spreads the user provided options to the default options, and spreads the global buffer options to the non-defined side buffer options.
+---
+---@param options table Module config table. See |NoNeckPain.options|.
+---@return table Module config table. See |NoNeckPain.options|.
+---
+---@private
+local function default(options)
+    options = options or {}
+    options.buffers = options.buffers or {}
+
+    local tde = function(t1, t2)
+        return vim.tbl_deep_extend("keep", t1 or {}, t2 or {})
+    end
+
+    for _, side in pairs(Co.SIDES) do
+        options.buffers[side] = options.buffers[side] or {}
+
+        options.buffers[side].bo = tde(options.buffers[side].bo, options.buffers.bo)
+        options.buffers[side].wo = tde(options.buffers[side].wo, options.buffers.wo)
+        options.buffers[side].colors = tde(options.buffers[side].colors, options.buffers.colors)
+        options.buffers[side].scratchPad =
+            tde(options.buffers[side].scratchPad, options.buffers.scratchPad)
+
+        -- if the user wants scratchpads, but did not provided a custom filetype, we default to `norg`.
+        if
+            options.buffers[side].scratchPad.enabled
+            and (options.buffers[side].bo == nil or options.buffers[side].bo.filetype == nil)
+        then
+            options.buffers[side].bo = options.buffers[side].bo or {}
+            options.buffers[side].bo.filetype = "norg"
+        end
+    end
+
+    return tde(options, NoNeckPain.options)
+end
+
 --- Define your no-neck-pain setup.
 ---
 ---@param options table Module config table. See |NoNeckPain.options|.
 ---
 ---@usage `require("no-neck-pain").setup()` (add `{}` with your |NoNeckPain.options| table)
 function NoNeckPain.setup(options)
-    options = options or {}
-    options.buffers = options.buffers or {}
-    NoNeckPain.options = vim.tbl_deep_extend("keep", options, NoNeckPain.options)
+    NoNeckPain.options = default(options)
 
     D.warnDeprecation(NoNeckPain.options)
 
@@ -305,23 +345,6 @@ function NoNeckPain.setup(options)
                 or NoNeckPain.options.integrations[tree].position == "right",
             string.format("%s position can only be `left` or `right`", tree)
         )
-    end
-
-    -- set default side buffers options
-    for _, side in pairs(Co.SIDES) do
-        NoNeckPain.options.buffers[side] = vim.tbl_deep_extend(
-            "keep",
-            options.buffers[side] or NoNeckPain.options.buffers,
-            NoNeckPain.options.buffers[side]
-        )
-
-        -- if the user wants scratchpads, but did not provided a custom filetype, we default to `norg`.
-        if
-            NoNeckPain.options.buffers[side].scratchPad.enabled
-            and NoNeckPain.options.buffers[side].bo.filetype == "no-neck-pain"
-        then
-            NoNeckPain.options.buffers[side].bo.filetype = "norg"
-        end
     end
 
     -- set theme options
