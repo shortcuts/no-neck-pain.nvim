@@ -8,8 +8,8 @@ local INTEGRATIONS = {
     },
     NeoTree = {
         enabled = false,
-        close = "NeoTreeClose",
-        open = "NeoTreeReveal",
+        close = "Neotree close",
+        open = "Neotree reveal",
     },
 }
 
