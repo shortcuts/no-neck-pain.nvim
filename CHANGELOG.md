@@ -1,4 +1,16 @@
 <a name="0.2.3"></a>
+## [1.2.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.1.1...v1.2.0) (2023-03-19)
+
+
+### Features
+
+* allow configuring scratchpad per side buffer ([#210](https://github.com/shortcuts/no-neck-pain.nvim/issues/210)) ([2a2b69e](https://github.com/shortcuts/no-neck-pain.nvim/commit/2a2b69edd4b64facb25535f6f2d9af0155b515a8))
+
+
+### Bug Fixes
+
+* leverage new Neotree commands ([#213](https://github.com/shortcuts/no-neck-pain.nvim/issues/213)) ([f620306](https://github.com/shortcuts/no-neck-pain.nvim/commit/f6203061cd1cfdc85df534e218ccbb27e21e3860))
+
 ## [1.1.1](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.1.0...v1.1.1) (2023-03-13)
 
 
