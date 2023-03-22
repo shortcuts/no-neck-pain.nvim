@@ -43,6 +43,10 @@ function Ta.insert(tabs, id)
         id = id,
         augroup = nil,
         scratchPadEnabled = false,
+        layers = {
+            vsplit = 1,
+            split = 1,
+        },
         wins = {
             main = {
                 curr = nil,

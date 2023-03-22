@@ -1,27 +1,7 @@
+local A = require("no-neck-pain.util.api")
+local D = require("no-neck-pain.util.debug")
+
 local Sp = {}
-
--- returns only the list of registered splits that are still active.
-function Sp.refresh(splits)
-    if splits == nil then
-        return nil
-    end
-
-    local actives = {}
-    local hasActives = false
-
-    for _, split in pairs(splits) do
-        if vim.api.nvim_win_is_valid(split.id) then
-            hasActives = true
-            table.insert(actives, split)
-        end
-    end
-
-    if not hasActives then
-        return nil
-    end
-
-    return actives
-end
 
 -- returns the list of registered splits, except the given split `id`.
 function Sp.remove(splits, id)
@@ -54,58 +34,59 @@ function Sp.insert(splits, winID, vsplit)
     return splits
 end
 
--- tries to get all of the active splits on the given tab.
-function Sp.get(tab)
-    local wins = vim.api.nvim_tabpage_list_wins(tab.id)
-    local screenWidth = vim.api.nvim_list_uis()[1].width
+---Creates side buffers with the correct padding, considering the side trees.
+--- - A side buffer is not created if there's not enough space.
+--- - If it already exists, we resize it.
+---
+---@param tab table: the table where the tab information are stored.
+---@param focusedWin number: the id of the current window.
+---@return table: the updated tab.
+---@return boolean: whether the current window is a vsplit or not.
+---@private
+function Sp.compute(tab, focusedWin)
+    local side = tab.wins.main.left or tab.wins.main.right
+    local sWidth, sHeight = A.getWidthAndHeight(side)
+    sWidth = vim.api.nvim_list_uis()[1].width - sWidth
 
-    local splits = {}
-    local nbSplits = 0
+    D.tprint(tab)
 
-    if tab.wins.splits ~= nil then
-        for _, split in pairs(tab.wins.splits) do
-            nbSplits = nbSplits + 1
-            table.insert(splits, split)
-        end
+    local fWidth, fHeight = A.getWidthAndHeight(focusedWin)
+
+    local isVSplit = true
+
+    local splitInF = math.floor(sHeight / fHeight)
+    if splitInF < 1 then
+        splitInF = 1
     end
 
-    for _, win in pairs(wins) do
-        if
-            not vim.tbl_contains(
-                { tab.wins.main.curr, tab.wins.main.left, tab.wins.main.right },
-                win
-            )
-        then
-            nbSplits = nbSplits + 1
-            table.insert(splits, {
-                id = win,
-                vertical = vim.api.nvim_win_get_width(win) < screenWidth,
-            })
-        end
+    if splitInF ~= tab.layers.split then
+        tab.layers.split = splitInF
+        isVSplit = false
     end
 
-    if nbSplits == 0 then
-        return nil
+    local vsplitInF = math.floor(sWidth / fWidth)
+    if vsplitInF < 1 then
+        vsplitInF = 1
     end
 
-    return splits
-end
-
--- returns the total number of vertical splits
-function Sp.nbVSplits(splits)
-    if splits == nil then
-        return 1
+    if vsplitInF ~= tab.layers.vsplit then
+        tab.layers.vsplit = vsplitInF
+        isVSplit = true
     end
 
-    local nbVSplits = 1
+    D.log(
+        "Sp.compute",
+        "[split %d | vsplit %d] new split window [H %d W %d / H %d W %d], vertical: %s",
+        tab.layers.split,
+        tab.layers.vsplit,
+        fHeight,
+        fWidth,
+        sHeight,
+        sWidth,
+        isVSplit
+    )
 
-    for _, split in pairs(splits) do
-        if split.vertical then
-            nbVSplits = nbVSplits + 1
-        end
-    end
-
-    return nbVSplits
+    return tab, isVSplit
 end
 
 return Sp

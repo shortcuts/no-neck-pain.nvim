@@ -103,7 +103,7 @@ function N.enable(scope)
     tab.augroup = vim.api.nvim_create_augroup(augroupName, { clear = true })
 
     tab.wins.main.curr = vim.api.nvim_get_current_win()
-    tab.wins.splits = Sp.get(tab)
+    tab, _ = Sp.compute(tab, tab.wins.main.curr)
 
     S = N.init(scope, tab, true)
 
@@ -140,39 +140,30 @@ function N.enable(scope)
                     return
                 end
 
+                -- there's nothing to manage when there's no side buffer, fallback to vim's default behavior
+                if tab.wins.main.right == nil and tab.wins.main.left == nil then
+                    return D.log(p.event, "skip split logic: no side buffer")
+                end
+
+                -- a side tree isn't considered as a split
+                if T.isSideTree(vim.api.nvim_buf_get_option(0, "filetype")) then
+                    return D.log(p.event, "skip split logic: side tree")
+                end
+
                 local focusedWin = vim.api.nvim_get_current_win()
                 local wins, total = W.winsExceptState(tab, false)
 
                 if total == 0 or not vim.tbl_contains(wins, focusedWin) then
-                    return
+                    return D.log(p.event, "skip split logic: no new window")
                 end
 
-                -- we skip side trees etc. as they are not part of the split manager.
-                if T.isSideTree(vim.api.nvim_buf_get_option(0, "filetype")) then
-                    return D.log(p.event, "encountered an external window")
-                end
+                local isVSplit = true
 
-                -- note: due to floor, side widths might be off by 1 on each side buffer so we add it
-                local width = vim.api.nvim_win_get_width(focusedWin)
-                for _, side in pairs(Co.SIDES) do
-                    if tab.wins.main[side] and _G.NoNeckPain.config.buffers[side].enabled then
-                        width = width + 1
-                    end
-                end
+                tab, isVSplit = Sp.compute(tab, focusedWin)
 
-                local vsplit = width < _G.NoNeckPain.config.width
+                tab.wins.splits = Sp.insert(tab.wins.splits, focusedWin, isVSplit)
 
-                D.log(
-                    p.event,
-                    "new split window [%d / %d], vertical: %s",
-                    width,
-                    _G.NoNeckPain.config.width,
-                    vsplit
-                )
-
-                tab.wins.splits = Sp.insert(tab.wins.splits, focusedWin, vsplit)
-
-                if vsplit then
+                if isVSplit then
                     S = N.init(p.event, tab)
                 end
             end)
@@ -226,7 +217,19 @@ function N.enable(scope)
                 -- the focus will be on a side buffer which is wrong
                 local haveCloseCurr = false
 
-                tab.wins.splits = Sp.refresh(tab.wins.splits)
+                tab.wins.splits = vim.tbl_filter(function (split)
+                    if vim.api.nvim_win_is_valid(split.id) then
+                        return true
+                    end
+
+                    if split.vertical then
+                        tab.layers.vsplit = tab.layers.vsplit - 1
+                    else
+                        tab.layers.split = tab.layers.split - 1
+                    end
+
+                    return false
+                end, tab.wins.splits)
 
                 -- if curr is not valid anymore, we focus the first valid split and remove it from the state
                 if not vim.api.nvim_win_is_valid(tab.wins.main.curr) then

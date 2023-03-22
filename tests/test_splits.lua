@@ -278,7 +278,7 @@ T["vsplit"]["many vsplit leave side buffers open as long as there's space for it
 end
 
 T["vsplit"]["keeps correct focus"] = function()
-    child.set_size(400, 400)
+    child.set_size(500, 500)
     child.lua([[
         require('no-neck-pain').setup({width=50})
         require('no-neck-pain').enable()
@@ -294,6 +294,11 @@ T["vsplit"]["keeps correct focus"] = function()
 
     child.cmd("vsplit")
     eq(child.lua_get("vim.api.nvim_get_current_win()"), 1005)
+
+    eq(
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
+        { 1001, 1005, 1004, 1003, 1000, 1002 }
+    )
 
     child.cmd("q")
     eq(child.lua_get("vim.api.nvim_get_current_win()"), 1004)
@@ -341,7 +346,7 @@ T["vsplit/split"]["state is correctly sync'd even after many changes"] = functio
 end
 
 T["vsplit/split"]["closing side buffers because of splits restores focus"] = function()
-    child.set_size(150, 150)
+    child.set_size(200, 200)
     child.lua([[
         require('no-neck-pain').setup({width=50})
         require('no-neck-pain').enable() 
