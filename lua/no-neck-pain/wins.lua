@@ -1,3 +1,4 @@
+local A = require("no-neck-pain.util.api")
 local C = require("no-neck-pain.colors")
 local Co = require("no-neck-pain.util.constants")
 local D = require("no-neck-pain.util.debug")
@@ -195,9 +196,21 @@ function W.createSideBuffers(tab, skipTrees)
     -- if we still have side buffers open at this point, and we have vsplit opened,
     -- there might be width issues so we the opened vsplits.
     if (tab.wins.main.left ~= nil or tab.wins.main.right ~= nil) and tab.wins.splits ~= nil then
+        local side = tab.wins.main.left or tab.wins.main.right
+        local sWidth, _ = A.getWidthAndHeight(side)
+        local nbSide = 1
+
+        if tab.wins.main.left or tab.wins.main.right then
+            nbSide = 2
+        end
+
+        -- get the available usable width (screen size without side paddings)
+        sWidth = vim.api.nvim_list_uis()[1].width - sWidth * nbSide
+        sWidth = sWidth / tab.layers.vsplit
+
         for _, split in pairs(tab.wins.splits) do
             if split.vertical then
-                resize(split.id, _G.NoNeckPain.config.width, "split")
+                resize(split.id, sWidth, "split")
             end
         end
     end

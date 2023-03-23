@@ -160,7 +160,6 @@ function N.enable(scope)
                 local isVSplit = true
 
                 tab, isVSplit = Sp.compute(tab, focusedWin)
-
                 tab.wins.splits = Sp.insert(tab.wins.splits, focusedWin, isVSplit)
 
                 if isVSplit then
@@ -213,23 +212,23 @@ function N.enable(scope)
                     return
                 end
 
-                -- we keep track if curr have been closed because if it's the case,
-                -- the focus will be on a side buffer which is wrong
-                local haveCloseCurr = false
-
-                tab.wins.splits = vim.tbl_filter(function (split)
+                tab.wins.splits = vim.tbl_filter(function(split)
                     if vim.api.nvim_win_is_valid(split.id) then
                         return true
                     end
 
-                    if split.vertical then
-                        tab.layers.vsplit = tab.layers.vsplit - 1
-                    else
-                        tab.layers.split = tab.layers.split - 1
-                    end
+                    tab.layers = Sp.decreaseLayers(tab.layers, split.vertical)
 
                     return false
                 end, tab.wins.splits)
+
+                if #tab.wins.splits == 0 then
+                    tab.wins.splits = nil
+                end
+
+                -- we keep track if curr have been closed because if it's the case,
+                -- the focus will be on a side buffer which is wrong
+                local haveCloseCurr = false
 
                 -- if curr is not valid anymore, we focus the first valid split and remove it from the state
                 if not vim.api.nvim_win_is_valid(tab.wins.main.curr) then
@@ -239,6 +238,8 @@ function N.enable(scope)
                     end
 
                     haveCloseCurr = true
+
+                    tab.layers = Sp.decreaseLayers(tab.layers, tab.wins.splits[1].vertical)
 
                     tab.wins.main.curr = tab.wins.splits[1].id
                     tab.wins.splits = Sp.remove(tab.wins.splits, tab.wins.splits[1].id)
