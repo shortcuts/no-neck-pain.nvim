@@ -22,21 +22,7 @@ function Sp.remove(splits, id)
     return remainings
 end
 
--- insert a new split window to the splits internal state list.
-function Sp.insert(splits, winID, vsplit)
-    splits = splits or {}
-
-    table.insert(splits, {
-        id = winID,
-        vertical = vsplit,
-    })
-
-    return splits
-end
-
----Creates side buffers with the correct padding, considering the side trees.
---- - A side buffer is not created if there's not enough space.
---- - If it already exists, we resize it.
+---Determines current state of the split/vsplit windows by comparing widths and heights.
 ---
 ---@param tab table: the table where the tab information are stored.
 ---@param focusedWin number: the id of the current window.
@@ -47,10 +33,11 @@ function Sp.compute(tab, focusedWin)
     local side = tab.wins.main.left or tab.wins.main.right
     local sWidth, sHeight = 0, 0
 
+    -- when side buffer exists we rely on them, otherwise we fallback to the UI
     if side ~= nil then
         local nbSide = 1
 
-        if tab.wins.main.left and tab.wins.main.right then
+        if A.hasSide(tab, "left") and A.hasSide(tab, "right") then
             nbSide = 2
         end
 
@@ -62,7 +49,6 @@ function Sp.compute(tab, focusedWin)
     end
 
     local fWidth, fHeight = A.getWidthAndHeight(focusedWin)
-
     local isVSplit = true
 
     local splitInF = math.floor(sHeight / fHeight)
@@ -73,7 +59,6 @@ function Sp.compute(tab, focusedWin)
     if splitInF > tab.layers.split then
         isVSplit = false
     end
-    tab.layers.split = splitInF
 
     local vsplitInF = math.floor(sWidth / fWidth)
     if vsplitInF < 1 then
@@ -83,17 +68,16 @@ function Sp.compute(tab, focusedWin)
     if vsplitInF > tab.layers.vsplit then
         isVSplit = true
     end
+
+    -- update anyway because we want state consistency
+    tab.layers.split = splitInF
     tab.layers.vsplit = vsplitInF
 
     D.log(
         "Sp.compute",
-        "[split %d | vsplit %d] new split window [H %d W %d / H %d W %d], vertical: %s",
+        "[split %d | vsplit %d] new split, vertical: %s",
         tab.layers.split,
         tab.layers.vsplit,
-        fHeight,
-        fWidth,
-        sHeight,
-        sWidth,
         isVSplit
     )
 

@@ -1,3 +1,4 @@
+local A = require("no-neck-pain.util.api")
 local Co = require("no-neck-pain.util.constants")
 local D = require("no-neck-pain.util.debug")
 local E = require("no-neck-pain.util.event")
@@ -64,10 +65,7 @@ function N.init(scope, tab, goToCurr, skipTrees)
 
     -- if we do not have side buffers, we must ensure we only trigger a focus if we re-create them
     local hadSideBuffers = true
-    if
-        (tab.wins.main.left == nil and _G.NoNeckPain.config.buffers.left.enabled)
-        or (tab.wins.main.right == nil and _G.NoNeckPain.config.buffers.right.enabled)
-    then
+    if not A.hasSide(tab, "left") or not A.hasSide(tab, "right") then
         hadSideBuffers = false
     end
 
@@ -75,7 +73,7 @@ function N.init(scope, tab, goToCurr, skipTrees)
 
     if
         goToCurr
-        or (not hadSideBuffers and (tab.wins.main.left ~= nil or tab.wins.main.right ~= nil))
+        or (not hadSideBuffers and (not A.sideNil(tab, "left") or not A.sideNil(tab, "right")))
     then
         vim.fn.win_gotoid(tab.wins.main.curr)
     end
@@ -141,7 +139,7 @@ function N.enable(scope)
                 end
 
                 -- there's nothing to manage when there's no side buffer, fallback to vim's default behavior
-                if tab.wins.main.right == nil and tab.wins.main.left == nil then
+                if A.sideNil(tab, "right") and A.sideNil(tab, "left") then
                     return D.log(p.event, "skip split logic: no side buffer")
                 end
 
@@ -160,7 +158,8 @@ function N.enable(scope)
                 local isVSplit = true
 
                 tab, isVSplit = Sp.compute(tab, focusedWin)
-                tab.wins.splits = Sp.insert(tab.wins.splits, focusedWin, isVSplit)
+                tab.wins.splits = tab.wins.splits or {}
+                table.insert(tab.wins.splits, { id = focusedWin, vertical = isVSplit })
 
                 if isVSplit then
                     S = N.init(p.event, tab)
@@ -347,7 +346,7 @@ function N.disable(scope)
         )
         vim.cmd(string.format("highlight! clear NoNeckPain_text_tab_%s_side_%s NONE", tab.id, side))
 
-        if tab.wins.main[side] ~= nil then
+        if not A.sideNil(tab, side) then
             local activeWins = vim.api.nvim_tabpage_list_wins(tab.id)
             local haveOtherWins = false
 
