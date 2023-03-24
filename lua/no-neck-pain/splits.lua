@@ -48,14 +48,18 @@ function Sp.compute(tab, focusedWin)
     local sWidth, sHeight = 0, 0
 
     if side ~= nil then
+        local nbSide = 1
+
+        if tab.wins.main.left and tab.wins.main.right then
+            nbSide = 2
+        end
+
         sWidth, sHeight = A.getWidthAndHeight(side)
-        sWidth = vim.api.nvim_list_uis()[1].width - sWidth
+        sWidth = vim.api.nvim_list_uis()[1].width - sWidth * nbSide
     else
         sWidth = vim.api.nvim_list_uis()[1].width
         sHeight = vim.api.nvim_list_uis()[1].height
     end
-
-    D.tprint(tab)
 
     local fWidth, fHeight = A.getWidthAndHeight(focusedWin)
 

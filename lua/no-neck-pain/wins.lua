@@ -200,13 +200,13 @@ function W.createSideBuffers(tab, skipTrees)
         local sWidth, _ = A.getWidthAndHeight(side)
         local nbSide = 1
 
-        if tab.wins.main.left or tab.wins.main.right then
+        if tab.wins.main.left and tab.wins.main.right then
             nbSide = 2
         end
 
         -- get the available usable width (screen size without side paddings)
         sWidth = vim.api.nvim_list_uis()[1].width - sWidth * nbSide
-        sWidth = sWidth / tab.layers.vsplit
+        sWidth = math.floor(sWidth / tab.layers.vsplit)
 
         for _, split in pairs(tab.wins.splits) do
             if split.vertical then
