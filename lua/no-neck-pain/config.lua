@@ -62,6 +62,8 @@ NoNeckPain.bufferOptionsWo = {
 ---@eval return MiniDoc.afterlines_to_code(MiniDoc.current.eval_section)
 NoNeckPain.bufferOptionsBo = {
     --- @type string
+    filetype = "no-neck-pain",
+    --- @type string
     buftype = "nofile",
     --- @type string
     bufhidden = "hide",
