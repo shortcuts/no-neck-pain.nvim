@@ -11,14 +11,13 @@ local E = {}
 --- - we are focusing one of the side buffer
 ---
 ---@param tab table?: the table where the tab information are stored.
----@param skipSplit boolean: whether we should consider a relative window or not.
 ---@private
-function E.skip(tab, skipSplit)
+function E.skip(tab)
     if _G.NoNeckPain.state == nil or not _G.NoNeckPain.state.enabled then
         return true
     end
 
-    if skipSplit or W.isRelativeWindow() then
+    if W.isRelativeWindow() then
         return true
     end
 

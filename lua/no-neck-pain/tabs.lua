@@ -86,16 +86,14 @@ end
 ---@private
 function Ta.remove(tabs, id)
     local newTabs = {}
-    local total = 0
 
     for _, tab in pairs(tabs) do
         if tab.id ~= id then
             table.insert(newTabs, tab)
-            total = total + 1
         end
     end
 
-    if total == 0 then
+    if #newTabs == 0 then
         return nil
     end
 
