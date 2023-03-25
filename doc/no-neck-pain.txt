@@ -73,8 +73,6 @@ values:
 >
   NoNeckPain.bufferOptionsBo = {
       --- @type string
-      filetype = "no-neck-pain",
-      --- @type string
       buftype = "nofile",
       --- @type string
       bufhidden = "hide",
