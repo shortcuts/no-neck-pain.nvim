@@ -154,7 +154,7 @@ T["vsplit"]["does not create side buffers when there's not enough space"] = func
 end
 
 T["vsplit"]["corretly size splits when opening helper with side buffers open"] = function()
-    child.set_size(150,150)
+    child.set_size(150, 150)
     child.lua([[
         require('no-neck-pain').setup({width=50})
         require('no-neck-pain').enable()
