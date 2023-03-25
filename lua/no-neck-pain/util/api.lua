@@ -40,6 +40,7 @@ end
 ---
 ---@return boolean
 ---@param win number?: the win number, defaults to 0 if nil
+---@private
 function A.isCurrentWin(win)
     return vim.api.nvim_get_current_win() == win
 end
