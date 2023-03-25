@@ -1,3 +1,4 @@
+local A = require("no-neck-pain.util.api")
 local T = require("no-neck-pain.trees")
 local W = require("no-neck-pain.wins")
 
@@ -10,14 +11,13 @@ local E = {}
 --- - we are focusing one of the side buffer
 ---
 ---@param tab table?: the table where the tab information are stored.
----@param skipSplit boolean: whether we should consider a relative window or not.
 ---@private
-function E.skip(tab, skipSplit)
+function E.skip(tab)
     if _G.NoNeckPain.state == nil or not _G.NoNeckPain.state.enabled then
         return true
     end
 
-    if skipSplit or W.isRelativeWindow() then
+    if W.isRelativeWindow() then
         return true
     end
 
@@ -26,9 +26,7 @@ function E.skip(tab, skipSplit)
             return true
         end
 
-        local curr = vim.api.nvim_get_current_win()
-
-        if curr == tab.wins.main.left or curr == tab.wins.main.right then
+        if A.isCurrentWin(tab.wins.main.left) or A.isCurrentWin(tab.wins.main.right) then
             return true
         end
     end

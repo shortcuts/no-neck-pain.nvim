@@ -1,3 +1,4 @@
+local A = require("no-neck-pain.util.api")
 local Co = require("no-neck-pain.util.constants")
 local D = require("no-neck-pain.util.debug")
 local E = require("no-neck-pain.util.event")
@@ -64,10 +65,7 @@ function N.init(scope, tab, goToCurr, skipTrees)
 
     -- if we do not have side buffers, we must ensure we only trigger a focus if we re-create them
     local hadSideBuffers = true
-    if
-        (tab.wins.main.left == nil and _G.NoNeckPain.config.buffers.left.enabled)
-        or (tab.wins.main.right == nil and _G.NoNeckPain.config.buffers.right.enabled)
-    then
+    if not A.hasSide(tab, "left") or not A.hasSide(tab, "right") then
         hadSideBuffers = false
     end
 
@@ -75,7 +73,8 @@ function N.init(scope, tab, goToCurr, skipTrees)
 
     if
         goToCurr
-        or (not hadSideBuffers and (tab.wins.main.left ~= nil or tab.wins.main.right ~= nil))
+        or (not hadSideBuffers and (not A.sideNil(tab, "left") or not A.sideNil(tab, "right")))
+        or (A.isCurrentWin(tab.wins.main.left) or A.isCurrentWin(tab.wins.main.right))
     then
         vim.fn.win_gotoid(tab.wins.main.curr)
     end
@@ -103,7 +102,7 @@ function N.enable(scope)
     tab.augroup = vim.api.nvim_create_augroup(augroupName, { clear = true })
 
     tab.wins.main.curr = vim.api.nvim_get_current_win()
-    tab.wins.splits = Sp.get(tab)
+    tab, _ = Sp.compute(tab, tab.wins.main.curr)
 
     S = N.init(scope, tab, true)
 
@@ -112,7 +111,7 @@ function N.enable(scope)
     vim.api.nvim_create_autocmd({ "VimResized" }, {
         callback = function(p)
             vim.schedule(function()
-                if E.skip(tab, false) then
+                if E.skip(tab) then
                     return
                 end
 
@@ -136,43 +135,34 @@ function N.enable(scope)
     vim.api.nvim_create_autocmd({ "WinEnter" }, {
         callback = function(p)
             vim.schedule(function()
-                if E.skip(tab, false) then
+                if E.skip(tab) then
                     return
+                end
+
+                -- there's nothing to manage when there's no side buffer, fallback to vim's default behavior
+                if A.sideNil(tab, "right") and A.sideNil(tab, "left") then
+                    return D.log(p.event, "skip split logic: no side buffer")
+                end
+
+                -- a side tree isn't considered as a split
+                if T.isSideTree(vim.api.nvim_buf_get_option(0, "filetype")) then
+                    return D.log(p.event, "skip split logic: side tree")
                 end
 
                 local focusedWin = vim.api.nvim_get_current_win()
                 local wins, total = W.winsExceptState(tab, false)
 
                 if total == 0 or not vim.tbl_contains(wins, focusedWin) then
-                    return
+                    return D.log(p.event, "skip split logic: no new window")
                 end
 
-                -- we skip side trees etc. as they are not part of the split manager.
-                if T.isSideTree(vim.api.nvim_buf_get_option(0, "filetype")) then
-                    return D.log(p.event, "encountered an external window")
-                end
+                local isVSplit = true
 
-                -- note: due to floor, side widths might be off by 1 on each side buffer so we add it
-                local width = vim.api.nvim_win_get_width(focusedWin)
-                for _, side in pairs(Co.SIDES) do
-                    if tab.wins.main[side] and _G.NoNeckPain.config.buffers[side].enabled then
-                        width = width + 1
-                    end
-                end
+                tab, isVSplit = Sp.compute(tab, focusedWin)
+                tab.wins.splits = tab.wins.splits or {}
+                table.insert(tab.wins.splits, { id = focusedWin, vertical = isVSplit })
 
-                local vsplit = width < _G.NoNeckPain.config.width
-
-                D.log(
-                    p.event,
-                    "new split window [%d / %d], vertical: %s",
-                    width,
-                    _G.NoNeckPain.config.width,
-                    vsplit
-                )
-
-                tab.wins.splits = Sp.insert(tab.wins.splits, focusedWin, vsplit)
-
-                if vsplit then
+                if isVSplit then
                     S = N.init(p.event, tab)
                 end
             end)
@@ -184,7 +174,7 @@ function N.enable(scope)
     vim.api.nvim_create_autocmd({ "QuitPre", "BufDelete" }, {
         callback = function(p)
             vim.schedule(function()
-                if E.skip(nil, false) then
+                if E.skip(nil) then
                     return
                 end
 
@@ -218,15 +208,27 @@ function N.enable(scope)
     vim.api.nvim_create_autocmd({ "WinClosed", "BufDelete" }, {
         callback = function(p)
             vim.schedule(function()
-                if E.skip(nil, false) or tab.wins.splits == nil or W.stateWinsActive(tab, true) then
+                if E.skip(nil) or tab.wins.splits == nil or W.stateWinsActive(tab, true) then
                     return
+                end
+
+                tab.wins.splits = vim.tbl_filter(function(split)
+                    if vim.api.nvim_win_is_valid(split.id) then
+                        return true
+                    end
+
+                    tab.layers = Sp.decreaseLayers(tab.layers, split.vertical)
+
+                    return false
+                end, tab.wins.splits)
+
+                if #tab.wins.splits == 0 then
+                    tab.wins.splits = nil
                 end
 
                 -- we keep track if curr have been closed because if it's the case,
                 -- the focus will be on a side buffer which is wrong
                 local haveCloseCurr = false
-
-                tab.wins.splits = Sp.refresh(tab.wins.splits)
 
                 -- if curr is not valid anymore, we focus the first valid split and remove it from the state
                 if not vim.api.nvim_win_is_valid(tab.wins.main.curr) then
@@ -236,6 +238,8 @@ function N.enable(scope)
                     end
 
                     haveCloseCurr = true
+
+                    tab.layers = Sp.decreaseLayers(tab.layers, tab.wins.splits[1].vertical)
 
                     tab.wins.main.curr = tab.wins.splits[1].id
                     tab.wins.splits = Sp.remove(tab.wins.splits, tab.wins.splits[1].id)
@@ -252,7 +256,7 @@ function N.enable(scope)
     vim.api.nvim_create_autocmd({ "WinEnter", "WinClosed" }, {
         callback = function(p)
             vim.schedule(function()
-                if E.skip(tab, false) then
+                if E.skip(tab) then
                     return
                 end
 
@@ -323,7 +327,7 @@ function N.disable(scope)
     if
         tab.wins.main.curr ~= nil
         and vim.api.nvim_win_is_valid(tab.wins.main.curr)
-        and tab.wins.main.curr ~= vim.api.nvim_get_current_win()
+        and not A.isCurrentWin(tab.wins.main.curr)
     then
         vim.fn.win_gotoid(tab.wins.main.curr)
 
@@ -343,7 +347,7 @@ function N.disable(scope)
         )
         vim.cmd(string.format("highlight! clear NoNeckPain_text_tab_%s_side_%s NONE", tab.id, side))
 
-        if tab.wins.main[side] ~= nil then
+        if not A.sideNil(tab, side) then
             local activeWins = vim.api.nvim_tabpage_list_wins(tab.id)
             local haveOtherWins = false
 

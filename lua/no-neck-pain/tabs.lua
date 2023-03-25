@@ -43,6 +43,10 @@ function Ta.insert(tabs, id)
         id = id,
         augroup = nil,
         scratchPadEnabled = false,
+        layers = {
+            vsplit = 1,
+            split = 1,
+        },
         wins = {
             main = {
                 curr = nil,
@@ -82,16 +86,14 @@ end
 ---@private
 function Ta.remove(tabs, id)
     local newTabs = {}
-    local total = 0
 
     for _, tab in pairs(tabs) do
         if tab.id ~= id then
             table.insert(newTabs, tab)
-            total = total + 1
         end
     end
 
-    if total == 0 then
+    if #newTabs == 0 then
         return nil
     end
 

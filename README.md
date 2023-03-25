@@ -131,7 +131,7 @@ require("no-neck-pain").setup({
     -- This option can be useful when switching window size frequently, example:
     -- in full screen screen, width is 210, you define an NNP `width` of 100, which creates each side buffer with a width of 50. If you resize your terminal to the half of the screen, each side buffer would be of width 5 and thereforce might not be useful and/or add "noise" to your workflow.
     --- @type integer
-    minSideBufferWidth = 5,
+    minSideBufferWidth = 10,
     -- Disables the plugin if the last valid buffer in the list have been closed.
     --- @type boolean
     disableOnLastBuffer = false,

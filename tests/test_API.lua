@@ -54,7 +54,7 @@ T["setup"]["sets exposed methods and default options value"] = function()
     eq_type_config(child, "buffers", "table")
 
     eq_config(child, "width", 100)
-    eq_config(child, "minSideBufferWidth", 5)
+    eq_config(child, "minSideBufferWidth", 10)
 
     eq_config(child, "autocmds.enableOnVimEnter", false)
     eq_config(child, "autocmds.enableOnTabEnter", false)

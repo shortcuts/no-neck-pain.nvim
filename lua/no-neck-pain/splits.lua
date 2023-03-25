@@ -1,27 +1,7 @@
+local A = require("no-neck-pain.util.api")
+local D = require("no-neck-pain.util.debug")
+
 local Sp = {}
-
--- returns only the list of registered splits that are still active.
-function Sp.refresh(splits)
-    if splits == nil then
-        return nil
-    end
-
-    local actives = {}
-    local hasActives = false
-
-    for _, split in pairs(splits) do
-        if vim.api.nvim_win_is_valid(split.id) then
-            hasActives = true
-            table.insert(actives, split)
-        end
-    end
-
-    if not hasActives then
-        return nil
-    end
-
-    return actives
-end
 
 -- returns the list of registered splits, except the given split `id`.
 function Sp.remove(splits, id)
@@ -42,70 +22,92 @@ function Sp.remove(splits, id)
     return remainings
 end
 
--- insert a new split window to the splits internal state list.
-function Sp.insert(splits, winID, vsplit)
-    splits = splits or {}
+---Determines current state of the split/vsplit windows by comparing widths and heights.
+---
+---@param tab table: the table where the tab information are stored.
+---@param focusedWin number: the id of the current window.
+---@return table: the updated tab.
+---@return boolean: whether the current window is a vsplit or not.
+---@private
+function Sp.compute(tab, focusedWin)
+    local side = tab.wins.main.left or tab.wins.main.right
+    local sWidth, sHeight = 0, 0
 
-    table.insert(splits, {
-        id = winID,
-        vertical = vsplit,
-    })
+    -- when side buffer exists we rely on them, otherwise we fallback to the UI
+    if side ~= nil then
+        local nbSide = 1
 
-    return splits
+        if A.hasSide(tab, "left") and A.hasSide(tab, "right") then
+            nbSide = 2
+        end
+
+        sWidth, sHeight = A.getWidthAndHeight(side)
+        sWidth = vim.api.nvim_list_uis()[1].width - sWidth * nbSide
+    else
+        sWidth = vim.api.nvim_list_uis()[1].width
+        sHeight = vim.api.nvim_list_uis()[1].height
+    end
+
+    local fWidth, fHeight = A.getWidthAndHeight(focusedWin)
+    local isVSplit = true
+
+    local splitInF = math.floor(sHeight / fHeight)
+    if splitInF < 1 then
+        splitInF = 1
+    end
+
+    if splitInF > tab.layers.split then
+        isVSplit = false
+    end
+
+    local vsplitInF = math.floor(sWidth / fWidth)
+    if vsplitInF < 1 then
+        vsplitInF = 1
+    end
+
+    if vsplitInF > tab.layers.vsplit then
+        isVSplit = true
+    end
+
+    -- update anyway because we want state consistency
+    tab.layers.split = splitInF
+    tab.layers.vsplit = vsplitInF
+
+    D.log(
+        "Sp.compute",
+        "[split %d | vsplit %d] new split, vertical: %s",
+        tab.layers.split,
+        tab.layers.vsplit,
+        isVSplit
+    )
+
+    return tab, isVSplit
 end
 
--- tries to get all of the active splits on the given tab.
-function Sp.get(tab)
-    local wins = vim.api.nvim_tabpage_list_wins(tab.id)
-    local screenWidth = vim.api.nvim_list_uis()[1].width
+---Decreases the layers state values.
+---
+---@param layers table: the layers state.
+---@param isVSplit boolean: whether the window is a vsplit or not.
+---@return table: the updated layers state.
+---@private
+function Sp.decreaseLayers(layers, isVSplit)
+    if isVSplit then
+        layers.vsplit = layers.vsplit - 1
 
-    local splits = {}
-    local nbSplits = 0
-
-    if tab.wins.splits ~= nil then
-        for _, split in pairs(tab.wins.splits) do
-            nbSplits = nbSplits + 1
-            table.insert(splits, split)
+        if layers.vsplit < 1 then
+            layers.vsplit = 1
         end
+
+        return layers
     end
 
-    for _, win in pairs(wins) do
-        if
-            not vim.tbl_contains(
-                { tab.wins.main.curr, tab.wins.main.left, tab.wins.main.right },
-                win
-            )
-        then
-            nbSplits = nbSplits + 1
-            table.insert(splits, {
-                id = win,
-                vertical = vim.api.nvim_win_get_width(win) < screenWidth,
-            })
-        end
+    layers.split = layers.split - 1
+
+    if layers.split < 1 then
+        layers.split = 1
     end
 
-    if nbSplits == 0 then
-        return nil
-    end
-
-    return splits
-end
-
--- returns the total number of vertical splits
-function Sp.nbVSplits(splits)
-    if splits == nil then
-        return 1
-    end
-
-    local nbVSplits = 1
-
-    for _, split in pairs(splits) do
-        if split.vertical then
-            nbVSplits = nbVSplits + 1
-        end
-    end
-
-    return nbVSplits
+    return layers
 end
 
 return Sp
