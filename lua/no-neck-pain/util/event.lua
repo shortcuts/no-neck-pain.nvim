@@ -1,3 +1,4 @@
+local A = require("no-neck-pain.util.api")
 local T = require("no-neck-pain.trees")
 local W = require("no-neck-pain.wins")
 
@@ -26,9 +27,7 @@ function E.skip(tab, skipSplit)
             return true
         end
 
-        local curr = vim.api.nvim_get_current_win()
-
-        if curr == tab.wins.main.left or curr == tab.wins.main.right then
+        if A.isCurrentWin(tab.wins.main.left) or A.isCurrentWin(tab.wins.main.right) then
             return true
         end
     end

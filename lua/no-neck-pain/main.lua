@@ -74,6 +74,7 @@ function N.init(scope, tab, goToCurr, skipTrees)
     if
         goToCurr
         or (not hadSideBuffers and (not A.sideNil(tab, "left") or not A.sideNil(tab, "right")))
+        or (A.isCurrentWin(tab.wins.main.left) or A.isCurrentWin(tab.wins.main.right))
     then
         vim.fn.win_gotoid(tab.wins.main.curr)
     end
@@ -326,7 +327,7 @@ function N.disable(scope)
     if
         tab.wins.main.curr ~= nil
         and vim.api.nvim_win_is_valid(tab.wins.main.curr)
-        and tab.wins.main.curr ~= vim.api.nvim_get_current_win()
+        and not A.isCurrentWin(tab.wins.main.curr)
     then
         vim.fn.win_gotoid(tab.wins.main.curr)
 

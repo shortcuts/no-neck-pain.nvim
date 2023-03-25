@@ -36,4 +36,12 @@ function A.sideNil(tab, side)
     return tab.wins.main[side] == nil
 end
 
+---whether the currently focused window is the provided one.
+---
+---@return boolean
+---@param win number?: the win number, defaults to 0 if nil
+function A.isCurrentWin(win)
+    return vim.api.nvim_get_current_win() == win
+end
+
 return A
