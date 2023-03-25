@@ -153,6 +153,28 @@ T["vsplit"]["does not create side buffers when there's not enough space"] = func
     )
 end
 
+T["vsplit"]["corretly size splits when opening helper with side buffers open"] = function()
+    child.set_size(150,150)
+    child.lua([[
+        require('no-neck-pain').setup({width=50})
+        require('no-neck-pain').enable()
+    ]])
+
+    child.cmd("vsplit")
+
+    eq(child.lua_get("vim.api.nvim_tabpage_list_wins(1)"), { 1001, 1003, 1000, 1002 })
+
+    eq_buf_width(child, "tabs[1].wins.splits[1].id", 50)
+    eq_buf_width(child, "tabs[1].wins.main.curr", 67)
+
+    child.cmd("h")
+
+    eq(child.lua_get("vim.api.nvim_tabpage_list_wins(1)"), { 1004, 1001, 1003, 1000, 1002 })
+
+    eq_buf_width(child, "tabs[1].wins.splits[1].id", 50)
+    eq_buf_width(child, "tabs[1].wins.main.curr", 67)
+end
+
 T["vsplit"]["correctly position side buffers when there's enough space"] = function()
     child.set_size(500, 500)
     child.cmd("vsplit")
