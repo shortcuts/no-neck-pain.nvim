@@ -375,4 +375,35 @@ T["vsplit/split"]["closing side buffers because of splits restores focus"] = fun
     eq(child.lua_get("vim.api.nvim_get_current_win()"), 1000)
 end
 
+T["vsplit/split"]["closing help page doens't break layout"] = function()
+    child.lua([[
+        require('no-neck-pain').setup({width=50})
+        require('no-neck-pain').enable() 
+    ]])
+
+    eq(
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
+        { 1001, 1000, 1002 }
+    )
+
+    child.cmd("split")
+    child.cmd("h")
+    eq(
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
+        { 1004, 1001, 1003, 1000, 1002 }
+    )
+
+    eq_buf_width(child, "tabs[1].wins.main.curr", 48)
+
+    child.cmd("q")
+    eq(
+        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
+        { 1001, 1003, 1000, 1002 }
+    )
+
+    eq(child.lua_get("vim.api.nvim_get_current_win()"), 1003)
+
+    eq_buf_width(child, "tabs[1].wins.main.curr", 48)
+end
+
 return T

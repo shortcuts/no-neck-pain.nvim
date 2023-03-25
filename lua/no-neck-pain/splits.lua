@@ -51,6 +51,8 @@ function Sp.compute(tab, focusedWin)
     local fWidth, fHeight = A.getWidthAndHeight(focusedWin)
     local isVSplit = true
 
+    D.tprint(tab.layers)
+
     local splitInF = math.floor(sHeight / fHeight)
     if splitInF < 1 then
         splitInF = 1
@@ -68,6 +70,8 @@ function Sp.compute(tab, focusedWin)
     if vsplitInF > tab.layers.vsplit then
         isVSplit = true
     end
+
+    print("00000000000000000", sWidth, sHeight, fWidth, fHeight)
 
     -- update anyway because we want state consistency
     tab.layers.split = splitInF
@@ -94,10 +98,18 @@ function Sp.decreaseLayers(layers, isVSplit)
     if isVSplit then
         layers.vsplit = layers.vsplit - 1
 
+        if layers.vsplit < 1 then
+            layers.vsplit = 1
+        end
+
         return layers
     end
 
     layers.split = layers.split - 1
+
+    if layers.split < 1 then
+        layers.split = 1
+    end
 
     return layers
 end
