@@ -28,6 +28,8 @@ jobs:
     name: documentation
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
 
       - name: setup neovim
         uses: rhysd/action-setup-vim@v1
@@ -39,7 +41,7 @@ jobs:
         run: make documentation-ci
 
       - name: check docs diff
-        run: exit $(git diff --name-only origin/main -- doc | wc -l)
+        run: exit $(git status --porcelain doc | wc -l | tr -d " ")
 
   tests:
     needs:
