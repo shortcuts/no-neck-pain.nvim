@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [1.2.1](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.2.0...v1.2.1) (2023-03-26)
+
+
+### Bug Fixes
+
+* register unfocused splits ([#218](https://github.com/shortcuts/no-neck-pain.nvim/issues/218)) ([3e766f9](https://github.com/shortcuts/no-neck-pain.nvim/commit/3e766f969361f998e204222e899d727df36e7816))
+
 ## [1.2.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.1.1...v1.2.0) (2023-03-19)
 
 
