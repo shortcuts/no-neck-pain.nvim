@@ -217,17 +217,14 @@ T["curr"]["closing `curr` window without any other window quits Neovim"] = funct
         require('no-neck-pain').enable()
     ]])
 
-    eq(
-        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
-        { 1001, 1000, 1002 }
-    )
+    eq(helpers.winsInTab(child), { 1001, 1000, 1002 })
     eq_state(child, "tabs[1].wins.main.curr", 1000)
 
     child.cmd("q")
 
     -- neovim is closed, so it errors
     helpers.expect.error(function()
-        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)")
+        helpers.winsInTab(child)
     end)
 end
 
@@ -290,17 +287,14 @@ T["left/right"]["closing the `left` buffer disables NNP"] = function()
         require('no-neck-pain').enable()
     ]])
 
-    eq(
-        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
-        { 1001, 1000, 1002 }
-    )
+    eq(helpers.winsInTab(child), { 1001, 1000, 1002 })
     eq_state(child, "tabs[1].wins.main.left", 1001)
     eq_state(child, "tabs[1].wins.main.right", 1002)
 
     child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.tabs[1].wins.main.left)")
     child.cmd("q")
 
-    eq(child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"), { 1000 })
+    eq(helpers.winsInTab(child), { 1000 })
 end
 
 T["left/right"]["closing the `right` buffer disables NNP"] = function()
@@ -309,17 +303,14 @@ T["left/right"]["closing the `right` buffer disables NNP"] = function()
         require('no-neck-pain').enable()
     ]])
 
-    eq(
-        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
-        { 1001, 1000, 1002 }
-    )
+    eq(helpers.winsInTab(child), { 1001, 1000, 1002 })
     eq_state(child, "tabs[1].wins.main.left", 1001)
     eq_state(child, "tabs[1].wins.main.right", 1002)
 
     child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.tabs[1].wins.main.right)")
     child.cmd("q")
 
-    eq(child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"), { 1000 })
+    eq(helpers.winsInTab(child), { 1000 })
 end
 
 return T

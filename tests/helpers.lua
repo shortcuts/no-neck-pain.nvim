@@ -4,6 +4,12 @@ local Helpers = {}
 -- Add extra expectations
 Helpers.expect = vim.deepcopy(MiniTest.expect)
 
+function Helpers.winsInTab(child, tab)
+    tab = tab or "_G.NoNeckPain.state.activeTab"
+
+    return child.lua_get("vim.api.nvim_tabpage_list_wins(" .. tab .. ")")
+end
+
 local function errorMessage(str, pattern)
     return string.format("Pattern: %s\nObserved string: %s", vim.inspect(pattern), str)
 end

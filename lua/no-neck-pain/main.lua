@@ -149,13 +149,16 @@ function N.enable(scope)
                     return D.log(p.event, "skip split logic: side tree")
                 end
 
-                local focusedWin = vim.api.nvim_get_current_win()
                 local wins, total = W.winsExceptState(tab, false)
 
-                if total == 0 or not vim.tbl_contains(wins, focusedWin) then
-                    return D.log(p.event, "skip split logic: no new window")
+                if total ~= 1 then
+                    return D.log(
+                        p.event,
+                        "skip split logic: no new or too many unregistered windows"
+                    )
                 end
 
+                local focusedWin = wins[1]
                 local isVSplit = true
 
                 tab, isVSplit = Sp.compute(tab, focusedWin)

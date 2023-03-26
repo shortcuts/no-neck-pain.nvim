@@ -174,12 +174,9 @@ T["setup"]["width - throws with non-supported string"] = function()
 end
 
 T["setup"]["starts the plugin on VimEnter"] = function()
-    child.restart({ "-u", "scripts/test_auto_open.lua" })
+    child.restart({ "-u", "scripts/init_auto_open.lua" })
 
-    eq(
-        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
-        { 1001, 1000, 1002 }
-    )
+    eq(helpers.winsInTab(child), { 1001, 1000, 1002 })
     eq_state(child, "enabled", true)
 
     child.stop()

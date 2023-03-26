@@ -8,4 +8,3 @@ require("no-neck-pain").setup({
     autocmds = { enableOnVimEnter = true, enableOnTabEnter = true },
 })
 require("mini.test").setup()
-require("mini.doc").setup()
