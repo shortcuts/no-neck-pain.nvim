@@ -10,6 +10,8 @@ test:
 deps:
 	@mkdir -p deps
 	git clone --depth 1 https://github.com/echasnovski/mini.nvim deps/mini.nvim
+	git clone --depth 1 https://github.com/nvim-treesitter/nvim-treesitter deps/nvim-treesitter
+	git clone --depth 1 https://github.com/nvim-treesitter/playground deps/playground
 
 test-ci: deps test
 

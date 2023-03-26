@@ -139,10 +139,7 @@ T["setup"]["increase the width with mapping"] = function()
     ]])
 
     eq_global(child, "_G.NoNeckPain.config.width", 50)
-    eq(
-        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
-        { 1001, 1000, 1002 }
-    )
+    eq(helpers.winsInTab(child), { 1001, 1000, 1002 })
 
     child.lua("vim.api.nvim_input('nn')")
     child.lua("vim.api.nvim_input('nn')")
@@ -159,10 +156,7 @@ T["setup"]["decrease the width with mapping"] = function()
     ]])
 
     eq_global(child, "_G.NoNeckPain.config.width", 50)
-    eq(
-        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
-        { 1001, 1000, 1002 }
-    )
+    eq(helpers.winsInTab(child), { 1001, 1000, 1002 })
 
     child.lua("vim.api.nvim_input('nn')")
     child.lua("vim.api.nvim_input('nn')")

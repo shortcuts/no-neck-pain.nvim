@@ -50,10 +50,7 @@ T["scratchPad"]["default to `norg` fileType"] = function()
     })]])
     child.lua([[require('no-neck-pain').enable()]])
 
-    eq(
-        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
-        { 1001, 1000, 1002 }
-    )
+    eq(helpers.winsInTab(child), { 1001, 1000, 1002 })
 
     local cwd = child.lua_get("vim.fn.getcwd()")
     local left = cwd .. "/no-neck-pain-left.norg"
@@ -93,10 +90,7 @@ T["scratchPad"]["override of filetype is reflected to the buffer"] = function()
     })]])
     child.lua([[require('no-neck-pain').enable()]])
 
-    eq(
-        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
-        { 1001, 1000, 1002 }
-    )
+    eq(helpers.winsInTab(child), { 1001, 1000, 1002 })
 
     local cwd = child.lua_get("vim.fn.getcwd()")
     local left = cwd .. "/no-neck-pain-left.md"
@@ -134,10 +128,7 @@ T["scratchPad"]["side buffer can have their own definition"] = function()
     })]])
     child.lua([[require('no-neck-pain').enable()]])
 
-    eq(
-        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
-        { 1001, 1000, 1002 }
-    )
+    eq(helpers.winsInTab(child), { 1001, 1000, 1002 })
 
     local cwd = child.lua_get("vim.fn.getcwd()")
     local left = cwd .. "/lua/no-neck-pain-left.norg"
@@ -174,10 +165,7 @@ T["scratchPad"]["side buffer definition overrides global one"] = function()
     })]])
     child.lua([[require('no-neck-pain').enable()]])
 
-    eq(
-        child.lua_get("vim.api.nvim_tabpage_list_wins(_G.NoNeckPain.state.activeTab)"),
-        { 1001, 1000, 1002 }
-    )
+    eq(helpers.winsInTab(child), { 1001, 1000, 1002 })
 
     local cwd = child.lua_get("vim.fn.getcwd()")
     local left = cwd .. "/lua/no-neck-pain-left.norg"
