@@ -118,16 +118,23 @@ end
 T["vsplit"] = new_set()
 
 T["vsplit"]["register new non-focused windows (TSPlayground)"] = function()
-    child.set_size(300, 300)
     child.restart({ "-u", "scripts/init_with_deps.lua" })
+    child.set_size(300, 300)
 
     child.lua([[ require('no-neck-pain').enable() ]])
 
     eq(helpers.winsInTab(child), { 1001, 1000, 1002 })
 
     child.cmd("TSPlaygroundToggle")
+    eq(child.lua_get("vim.api.nvim_get_current_win()"), 1000)
 
-    eq(helpers.winsInTab(child), { 1001, 1000, 1004, 1002 })
+    eq(helpers.winsInTab(child), { 1001, 1004, 1000, 1002 })
+
+    eq_state(child, "tabs[1].wins.main.curr", 1000)
+    eq_state(child, "tabs[1].wins.main.left", 1001)
+    eq_state(child, "tabs[1].wins.main.right", 1002)
+    eq_state(child, "tabs[1].wins.splits[1].id", 1004)
+    eq_state(child, "tabs[1].wins.splits[1].vertical", true)
 end
 
 T["vsplit"]["does not create side buffers when there's not enough space"] = function()
