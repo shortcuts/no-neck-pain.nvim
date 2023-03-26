@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 * register unfocused splits ([#218](https://github.com/shortcuts/no-neck-pain.nvim/issues/218)) ([3e766f9](https://github.com/shortcuts/no-neck-pain.nvim/commit/3e766f969361f998e204222e899d727df36e7816))
+* split/vsplit state manager and fix weird resizes ([#215](https://github.com/shortcuts/no-neck-pain.nvim/issues/215)) ([0a81bc5](https://github.com/shortcuts/no-neck-pain.nvim/commit/0a81bc5ed883f8fec7ec934a8c8e28e9f5d0d14a))
 
 ## [1.2.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.1.1...v1.2.0) (2023-03-19)
 
