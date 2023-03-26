@@ -4,6 +4,10 @@ local Helpers = {}
 -- Add extra expectations
 Helpers.expect = vim.deepcopy(MiniTest.expect)
 
+function Helpers.currentWin(child)
+    return child.lua_get("vim.api.nvim_get_current_win()")
+end
+
 function Helpers.winsInTab(child, tab)
     tab = tab or "_G.NoNeckPain.state.activeTab"
 

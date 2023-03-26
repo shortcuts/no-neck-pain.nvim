@@ -39,7 +39,7 @@ T["split"]["only one side buffer, closing help doesn't close NNP"] = function()
     child.cmd("q")
 
     eq(helpers.winsInTab(child), { 1001, 1000 })
-    eq(child.lua_get("vim.api.nvim_get_current_win()"), 1000)
+    eq(helpers.currentWin(child), 1000)
     eq_state(child, "enabled", true)
 end
 
@@ -62,7 +62,7 @@ T["split"]["closing `curr` makes `split` the new `curr`"] = function()
     child.cmd("q")
 
     eq(helpers.winsInTab(child), { 1001, 1003, 1002 })
-    eq(child.lua_get("vim.api.nvim_get_current_win()"), 1003)
+    eq(helpers.currentWin(child), 1003)
 end
 
 T["split"]["keeps side buffers"] = function()
@@ -94,25 +94,25 @@ T["split"]["keeps correct focus"] = function()
         require('no-neck-pain').enable()
     ]])
 
-    eq(child.lua_get("vim.api.nvim_get_current_win()"), 1000)
+    eq(helpers.currentWin(child), 1000)
 
     child.cmd("split")
-    eq(child.lua_get("vim.api.nvim_get_current_win()"), 1003)
+    eq(helpers.currentWin(child), 1003)
 
     child.cmd("split")
-    eq(child.lua_get("vim.api.nvim_get_current_win()"), 1004)
+    eq(helpers.currentWin(child), 1004)
 
     child.cmd("split")
-    eq(child.lua_get("vim.api.nvim_get_current_win()"), 1005)
+    eq(helpers.currentWin(child), 1005)
 
     child.cmd("q")
-    eq(child.lua_get("vim.api.nvim_get_current_win()"), 1004)
+    eq(helpers.currentWin(child), 1004)
 
     child.cmd("q")
-    eq(child.lua_get("vim.api.nvim_get_current_win()"), 1003)
+    eq(helpers.currentWin(child), 1003)
 
     child.cmd("q")
-    eq(child.lua_get("vim.api.nvim_get_current_win()"), 1000)
+    eq(helpers.currentWin(child), 1000)
 end
 
 T["vsplit"] = new_set()
@@ -126,7 +126,7 @@ T["vsplit"]["register new non-focused windows (TSPlayground)"] = function()
     eq(helpers.winsInTab(child), { 1001, 1000, 1002 })
 
     child.cmd("TSPlaygroundToggle")
-    eq(child.lua_get("vim.api.nvim_get_current_win()"), 1000)
+    eq(helpers.currentWin(child), 1000)
 
     eq(helpers.winsInTab(child), { 1001, 1004, 1000, 1002 })
 
@@ -224,7 +224,7 @@ T["vsplit"]["closing `curr` makes `split` the new `curr`"] = function()
 
     eq_state(child, "tabs[1].wins.main.curr", 1003)
     eq(helpers.winsInTab(child), { 1001, 1003, 1002 })
-    eq(child.lua_get("vim.api.nvim_get_current_win()"), 1003)
+    eq(helpers.currentWin(child), 1003)
 end
 
 T["vsplit"]["hides side buffers"] = function()
@@ -274,13 +274,13 @@ T["vsplit"]["keeps correct focus"] = function()
         require('no-neck-pain').enable()
     ]])
 
-    eq(child.lua_get("vim.api.nvim_get_current_win()"), 1000)
+    eq(helpers.currentWin(child), 1000)
 
     child.cmd("vsplit")
-    eq(child.lua_get("vim.api.nvim_get_current_win()"), 1003)
+    eq(helpers.currentWin(child), 1003)
 
     child.cmd("vsplit")
-    eq(child.lua_get("vim.api.nvim_get_current_win()"), 1004)
+    eq(helpers.currentWin(child), 1004)
 
     eq(helpers.winsInTab(child), { 1001, 1004, 1003, 1000, 1002 })
 end
@@ -333,7 +333,7 @@ T["vsplit/split"]["closing side buffers because of splits restores focus"] = fun
     child.cmd("q")
     eq(helpers.winsInTab(child), { 1006, 1003, 1000, 1007 })
 
-    eq(child.lua_get("vim.api.nvim_get_current_win()"), 1000)
+    eq(helpers.currentWin(child), 1000)
 end
 
 T["vsplit/split"]["closing help page doens't break layout"] = function()
@@ -353,7 +353,7 @@ T["vsplit/split"]["closing help page doens't break layout"] = function()
     child.cmd("q")
     eq(helpers.winsInTab(child), { 1001, 1003, 1000, 1002 })
 
-    eq(child.lua_get("vim.api.nvim_get_current_win()"), 1003)
+    eq(helpers.currentWin(child), 1003)
 
     eq_buf_width(child, "tabs[1].wins.main.curr", 48)
 end
