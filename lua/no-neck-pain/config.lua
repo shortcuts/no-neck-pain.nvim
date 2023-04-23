@@ -189,6 +189,9 @@ NoNeckPain.options = {
         -- note: it does not trigger if you come back to an existing tab, to prevent unwanted interfer with user's decisions.
         --- @type boolean
         enableOnTabEnter = false,
+        -- When `true`, reloads the plugin configuration after a colorscheme change.
+        --- @type boolean
+        reloadOnColorSchemeChange = false,
     },
     -- Creates mappings for you to easily interact with the exposed commands.
     --- @type table

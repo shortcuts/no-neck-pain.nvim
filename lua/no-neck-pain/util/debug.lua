@@ -29,35 +29,6 @@ function D.log(scope, str, ...)
     )
 end
 
----prints the table if debug is true.
----
----@param table table: the table to print.
----@param indent number?: the default indent value, starts at 0.
----@private
-function D.tprint(table, indent)
-    if _G.NoNeckPain.config ~= nil and not _G.NoNeckPain.config.debug then
-        return
-    end
-
-    if not indent then
-        indent = 0
-    end
-
-    for k, v in pairs(table) do
-        local formatting = string.rep("  ", indent) .. k .. ": "
-        if type(v) == "table" then
-            print(formatting)
-            D.tprint(v, indent + 1)
-        elseif type(v) == "boolean" then
-            print(formatting .. tostring(v))
-        elseif type(v) == "function" then
-            print(formatting .. "FUNCTION")
-        else
-            print(formatting .. v)
-        end
-    end
-end
-
 ---analyzes the user provided `setup` parameters and sends a message if they use a deprecated option, then gives the new option to use.
 ---
 ---@param options table: the options provided by the user.

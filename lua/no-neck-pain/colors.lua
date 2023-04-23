@@ -1,3 +1,4 @@
+local D = require("no-neck-pain.util.debug")
 local Co = require("no-neck-pain.util.constants")
 
 local C = {}
@@ -86,8 +87,11 @@ end
 ---
 ---@param buffers table: the buffers table to parse.
 ---@return table: the parsed buffers.
+---@return boolean?: when true, doen't rely on already stored color value.
 ---@private
-function C.parse(buffers)
+function C.parse(buffers, reload)
+    D.log("colors", "parsing colors")
+
     local defaultBackground = vim.api.nvim_get_hl_by_name("Normal", true).background
 
     -- if the user did not provided a custom background color, and have a transparent bg,
@@ -100,13 +104,21 @@ function C.parse(buffers)
         buffers.colors.text = "#ffffff"
     else
         buffers.colors.background = matchAndBlend(
-            buffers.colors.background or string.format("#%06X", defaultBackground),
+            (not reload and buffers.colors.background) or string.format("#%06X", defaultBackground),
             buffers.colors.blend
         )
     end
 
     for _, side in pairs(Co.SIDES) do
         if buffers[side].enabled then
+            D.log("colors", "aaaaaaaaaa %s", buffers[side].colors.background)
+            D.log("colors", "zzzzzzzzzz %s", buffers[side].colors.text)
+
+            if reload then
+                buffers[side].colors.background = nil
+                buffers[side].colors.text = nil
+            end
+
             -- if the side buffer colors.background is not defined, we fallback to the common option.
             buffers[side].colors.background = matchAndBlend(
                 buffers[side].colors.background,
@@ -124,6 +136,9 @@ function C.parse(buffers)
             buffers[side].colors.text = buffers[side].colors.text
                 or buffers.colors.text
                 or matchAndBlend(defaultTextColor, 0.5)
+
+            D.log("colors", "bbbbbbbbbb %s", buffers[side].colors.background)
+            D.log("colors", "yyyyyyyyyy %s", buffers[side].colors.text)
         end
     end
 
@@ -140,6 +155,8 @@ end
 ---@param side "left"|"right": the side of the window being resized, used for logging only.
 ---@private
 function C.init(win, tab, side)
+    D.log("colors", "initializing colors for %s side", side)
+
     local backgroundGroup = string.format("NoNeckPain_background_tab_%s_side_%s", tab, side)
     local textGroup = string.format("NoNeckPain_text_tab_%s_side_%s", tab, side)
 

@@ -1,4 +1,5 @@
 local M = require("no-neck-pain.main")
+local C = require("no-neck-pain.colors")
 
 local NoNeckPain = {}
 
@@ -72,8 +73,27 @@ function NoNeckPain.setup(opts)
     if
         _G.NoNeckPain.config.autocmds.enableOnVimEnter
         or _G.NoNeckPain.config.autocmds.enableOnTabEnter
+        or _G.NoNeckPain.config.autocmds.reloadOnColorSchemeChange
     then
         vim.api.nvim_create_augroup("NoNeckPainAutocmd", { clear = true })
+    end
+
+    if _G.NoNeckPain.config.autocmds.reloadOnColorSchemeChange then
+        vim.api.nvim_create_autocmd({ "ColorScheme" }, {
+            pattern = "*",
+            callback = function()
+                vim.schedule(function()
+                    if _G.NoNeckPain.state == nil or not _G.NoNeckPain.state.enabled then
+                        return
+                    end
+
+                    _G.NoNeckPain.config.buffers = C.parse(_G.NoNeckPain.config.buffers, true)
+                    M.init("ColorScheme", nil)
+                end)
+            end,
+            group = "NoNeckPainAutocmd",
+            desc = "Triggers until it finds the correct moment/buffer to enable the plugin.",
+        })
     end
 
     if _G.NoNeckPain.config.autocmds.enableOnVimEnter then

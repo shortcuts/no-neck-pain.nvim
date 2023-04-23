@@ -174,8 +174,6 @@ function W.createSideBuffers(tab, skipTrees)
                     vim.api.nvim_win_set_option(id, opt, val)
                 end
 
-                C.init(id, tab.id, side)
-
                 if _G.NoNeckPain.config.buffers[side].scratchPad.enabled then
                     W.initScratchPad(side)
                     tab.scratchPadEnabled = true
@@ -183,6 +181,8 @@ function W.createSideBuffers(tab, skipTrees)
 
                 tab.wins.main[side] = id
             end
+
+            C.init(tab.wins.main[side], tab.id, side)
         end
     end
 
