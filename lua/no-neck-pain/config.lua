@@ -277,13 +277,14 @@ NoNeckPain.options = {
     },
 }
 
---- Define your no-neck-pain setup.
+local defaults = vim.deepcopy(NoNeckPain.options)
+
+--- Defaults NoNeckPain options by merging user provided options with the default plugin values.
 ---
 ---@param options table Module config table. See |NoNeckPain.options|.
 ---
----@usage `require("no-neck-pain").setup()` (add `{}` with your |NoNeckPain.options| table)
-function NoNeckPain.setup(options)
-    options = options or {}
+---@private
+function NoNeckPain.defaults(options)
     options.buffers = options.buffers or {}
 
     local tde = function(t1, t2)
@@ -309,9 +310,8 @@ function NoNeckPain.setup(options)
         end
     end
 
-    NoNeckPain.options = tde(options, NoNeckPain.options)
-
-    D.warnDeprecation(NoNeckPain.options)
+    NoNeckPain.options = tde(options, defaults)
+    NoNeckPain.options.buffers = C.parse(NoNeckPain.options.buffers)
 
     -- assert `width` values through vim options
     if NoNeckPain.options.width == "textwidth" then
@@ -340,8 +340,18 @@ function NoNeckPain.setup(options)
         )
     end
 
-    -- set theme options
-    NoNeckPain.options.buffers = C.parse(NoNeckPain.options.buffers)
+    return NoNeckPain.options
+end
+
+--- Define your no-neck-pain setup.
+---
+---@param options table Module config table. See |NoNeckPain.options|.
+---
+---@usage `require("no-neck-pain").setup()` (add `{}` with your |NoNeckPain.options| table)
+function NoNeckPain.setup(options)
+    NoNeckPain.options = NoNeckPain.defaults(options or {})
+
+    D.warnDeprecation(NoNeckPain.options)
 
     registerMappings(NoNeckPain.options.mappings, {
         toggle = ":NoNeckPain<CR>",

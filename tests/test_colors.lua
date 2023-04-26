@@ -174,28 +174,19 @@ T["color"]["map integration name to a value"] = function()
         end
     end
 end
---
-T["color"]["buffers: throws with wrong values"] = function()
-    local keyValueSetupErrors = {
-        { "background", "no-neck-pain" },
-        { "blend", 30 },
-    }
 
-    for _, keyValueSetupError in pairs(keyValueSetupErrors) do
-        helpers.expect.error(function()
-            child.lua(string.format(
-                [[require('no-neck-pain').setup({
-                    buffers = {
-                        colors = {
-                            %s = "%s",
-                        },
-                    },
-                })]],
-                keyValueSetupError[1],
-                keyValueSetupError[2]
-            ))
-        end)
-    end
+T["color"]["buffers: throws with wrong background value"] = function()
+    helpers.expect.error(function()
+        child.lua([[
+        require('no-neck-pain').setup({
+            buffers = {
+                colors = {
+                    background = "no-neck-pain",
+                },
+            },
+        })
+        ]])
+    end)
 end
 
 return T

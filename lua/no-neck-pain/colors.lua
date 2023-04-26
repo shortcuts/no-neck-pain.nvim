@@ -1,4 +1,3 @@
-local D = require("no-neck-pain.util.debug")
 local Co = require("no-neck-pain.util.constants")
 
 local C = {}
@@ -56,7 +55,7 @@ local function matchAndBlend(colorCode, factor)
 
     if factor ~= nil then
         assert(
-            factor >= -1 and factor <= 1,
+            type(factor) == "number" and factor >= -1 and factor <= 1,
             string.format(
                 "`blend` value %s does not match the range constraint, number must be between -1 and 1.",
                 factor
@@ -86,10 +85,9 @@ end
 ---Parses to color for each buffer parameters, considering transparent backgrounds.
 ---
 ---@param buffers table: the buffers table to parse.
----@param reload boolean?: when true, doen't rely on already stored color value.
 ---@return table: the parsed buffers.
 ---@private
-function C.parse(buffers, reload)
+function C.parse(buffers)
     local defaultBackground = vim.api.nvim_get_hl_by_name("Normal", true).background
 
     -- if the user did not provided a custom background color, and have a transparent bg,
@@ -102,18 +100,13 @@ function C.parse(buffers, reload)
         buffers.colors.text = "#ffffff"
     else
         buffers.colors.background = matchAndBlend(
-            (not reload and buffers.colors.background) or string.format("#%06X", defaultBackground),
+            buffers.colors.background or string.format("#%06X", defaultBackground),
             buffers.colors.blend
         )
     end
 
     for _, side in pairs(Co.SIDES) do
         if buffers[side].enabled then
-            if reload then
-                buffers[side].colors.background = nil
-                buffers[side].colors.text = nil
-            end
-
             -- if the side buffer colors.background is not defined, we fallback to the common option.
             buffers[side].colors.background = matchAndBlend(
                 buffers[side].colors.background,
@@ -147,8 +140,6 @@ end
 ---@param side "left"|"right": the side of the window being resized, used for logging only.
 ---@private
 function C.init(win, tab, side)
-    D.log("colors", "initializing colors for %s side", side)
-
     local backgroundGroup = string.format("NoNeckPain_background_tab_%s_side_%s", tab, side)
     local textGroup = string.format("NoNeckPain_text_tab_%s_side_%s", tab, side)
 
