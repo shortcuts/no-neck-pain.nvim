@@ -174,28 +174,40 @@ T["color"]["map integration name to a value"] = function()
         end
     end
 end
---
-T["color"]["buffers: throws with wrong values"] = function()
-    local keyValueSetupErrors = {
-        { "background", "no-neck-pain" },
-        { "blend", 30 },
-    }
 
-    for _, keyValueSetupError in pairs(keyValueSetupErrors) do
-        helpers.expect.error(function()
-            child.lua(string.format(
-                [[require('no-neck-pain').setup({
-                    buffers = {
-                        colors = {
-                            %s = "%s",
-                        },
-                    },
-                })]],
-                keyValueSetupError[1],
-                keyValueSetupError[2]
-            ))
-        end)
-    end
+T["color"]["buffers: throws with wrong background value"] = function()
+    helpers.expect.error(function()
+        child.lua([[
+        require('no-neck-pain').setup({
+            buffers = {
+                colors = {
+                    background = "no-neck-pain",
+                },
+            },
+        })
+        ]])
+    end)
+end
+
+T["color"]["refreshes the stored color when changing colorscheme"] = function()
+    child.lua([[
+    require('no-neck-pain').setup({
+        autocmds = {
+            reloadOnColorSchemeChange=true,
+        },
+    })
+    require('no-neck-pain').enable()
+    ]])
+
+    eq_config(child, "buffers.colors.background", "NONE")
+    eq_config(child, "buffers.colors.blend", 0)
+    eq_config(child, "buffers.colors.text", "#ffffff")
+
+    child.cmd([[colorscheme peachpuff]])
+
+    eq_config(child, "buffers.colors.background", "#ffdab9")
+    eq_config(child, "buffers.colors.blend", 0)
+    eq_config(child, "buffers.colors.text", vim.NIL)
 end
 
 return T

@@ -1,11 +1,12 @@
 local M = require("no-neck-pain.main")
+local cfg = require("no-neck-pain.config")
 
 local NoNeckPain = {}
 
 --- Toggle the plugin by calling the `enable`/`disable` methods respectively.
 function NoNeckPain.toggle()
     if _G.NoNeckPain.config == nil then
-        _G.NoNeckPain.config = require("no-neck-pain.config").options
+        _G.NoNeckPain.config = cfg.options
     end
 
     _G.NoNeckPain.state = M.toggle("publicAPI_toggle")
@@ -18,7 +19,7 @@ function NoNeckPain.toggleScratchPad()
     end
 
     if _G.NoNeckPain.config == nil then
-        _G.NoNeckPain.config = require("no-neck-pain.config").options
+        _G.NoNeckPain.config = cfg.options
     end
 
     _G.NoNeckPain.state = M.toggleScratchPad()
@@ -48,7 +49,7 @@ end
 --- Initializes the plugin, sets event listeners and internal state.
 function NoNeckPain.enable()
     if _G.NoNeckPain.config == nil then
-        _G.NoNeckPain.config = require("no-neck-pain.config").options
+        _G.NoNeckPain.config = cfg.options
     end
 
     local state = M.enable("publicAPI_enable")
@@ -67,13 +68,32 @@ end
 
 -- setup NoNeckPain options and merge them with user provided ones.
 function NoNeckPain.setup(opts)
-    _G.NoNeckPain.config = require("no-neck-pain.config").setup(opts)
+    _G.NoNeckPain.config = cfg.setup(opts)
 
     if
         _G.NoNeckPain.config.autocmds.enableOnVimEnter
         or _G.NoNeckPain.config.autocmds.enableOnTabEnter
+        or _G.NoNeckPain.config.autocmds.reloadOnColorSchemeChange
     then
         vim.api.nvim_create_augroup("NoNeckPainAutocmd", { clear = true })
+    end
+
+    if _G.NoNeckPain.config.autocmds.reloadOnColorSchemeChange then
+        vim.api.nvim_create_autocmd({ "ColorScheme" }, {
+            pattern = "*",
+            callback = function()
+                vim.schedule(function()
+                    if _G.NoNeckPain.state == nil or not _G.NoNeckPain.state.enabled then
+                        return
+                    end
+
+                    _G.NoNeckPain.config = cfg.defaults(opts)
+                    M.init("ColorScheme", nil)
+                end)
+            end,
+            group = "NoNeckPainAutocmd",
+            desc = "Triggers until it finds the correct moment/buffer to enable the plugin.",
+        })
     end
 
     if _G.NoNeckPain.config.autocmds.enableOnVimEnter then

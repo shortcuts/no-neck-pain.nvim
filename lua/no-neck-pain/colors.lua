@@ -55,7 +55,7 @@ local function matchAndBlend(colorCode, factor)
 
     if factor ~= nil then
         assert(
-            factor >= -1 and factor <= 1,
+            type(factor) == "number" and factor >= -1 and factor <= 1,
             string.format(
                 "`blend` value %s does not match the range constraint, number must be between -1 and 1.",
                 factor
