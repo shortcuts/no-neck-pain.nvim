@@ -86,12 +86,10 @@ end
 ---Parses to color for each buffer parameters, considering transparent backgrounds.
 ---
 ---@param buffers table: the buffers table to parse.
+---@param reload boolean?: when true, doen't rely on already stored color value.
 ---@return table: the parsed buffers.
----@return boolean?: when true, doen't rely on already stored color value.
 ---@private
 function C.parse(buffers, reload)
-    D.log("colors", "parsing colors")
-
     local defaultBackground = vim.api.nvim_get_hl_by_name("Normal", true).background
 
     -- if the user did not provided a custom background color, and have a transparent bg,
@@ -111,9 +109,6 @@ function C.parse(buffers, reload)
 
     for _, side in pairs(Co.SIDES) do
         if buffers[side].enabled then
-            D.log("colors", "aaaaaaaaaa %s", buffers[side].colors.background)
-            D.log("colors", "zzzzzzzzzz %s", buffers[side].colors.text)
-
             if reload then
                 buffers[side].colors.background = nil
                 buffers[side].colors.text = nil
@@ -136,9 +131,6 @@ function C.parse(buffers, reload)
             buffers[side].colors.text = buffers[side].colors.text
                 or buffers.colors.text
                 or matchAndBlend(defaultTextColor, 0.5)
-
-            D.log("colors", "bbbbbbbbbb %s", buffers[side].colors.background)
-            D.log("colors", "yyyyyyyyyy %s", buffers[side].colors.text)
         end
     end
 

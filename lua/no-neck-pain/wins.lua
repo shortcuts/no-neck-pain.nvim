@@ -182,7 +182,9 @@ function W.createSideBuffers(tab, skipTrees)
                 tab.wins.main[side] = id
             end
 
-            C.init(tab.wins.main[side], tab.id, side)
+            if tab.wins.main[side] ~= nil then
+                C.init(tab.wins.main[side], tab.id, side)
+            end
         end
     end
 
