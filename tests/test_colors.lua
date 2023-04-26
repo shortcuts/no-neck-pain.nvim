@@ -189,4 +189,25 @@ T["color"]["buffers: throws with wrong background value"] = function()
     end)
 end
 
+T["color"]["refreshes the stored color when changing colorscheme"] = function()
+    child.lua([[
+    require('no-neck-pain').setup({
+        autocmds = {
+            reloadOnColorSchemeChange=true,
+        },
+    })
+    require('no-neck-pain').enable()
+    ]])
+
+    eq_config(child, "buffers.colors.background", "NONE")
+    eq_config(child, "buffers.colors.blend", 0)
+    eq_config(child, "buffers.colors.text", "#ffffff")
+
+    child.cmd([[colorscheme peachpuff]])
+
+    eq_config(child, "buffers.colors.background", "#ffdab9")
+    eq_config(child, "buffers.colors.blend", 0)
+    eq_config(child, "buffers.colors.text", vim.NIL)
+end
+
 return T

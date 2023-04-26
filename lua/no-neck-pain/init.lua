@@ -1,5 +1,4 @@
 local M = require("no-neck-pain.main")
-local C = require("no-neck-pain.colors")
 local cfg = require("no-neck-pain.config")
 
 local NoNeckPain = {}

@@ -277,6 +277,7 @@ NoNeckPain.options = {
     },
 }
 
+---@private
 local defaults = vim.deepcopy(NoNeckPain.options)
 
 --- Defaults NoNeckPain options by merging user provided options with the default plugin values.
@@ -288,7 +289,7 @@ function NoNeckPain.defaults(options)
     options.buffers = options.buffers or {}
 
     local tde = function(t1, t2)
-        return vim.tbl_deep_extend("keep", t1 or {}, t2 or {})
+        return vim.deepcopy(vim.tbl_deep_extend("keep", t1 or {}, t2 or {}))
     end
 
     for _, side in pairs(Co.SIDES) do

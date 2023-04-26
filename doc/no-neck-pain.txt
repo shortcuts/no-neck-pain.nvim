@@ -312,8 +312,6 @@ values:
       },
   }
 
-  local defaults = vim.deepcopy(NoNeckPain.options)
-
 <
 
 ------------------------------------------------------------------------------
