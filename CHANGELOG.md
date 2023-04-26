@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [1.2.2](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.2.1...v1.2.2) (2023-04-26)
+
+
+### Bug Fixes
+
+* refresh colorscheme ([#225](https://github.com/shortcuts/no-neck-pain.nvim/issues/225)) ([07e7c7e](https://github.com/shortcuts/no-neck-pain.nvim/commit/07e7c7e9f4fd4181bd9e0e2ac3379fe7b3a5ec0f))
+
 ## [1.2.1](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.2.0...v1.2.1) (2023-03-26)
 
 
