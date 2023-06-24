@@ -1,5 +1,3 @@
-local D = require("no-neck-pain.util.debug")
-
 local Ta = {}
 
 ---Initializes the state for the first tab, called when enabling or disabling the plugin.
@@ -14,20 +12,35 @@ function Ta.initState()
     }
 end
 
----Gets the current tab page ID.
+---Returns the name of the augroup for the given tab ID.
 ---
----@return number: the current tab page ID.
+---@param id number: the tab ID.
+---@return string: the initialied state
 ---@private
-function Ta.refresh(curr)
-    local new = vim.api.nvim_win_get_tabpage(0)
+function Ta.getAugroupName(id)
+    return string.format("NoNeckPain-%d", id)
+end
 
-    if curr == new then
-        return curr
+---Iterates over the current state to refresh the `tabs` table, removes any `tab` that are not valid anymore.
+---
+---@param tabs table: the `tabs` state list.
+---@return table?: the refreshed tabs list.
+---@private
+function Ta.refresh(tabs)
+    local id = vim.api.nvim_get_current_tabpage()
+    local refreshedTabs = {}
+
+    for _, tab in pairs(tabs) do
+        if tab.id ~= id and vim.api.nvim_tabpage_is_valid(tab.id) then
+            table.insert(refreshedTabs, tab)
+        end
     end
 
-    D.log("Ta.refresh", "new tab page registered: was %d, now %d", curr, new)
+    if #refreshedTabs == 0 then
+        return nil
+    end
 
-    return new
+    return refreshedTabs
 end
 
 ---Inserts a new tab to the `tabs` state, with the given `id`.
@@ -41,7 +54,6 @@ function Ta.insert(tabs, id)
 
     local newTab = {
         id = id,
-        augroup = nil,
         scratchPadEnabled = false,
         layers = {
             vsplit = 1,
@@ -76,28 +88,6 @@ function Ta.insert(tabs, id)
     table.insert(tabs, newTab)
 
     return tabs, newTab
-end
-
----Remove the tab with the given `id` from the tabs state.
----
----@param tabs table: the `tabs` state list.
----@param id number: the id of the tab to remove.
----@return table?: the updated tabs state list or nil if there's no remaining tabs active.
----@private
-function Ta.remove(tabs, id)
-    local newTabs = {}
-
-    for _, tab in pairs(tabs) do
-        if tab.id ~= id then
-            table.insert(newTabs, tab)
-        end
-    end
-
-    if #newTabs == 0 then
-        return nil
-    end
-
-    return newTabs
 end
 
 ---Gets the tab with the given `id` for the state

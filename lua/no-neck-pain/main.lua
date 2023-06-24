@@ -98,8 +98,8 @@ function N.enable(scope)
     -- register the new tab.
     S.tabs, tab = Ta.insert(S.tabs, S.activeTab)
 
-    local augroupName = string.format("NoNeckPain-%d", S.activeTab)
-    tab.augroup = vim.api.nvim_create_augroup(augroupName, { clear = true })
+    local augroupName = Ta.getAugroupName(S.activeTab)
+    vim.api.nvim_create_augroup(augroupName, { clear = true })
 
     tab.wins.main.curr = vim.api.nvim_get_current_win()
     tab, _ = Sp.compute(tab, tab.wins.main.curr)
@@ -125,7 +125,9 @@ function N.enable(scope)
     vim.api.nvim_create_autocmd({ "TabLeave" }, {
         callback = function()
             vim.schedule(function()
-                S.activeTab = Ta.refresh(S.activeTab)
+                S.activeTab = vim.api.nvim_get_current_tabpage()
+
+                D.log("TabLeave", "new tab page registered %d", S.activeTab)
             end)
         end,
         group = augroupName,
@@ -317,14 +319,16 @@ function N.disable(scope)
 
     D.log(scope, "calling disable for tab %d", S.activeTab)
 
-    -- we first remove the tab and reset the state if necessary, so there's no side effects of later actions.
-    S.tabs = Ta.remove(S.tabs, tab.id)
+    S.tabs = Ta.refresh(S.tabs)
 
     if S.tabs == nil then
         S = Ta.initState()
     end
 
-    vim.api.nvim_del_augroup_by_id(tab.augroup)
+    local augroupName = Ta.getAugroupName(S.activeTab)
+    if vim.fn.exists(augroupName) then
+        vim.api.nvim_del_augroup_by_name(augroupName)
+    end
 
     -- shutdowns gracefully by focusing the stored `curr` buffer
     if
