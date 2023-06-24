@@ -123,11 +123,16 @@ function N.enable(scope)
     })
 
     vim.api.nvim_create_autocmd({ "TabLeave" }, {
-        callback = function()
+        callback = function(p)
             vim.schedule(function()
+                -- if the left tab is not valid anymore, we can remove it from the state
+                if not vim.api.nvim_tabpage_is_valid(S.activeTab) then
+                    S.tabs = Ta.refresh(S.tabs, S.activeTab)
+                end
+
                 S.activeTab = vim.api.nvim_get_current_tabpage()
 
-                D.log("TabLeave", "new tab page registered %d", S.activeTab)
+                D.log(p.event, "new tab page registered %d", S.activeTab)
             end)
         end,
         group = augroupName,
