@@ -175,4 +175,133 @@ T["tabnew/tabclose"]["opening and closing tabs does not throw any error"] = func
     eq_state(child, "activeTab", 1)
 end
 
+T["tabnew/tabclose"]["doesn't keep closed tabs in state"] = function()
+    child.restart({ "-u", "scripts/init_auto_open.lua" })
+
+    eq_state(child, "enabled", true)
+    eq_state(child, "activeTab", 1)
+    eq_state(child, "tabs", {
+        {
+            id = 1,
+            layers = {
+                split = 1,
+                vsplit = 1,
+            },
+            scratchPadEnabled = false,
+            wins = {
+                external = {
+                    trees = {
+                        NeoTree = {
+                            width = 0,
+                        },
+                        NvimTree = {
+                            width = 0,
+                        },
+                        undotree = {
+                            width = 0,
+                        },
+                    },
+                },
+                main = {
+                    curr = 1000,
+                    left = 1001,
+                    right = 1002,
+                },
+            },
+        },
+    })
+
+    child.cmd("tabnew")
+    eq_state(child, "tabs", {
+        {
+            id = 1,
+            layers = {
+                split = 1,
+                vsplit = 1,
+            },
+            scratchPadEnabled = false,
+            wins = {
+                external = {
+                    trees = {
+                        NeoTree = {
+                            width = 0,
+                        },
+                        NvimTree = {
+                            width = 0,
+                        },
+                        undotree = {
+                            width = 0,
+                        },
+                    },
+                },
+                main = {
+                    curr = 1000,
+                    left = 1001,
+                    right = 1002,
+                },
+            },
+        },
+        {
+            id = 2,
+            layers = {
+                split = 1,
+                vsplit = 1,
+            },
+            scratchPadEnabled = false,
+            wins = {
+                external = {
+                    trees = {
+                        NeoTree = {
+                            width = 0,
+                        },
+                        NvimTree = {
+                            width = 0,
+                        },
+                        undotree = {
+                            width = 0,
+                        },
+                    },
+                },
+                main = {
+                    curr = 1003,
+                    left = 1004,
+                    right = 1005,
+                },
+            },
+        },
+    })
+
+    child.cmd("tabclose")
+    eq_state(child, "tabs", {
+        {
+            id = 1,
+            layers = {
+                split = 1,
+                vsplit = 1,
+            },
+            scratchPadEnabled = false,
+            wins = {
+                external = {
+                    trees = {
+                        NeoTree = {
+                            width = 0,
+                        },
+                        NvimTree = {
+                            width = 0,
+                        },
+                        undotree = {
+                            width = 0,
+                        },
+                    },
+                },
+                main = {
+                    curr = 1000,
+                    left = 1001,
+                    right = 1002,
+                },
+            },
+        },
+    })
+end
+
 return T

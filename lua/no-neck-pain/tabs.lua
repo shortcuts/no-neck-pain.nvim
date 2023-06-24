@@ -24,10 +24,11 @@ end
 ---Iterates over the current state to refresh the `tabs` table, removes any `tab` that are not valid anymore.
 ---
 ---@param tabs table: the `tabs` state list.
+---@param id number?: the `id` of the tab to remove from the state, defaults to the current tabpage.
 ---@return table?: the refreshed tabs list.
 ---@private
-function Ta.refresh(tabs)
-    local id = vim.api.nvim_get_current_tabpage()
+function Ta.refresh(tabs, id)
+    id = id or vim.api.nvim_get_current_tabpage()
     local refreshedTabs = {}
 
     for _, tab in pairs(tabs) do
