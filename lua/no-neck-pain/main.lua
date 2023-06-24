@@ -325,10 +325,7 @@ function N.disable(scope)
         S = Ta.initState()
     end
 
-    local augroupName = Ta.getAugroupName(S.activeTab)
-    if vim.fn.exists(augroupName) then
-        vim.api.nvim_del_augroup_by_name(augroupName)
-    end
+    pcall(vim.api.nvim_del_augroup_by_name, Ta.getAugroupName(S.activeTab))
 
     -- shutdowns gracefully by focusing the stored `curr` buffer
     if
