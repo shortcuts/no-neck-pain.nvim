@@ -74,12 +74,13 @@ function W.initScratchPad(side, cleanup)
         location = location .. "/"
     end
 
-    location = location
-        .. _G.NoNeckPain.config.buffers[side].scratchPad.fileName
-        .. "-"
-        .. side
-        .. "."
-        .. _G.NoNeckPain.config.buffers[side].bo.filetype
+    location = string.format(
+        "%s%s-%s.%s",
+        location,
+        _G.NoNeckPain.config.buffers[side].scratchPad.fileName,
+        side,
+        _G.NoNeckPain.config.buffers[side].bo.filetype
+    )
 
     -- we edit the file if it exists, otherwise we create it
     if vim.fn.filereadable(location) then
@@ -106,7 +107,7 @@ end
 ---@private
 local function resizeOrCloseSideBuffers(scope, tab, paddings)
     for _, side in pairs(Co.SIDES) do
-        if not A.sideNil(tab, side) then
+        if A.sideExist(tab, side) then
             local padding = paddings[side].padding or W.getPadding(side, tab)
 
             if padding > _G.NoNeckPain.config.minSideBufferWidth then
@@ -197,7 +198,7 @@ function W.createSideBuffers(tab, skipTrees)
 
     -- if we still have side buffers open at this point, and we have vsplit opened,
     -- there might be width issues so we the opened vsplits.
-    if (not A.sideNil(tab, "left") or not A.sideNil(tab, "right")) and tab.wins.splits ~= nil then
+    if (A.sideExist(tab, "left") or A.sideExist(tab, "right")) and tab.wins.splits ~= nil then
         local side = tab.wins.main.left or tab.wins.main.right
         local sWidth, _ = A.getWidthAndHeight(side)
         local nbSide = 1

@@ -22,18 +22,8 @@ end
 ---@param side "left"|"right": the side of the window being resized.
 ---@return boolean: whether the side exists or not.
 ---@private
-function A.hasSide(tab, side)
+function A.sideExist(tab, side)
     return _G.NoNeckPain.config.buffers[side].enabled and tab.wins.main[side] ~= nil
-end
-
----whether the side is nil or not.
----
----@param tab table: the table where the tab information are stored.
----@param side "left"|"right": the side of the window being resized.
----@return boolean: whether the side nil or not.
----@private
-function A.sideNil(tab, side)
-    return tab.wins.main[side] == nil
 end
 
 ---whether the currently focused window is the provided one.

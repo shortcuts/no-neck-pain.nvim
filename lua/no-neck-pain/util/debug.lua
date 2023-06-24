@@ -11,18 +11,10 @@ function D.log(scope, str, ...)
         return
     end
 
-    local info = debug.getinfo(2, "Sl")
-    local line = ""
-
-    if info then
-        line = "L" .. info.currentline
-    end
-
     print(
         string.format(
-            "[no-neck-pain:%s %s in %s] > %s",
-            os.date("%H:%M:%S"),
-            line,
+            "[no-neck-pain@%s in '%s'] > %s",
+            os.date("%X"),
             scope,
             string.format(str, ...)
         )

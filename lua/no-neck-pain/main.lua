@@ -65,7 +65,7 @@ function N.init(scope, tab, goToCurr, skipTrees)
 
     -- if we do not have side buffers, we must ensure we only trigger a focus if we re-create them
     local hadSideBuffers = true
-    if not A.hasSide(tab, "left") or not A.hasSide(tab, "right") then
+    if not A.sideExist(tab, "left") or not A.sideExist(tab, "right") then
         hadSideBuffers = false
     end
 
@@ -73,7 +73,7 @@ function N.init(scope, tab, goToCurr, skipTrees)
 
     if
         goToCurr
-        or (not hadSideBuffers and (not A.sideNil(tab, "left") or not A.sideNil(tab, "right")))
+        or (not hadSideBuffers and (A.sideExist(tab, "left") or A.sideExist(tab, "right")))
         or (A.isCurrentWin(tab.wins.main.left) or A.isCurrentWin(tab.wins.main.right))
     then
         vim.fn.win_gotoid(tab.wins.main.curr)
@@ -147,7 +147,7 @@ function N.enable(scope)
                 end
 
                 -- there's nothing to manage when there's no side buffer, fallback to vim's default behavior
-                if A.sideNil(tab, "right") and A.sideNil(tab, "left") then
+                if not A.sideExist(tab, "right") and not A.sideExist(tab, "left") then
                     return D.log(p.event, "skip split logic: no side buffer")
                 end
 
@@ -356,7 +356,7 @@ function N.disable(scope)
         )
         vim.cmd(string.format("highlight! clear NoNeckPain_text_tab_%s_side_%s NONE", tab.id, side))
 
-        if not A.sideNil(tab, side) then
+        if A.sideExist(tab, side) then
             local activeWins = vim.api.nvim_tabpage_list_wins(tab.id)
             local haveOtherWins = false
 
