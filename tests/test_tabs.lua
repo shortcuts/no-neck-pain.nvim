@@ -150,4 +150,29 @@ T["TabNewEntered"]["does not re-enable if the user disables it"] = function()
     child.stop()
 end
 
+T["tabnew/tabclose"] = MiniTest.new_set()
+
+T["tabnew/tabclose"]["opening and closing tabs does not throw any error"] = function()
+    child.restart({ "-u", "scripts/init_auto_open.lua" })
+
+    eq_state(child, "enabled", true)
+    eq_state(child, "activeTab", 1)
+
+    child.cmd("tabnew")
+    eq_state(child, "activeTab", 2)
+
+    child.cmd("tabclose")
+    eq_state(child, "activeTab", 1)
+
+    child.cmd("tabnew")
+    child.cmd("tabnew")
+    eq_state(child, "activeTab", 4)
+
+    child.cmd("tabclose")
+    eq_state(child, "activeTab", 3)
+
+    child.cmd("tabclose")
+    eq_state(child, "activeTab", 1)
+end
+
 return T
