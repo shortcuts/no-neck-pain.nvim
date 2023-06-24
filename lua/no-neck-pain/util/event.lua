@@ -22,7 +22,7 @@ function E.skip(tab)
     end
 
     if tab ~= nil then
-        if vim.api.nvim_win_get_tabpage(0) ~= tab.id then
+        if vim.api.nvim_get_current_tabpage() ~= tab.id then
             return true
         end
 

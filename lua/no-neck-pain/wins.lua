@@ -369,6 +369,10 @@ end
 ---@return boolean: whether all windows are active and valid or not.
 ---@private
 function W.stateWinsActive(tab, checkSplits)
+    if not vim.api.nvim_tabpage_is_valid(tab.id) then
+        return false
+    end
+
     local wins = vim.api.nvim_tabpage_list_wins(tab.id)
     local swins = tab.wins.main
 
