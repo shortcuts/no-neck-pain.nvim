@@ -1,4 +1,13 @@
 <a name="0.2.3"></a>
+## [1.2.3](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.2.2...v1.2.3) (2023-06-24)
+
+
+### Bug Fixes
+
+* prevent error on augroup deletion ([#233](https://github.com/shortcuts/no-neck-pain.nvim/issues/233)) ([649c5a9](https://github.com/shortcuts/no-neck-pain.nvim/commit/649c5a95236bd917d875caa8945fb36ec7bbad57))
+* remove closed tab from state ([#235](https://github.com/shortcuts/no-neck-pain.nvim/issues/235)) ([8cca43d](https://github.com/shortcuts/no-neck-pain.nvim/commit/8cca43d7c6187f695eeccc48a7beacfbe95f8c00))
+* tab state synchronization ([#231](https://github.com/shortcuts/no-neck-pain.nvim/issues/231)) ([137290b](https://github.com/shortcuts/no-neck-pain.nvim/commit/137290bccfad1a3f5bd0931dba3490991d1d3eeb))
+
 ## [1.2.2](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.2.1...v1.2.2) (2023-04-26)
 
 
