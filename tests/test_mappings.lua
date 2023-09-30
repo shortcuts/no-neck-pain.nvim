@@ -71,11 +71,13 @@ T["setup"]["overrides default values"] = function()
         }
     })]])
 
-    eq_config(child, "mappings.enabled", true)
-    eq_config(child, "mappings.toggle", "<Leader>kz")
-    eq_config(child, "mappings.widthUp", "<Leader>k-")
-    eq_config(child, "mappings.widthDown", "<Leader>k=")
-    eq_config(child, "mappings.scratchPad", "<Leader>ks")
+    eq_config(child, "mappings", {
+        enabled = true,
+        scratchPad = "<Leader>ks",
+        toggle = "<Leader>kz",
+        widthDown = "<Leader>k=",
+        widthUp = "<Leader>k-",
+    })
 end
 
 T["setup"]["does not create mappings if false"] = function()
@@ -89,11 +91,13 @@ T["setup"]["does not create mappings if false"] = function()
         }
     })]])
 
-    eq_config(child, "mappings.enabled", true)
-    eq_config(child, "mappings.toggle", false)
-    eq_config(child, "mappings.widthUp", false)
-    eq_config(child, "mappings.widthDown", false)
-    eq_config(child, "mappings.scratchPad", false)
+    eq_config(child, "mappings", {
+        enabled = true,
+        scratchPad = false,
+        toggle = false,
+        widthUp = false,
+        widthDown = false,
+    })
 
     -- toggle plugin state
     child.lua("vim.api.nvim_input('<Leader>np')")

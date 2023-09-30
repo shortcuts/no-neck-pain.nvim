@@ -34,11 +34,19 @@ T["setup"]["overrides default values"] = function()
         }
     })]])
 
-    eq_config(child, "integrations.NvimTree.position", "right")
-    eq_config(child, "integrations.NvimTree.reopen", false)
-    eq_config(child, "integrations.NeoTree.position", "right")
-    eq_config(child, "integrations.NeoTree.reopen", false)
-    eq_config(child, "integrations.undotree.position", "right")
+    eq_config(child, "integrations.NvimTree", {
+        position = "right",
+        reopen = false,
+    })
+
+    eq_config(child, "integrations.NeoTree", {
+        position = "right",
+        reopen = false,
+    })
+
+    eq_config(child, "integrations.undotree", {
+        position = "right",
+    })
 end
 
 T["integrations"] = MiniTest.new_set()

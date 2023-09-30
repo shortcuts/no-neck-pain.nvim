@@ -1,5 +1,6 @@
 local helpers = dofile("tests/helpers.lua")
 local Co = require("no-neck-pain.util.constants")
+local C = require("no-neck-pain.colors")
 
 local child = helpers.new_child_neovim()
 local eq_config = helpers.expect.config_equality
@@ -47,14 +48,18 @@ T["setup"]["overrides default values"] = function()
         },
     })]])
 
-    eq_config(child, "buffers.colors.background", "#828590")
-    eq_config(child, "buffers.colors.blend", 0.4)
-    eq_config(child, "buffers.colors.text", "#7480c2")
+    eq_config(child, "buffers.colors", {
+        background = "#828590",
+        blend = 0.4,
+        text = "#7480c2",
+    })
 
     for _, scope in pairs(Co.SIDES) do
-        eq_config(child, "buffers." .. scope .. ".colors.background", "#595c6b")
-        eq_config(child, "buffers." .. scope .. ".colors.blend", 0.2)
-        eq_config(child, "buffers." .. scope .. ".colors.text", "#7480c2")
+        eq_config(child, "buffers." .. scope .. ".colors", {
+            background = "#595c6b",
+            blend = 0.2,
+            text = "#7480c2",
+        })
     end
 end
 
@@ -87,18 +92,23 @@ T["setup"]["`left` or `right` buffer options overrides `common` ones"] = functio
         },
     })]])
 
-    eq_config(child, "buffers.colors.background", "#444858")
-    eq_config(child, "buffers.colors.blend", 0.1)
-    eq_config(child, "buffers.colors.text", "#7480c2")
+    eq_config(child, "buffers.colors", {
+        background = "#444858",
+        blend = 0.1,
+        text = "#7480c2",
+    })
 
-    eq_config(child, "buffers.left.colors.background", "#08080b")
-    eq_config(child, "buffers.right.colors.background", "#ffffff")
+    eq_config(child, "buffers.left.colors", {
+        background = "#08080b",
+        blend = -0.8,
+        text = "#123123",
+    })
 
-    eq_config(child, "buffers.left.colors.blend", -0.8)
-    eq_config(child, "buffers.right.colors.blend", 1)
-
-    eq_config(child, "buffers.left.colors.text", "#123123")
-    eq_config(child, "buffers.right.colors.text", "#456456")
+    eq_config(child, "buffers.right.colors", {
+        background = "#ffffff",
+        blend = 1,
+        text = "#456456",
+    })
 end
 
 T["setup"]["`common` options spreads it to `left` and `right` buffers"] = function()
@@ -116,41 +126,66 @@ T["setup"]["`common` options spreads it to `left` and `right` buffers"] = functi
         },
     })]])
 
-    eq_config(child, "buffers.colors.background", "#ffffff")
-    eq_config(child, "buffers.colors.text", "#000000")
+    eq_config(child, "buffers.colors", {
+        background = "#ffffff",
+        blend = 1,
+        text = "#000000",
+    })
 
-    eq_config(child, "buffers.left.colors.background", "#ffffff")
-    eq_config(child, "buffers.right.colors.background", "#ffffff")
+    eq_config(child, "buffers.left.colors", {
+        background = "#ffffff",
+        blend = 1,
+        text = "#000000",
+    })
 
-    eq_config(child, "buffers.left.colors.blend", 1)
-    eq_config(child, "buffers.right.colors.blend", 1)
-
-    eq_config(child, "buffers.left.colors.text", "#000000")
-    eq_config(child, "buffers.right.colors.text", "#000000")
+    eq_config(child, "buffers.right.colors", {
+        background = "#ffffff",
+        blend = 1,
+        text = "#000000",
+    })
 end
 
 T["setup"]["supports transparent bgs"] = function()
     child.lua([[require('no-neck-pain').setup()]])
 
-    eq_config(child, "buffers.colors.background", "NONE")
-    eq_config(child, "buffers.colors.text", "#ffffff")
+    eq_config(child, "buffers.colors", {
+        background = "NONE",
+        blend = 0,
+        text = "#ffffff",
+    })
 
-    for _, scope in pairs(Co.SIDES) do
-        eq_config(child, "buffers." .. scope .. ".colors.background", "NONE")
-        eq_config(child, "buffers." .. scope .. ".colors.text", "#ffffff")
-    end
+    eq_config(child, "buffers.left.colors", {
+        background = "NONE",
+        blend = 0,
+        text = "#ffffff",
+    })
+
+    eq_config(child, "buffers.right.colors", {
+        background = "NONE",
+        blend = 0,
+        text = "#ffffff",
+    })
 end
 
 T["setup"]["colors.background overrides a nil background when defined"] = function()
     child.lua([[require('no-neck-pain').setup({buffers={colors={background="#abcabc"}}})]])
 
-    eq_config(child, "buffers.colors.background", "#abcabc")
-    eq_config(child, "buffers.colors.text", vim.NIL)
+    eq_config(child, "buffers.colors", {
+        background = "#abcabc",
+        blend = 0,
+    })
 
-    for _, scope in pairs(Co.SIDES) do
-        eq_config(child, "buffers." .. scope .. ".colors.background", "#abcabc")
-        eq_config(child, "buffers." .. scope .. ".colors.text", "#d5e4dd")
-    end
+    eq_config(child, "buffers.left.colors", {
+        background = "#abcabc",
+        blend = 0,
+        text = "#d5e4dd",
+    })
+
+    eq_config(child, "buffers.right.colors", {
+        background = "#abcabc",
+        blend = 0,
+        text = "#d5e4dd",
+    })
 end
 
 T["color"] = MiniTest.new_set()
@@ -170,7 +205,11 @@ T["color"]["map integration name to a value"] = function()
             integration
         ))
         for _, scope in pairs(Co.SIDES) do
-            eq_config(child, "buffers." .. scope .. ".colors.background", value)
+            eq_config(child, "buffers." .. scope .. ".colors", {
+                background = value,
+                blend = 0,
+                text = C.matchAndBlend(value, 0.5),
+            })
         end
     end
 end
@@ -199,15 +238,18 @@ T["color"]["refreshes the stored color when changing colorscheme"] = function()
     require('no-neck-pain').enable()
     ]])
 
-    eq_config(child, "buffers.colors.background", "NONE")
-    eq_config(child, "buffers.colors.blend", 0)
-    eq_config(child, "buffers.colors.text", "#ffffff")
+    eq_config(child, "buffers.colors", {
+        background = "NONE",
+        blend = 0,
+        text = "#ffffff",
+    })
 
     child.cmd([[colorscheme peachpuff]])
 
-    eq_config(child, "buffers.colors.background", "#ffdab9")
-    eq_config(child, "buffers.colors.blend", 0)
-    eq_config(child, "buffers.colors.text", vim.NIL)
+    eq_config(child, "buffers.colors", {
+        background = "#ffdab9",
+        blend = 0,
+    })
 end
 
 return T
