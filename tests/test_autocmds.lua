@@ -27,9 +27,9 @@ T["auto command"]["does not create side buffers window's width < options.width"]
     ]])
 
     eq(helpers.winsInTab(child), { 1000 })
-    eq_state(child, "tabs[1].wins.main.curr", 1000)
-    eq_state(child, "tabs[1].wins.main.left", vim.NIL)
-    eq_state(child, "tabs[1].wins.main.right", vim.NIL)
+    eq_state(child, "tabs[1].wins.main", {
+        curr = 1000,
+    })
 end
 
 T["auto command"]["does not shift using when opening/closing float window"] = function()
@@ -40,8 +40,11 @@ T["auto command"]["does not shift using when opening/closing float window"] = fu
     ]])
 
     eq(helpers.winsInTab(child), { 1001, 1000, 1002 })
-    eq_state(child, "tabs[1].wins.main.left", 1001)
-    eq_state(child, "tabs[1].wins.main.right", 1002)
+    eq_state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
 
     eq_buf_width(child, "tabs[1].wins.main.left", 15)
     eq_buf_width(child, "tabs[1].wins.main.right", 15)
@@ -49,8 +52,11 @@ T["auto command"]["does not shift using when opening/closing float window"] = fu
     child.lua("vim.api.nvim_open_win(0,true, {width=100,height=100,relative='cursor',row=0,col=0})")
 
     eq(helpers.winsInTab(child), { 1001, 1000, 1002, 1003 })
-    eq_state(child, "tabs[1].wins.main.left", 1001)
-    eq_state(child, "tabs[1].wins.main.right", 1002)
+    eq_state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
 
     eq_buf_width(child, "tabs[1].wins.main.left", 15)
     eq_buf_width(child, "tabs[1].wins.main.right", 15)
@@ -60,8 +66,11 @@ T["auto command"]["does not shift using when opening/closing float window"] = fu
     child.cmd("q")
 
     eq(helpers.winsInTab(child), { 1001, 1000, 1002 })
-    eq_state(child, "tabs[1].wins.main.left", 1001)
-    eq_state(child, "tabs[1].wins.main.right", 1002)
+    eq_state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
 
     eq_buf_width(child, "tabs[1].wins.main.left", 15)
     eq_buf_width(child, "tabs[1].wins.main.right", 15)

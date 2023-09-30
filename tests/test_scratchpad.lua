@@ -27,14 +27,23 @@ T["setup"]["overrides default values"] = function()
         },
     })]])
 
-    eq_config(child, "buffers.scratchPad.enabled", true)
-    eq_config(child, "buffers.scratchPad.location", "~/Documents")
+    eq_config(child, "buffers.scratchPad", {
+        enabled = true,
+        fileName = "no-neck-pain",
+        location = "~/Documents",
+    })
 
-    eq_config(child, "buffers.left.scratchPad.enabled", true)
-    eq_config(child, "buffers.left.scratchPad.location", "~/Documents")
+    eq_config(child, "buffers.left.scratchPad", {
+        enabled = true,
+        fileName = "no-neck-pain",
+        location = "~/Documents",
+    })
 
-    eq_config(child, "buffers.left.scratchPad.enabled", true)
-    eq_config(child, "buffers.right.scratchPad.location", "~/Documents")
+    eq_config(child, "buffers.right.scratchPad", {
+        enabled = true,
+        fileName = "no-neck-pain",
+        location = "~/Documents",
+    })
 end
 
 T["scratchPad"] = MiniTest.new_set()

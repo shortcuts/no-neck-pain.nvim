@@ -55,18 +55,23 @@ T["setup"]["sets exposed methods and default options value"] = function()
 
     eq_config(child, "width", 100)
     eq_config(child, "minSideBufferWidth", 10)
-
-    eq_config(child, "autocmds.enableOnVimEnter", false)
-    eq_config(child, "autocmds.enableOnTabEnter", false)
-
-    eq_config(child, "mappings.enabled", false)
-    eq_config(child, "mappings.toggle", "<Leader>np")
-    eq_config(child, "mappings.widthUp", "<Leader>n=")
-    eq_config(child, "mappings.widthDown", "<Leader>n-")
-
     eq_config(child, "debug", false)
     eq_config(child, "disableOnLastBuffer", false)
     eq_config(child, "killAllBuffersOnDisable", false)
+
+    eq_config(child, "autocmds", {
+        enableOnVimEnter = false,
+        enableOnTabEnter = false,
+        reloadOnColorSchemeChange = false,
+    })
+
+    eq_config(child, "mappings", {
+        enabled = false,
+        scratchPad = "<Leader>ns",
+        toggle = "<Leader>np",
+        widthUp = "<Leader>n=",
+        widthDown = "<Leader>n-",
+    })
 
     -- buffers
     eq_type_config(child, "buffers", "table")
@@ -74,57 +79,77 @@ T["setup"]["sets exposed methods and default options value"] = function()
     eq_type_config(child, "buffers.wo", "table")
 
     eq_config(child, "buffers.setNames", false)
-    eq_config(child, "buffers.colors.background", "#000000")
-    eq_config(child, "buffers.colors.blend", 0)
-    eq_config(child, "buffers.colors.text", vim.NIL)
 
-    eq_config(child, "buffers.bo.filetype", "no-neck-pain")
-    eq_config(child, "buffers.bo.buftype", "nofile")
-    eq_config(child, "buffers.bo.bufhidden", "hide")
-    eq_config(child, "buffers.bo.buflisted", false)
-    eq_config(child, "buffers.bo.swapfile", false)
+    eq_config(child, "buffers.colors", {
+        background = "#000000",
+        blend = 0,
+    })
 
-    eq_config(child, "buffers.wo.cursorline", false)
-    eq_config(child, "buffers.wo.cursorcolumn", false)
-    eq_config(child, "buffers.wo.colorcolumn", "0")
-    eq_config(child, "buffers.wo.number", false)
-    eq_config(child, "buffers.wo.relativenumber", false)
-    eq_config(child, "buffers.wo.foldenable", false)
-    eq_config(child, "buffers.wo.list", false)
-    eq_config(child, "buffers.wo.wrap", true)
-    eq_config(child, "buffers.wo.linebreak", true)
+    eq_config(child, "buffers.bo", {
+        bufhidden = "hide",
+        buflisted = false,
+        buftype = "nofile",
+        filetype = "no-neck-pain",
+        swapfile = false,
+    })
+
+    eq_config(child, "buffers.wo", {
+        colorcolumn = "0",
+        cursorcolumn = false,
+        cursorline = false,
+        foldenable = false,
+        linebreak = true,
+        list = false,
+        number = false,
+        relativenumber = false,
+        wrap = true,
+    })
 
     for _, scope in pairs(Co.SIDES) do
         eq_type_config(child, "buffers." .. scope, "table")
         eq_type_config(child, "buffers." .. scope .. ".bo", "table")
         eq_type_config(child, "buffers." .. scope .. ".wo", "table")
 
-        eq_config(child, "buffers." .. scope .. ".colors.background", "#000000")
-        eq_config(child, "buffers." .. scope .. ".colors.blend", 0)
-        eq_config(child, "buffers." .. scope .. ".colors.text", "#7f7f7f")
+        eq_config(child, "buffers." .. scope .. ".colors", {
+            background = "#000000",
+            blend = 0,
+            text = "#7f7f7f",
+        })
 
-        eq_config(child, "buffers." .. scope .. ".bo.filetype", "no-neck-pain")
-        eq_config(child, "buffers." .. scope .. ".bo.buftype", "nofile")
-        eq_config(child, "buffers." .. scope .. ".bo.bufhidden", "hide")
-        eq_config(child, "buffers." .. scope .. ".bo.buflisted", false)
-        eq_config(child, "buffers." .. scope .. ".bo.swapfile", false)
+        eq_config(child, "buffers." .. scope .. ".bo", {
+            bufhidden = "hide",
+            buflisted = false,
+            buftype = "nofile",
+            filetype = "no-neck-pain",
+            swapfile = false,
+        })
 
-        eq_config(child, "buffers." .. scope .. ".wo.cursorline", false)
-        eq_config(child, "buffers." .. scope .. ".wo.cursorcolumn", false)
-        eq_config(child, "buffers." .. scope .. ".wo.colorcolumn", "0")
-        eq_config(child, "buffers." .. scope .. ".wo.number", false)
-        eq_config(child, "buffers." .. scope .. ".wo.relativenumber", false)
-        eq_config(child, "buffers." .. scope .. ".wo.foldenable", false)
-        eq_config(child, "buffers." .. scope .. ".wo.list", false)
-        eq_config(child, "buffers." .. scope .. ".wo.wrap", true)
-        eq_config(child, "buffers." .. scope .. ".wo.linebreak", true)
+        eq_config(child, "buffers." .. scope .. ".wo", {
+            colorcolumn = "0",
+            cursorcolumn = false,
+            cursorline = false,
+            foldenable = false,
+            linebreak = true,
+            list = false,
+            number = false,
+            relativenumber = false,
+            wrap = true,
+        })
     end
 
-    eq_config(child, "integrations.NvimTree.position", "left")
-    eq_config(child, "integrations.NvimTree.reopen", true)
-    eq_config(child, "integrations.NeoTree.position", "left")
-    eq_config(child, "integrations.NeoTree.reopen", true)
-    eq_config(child, "integrations.undotree.position", "left")
+    eq_config(child, "integrations.NvimTree", {
+        position = "left",
+        reopen = true,
+    })
+
+    eq_config(child, "integrations.NeoTree", {
+        position = "left",
+        reopen = true,
+    })
+
+    eq_config(child, "integrations.undotree", {
+        position = "left",
+    })
 end
 
 T["setup"]["overrides default values"] = function()
@@ -134,6 +159,7 @@ T["setup"]["overrides default values"] = function()
         autocmds = {
             enableOnVimEnter = true,
             enableOnTabEnter = true,
+            reloadOnColorSchemeChange = true,
         },
         debug = true,
         disableOnLastBuffer = true,
@@ -142,11 +168,14 @@ T["setup"]["overrides default values"] = function()
 
     eq_config(child, "width", 42)
     eq_config(child, "minSideBufferWidth", 0)
-    eq_config(child, "autocmds.enableOnVimEnter", true)
-    eq_config(child, "autocmds.enableOnTabEnter", true)
     eq_config(child, "debug", true)
     eq_config(child, "disableOnLastBuffer", true)
     eq_config(child, "killAllBuffersOnDisable", true)
+    eq_config(child, "autocmds", {
+        enableOnVimEnter = true,
+        enableOnTabEnter = true,
+        reloadOnColorSchemeChange = true,
+    })
 end
 
 T["setup"]["width - defaults to the `textwidth` when specified"] = function()
@@ -202,16 +231,20 @@ T["enable"]["(single tab) sets state"] = function()
     eq_type_state(child, "tabs[1].wins.main", "table")
     eq_type_state(child, "tabs[1].wins.external", "table")
 
-    eq_state(child, "tabs[1].wins.main.curr", 1000)
-    eq_state(child, "tabs[1].wins.main.left", 1001)
-    eq_state(child, "tabs[1].wins.main.right", 1002)
+    eq_state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
+
     eq_state(child, "tabs[1].wins.splits", vim.NIL)
 
     eq_type_state(child, "tabs[1].wins.external.trees", "table")
 
     for _, external in pairs(EXTERNALS) do
-        eq_state(child, "tabs[1].wins.external.trees." .. external .. ".id", vim.NIL)
-        eq_state(child, "tabs[1].wins.external.trees." .. external .. ".width", 0)
+        eq_state(child, "tabs[1].wins.external.trees." .. external, {
+            width = 0,
+        })
     end
 end
 
@@ -233,16 +266,19 @@ T["enable"]["(multiple tab) sets state"] = function()
     eq_type_state(child, "tabs[1].wins.main", "table")
     eq_type_state(child, "tabs[1].wins.external", "table")
 
-    eq_state(child, "tabs[1].wins.main.curr", 1000)
-    eq_state(child, "tabs[1].wins.main.left", 1001)
-    eq_state(child, "tabs[1].wins.main.right", 1002)
+    eq_state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
     eq_state(child, "tabs[1].wins.splits", vim.NIL)
 
     eq_type_state(child, "tabs[1].wins.external.trees", "table")
 
     for _, external in pairs(EXTERNALS) do
-        eq_state(child, "tabs[1].wins.external.trees." .. external .. ".id", vim.NIL)
-        eq_state(child, "tabs[1].wins.external.trees." .. external .. ".width", 0)
+        eq_state(child, "tabs[1].wins.external.trees." .. external, {
+            width = 0,
+        })
     end
 
     -- tab 2
@@ -258,16 +294,19 @@ T["enable"]["(multiple tab) sets state"] = function()
     eq_type_state(child, "tabs[2].wins.main", "table")
     eq_type_state(child, "tabs[2].wins.external", "table")
 
-    eq_state(child, "tabs[2].wins.main.curr", 1003)
-    eq_state(child, "tabs[2].wins.main.left", 1004)
-    eq_state(child, "tabs[2].wins.main.right", 1005)
+    eq_state(child, "tabs[2].wins.main", {
+        curr = 1003,
+        left = 1004,
+        right = 1005,
+    })
     eq_state(child, "tabs[2].wins.splits", vim.NIL)
 
     eq_type_state(child, "tabs[2].wins.external.trees", "table")
 
     for _, external in pairs(EXTERNALS) do
-        eq_state(child, "tabs[2].wins.external.trees." .. external .. ".id", vim.NIL)
-        eq_state(child, "tabs[2].wins.external.trees." .. external .. ".width", 0)
+        eq_state(child, "tabs[2].wins.external.trees." .. external, {
+            width = 0,
+        })
     end
 end
 

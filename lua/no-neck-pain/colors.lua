@@ -48,7 +48,7 @@ end
 ---@param factor number: Brighten (positive) or darken (negative) the side buffers background color. Accepted values are [-1..1].
 ---@return string?: the blended color code.
 ---@private
-local function matchAndBlend(colorCode, factor)
+function C.matchAndBlend(colorCode, factor)
     if colorCode == nil or string.lower(colorCode) == "none" then
         return nil
     end
@@ -99,7 +99,7 @@ function C.parse(buffers)
         buffers.colors.background = "NONE"
         buffers.colors.text = "#ffffff"
     else
-        buffers.colors.background = matchAndBlend(
+        buffers.colors.background = C.matchAndBlend(
             buffers.colors.background or string.format("#%06X", defaultBackground),
             buffers.colors.blend
         )
@@ -108,7 +108,7 @@ function C.parse(buffers)
     for _, side in pairs(Co.SIDES) do
         if buffers[side].enabled then
             -- if the side buffer colors.background is not defined, we fallback to the common option.
-            buffers[side].colors.background = matchAndBlend(
+            buffers[side].colors.background = C.matchAndBlend(
                 buffers[side].colors.background,
                 buffers[side].colors.blend or buffers.colors.blend
             ) or buffers.colors.background
@@ -123,7 +123,7 @@ function C.parse(buffers)
 
             buffers[side].colors.text = buffers[side].colors.text
                 or buffers.colors.text
-                or matchAndBlend(defaultTextColor, 0.5)
+                or C.matchAndBlend(defaultTextColor, 0.5)
         end
     end
 

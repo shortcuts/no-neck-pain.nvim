@@ -94,38 +94,46 @@ T["setup"]["overrides default values"] = function()
 
     eq_config(child, "buffers.setNames", true)
 
-    eq_config(child, "buffers.bo.filetype", "my-file-type")
-    eq_config(child, "buffers.bo.buftype", "help")
-    eq_config(child, "buffers.bo.bufhidden", "")
-    eq_config(child, "buffers.bo.buflisted", true)
-    eq_config(child, "buffers.bo.swapfile", true)
+    eq_config(child, "buffers.bo", {
+        bufhidden = "",
+        buflisted = true,
+        buftype = "help",
+        filetype = "my-file-type",
+        swapfile = true,
+    })
 
-    eq_config(child, "buffers.wo.cursorline", true)
-    eq_config(child, "buffers.wo.cursorcolumn", true)
-    eq_config(child, "buffers.wo.colorcolumn", "90")
-    eq_config(child, "buffers.wo.number", true)
-    eq_config(child, "buffers.wo.relativenumber", true)
-    eq_config(child, "buffers.wo.foldenable", true)
-    eq_config(child, "buffers.wo.list", true)
-    eq_config(child, "buffers.wo.wrap", false)
-    eq_config(child, "buffers.wo.linebreak", false)
+    eq_config(child, "buffers.wo", {
+        colorcolumn = "90",
+        cursorcolumn = true,
+        cursorline = true,
+        foldenable = true,
+        linebreak = false,
+        list = true,
+        number = true,
+        relativenumber = true,
+        wrap = false,
+    })
 
     for _, scope in pairs(Co.SIDES) do
-        eq_config(child, "buffers." .. scope .. ".bo.filetype", "my-file-type")
-        eq_config(child, "buffers." .. scope .. ".bo.buftype", "help")
-        eq_config(child, "buffers." .. scope .. ".bo.bufhidden", "")
-        eq_config(child, "buffers." .. scope .. ".bo.buflisted", true)
-        eq_config(child, "buffers." .. scope .. ".bo.swapfile", true)
+        eq_config(child, "buffers." .. scope .. ".bo", {
+            bufhidden = "",
+            buflisted = true,
+            buftype = "help",
+            filetype = "my-file-type",
+            swapfile = true,
+        })
 
-        eq_config(child, "buffers." .. scope .. ".wo.cursorline", true)
-        eq_config(child, "buffers." .. scope .. ".wo.cursorcolumn", true)
-        eq_config(child, "buffers." .. scope .. ".wo.colorcolumn", "30")
-        eq_config(child, "buffers." .. scope .. ".wo.number", true)
-        eq_config(child, "buffers." .. scope .. ".wo.relativenumber", true)
-        eq_config(child, "buffers." .. scope .. ".wo.foldenable", true)
-        eq_config(child, "buffers." .. scope .. ".wo.list", true)
-        eq_config(child, "buffers." .. scope .. ".wo.wrap", false)
-        eq_config(child, "buffers." .. scope .. ".wo.linebreak", false)
+        eq_config(child, "buffers." .. scope .. ".wo", {
+            colorcolumn = "30",
+            cursorcolumn = true,
+            cursorline = true,
+            foldenable = true,
+            linebreak = false,
+            list = true,
+            number = true,
+            relativenumber = true,
+            wrap = false,
+        })
     end
 end
 
@@ -263,8 +271,10 @@ T["left/right"]["only creates a `left` buffer when `right.enabled` is `false`"] 
         require('no-neck-pain').enable()
     ]])
 
-    eq_state(child, "tabs[1].wins.main.left", 1001)
-    eq_state(child, "tabs[1].wins.main.right", vim.NIL)
+    eq_state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+    })
 
     eq_buf_width(child, "tabs[1].wins.main.left", 15)
 end
@@ -275,8 +285,10 @@ T["left/right"]["only creates a `right` buffer when `left.enabled` is `false`"] 
         require('no-neck-pain').enable()
     ]])
 
-    eq_state(child, "tabs[1].wins.main.left", vim.NIL)
-    eq_state(child, "tabs[1].wins.main.right", 1001)
+    eq_state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        right = 1001,
+    })
 
     eq_buf_width(child, "tabs[1].wins.main.right", 15)
 end
@@ -288,8 +300,11 @@ T["left/right"]["closing the `left` buffer disables NNP"] = function()
     ]])
 
     eq(helpers.winsInTab(child), { 1001, 1000, 1002 })
-    eq_state(child, "tabs[1].wins.main.left", 1001)
-    eq_state(child, "tabs[1].wins.main.right", 1002)
+    eq_state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
 
     child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.tabs[1].wins.main.left)")
     child.cmd("q")
@@ -304,8 +319,11 @@ T["left/right"]["closing the `right` buffer disables NNP"] = function()
     ]])
 
     eq(helpers.winsInTab(child), { 1001, 1000, 1002 })
-    eq_state(child, "tabs[1].wins.main.left", 1001)
-    eq_state(child, "tabs[1].wins.main.right", 1002)
+    eq_state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
 
     child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.tabs[1].wins.main.right)")
     child.cmd("q")
