@@ -247,7 +247,6 @@ end
 ---@param tab table: the table where the tab information are stored.
 ---@param withTrees boolean: whether we should consider external windows or not.
 ---@return table: the wins that are not in `tab`.
----@return number: the total number of `wins`.
 ---@private
 function W.winsExceptState(tab, withTrees)
     local wins = vim.api.nvim_tabpage_list_wins(tab.id)
@@ -255,16 +254,14 @@ function W.winsExceptState(tab, withTrees)
         W.mergeState(tab.wins.main, tab.wins.splits, withTrees and tab.wins.external.trees or nil)
 
     local validWins = {}
-    local size = 0
 
     for _, win in pairs(wins) do
         if not vim.tbl_contains(mergedWins, win) and not W.isRelativeWindow(win) then
             table.insert(validWins, win)
-            size = size + 1
         end
     end
 
-    return validWins, size
+    return validWins
 end
 
 ---Determine the "padding" (width) of the buffer based on the `_G.NoNeckPain.config.width` and the width of the screen.

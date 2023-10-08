@@ -48,12 +48,11 @@ end
 ---
 ---@param tabs table?: the `tabs` state list.
 ---@return table: the updated tabs state.
----@return table: the newly initialized tab.
 ---@private
 function Ta.insert(tabs, id)
     tabs = tabs or {}
 
-    local newTab = {
+    tabs[id] = {
         id = id,
         scratchPadEnabled = false,
         layers = {
@@ -86,9 +85,7 @@ function Ta.insert(tabs, id)
         },
     }
 
-    table.insert(tabs, newTab)
-
-    return tabs, newTab
+    return tabs
 end
 
 ---Gets the tab with the given `id` for the state
@@ -104,13 +101,7 @@ function Ta.get(tabs, id)
 
     id = id or vim.api.nvim_get_current_tabpage()
 
-    for _, tab in pairs(tabs) do
-        if tab.id == id then
-            return tab
-        end
-    end
-
-    return nil
+    return tabs[id]
 end
 
 ---Replaces the tab with the given `id` by the `updatedTab`
@@ -125,17 +116,9 @@ function Ta.update(tabs, id, updatedTab)
         return nil
     end
 
-    local updatedTabs = {}
+    tabs[id] = updatedTab
 
-    for _, tab in pairs(tabs) do
-        if tab.id == id then
-            table.insert(updatedTabs, updatedTab)
-        elseif tab.id ~= id then
-            table.insert(updatedTabs, tab)
-        end
-    end
-
-    return updatedTabs
+    return tabs
 end
 
 return Ta

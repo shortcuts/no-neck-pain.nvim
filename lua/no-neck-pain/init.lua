@@ -1,4 +1,5 @@
 local M = require("no-neck-pain.main")
+local D = require("no-neck-pain.util.debug")
 local cfg = require("no-neck-pain.config")
 
 local NoNeckPain = {}
@@ -43,7 +44,7 @@ function NoNeckPain.resize(width)
         _G.NoNeckPain.config = vim.tbl_deep_extend("keep", { width = width }, _G.NoNeckPain.config)
     end
 
-    _G.NoNeckPain.state = M.init("publicAPI_resize", nil, false)
+    _G.NoNeckPain.state = M.init("publicAPI_resize", false)
 end
 
 --- Initializes the plugin, sets event listeners and internal state.
@@ -88,7 +89,7 @@ function NoNeckPain.setup(opts)
                     end
 
                     _G.NoNeckPain.config = cfg.defaults(opts)
-                    M.init("ColorScheme", nil)
+                    M.init("ColorScheme")
                 end)
             end,
             group = "NoNeckPainAutocmd",
@@ -119,8 +120,12 @@ function NoNeckPain.setup(opts)
 
     if _G.NoNeckPain.config.autocmds.enableOnTabEnter then
         vim.api.nvim_create_autocmd({ "TabNewEntered" }, {
-            callback = function()
+            callback = function(p)
                 vim.schedule(function()
+                    if _G.NoNeckPain.state == nil or not _G.NoNeckPain.state.enabled then
+                        return D.log(p.event, "plugin is disabled")
+                    end
+
                     NoNeckPain.enable()
                 end)
             end,
