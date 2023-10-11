@@ -23,6 +23,10 @@ end
 ---@return boolean: whether the side exists or not.
 ---@private
 function A.sideExist(tab, side)
+    if tab == nil then
+        return false
+    end
+
     return _G.NoNeckPain.config.buffers[side].enabled and tab.wins.main[side] ~= nil
 end
 
