@@ -26,6 +26,7 @@ end
 ---@param fileType string: the fileType of the buffer.
 ---@return boolean
 ---@return table|nil
+---@private
 function T.isSideTree(tab, fileType)
     if fileType == "" then
         return false, nil
