@@ -306,19 +306,13 @@ function N.enable(scope)
                     return
                 end
 
-                -- if a buffer have been closed but we don't have trees in the state
-                if p.event == "WinClosed" and #S.tabs[S.activeTab].wins.external.trees == 0 then
-                    return
-                end
-
                 local trees = T.refresh(S.tabs[S.activeTab])
-                local treesIDs = W.mergeState(nil, nil, trees)
 
                 -- we cycle over supported integrations to see which got closed or opened
                 for name, tree in pairs(S.tabs[S.activeTab].wins.external.trees) do
                     if
                         -- if we have an id in the state but it's not active anymore
-                        (tree.id ~= nil and not vim.tbl_contains(treesIDs, tree.id))
+                        (tree.id ~= nil and (trees[name].id == nil or trees[name].id ~= tree.id))
                         -- we have a new tree registered, we can resize
                         or (trees[name].id ~= nil and trees[name].id ~= tree.id)
                     then

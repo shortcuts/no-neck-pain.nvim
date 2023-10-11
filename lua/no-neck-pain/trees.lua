@@ -1,3 +1,5 @@
+local D = require("no-neck-pain.util.debug")
+
 local T = {}
 
 function T.init()
@@ -12,7 +14,7 @@ function T.init()
             close = "Neotree close",
             open = "Neotree reveal",
         },
-        Neotest = {
+        neotest = {
             configName = "neotest",
             close = "lua require('neotest').summary.toggle()",
             open = "lua require('neotest').summary.toggle()",
@@ -36,6 +38,8 @@ function T.isSideTree(tab, fileType)
 
     for treeFileType, tree in pairs(trees) do
         if vim.startswith(fileType, treeFileType) then
+            D.log("isSideTree", "'%s' is a valid sidetree", fileType)
+
             return true, tab ~= nil and tree or nil
         end
     end
