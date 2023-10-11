@@ -139,10 +139,10 @@ function W.createSideBuffers(tab, skipTrees)
         right = { cmd = "botright vnew", padding = 0 },
     }
 
-    local integrations = nil
+    local trees = nil
 
     if not skipTrees then
-        integrations = T.close(tab)
+        trees = T.close(tab)
     end
 
     for _, side in pairs(Co.SIDES) do
@@ -189,8 +189,8 @@ function W.createSideBuffers(tab, skipTrees)
         end
     end
 
-    if not skipTrees then
-        T.reopen(integrations)
+    if not skipTrees and trees ~= nil then
+        T.reopen(trees)
     end
 
     tab.wins.main.left, tab.wins.main.right =
@@ -310,7 +310,7 @@ function W.getPadding(side, tab)
         if
             tree ~= nil
             and tree.id ~= nil
-            and side == _G.NoNeckPain.config.integrations[name].position
+            and side == _G.NoNeckPain.config.integrations[tree.configName].position
         then
             D.log(
                 "W.getPadding",

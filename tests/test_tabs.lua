@@ -1,3 +1,4 @@
+local Trees = require("no-neck-pain.trees")
 local helpers = dofile("tests/helpers.lua")
 
 local child = helpers.new_child_neovim()
@@ -190,17 +191,7 @@ T["tabnew/tabclose"]["doesn't keep closed tabs in state"] = function()
             scratchPadEnabled = false,
             wins = {
                 external = {
-                    trees = {
-                        NeoTree = {
-                            width = 0,
-                        },
-                        NvimTree = {
-                            width = 0,
-                        },
-                        undotree = {
-                            width = 0,
-                        },
-                    },
+                    trees = Trees.init(),
                 },
                 main = {
                     curr = 1000,
@@ -222,17 +213,7 @@ T["tabnew/tabclose"]["doesn't keep closed tabs in state"] = function()
             scratchPadEnabled = false,
             wins = {
                 external = {
-                    trees = {
-                        NeoTree = {
-                            width = 0,
-                        },
-                        NvimTree = {
-                            width = 0,
-                        },
-                        undotree = {
-                            width = 0,
-                        },
-                    },
+                    trees = Trees.init(),
                 },
                 main = {
                     curr = 1000,
@@ -250,17 +231,7 @@ T["tabnew/tabclose"]["doesn't keep closed tabs in state"] = function()
             scratchPadEnabled = false,
             wins = {
                 external = {
-                    trees = {
-                        NeoTree = {
-                            width = 0,
-                        },
-                        NvimTree = {
-                            width = 0,
-                        },
-                        undotree = {
-                            width = 0,
-                        },
-                    },
+                    trees = Trees.init(),
                 },
                 main = {
                     curr = 1003,
@@ -282,17 +253,7 @@ T["tabnew/tabclose"]["doesn't keep closed tabs in state"] = function()
             scratchPadEnabled = false,
             wins = {
                 external = {
-                    trees = {
-                        NeoTree = {
-                            width = 0,
-                        },
-                        NvimTree = {
-                            width = 0,
-                        },
-                        undotree = {
-                            width = 0,
-                        },
-                    },
+                    trees = Trees.init(),
                 },
                 main = {
                     curr = 1000,

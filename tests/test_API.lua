@@ -1,3 +1,4 @@
+local Trees = require("no-neck-pain.trees")
 local Co = require("no-neck-pain.util.constants")
 local helpers = dofile("tests/helpers.lua")
 
@@ -241,11 +242,7 @@ T["enable"]["(single tab) sets state"] = function()
 
     eq_type_state(child, "tabs[1].wins.external.trees", "table")
 
-    for _, external in pairs(EXTERNALS) do
-        eq_state(child, "tabs[1].wins.external.trees." .. external, {
-            width = 0,
-        })
-    end
+    eq_state(child, "tabs[1].wins.external.trees", Trees.init())
 end
 
 T["enable"]["(multiple tab) sets state"] = function()
@@ -275,11 +272,7 @@ T["enable"]["(multiple tab) sets state"] = function()
 
     eq_type_state(child, "tabs[1].wins.external.trees", "table")
 
-    for _, external in pairs(EXTERNALS) do
-        eq_state(child, "tabs[1].wins.external.trees." .. external, {
-            width = 0,
-        })
-    end
+    eq_state(child, "tabs[1].wins.external.trees", Trees.init())
 
     -- tab 2
     child.cmd("tabnew")
@@ -303,11 +296,7 @@ T["enable"]["(multiple tab) sets state"] = function()
 
     eq_type_state(child, "tabs[2].wins.external.trees", "table")
 
-    for _, external in pairs(EXTERNALS) do
-        eq_state(child, "tabs[2].wins.external.trees." .. external, {
-            width = 0,
-        })
-    end
+    eq_state(child, "tabs[2].wins.external.trees", Trees.init())
 end
 
 T["disable"] = MiniTest.new_set()

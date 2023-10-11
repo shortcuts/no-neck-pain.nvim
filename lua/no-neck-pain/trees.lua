@@ -1,25 +1,45 @@
 local T = {}
 
-local INTEGRATIONS = {
-    NvimTree = {
-        enabled = false,
-        close = "NvimTreeClose",
-        open = "NvimTreeOpen",
-    },
-    NeoTree = {
-        enabled = false,
-        close = "Neotree close",
-        open = "Neotree reveal",
-    },
-}
+function T.init()
+    return {
+        NvimTree = {
+            configName = "NvimTree",
+            close = "NvimTreeClose",
+            open = "NvimTreeOpen",
+        },
+        ["neo-tree"] = {
+            configName = "NeoTree",
+            close = "Neotree close",
+            open = "Neotree reveal",
+        },
+        Neotest = {
+            configName = "neotest",
+            close = "lua require('neotest').summary.toggle()",
+            open = "lua require('neotest').summary.toggle()",
+        },
+    }
+end
 
 ---Whether the given `fileType` matches a supported side tree or not.
 ---
+---@param tab table?: the state tab.
 ---@param fileType string: the fileType of the buffer.
 ---@return boolean
----@private
-function T.isSideTree(fileType)
-    return fileType == "NvimTree" or fileType == "undotree" or fileType == "neo-tree"
+---@return table|nil
+function T.isSideTree(tab, fileType)
+    if fileType == "" then
+        return false, nil
+    end
+
+    local trees = tab ~= nil and tab.wins.external.trees or T.init()
+
+    for treeFileType, tree in pairs(trees) do
+        if vim.startswith(fileType, treeFileType) then
+            return true, tab ~= nil and tree or nil
+        end
+    end
+
+    return false, nil
 end
 
 ---Scans the current tab wins to update registered side trees.
@@ -29,33 +49,16 @@ end
 ---@private
 function T.refresh(tab)
     local wins = vim.api.nvim_tabpage_list_wins(tab.id)
-    local trees = {
-        NvimTree = {
-            id = nil,
-            width = 0,
-        },
-        NeoTree = {
-            id = nil,
-            width = 0,
-        },
-        undotree = {
-            id = nil,
-            width = 0,
-        },
-    }
+    local trees = T.init()
 
     for _, win in pairs(wins) do
         local fileType = vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(win), "filetype")
-        if T.isSideTree(fileType) then
-            -- NeoTree filetype is cased differently than the plugin name
-            if fileType == "neo-tree" then
-                fileType = "NeoTree"
-            end
+        local isSideTree, external = T.isSideTree(tab, fileType)
+        if isSideTree and external ~= nil then
+            external.width = vim.api.nvim_win_get_width(win) * 2
+            external.id = win
 
-            trees[fileType] = {
-                id = win,
-                width = vim.api.nvim_win_get_width(win) * 2,
-            }
+            trees[external.configName] = external
         end
     end
 
@@ -68,23 +71,26 @@ end
 ---@return table: the integrations mapping with a boolean set to true, if we closed one of them.
 ---@private
 function T.close(tab)
-    for tree, opts in pairs(INTEGRATIONS) do
-        if tab.wins.external.trees[tree].id ~= nil then
-            INTEGRATIONS[tree].enabled = true
+    for _, opts in pairs(tab.wins.external.trees) do
+        if opts.id ~= nil and opts.close ~= nil then
             vim.cmd(opts.close)
         end
     end
 
-    return INTEGRATIONS
+    return tab.wins.external.trees
 end
 
----Reopens the tree if it was previously closed.
+---Reopens the trees if they were previously closed.
 ---
----@param integrations table: the integrations mappings with their associated boolean value, `true` if we closed it previously.
+---@param trees table: the integrations mappings with their associated boolean value, `true` if we closed it previously.
 ---@private
-function T.reopen(integrations)
-    for tree, opts in pairs(integrations) do
-        if opts.enabled and _G.NoNeckPain.config.integrations[tree].reopen == true then
+function T.reopen(trees)
+    for tree, opts in pairs(trees) do
+        if
+            opts.id ~= nil
+            and opts.open ~= nil
+            and _G.NoNeckPain.config.integrations[tree].reopen == true
+        then
             vim.cmd(opts.open)
         end
     end

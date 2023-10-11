@@ -159,7 +159,9 @@ function N.enable(scope)
                 end
 
                 -- a side tree isn't considered as a split
-                if T.isSideTree(vim.api.nvim_buf_get_option(0, "filetype")) then
+                local isSideTree, _ =
+                    T.isSideTree(S.tabs[S.activeTab], vim.api.nvim_buf_get_option(0, "filetype"))
+                if isSideTree then
                     return D.log(p.event, "skip split logic: side tree")
                 end
 
@@ -299,7 +301,8 @@ function N.enable(scope)
                 local fileType = vim.api.nvim_buf_get_option(0, "filetype")
 
                 -- We can skip enter hooks that are not on a side tree
-                if p.event == "WinEnter" and not T.isSideTree(fileType) then
+                local isSideTree, _ = T.isSideTree(S.tabs[S.activeTab], fileType)
+                if p.event == "WinEnter" and not isSideTree then
                     return
                 end
 

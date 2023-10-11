@@ -56,7 +56,8 @@ function E.skipEnable(tab)
 
     local fileType = vim.bo.filetype
 
-    if T.isSideTree(fileType) or fileType == "dashboard" then
+    local isSideTree, _ = T.isSideTree(tab, fileType)
+    if isSideTree or fileType == "dashboard" then
         return true
     end
 

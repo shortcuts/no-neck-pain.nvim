@@ -274,6 +274,12 @@ NoNeckPain.options = {
             --- @type "left"|"right"
             position = "left",
         },
+        -- @link https://github.com/nvim-neotest/neotest
+        neotest = {
+            -- The position of the tree.
+            --- @type "none"
+            position = "none",
+        },
     },
 }
 
