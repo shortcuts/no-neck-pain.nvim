@@ -90,11 +90,11 @@ end
 ---@param trees table: the integrations mappings with their associated boolean value, `true` if we closed it previously.
 ---@private
 function T.reopen(trees)
-    for tree, opts in pairs(trees) do
+    for _, opts in pairs(trees) do
         if
             opts.id ~= nil
             and opts.open ~= nil
-            and _G.NoNeckPain.config.integrations[tree].reopen == true
+            and _G.NoNeckPain.config.integrations[opts.configName].reopen == true
         then
             vim.cmd(opts.open)
         end
