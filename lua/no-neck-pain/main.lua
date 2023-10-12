@@ -306,24 +306,29 @@ function N.enable(scope)
                     return
                 end
 
-                local trees = T.refresh(S.tabs[S.activeTab])
+                -- we copy the state so we can compare with the refreshed trees what changed
+                -- if something changed, we will run init in order to resize buffers correctly
+                local stateTrees = vim.deepcopy(S.tabs[S.activeTab].wins.external.trees)
+                local shouldInit = false
 
-                -- we cycle over supported integrations to see which got closed or opened
+                S.tabs[S.activeTab].wins.external.trees = T.refresh(p.event, S.tabs[S.activeTab])
+
                 for name, tree in pairs(S.tabs[S.activeTab].wins.external.trees) do
                     if
-                        -- if we have an id in the state but it's not active anymore
-                        (tree.id ~= nil and (trees[name].id == nil or trees[name].id ~= tree.id))
-                        -- we have a new tree registered, we can resize
-                        or (trees[name].id ~= nil and trees[name].id ~= tree.id)
+                        -- if we had an id but it's not valid anymore or it changed
+                        (stateTrees[name].id ~= nil and (tree.id == nil or tree.id ~= tree.id))
+                        -- if we registered a new side tree
+                        or (tree.id ~= nil and stateTrees[name].id ~= tree.id)
                     then
                         D.log(p.event, "%s have changed, resizing", name)
 
-                        S = N.init(p.event, false, true)
-
-                        return
+                        shouldInit = true
                     end
                 end
-                S.tabs[S.activeTab].wins.external.trees = trees
+
+                if shouldInit then
+                    S = N.init(p.event, false, true)
+                end
             end)
         end,
         group = augroupName,

@@ -132,7 +132,7 @@ end
 ---@private
 function W.createSideBuffers(tab, skipTrees)
     -- before creating side buffers, we determine if we should consider externals
-    tab.wins.external.trees = T.refresh(tab)
+    tab.wins.external.trees = T.refresh("W.createSideBuffers[start]", tab)
 
     local wins = {
         left = { cmd = "topleft vnew", padding = 0 },
@@ -219,7 +219,7 @@ function W.createSideBuffers(tab, skipTrees)
     end
 
     -- we might have closed trees during the buffer creation process, we re-fetch the latest IDs to prevent inconsistencies
-    tab.wins.external.trees = T.refresh(tab)
+    tab.wins.external.trees = T.refresh("W.createSideBuffers[end]", tab)
 
     return tab
 end

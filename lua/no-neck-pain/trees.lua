@@ -38,8 +38,6 @@ function T.isSideTree(tab, fileType)
 
     for treeFileType, tree in pairs(trees) do
         if vim.startswith(fileType, treeFileType) then
-            D.log("isSideTree", "'%s' is a valid sidetree", fileType)
-
             return true, tab ~= nil and tree or nil
         end
     end
@@ -49,10 +47,11 @@ end
 
 ---Scans the current tab wins to update registered side trees.
 ---
+---@param scope string: the caller of the method.
 ---@param tab table: the table where the tab information are stored.
 ---@return table: the update state trees table.
 ---@private
-function T.refresh(tab)
+function T.refresh(scope, tab)
     local wins = vim.api.nvim_tabpage_list_wins(tab.id)
     local trees = T.init()
 
@@ -62,6 +61,8 @@ function T.refresh(tab)
         if isSideTree and external ~= nil then
             external.width = vim.api.nvim_win_get_width(win) * 2
             external.id = win
+
+            D.log(scope, "found opened '%s' side tree on id '%d'", external.configName, win)
 
             trees[external.configName] = external
         end
