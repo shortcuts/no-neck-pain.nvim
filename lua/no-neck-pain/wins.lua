@@ -300,7 +300,7 @@ function W.getPadding(side, tab)
         return 0
     end
 
-    D.log(side, "%d currently occupied - checking for external trees", occupied)
+    D.log(side, "%d currently with splits - computing trees width", occupied)
 
     -- now we need to determine how much we should substract from the remaining padding
     -- if there's side trees open.
