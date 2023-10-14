@@ -1,3 +1,5 @@
+local T = require("no-neck-pain.trees")
+
 local Ta = {}
 
 ---Initializes the state for the first tab, called when enabling or disabling the plugin.
@@ -67,20 +69,7 @@ function Ta.insert(tabs, id)
             },
             splits = nil,
             external = {
-                trees = {
-                    NvimTree = {
-                        id = nil,
-                        width = 0,
-                    },
-                    NeoTree = {
-                        id = nil,
-                        width = 0,
-                    },
-                    undotree = {
-                        id = nil,
-                        width = 0,
-                    },
-                },
+                trees = T.init(),
             },
         },
     }

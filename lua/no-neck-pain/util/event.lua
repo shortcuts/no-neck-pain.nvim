@@ -1,6 +1,5 @@
 local A = require("no-neck-pain.util.api")
 local T = require("no-neck-pain.trees")
-local W = require("no-neck-pain.wins")
 
 local E = {}
 
@@ -17,7 +16,7 @@ function E.skip(tab)
         return true
     end
 
-    if W.isRelativeWindow() then
+    if A.isRelativeWindow() then
         return true
     end
 
@@ -50,13 +49,12 @@ function E.skipEnable(tab)
         return true
     end
 
-    if W.isRelativeWindow() then
+    if A.isRelativeWindow() then
         return true
     end
 
-    local fileType = vim.bo.filetype
-
-    if T.isSideTree(fileType) or fileType == "dashboard" then
+    local isSideTree, _ = T.isSideTree("E.skipEnable", tab, nil)
+    if isSideTree or vim.bo.filetype == "dashboard" then
         return true
     end
 

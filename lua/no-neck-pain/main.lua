@@ -159,11 +159,12 @@ function N.enable(scope)
                 end
 
                 -- a side tree isn't considered as a split
-                if T.isSideTree(vim.api.nvim_buf_get_option(0, "filetype")) then
+                local isSideTree, _ = T.isSideTree(p.event, S.tabs[S.activeTab], nil)
+                if isSideTree then
                     return D.log(p.event, "skip split logic: side tree")
                 end
 
-                local wins = W.winsExceptState(S.tabs[S.activeTab], false)
+                local wins = A.winsExceptState(S.tabs[S.activeTab], false)
 
                 if #wins ~= 1 then
                     return D.log(
@@ -200,8 +201,10 @@ function N.enable(scope)
 
                 -- if we are not in split view, we check if we killed one of the main buffers (curr, left, right) to disable NNP
                 if
-                    S.tabs[S.activeTab].wins.splits == nil
-                    and not W.stateWinsActive(S.tabs[S.activeTab], false)
+                    S.tabs[S.activeTab] == nil
+                    or S.tabs[S.activeTab].wins == nil
+                    or S.tabs[S.activeTab].wins.splits == nil
+                        and not W.stateWinsActive(S.tabs[S.activeTab], false)
                 then
                     D.log(p.event, "one of the NNP main buffers have been closed, disabling...")
 
@@ -209,7 +212,7 @@ function N.enable(scope)
                 end
 
                 if _G.NoNeckPain.config.disableOnLastBuffer then
-                    local rwins = W.winsExceptState(S.tabs[S.activeTab], true)
+                    local rwins = A.winsExceptState(S.tabs[S.activeTab], true)
 
                     if
                         #rwins == 0
@@ -296,37 +299,42 @@ function N.enable(scope)
                     return
                 end
 
-                local fileType = vim.api.nvim_buf_get_option(0, "filetype")
-
                 -- We can skip enter hooks that are not on a side tree
-                if p.event == "WinEnter" and not T.isSideTree(fileType) then
+                local isSideTree, _ = T.isSideTree(p.event, S.tabs[S.activeTab], nil)
+                if p.event == "WinEnter" and not isSideTree then
                     return
                 end
 
-                -- if a buffer have been closed but we don't have trees in the state
-                if p.event == "WinClosed" and #S.tabs[S.activeTab].wins.external.trees == 0 then
-                    return
-                end
+                -- we copy the state so we can compare with the refreshed trees what changed
+                -- if something changed, we will run init in order to resize buffers correctly
+                local stateTrees = vim.deepcopy(S.tabs[S.activeTab].wins.external.trees)
+                local shouldInit = false
 
-                local trees = T.refresh(S.tabs[S.activeTab])
-                local treesIDs = W.mergeState(nil, nil, trees)
+                S.tabs[S.activeTab].wins.external.trees = T.refresh(S.tabs[S.activeTab])
 
-                -- we cycle over supported integrations to see which got closed or opened
                 for name, tree in pairs(S.tabs[S.activeTab].wins.external.trees) do
                     if
-                        -- if we have an id in the state but it's not active anymore
-                        (tree.id ~= nil and not vim.tbl_contains(treesIDs, tree.id))
-                        -- we have a new tree registered, we can resize
-                        or (trees[name].id ~= nil and trees[name].id ~= tree.id)
+                        -- if we had an id but it's not valid anymore or it changed
+                        (
+                            stateTrees[name] ~= nil
+                            and stateTrees[name].id ~= nil
+                            and (tree.id == nil or tree.id ~= tree.id)
+                        )
+                        -- if we registered a new side tree
+                        or (
+                            tree.id ~= nil
+                            and (stateTrees[name] == nil or stateTrees[name].id ~= tree.id)
+                        )
                     then
-                        D.log(p.event, "%s have changed, resizing", name)
+                        D.log(p.event, "%s has changed, resizing", name)
 
-                        S = N.init(p.event, false, true)
-
-                        return
+                        shouldInit = true
                     end
                 end
-                S.tabs[S.activeTab].wins.external.trees = trees
+
+                if shouldInit then
+                    S = N.init(p.event, false, true)
+                end
             end)
         end,
         group = augroupName,
@@ -385,7 +393,7 @@ function N.disable(scope)
             for _, activeWin in pairs(activeWins) do
                 if
                     S.tabs[S.activeTab].wins.main[side] ~= activeWin
-                    and not W.isRelativeWindow(activeWin)
+                    and not A.isRelativeWindow(activeWin)
                 then
                     haveOtherWins = true
                 end
