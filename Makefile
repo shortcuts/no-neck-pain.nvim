@@ -14,6 +14,10 @@ deps:
 	git clone --depth 1 https://github.com/nvim-treesitter/playground deps/playground
 	git clone --depth 1 https://github.com/nvim-neotest/neotest deps/neotest
 	git clone --depth 1 https://github.com/nvim-tree/nvim-tree.lua deps/nvimtree
+	git clone --depth 1 https://github.com/nvim-neo-tree/neo-tree.nvim deps/neo-tree
+	git clone --depth 1 https://github.com/nvim-lua/plenary.nvim deps/plenary
+	git clone --depth 1 https://github.com/nvim-tree/nvim-web-devicons deps/nvim-web-devicons
+	git clone --depth 1 https://github.com/MunifTanjim/nui.nvim deps/nui
 
 test-ci: deps test
 
@@ -23,4 +27,4 @@ documentation:
 documentation-ci: deps documentation
 
 lint:
-	stylua .
+	stylua . -g 'deps/'

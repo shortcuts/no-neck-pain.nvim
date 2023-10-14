@@ -87,7 +87,7 @@ end
 
 T["neotest"] = MiniTest.new_set()
 
-T["neotest"]["keeps split opens"] = function()
+T["neotest"]["keeps sides open"] = function()
     child.restart({ "-u", "scripts/init_with_neotest.lua" })
 
     child.lua([[require('no-neck-pain').enable()]])
@@ -112,7 +112,7 @@ T["neotest"]["keeps split opens"] = function()
             configName = "neotest",
             id = 1003,
             open = "lua require('neotest').summary.open()",
-            width = 74,
+            width = 70,
         },
         nvimtree = {
             close = "NvimTreeClose",
@@ -124,7 +124,7 @@ end
 
 T["NvimTree"] = MiniTest.new_set()
 
-T["NvimTree"]["keeps split opens"] = function()
+T["NvimTree"]["keeps sides open"] = function()
     child.restart({ "-u", "scripts/init_with_nvimtree.lua", "foo" })
     child.set_size(5, 300)
 
@@ -158,6 +158,61 @@ T["NvimTree"]["keeps split opens"] = function()
             id = 1004,
             open = "NvimTreeOpen",
             width = 60,
+        },
+        ["neo-tree"] = {
+            close = "Neotree close",
+            configName = "NeoTree",
+            open = "Neotree reveal",
+        },
+        neotest = {
+            close = "lua require('neotest').summary.close()",
+            configName = "neotest",
+            open = "lua require('neotest').summary.open()",
+        },
+        nvimtree = {
+            close = "NvimTreeClose",
+            configName = "NvimTree",
+            open = "NvimTreeOpen",
+        },
+    })
+end
+
+T["neo-tree"] = MiniTest.new_set()
+
+T["neo-tree"]["keeps sides open"] = function()
+    child.restart({ "-u", "scripts/init_with_neotree.lua", "foo" })
+    child.set_size(5, 300)
+
+    child.cmd([[NoNeckPain]])
+
+    eq(helpers.winsInTab(child), { 1001, 1000, 1002 })
+
+    eq_state(child, "enabled", true)
+    eq_state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
+
+    child.cmd([[Neotree reveal]])
+
+    eq(helpers.winsInTab(child), { 1004, 1001, 1000, 1002 })
+
+    eq_state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
+
+    eq_state(child, "tabs[1].wins.splits", vim.NIL)
+
+    eq_state(child, "tabs[1].wins.external.trees", {
+        NeoTree = {
+            close = "Neotree close",
+            configName = "NeoTree",
+            id = 1004,
+            open = "Neotree reveal",
+            width = 2,
         },
         ["neo-tree"] = {
             close = "Neotree close",
