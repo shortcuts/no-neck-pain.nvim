@@ -1,7 +1,8 @@
 local helpers = dofile("tests/helpers.lua")
 
 local child = helpers.new_child_neovim()
-local eq_config, eq_state = helpers.expect.config_equality, helpers.expect.state_equality
+local eq, eq_config, eq_state =
+    helpers.expect.equality, helpers.expect.config_equality, helpers.expect.state_equality
 
 local T = MiniTest.new_set({
     hooks = {
@@ -112,6 +113,61 @@ T["neotest"]["keeps split opens"] = function()
             id = 1003,
             open = "lua require('neotest').summary.open()",
             width = 74,
+        },
+        nvimtree = {
+            close = "NvimTreeClose",
+            configName = "NvimTree",
+            open = "NvimTreeOpen",
+        },
+    })
+end
+
+T["NvimTree"] = MiniTest.new_set()
+
+T["NvimTree"]["keeps split opens"] = function()
+    child.restart({ "-u", "scripts/init_with_nvimtree.lua", "foo" })
+    child.set_size(5, 300)
+
+    child.cmd([[NoNeckPain]])
+
+    eq(helpers.winsInTab(child), { 1001, 1000, 1002 })
+
+    eq_state(child, "enabled", true)
+    eq_state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
+
+    child.cmd([[NvimTreeOpen]])
+
+    eq(helpers.winsInTab(child), { 1004, 1001, 1000, 1002 })
+
+    eq_state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
+
+    eq_state(child, "tabs[1].wins.splits", vim.NIL)
+
+    eq_state(child, "tabs[1].wins.external.trees", {
+        NvimTree = {
+            close = "NvimTreeClose",
+            configName = "NvimTree",
+            id = 1004,
+            open = "NvimTreeOpen",
+            width = 60,
+        },
+        ["neo-tree"] = {
+            close = "Neotree close",
+            configName = "NeoTree",
+            open = "Neotree reveal",
+        },
+        neotest = {
+            close = "lua require('neotest').summary.close()",
+            configName = "neotest",
+            open = "lua require('neotest').summary.open()",
         },
         nvimtree = {
             close = "NvimTreeClose",

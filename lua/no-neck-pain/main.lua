@@ -315,9 +315,16 @@ function N.enable(scope)
                 for name, tree in pairs(S.tabs[S.activeTab].wins.external.trees) do
                     if
                         -- if we had an id but it's not valid anymore or it changed
-                        (stateTrees[name].id ~= nil and (tree.id == nil or tree.id ~= tree.id))
+                        (
+                            stateTrees[name] ~= nil
+                            and stateTrees[name].id ~= nil
+                            and (tree.id == nil or tree.id ~= tree.id)
+                        )
                         -- if we registered a new side tree
-                        or (tree.id ~= nil and stateTrees[name].id ~= tree.id)
+                        or (
+                            tree.id ~= nil
+                            and (stateTrees[name] == nil or stateTrees[name].id ~= tree.id)
+                        )
                     then
                         D.log(p.event, "%s has changed, resizing", name)
 
