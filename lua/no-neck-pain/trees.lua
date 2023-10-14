@@ -1,10 +1,11 @@
+local A = require("no-neck-pain.util.api")
 local D = require("no-neck-pain.util.debug")
 
 local T = {}
 
 function T.init()
     return {
-        NvimTree = {
+        nvimtree = {
             configName = "NvimTree",
             close = "NvimTreeClose",
             open = "NvimTreeOpen",
@@ -16,28 +17,49 @@ function T.init()
         },
         neotest = {
             configName = "neotest",
-            close = "lua require('neotest').summary.toggle()",
-            open = "lua require('neotest').summary.toggle()",
+            close = "lua require('neotest').summary.close()",
+            open = "lua require('neotest').summary.open()",
         },
     }
 end
 
 ---Whether the given `fileType` matches a supported side tree or not.
 ---
+---@param scope string: caller of the method.
 ---@param tab table?: the state tab.
----@param fileType string: the fileType of the buffer.
+---@param win integer?: the id of the win
 ---@return boolean
 ---@return table|nil
 ---@private
-function T.isSideTree(tab, fileType)
+function T.isSideTree(scope, tab, win)
+    win = win or 0
+    local buffer = vim.api.nvim_win_get_buf(win)
+    local fileType = vim.api.nvim_buf_get_option(buffer, "filetype")
+
     if fileType == "" then
-        return false, nil
+        fileType = vim.api.nvim_buf_get_name(buffer)
+    end
+
+    if fileType == "" and tab ~= nil then
+        D.log(scope, "no name or filetype matching a tree, searching in wins...")
+
+        local wins = A.winsExceptState(tab, false)
+
+        if #wins ~= 1 or wins[1] == win then
+            D.log(scope, "too many windows to determine")
+
+            return false, nil
+        end
+
+        return T.isSideTree(scope, tab, wins[1])
     end
 
     local trees = tab ~= nil and tab.wins.external.trees or T.init()
 
     for treeFileType, tree in pairs(trees) do
-        if vim.startswith(fileType, treeFileType) then
+        if vim.startswith(string.lower(fileType), treeFileType) then
+            D.log(scope, "win '%d' is a side tree '%s'", win, fileType)
+
             return true, tab ~= nil and tree or nil
         end
     end
@@ -47,22 +69,18 @@ end
 
 ---Scans the current tab wins to update registered side trees.
 ---
----@param scope string: the caller of the method.
 ---@param tab table: the table where the tab information are stored.
 ---@return table: the update state trees table.
 ---@private
-function T.refresh(scope, tab)
+function T.refresh(tab)
     local wins = vim.api.nvim_tabpage_list_wins(tab.id)
     local trees = T.init()
 
     for _, win in pairs(wins) do
-        local fileType = vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(win), "filetype")
-        local isSideTree, external = T.isSideTree(tab, fileType)
+        local isSideTree, external = T.isSideTree("T.refresh", tab, win)
         if isSideTree and external ~= nil then
             external.width = vim.api.nvim_win_get_width(win) * 2
             external.id = win
-
-            D.log(scope, "found opened '%s' side tree on id '%d'", external.configName, win)
 
             trees[external.configName] = external
         end

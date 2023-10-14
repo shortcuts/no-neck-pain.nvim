@@ -132,7 +132,7 @@ end
 ---@private
 function W.createSideBuffers(tab, skipTrees)
     -- before creating side buffers, we determine if we should consider externals
-    tab.wins.external.trees = T.refresh("W.createSideBuffers[start]", tab)
+    tab.wins.external.trees = T.refresh(tab)
 
     local wins = {
         left = { cmd = "topleft vnew", padding = 0 },
@@ -197,7 +197,7 @@ function W.createSideBuffers(tab, skipTrees)
         resizeOrCloseSideBuffers("W.createSideBuffers", tab, wins)
 
     -- if we still have side buffers open at this point, and we have vsplit opened,
-    -- there might be width issues so we the opened vsplits.
+    -- there might be width issues so we the resize opened vsplits.
     if (A.sideExist(tab, "left") or A.sideExist(tab, "right")) and tab.wins.splits ~= nil then
         local side = tab.wins.main.left or tab.wins.main.right
         local sWidth, _ = A.getWidthAndHeight(side)
@@ -219,49 +219,9 @@ function W.createSideBuffers(tab, skipTrees)
     end
 
     -- we might have closed trees during the buffer creation process, we re-fetch the latest IDs to prevent inconsistencies
-    tab.wins.external.trees = T.refresh("W.createSideBuffers[end]", tab)
+    tab.wins.external.trees = T.refresh(tab)
 
     return tab
-end
-
----Determines if the given `win` or the current window is relative.
----
----@param win number?: the id of the window.
----@return boolean: true if the window is relative.
----@private
-function W.isRelativeWindow(win)
-    win = win or vim.api.nvim_get_current_win()
-
-    if
-        vim.api.nvim_win_get_config(0).relative ~= ""
-        or vim.api.nvim_win_get_config(win).relative ~= ""
-    then
-        return true
-    end
-
-    return false
-end
-
----Gets all wins that are not already registered in the given `tab`, we consider side trees if provided.
----
----@param tab table: the table where the tab information are stored.
----@param withTrees boolean: whether we should consider external windows or not.
----@return table: the wins that are not in `tab`.
----@private
-function W.winsExceptState(tab, withTrees)
-    local wins = vim.api.nvim_tabpage_list_wins(tab.id)
-    local mergedWins =
-        W.mergeState(tab.wins.main, tab.wins.splits, withTrees and tab.wins.external.trees or nil)
-
-    local validWins = {}
-
-    for _, win in pairs(wins) do
-        if not vim.tbl_contains(mergedWins, win) and not W.isRelativeWindow(win) then
-            table.insert(validWins, win)
-        end
-    end
-
-    return validWins
 end
 
 ---Determine the "padding" (width) of the buffer based on the `_G.NoNeckPain.config.width` and the width of the screen.
@@ -329,37 +289,6 @@ function W.getPadding(side, tab)
     )
 end
 
----Merges the state windows in a single table containing all of their IDs.
----
----@param main table?: the `main` window state.
----@param splits table?: the `splits` window state.
----@param trees table?: the `external.trees` window state.
----@return table: the state window IDs.
----@private
-function W.mergeState(main, splits, trees)
-    local wins = {}
-
-    if main ~= nil then
-        for _, side in pairs(main) do
-            table.insert(wins, side)
-        end
-    end
-
-    if splits ~= nil then
-        for _, split in pairs(splits) do
-            table.insert(wins, split.id)
-        end
-    end
-
-    if trees ~= nil then
-        for _, tree in pairs(trees) do
-            table.insert(wins, tree.id)
-        end
-    end
-
-    return wins
-end
-
 ---Determine if the tab wins are still active and valid.
 ---
 ---@param tab table: the table where the tab information are stored.
@@ -375,7 +304,7 @@ function W.stateWinsActive(tab, checkSplits)
     local swins = tab.wins.main
 
     if checkSplits and tab.wins.splits ~= nil then
-        swins = W.mergeState(tab.wins.main, tab.wins.splits, nil)
+        swins = A.mergeState(tab.wins.main, tab.wins.splits, nil)
     end
 
     for _, swin in pairs(swins) do
