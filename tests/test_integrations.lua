@@ -127,6 +127,8 @@ T["NvimTree"] = MiniTest.new_set()
 T["NvimTree"]["keeps sides open"] = function()
     if child.fn.has("nvim-0.8") == 0 then
         MiniTest.skip("NvimTree doesn't support version below 8")
+
+        return
     end
 
     child.restart({ "-u", "scripts/init_with_nvimtree.lua", "foo" })
