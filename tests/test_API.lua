@@ -25,8 +25,6 @@ local T = MiniTest.new_set({
     },
 })
 
-local EXTERNALS = { "NvimTree", "NeoTree", "undotree" }
-
 T["install"] = MiniTest.new_set()
 
 T["install"]["sets global loaded variable"] = function()

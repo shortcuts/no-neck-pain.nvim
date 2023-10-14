@@ -124,7 +124,7 @@ end
 T["vsplit"] = new_set()
 
 T["vsplit"]["register new non-focused windows (TSPlayground)"] = function()
-    child.restart({ "-u", "scripts/init_with_deps.lua" })
+    child.restart({ "-u", "scripts/init_with_tsplayground.lua" })
     child.set_size(300, 300)
 
     child.lua([[ require('no-neck-pain').enable() ]])

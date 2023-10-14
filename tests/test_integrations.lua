@@ -1,7 +1,7 @@
 local helpers = dofile("tests/helpers.lua")
 
 local child = helpers.new_child_neovim()
-local eq_config = helpers.expect.config_equality
+local eq_config, eq_state = helpers.expect.config_equality, helpers.expect.state_equality
 
 local T = MiniTest.new_set({
     hooks = {
@@ -30,22 +30,29 @@ T["setup"]["overrides default values"] = function()
             },
             undotree = {
                 position = "right",
-            }
+            },
+            neotest = {
+                reopen = false,
+            },
         }
     })]])
 
-    eq_config(child, "integrations.NvimTree", {
-        position = "right",
-        reopen = false,
-    })
-
-    eq_config(child, "integrations.NeoTree", {
-        position = "right",
-        reopen = false,
-    })
-
-    eq_config(child, "integrations.undotree", {
-        position = "right",
+    eq_config(child, "integrations", {
+        NeoTree = {
+            position = "right",
+            reopen = false,
+        },
+        NvimTree = {
+            position = "right",
+            reopen = false,
+        },
+        neotest = {
+            position = "none",
+            reopen = false,
+        },
+        undotree = {
+            position = "right",
+        },
     })
 end
 
@@ -56,7 +63,7 @@ T["integrations"]["NvimTree throws with wrong values"] = function()
         child.lua([[ require('no-neck-pain').setup({
                     integrations = {
                         NvimTree = {
-                            "position": "nope"
+                            position = "nope",
                         },
                     },
                 })
@@ -69,12 +76,49 @@ T["integrations"]["NeoTree throws with wrong values"] = function()
         child.lua([[ require('no-neck-pain').setup({
                     integrations = {
                         NeoTree = {
-                            "position": "nope"
+                            position = "nope",
                         },
                     },
                 })
             ]])
     end)
+end
+
+T["neotest"] = MiniTest.new_set()
+
+T["neotest"]["keeps split opens"] = function()
+    child.restart({ "-u", "scripts/init_with_neotest.lua" })
+
+    child.lua([[require('no-neck-pain').enable()]])
+    child.lua([[require('neotest').summary.open()]])
+
+    eq_state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
+
+    eq_state(child, "tabs[1].wins.splits", vim.NIL)
+
+    eq_state(child, "tabs[1].wins.external.trees", {
+        ["neo-tree"] = {
+            close = "Neotree close",
+            configName = "NeoTree",
+            open = "Neotree reveal",
+        },
+        neotest = {
+            close = "lua require('neotest').summary.close()",
+            configName = "neotest",
+            id = 1003,
+            open = "lua require('neotest').summary.open()",
+            width = 74,
+        },
+        nvimtree = {
+            close = "NvimTreeClose",
+            configName = "NvimTree",
+            open = "NvimTreeOpen",
+        },
+    })
 end
 
 return T

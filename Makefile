@@ -12,6 +12,7 @@ deps:
 	git clone --depth 1 https://github.com/echasnovski/mini.nvim deps/mini.nvim
 	git clone --depth 1 https://github.com/nvim-treesitter/nvim-treesitter deps/nvim-treesitter
 	git clone --depth 1 https://github.com/nvim-treesitter/playground deps/playground
+	git clone --depth 1 https://github.com/nvim-neotest/neotest deps/neotest
 
 test-ci: deps test
 
