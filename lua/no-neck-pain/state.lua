@@ -286,6 +286,20 @@ function State:setTab(id)
     }
 end
 
+---Sets the `layers` of the currently active tab.
+---
+---@param vsplit number?: the number of opened vsplits.
+---@param split number?: the number of opened splits.
+---@private
+function State:setLayers(vsplit, split)
+    if vsplit ~= nil then
+        self.tabs[self.activeTab].layers.vsplit = vsplit
+    end
+
+    if vsplit ~= nil then
+        self.tabs[self.activeTab].layers.split = split
+    end
+end
 
 ---Removes the split with the given `id` from the state.
 ---
@@ -341,9 +355,7 @@ function State:computeSplits(focusedWin)
         splitInF = 1
     end
 
-    local tab = self.tabs[self.activeTab]
-
-    if splitInF > tab.layers.split then
+    if splitInF > self.tabs[self.activeTab].layers.split then
         isVSplit = false
     end
 
@@ -352,19 +364,18 @@ function State:computeSplits(focusedWin)
         vsplitInF = 1
     end
 
-    if vsplitInF > tab.layers.vsplit then
+    if vsplitInF > self.tabs[self.activeTab].layers.vsplit then
         isVSplit = true
     end
 
     -- update anyway because we want state consistency
-    tab.layers.split = splitInF
-    tab.layers.vsplit = vsplitInF
+    self.setLayers(self, vsplitInF, splitInF)
 
     D.log(
         "Sp.compute",
         "[split %d | vsplit %d] new split, vertical: %s",
-        tab.layers.split,
-        tab.layers.vsplit,
+        self.tabs[self.activeTab].layers.split,
+        self.tabs[self.activeTab].layers.vsplit,
         isVSplit
     )
 
