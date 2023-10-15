@@ -1,4 +1,5 @@
 local A = require("no-neck-pain.util.api")
+local D = require("no-neck-pain.util.debug")
 local T = require("no-neck-pain.trees")
 
 State = {enabled = false, activeTab = 1, tabs = nil}
@@ -247,6 +248,13 @@ function State:setScratchpad(bool)
     self.tabs[self.activeTab].scratchPadEnabled = bool
 end
 
+---Gets the scratchpad value for the active tab.
+---
+---@private
+function State:getScratchpad()
+    return self.tabs[self.activeTab].scratchPadEnabled
+end
+
 ---Register a new `tab` with the given `id` in the state.
 ---
 ---@param id number: the id of the tab.
@@ -278,5 +286,89 @@ function State:setTab(id)
     }
 end
 
+
+---Removes the split with the given `id` from the state.
+---
+---@param id number: the id of the split to remove.
+---@private
+function State:removeSplit(id)
+    self.tabs[self.activeTab].wins.splits[id] = nil
+end
+
+---Decreases the layers of splits state values.
+---
+---@param isVSplit boolean: whether the window is a vsplit or not.
+---@private
+function State:decreaseLayers(isVSplit)
+    local scope = isVSplit and 'vsplit' or 'split'
+
+        self.tabs[self.activeTab].layers[scope] = self.tabs[self.activeTab].layers[scope] - 1
+
+        if self.tabs[self.activeTab].layers[scope] < 1 then
+            self.tabs[self.activeTab].layers[scope] = 1
+        end
+end
+
+---Determines current state of the split/vsplit windows by comparing widths and heights.
+---
+---@param focusedWin number: the id of the current window.
+---@return boolean: whether the current window is a vsplit or not.
+---@private
+function State:computeSplits(focusedWin)
+    local side = self.getSideID(self, 'left') or self.getSideID(self, 'right')
+    local sWidth, sHeight = 0, 0
+
+    -- when side buffer exists we rely on them, otherwise we fallback to the UI
+    if side ~= nil then
+        local nbSide = 1
+
+        if self.isSideRegistered(self, 'left') and self.isSideRegistered(self, 'right') then
+            nbSide = 2
+        end
+
+        sWidth, sHeight = A.getWidthAndHeight(side)
+        sWidth = vim.api.nvim_list_uis()[1].width - sWidth * nbSide
+    else
+        sWidth = vim.api.nvim_list_uis()[1].width
+        sHeight = vim.api.nvim_list_uis()[1].height
+    end
+
+    local fWidth, fHeight = A.getWidthAndHeight(focusedWin)
+    local isVSplit = true
+
+    local splitInF = math.floor(sHeight / fHeight)
+    if splitInF < 1 then
+        splitInF = 1
+    end
+
+    local tab = self.tabs[self.activeTab]
+
+    if splitInF > tab.layers.split then
+        isVSplit = false
+    end
+
+    local vsplitInF = math.floor(sWidth / fWidth)
+    if vsplitInF < 1 then
+        vsplitInF = 1
+    end
+
+    if vsplitInF > tab.layers.vsplit then
+        isVSplit = true
+    end
+
+    -- update anyway because we want state consistency
+    tab.layers.split = splitInF
+    tab.layers.vsplit = vsplitInF
+
+    D.log(
+        "Sp.compute",
+        "[split %d | vsplit %d] new split, vertical: %s",
+        tab.layers.split,
+        tab.layers.vsplit,
+        isVSplit
+    )
+
+    return isVSplit
+end
 
 return State

@@ -2,7 +2,6 @@ local A = require("no-neck-pain.util.api")
 local Co = require("no-neck-pain.util.constants")
 local D = require("no-neck-pain.util.debug")
 local E = require("no-neck-pain.util.event")
-local Sp = require("no-neck-pain.splits")
 local T = require("no-neck-pain.trees")
 local W = require("no-neck-pain.wins")
 
@@ -31,7 +30,7 @@ function N.toggleScratchPad()
     -- map over both sides and let the init method either setup or cleanup the side buffers
     for _, side in pairs(Co.SIDES) do
         vim.fn.win_gotoid(State.getSideID(State, side))
-        W.initScratchPad(side, State.tabs[State.activeTab].scratchPadEnabled)
+        W.initScratchPad(side)
     end
 
     -- restore focus
@@ -83,11 +82,11 @@ function N.enable(scope)
     -- register the new tab.
     State.setTab(State, State.activeTab)
 
-    local augroupName = A.getAugroupName(State.activeTab)
+    local augroupName = A.getAugroupName()
     vim.api.nvim_create_augroup(augroupName, { clear = true })
 
     State.setSideID(State, vim.api.nvim_get_current_win(), 'curr')
-    State.tabs[State.activeTab], _ = Sp.compute(State.getTab(State), State.getSideID(State, 'curr'))
+    State.computeSplits(State, State.getSideID(State, 'curr'))
 
     N.init(scope, true)
 
@@ -155,9 +154,8 @@ function N.enable(scope)
                 end
 
                 local focusedWin = wins[1]
-                local isVSplit = true
 
-                State.tabs[State.activeTab], isVSplit = Sp.compute(State.getTab(State), focusedWin)
+                local isVSplit = State.computeSplits(State, focusedWin)
                 State.setSplit(State, { id = focusedWin, vertical = isVSplit })
 
                 if isVSplit then
@@ -226,8 +224,7 @@ function N.enable(scope)
                         return true
                     end
 
-                    State.tabs[State.activeTab].layers =
-                        Sp.decreaseLayers(State.tabs[State.activeTab].layers, split.vertical)
+                    State.decreaseLayers(State, split.vertical)
 
                     return false
                 end, State.tabs[State.activeTab].wins.splits)
@@ -249,16 +246,12 @@ function N.enable(scope)
 
                     haveCloseCurr = true
 
-                    State.tabs[State.activeTab].layers = Sp.decreaseLayers(
-                        State.tabs[State.activeTab].layers,
-                        State.tabs[State.activeTab].wins.splits[1].vertical
-                    )
 
-                    State.setSideID(State, State.tabs[State.activeTab].wins.splits[1].id, 'curr')
-                    State.tabs[State.activeTab].wins.splits = Sp.remove(
-                        State.tabs[State.activeTab].wins.splits,
-                        State.tabs[State.activeTab].wins.splits[1].id
-                    )
+                    local split = State.tabs[State.activeTab].wins.splits[1]
+
+                    State.decreaseLayers(State, split.vertical)
+                    State.setSideID(State, split.id, 'curr')
+                    State.removeSplit(State, split.id)
                 end
 
                 -- we only restore focus on curr if there's no split left
@@ -326,7 +319,7 @@ end
 function N.disable(scope)
     D.log(scope, "calling disable for tab %d", State.activeTab)
 
-    pcall(vim.api.nvim_del_augroup_by_name, A.getAugroupName(State.activeTab))
+    pcall(vim.api.nvim_del_augroup_by_name, A.getAugroupName())
 
     local currID = State.getSideID(State, 'curr')
 

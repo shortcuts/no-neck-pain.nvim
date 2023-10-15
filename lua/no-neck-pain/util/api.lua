@@ -2,11 +2,10 @@ local A = {}
 
 ---Returns the name of the augroup for the given tab ID.
 ---
----@param id number: the tab ID.
 ---@return string: the initialied state
 ---@private
-function A.getAugroupName(id)
-    return string.format("NoNeckPain-%d", id)
+function A.getAugroupName()
+    return string.format("NoNeckPain-%d", State.activeTab)
 end
 
 ---returns the width and height of a given window
