@@ -100,39 +100,34 @@ end
 ---Closes them if there's not enough space left.
 ---
 ---@param scope string: the scope from where this function is called.
----@param tab table: the table where the tab information are stored.
 ---@param paddings table: the paddings of each side window.
 ---@return number?: the left window id.
 ---@return number?: the right window id.
 ---@private
-local function resizeOrCloseSideBuffers(scope, tab, paddings)
+local function resizeOrCloseSideBuffers(scope, paddings)
     for _, side in pairs(Co.SIDES) do
-        if A.sideExist(tab, side) then
-            local padding = paddings[side].padding or W.getPadding(side, tab)
+        if State.isSideRegistered(State, side) then
+            local padding = paddings[side].padding or W.getPadding(side)
 
             if padding > _G.NoNeckPain.config.minSideBufferWidth then
-                resize(tab.wins.main[side], padding, side)
+                resize(State.getSideID(State, side), padding, side)
             else
-                W.close(scope, tab.wins.main[side], side)
-                tab.wins.main[side] = nil
+                W.close(scope, State.getSideID(State, side), side)
+                State.setSideID(State, nil, side)
             end
         end
     end
-
-    return tab.wins.main.left, tab.wins.main.right
 end
 
 ---Creates side buffers with the correct padding, considering the side trees.
 --- - A side buffer is not created if there's not enough space.
 --- - If it already exists, we resize it.
 ---
----@param tab table: the table where the tab information are stored.
 ---@param skipTrees boolean?: skip trees action when true.
----@return table: the updated tab.
 ---@private
-function W.createSideBuffers(tab, skipTrees)
+function W.createSideBuffers(skipTrees)
     -- before creating side buffers, we determine if we should consider externals
-    tab.wins.external.trees = T.refresh(tab)
+    State.refreshTrees(State)
 
     local wins = {
         left = { cmd = "topleft vnew", padding = 0 },
@@ -142,17 +137,14 @@ function W.createSideBuffers(tab, skipTrees)
     local trees = nil
 
     if not skipTrees then
-        trees = T.close(tab)
+        trees = T.close()
     end
 
     for _, side in pairs(Co.SIDES) do
         if _G.NoNeckPain.config.buffers[side].enabled then
-            local valid = tab.wins.main[side] ~= nil
-                and vim.api.nvim_win_is_valid(tab.wins.main[side])
+            wins[side].padding = W.getPadding(side)
 
-            wins[side].padding = W.getPadding(side, tab)
-
-            if wins[side].padding > _G.NoNeckPain.config.minSideBufferWidth and not valid then
+            if wins[side].padding > _G.NoNeckPain.config.minSideBufferWidth and not State.isSideWinValid(State, side) then
                 vim.cmd(wins[side].cmd)
 
                 local id = vim.api.nvim_get_current_win()
@@ -177,14 +169,16 @@ function W.createSideBuffers(tab, skipTrees)
 
                 if _G.NoNeckPain.config.buffers[side].scratchPad.enabled then
                     W.initScratchPad(side)
-                    tab.scratchPadEnabled = true
+                    State.setScratchpad(State, true)
                 end
 
-                tab.wins.main[side] = id
+                State.setSideID(State, id, side)
             end
 
-            if tab.wins.main[side] ~= nil then
-                C.init(tab.wins.main[side], tab.id, side)
+            local sideID = State.getSideID(State, side)
+
+            if sideID ~= nil then
+                C.init(sideID, side)
             end
         end
     end
@@ -193,19 +187,20 @@ function W.createSideBuffers(tab, skipTrees)
         T.reopen(trees)
     end
 
-    tab.wins.main.left, tab.wins.main.right =
-        resizeOrCloseSideBuffers("W.createSideBuffers", tab, wins)
+    resizeOrCloseSideBuffers("W.createSideBuffers", wins)
 
     -- if we still have side buffers open at this point, and we have vsplit opened,
     -- there might be width issues so we the resize opened vsplits.
-    if (A.sideExist(tab, "left") or A.sideExist(tab, "right")) and tab.wins.splits ~= nil then
-        local side = tab.wins.main.left or tab.wins.main.right
+    if (State.isSideRegistered(State, 'left') or State.isSideRegistered(State, 'right')) and State.hasSplits(State) then
+        local side = State.getSideID(State, 'left') or State.getSideID(State, 'right')
         local sWidth, _ = A.getWidthAndHeight(side)
         local nbSide = 1
 
-        if tab.wins.main.left and tab.wins.main.right then
+        if State.getSideID(State, 'left') and State.getSideID(State, 'right') then
             nbSide = 2
         end
+
+        local tab = State.getTab(State)
 
         -- get the available usable width (screen size without side paddings)
         sWidth = vim.api.nvim_list_uis()[1].width - sWidth * nbSide
@@ -219,18 +214,15 @@ function W.createSideBuffers(tab, skipTrees)
     end
 
     -- we might have closed trees during the buffer creation process, we re-fetch the latest IDs to prevent inconsistencies
-    tab.wins.external.trees = T.refresh(tab)
-
-    return tab
+    State.refreshTrees(State)
 end
 
 ---Determine the "padding" (width) of the buffer based on the `_G.NoNeckPain.config.width` and the width of the screen.
 ---
 ---@param side "left"|"right": the side of the window.
----@param tab table: the table where the tab information are stored.
 ---@return number: the width of the side window.
 ---@private
-function W.getPadding(side, tab)
+function W.getPadding(side)
     local uis = vim.api.nvim_list_uis()
 
     if uis[1] == nil then
@@ -248,6 +240,8 @@ function W.getPadding(side, tab)
 
         return 0
     end
+
+    local tab = State.getTab(State)
 
     -- we need to see if there's enough space left to have side buffers
     local occupied = _G.NoNeckPain.config.width * tab.layers.vsplit
@@ -304,7 +298,7 @@ function W.stateWinsActive(tab, checkSplits)
     local swins = tab.wins.main
 
     if checkSplits and tab.wins.splits ~= nil then
-        swins = A.mergeState(tab.wins.main, tab.wins.splits, nil)
+        swins = State.getRegisteredWins(State, true, true, false)
     end
 
     for _, swin in pairs(swins) do

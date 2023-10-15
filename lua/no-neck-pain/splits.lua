@@ -37,7 +37,7 @@ function Sp.compute(tab, focusedWin)
     if side ~= nil then
         local nbSide = 1
 
-        if A.sideExist(tab, "left") and A.sideExist(tab, "right") then
+        if State.isSideRegistered(State, 'left') and State.isSideRegistered(State, 'right') then
             nbSide = 2
         end
 

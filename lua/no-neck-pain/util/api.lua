@@ -1,5 +1,14 @@
 local A = {}
 
+---Returns the name of the augroup for the given tab ID.
+---
+---@param id number: the tab ID.
+---@return string: the initialied state
+---@private
+function A.getAugroupName(id)
+    return string.format("NoNeckPain-%d", id)
+end
+
 ---returns the width and height of a given window
 ---
 ---@param win number?: the win number, defaults to 0 if nil
@@ -28,61 +37,6 @@ function A.sideExist(tab, side)
     end
 
     return _G.NoNeckPain.config.buffers[side].enabled and tab.wins.main[side] ~= nil
-end
-
----whether the currently focused window is the provided one.
----
----@return boolean
----@param win number?: the win number, defaults to 0 if nil
----@private
-function A.isCurrentWin(win)
-    return vim.api.nvim_get_current_win() == win
-end
-
-function A.mergeState(main, splits, trees)
-    local wins = {}
-
-    if main ~= nil then
-        for _, side in pairs(main) do
-            table.insert(wins, side)
-        end
-    end
-
-    if splits ~= nil then
-        for _, split in pairs(splits) do
-            table.insert(wins, split.id)
-        end
-    end
-
-    if trees ~= nil then
-        for _, tree in pairs(trees) do
-            table.insert(wins, tree.id)
-        end
-    end
-
-    return wins
-end
-
----Gets all wins that are not already registered in the given `tab`, we consider side trees if provided.
----
----@param tab table: the table where the tab information are stored.
----@param withTrees boolean: whether we should consider external windows or not.
----@return table: the wins that are not in `tab`.
----@private
-function A.winsExceptState(tab, withTrees)
-    local wins = vim.api.nvim_tabpage_list_wins(tab.id)
-    local mergedWins =
-        A.mergeState(tab.wins.main, tab.wins.splits, withTrees and tab.wins.external.trees or nil)
-
-    local validWins = {}
-
-    for _, win in pairs(wins) do
-        if not vim.tbl_contains(mergedWins, win) and not A.isRelativeWindow(win) then
-            table.insert(validWins, win)
-        end
-    end
-
-    return validWins
 end
 
 ---Determines if the given `win` or the current window is relative.

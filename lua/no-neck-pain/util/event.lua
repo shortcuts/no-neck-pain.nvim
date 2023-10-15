@@ -25,7 +25,7 @@ function E.skip(tab)
             return true
         end
 
-        if A.isCurrentWin(tab.wins.main.left) or A.isCurrentWin(tab.wins.main.right) then
+        if State.isSideTheActiveWin(State, 'left') or State.isSideTheActiveWin(State, 'right') then
             return true
         end
     end
@@ -42,10 +42,9 @@ end
 --- - we are focusing a floating window
 --- - we are focusing one of the side buffer
 ---
----@param tab table?: the table where the tab information are stored.
 ---@private
-function E.skipEnable(tab)
-    if tab ~= nil then
+function E.skipEnable()
+    if State.hasTabs(State) then
         return true
     end
 
@@ -53,7 +52,7 @@ function E.skipEnable(tab)
         return true
     end
 
-    local isSideTree, _ = T.isSideTree("E.skipEnable", tab, nil)
+    local isSideTree, _ = T.isSideTree("E.skipEnable", nil)
     if isSideTree or vim.bo.filetype == "dashboard" then
         return true
     end

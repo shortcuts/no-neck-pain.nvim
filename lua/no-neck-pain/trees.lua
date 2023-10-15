@@ -1,4 +1,3 @@
-local A = require("no-neck-pain.util.api")
 local D = require("no-neck-pain.util.debug")
 
 local T = {}
@@ -26,13 +25,13 @@ end
 ---Whether the given `fileType` matches a supported side tree or not.
 ---
 ---@param scope string: caller of the method.
----@param tab table?: the state tab.
 ---@param win integer?: the id of the win
 ---@return boolean
 ---@return table|nil
 ---@private
-function T.isSideTree(scope, tab, win)
+function T.isSideTree(scope, win)
     win = win or 0
+    local tab = State.getTabSafe(State)
     local buffer = vim.api.nvim_win_get_buf(win)
     local fileType = vim.api.nvim_buf_get_option(buffer, "filetype")
 
@@ -43,7 +42,7 @@ function T.isSideTree(scope, tab, win)
     if fileType == "" and tab ~= nil then
         D.log(scope, "no name or filetype matching a tree, searching in wins...")
 
-        local wins = A.winsExceptState(tab, false)
+        local wins = State.getUnregisteredWins(State, false)
 
         if #wins ~= 1 or wins[1] == win then
             D.log(scope, "too many windows to determine")
@@ -51,7 +50,7 @@ function T.isSideTree(scope, tab, win)
             return false, nil
         end
 
-        return T.isSideTree(scope, tab, wins[1])
+        return T.isSideTree(scope, wins[1])
     end
 
     local trees = tab ~= nil and tab.wins.external.trees or T.init()
@@ -69,15 +68,14 @@ end
 
 ---Scans the current tab wins to update registered side trees.
 ---
----@param tab table: the table where the tab information are stored.
 ---@return table: the update state trees table.
 ---@private
-function T.refresh(tab)
-    local wins = vim.api.nvim_tabpage_list_wins(tab.id)
+function T.refresh()
+    local wins = vim.api.nvim_tabpage_list_wins(State.activeTab)
     local trees = T.init()
 
     for _, win in pairs(wins) do
-        local isSideTree, external = T.isSideTree("T.refresh", tab, win)
+        local isSideTree, external = T.isSideTree("T.refresh", win)
         if isSideTree and external ~= nil then
             external.width = vim.api.nvim_win_get_width(win) * 2
             external.id = win
@@ -91,10 +89,11 @@ end
 
 ---Closes side trees if opened.
 ---
----@param tab table: the table where the tab information are stored.
 ---@return table: the integrations mapping with a boolean set to true, if we closed one of them.
 ---@private
-function T.close(tab)
+function T.close()
+    local tab = State.getTab(State)
+
     for _, opts in pairs(tab.wins.external.trees) do
         if opts.id ~= nil and opts.close ~= nil then
             vim.cmd(opts.close)

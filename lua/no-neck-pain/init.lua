@@ -1,3 +1,5 @@
+State = require("no-neck-pain.state")
+
 local M = require("no-neck-pain.main")
 local D = require("no-neck-pain.util.debug")
 local cfg = require("no-neck-pain.config")
