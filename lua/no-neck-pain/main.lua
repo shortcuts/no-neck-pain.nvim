@@ -230,7 +230,7 @@ function N.enable(scope)
                 end, S.tabs[S.activeTab].wins.splits)
 
                 if #S.tabs[S.activeTab].wins.splits == 0 then
-                    S.tabs[S.activeTab].wins.splits = nil
+                    S.initSplits(S)
                 end
 
                 -- we keep track if curr have been closed because if it's the case,
@@ -280,7 +280,7 @@ function N.enable(scope)
                 local stateTrees = vim.deepcopy(S.tabs[S.activeTab].wins.trees)
                 local shouldInit = false
 
-                S.tabs[S.activeTab].wins.trees = S.refreshTrees(S)
+                S.refreshTrees(S)
 
                 for name, tree in pairs(S.tabs[S.activeTab].wins.trees) do
                     if

@@ -34,7 +34,14 @@ end
 ---
 ---@private
 function State:initTrees()
-    self.tabs[self.activeTab].trees = vim.deepcopy(trees)
+    self.tabs[self.activeTab].wins.trees = vim.deepcopy(trees)
+end
+
+---Sets the state splits to its original value.
+---
+---@private
+function State:initSplits()
+    self.tabs[self.activeTab].wins.splits = nil
 end
 
 ---Iterates over the tabs in the state to remove invalid tabs.
