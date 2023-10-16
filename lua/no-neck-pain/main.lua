@@ -277,12 +277,12 @@ function N.enable(scope)
 
                 -- we copy the state so we can compare with the refreshed trees what changed
                 -- if something changed, we will run init in order to resize buffers correctly
-                local stateTrees = vim.deepcopy(State.tabs[State.activeTab].wins.external.trees)
+                local stateTrees = vim.deepcopy(State.tabs[State.activeTab].wins.trees)
                 local shouldInit = false
 
-                State.tabs[State.activeTab].wins.external.trees = T.refresh()
+                State.tabs[State.activeTab].wins.trees = T.refresh()
 
-                for name, tree in pairs(State.tabs[State.activeTab].wins.external.trees) do
+                for name, tree in pairs(State.tabs[State.activeTab].wins.trees) do
                     if
                         -- if we had an id but it's not valid anymore or it changed
                         (

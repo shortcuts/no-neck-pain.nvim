@@ -259,7 +259,7 @@ function W.getPadding(side)
     -- if there's side trees open.
     local paddingToSubstract = 0
 
-    for name, tree in pairs(tab.wins.external.trees) do
+    for name, tree in pairs(tab.wins.trees) do
         if
             tree ~= nil
             and tree.id ~= nil

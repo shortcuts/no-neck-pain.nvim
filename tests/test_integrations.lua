@@ -101,7 +101,7 @@ T["neotest"]["keeps sides open"] = function()
 
     eq_state(child, "tabs[1].wins.splits", vim.NIL)
 
-    eq_state(child, "tabs[1].wins.external.trees", {
+    eq_state(child, "tabs[1].wins.trees", {
         ["neo-tree"] = {
             close = "Neotree close",
             configName = "NeoTree",
@@ -157,7 +157,7 @@ T["NvimTree"]["keeps sides open"] = function()
 
     eq_state(child, "tabs[1].wins.splits", vim.NIL)
 
-    eq_state(child, "tabs[1].wins.external.trees", {
+    eq_state(child, "tabs[1].wins.trees", {
         NvimTree = {
             close = "NvimTreeClose",
             configName = "NvimTree",
@@ -212,7 +212,7 @@ T["neo-tree"]["keeps sides open"] = function()
 
     eq_state(child, "tabs[1].wins.splits", vim.NIL)
 
-    eq_state(child, "tabs[1].wins.external.trees", {
+    eq_state(child, "tabs[1].wins.trees", {
         NeoTree = {
             close = "Neotree close",
             configName = "NeoTree",

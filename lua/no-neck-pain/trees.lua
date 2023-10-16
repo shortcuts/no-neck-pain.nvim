@@ -53,7 +53,7 @@ function T.isSideTree(scope, win)
         return T.isSideTree(scope, wins[1])
     end
 
-    local trees = tab ~= nil and tab.wins.external.trees or T.init()
+    local trees = tab ~= nil and tab.wins.trees or T.init()
 
     for treeFileType, tree in pairs(trees) do
         if vim.startswith(string.lower(fileType), treeFileType) then
@@ -94,13 +94,13 @@ end
 function T.close()
     local tab = State.getTab(State)
 
-    for _, opts in pairs(tab.wins.external.trees) do
+    for _, opts in pairs(tab.wins.trees) do
         if opts.id ~= nil and opts.close ~= nil then
             vim.cmd(opts.close)
         end
     end
 
-    return tab.wins.external.trees
+    return tab.wins.trees
 end
 
 ---Reopens the trees if they were previously closed.

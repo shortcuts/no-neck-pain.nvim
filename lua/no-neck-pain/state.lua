@@ -39,7 +39,7 @@ end
 ---
 ---@private
 function State:refreshTrees()
-    self.tabs[self.activeTab].wins.external.trees = T.refresh()
+    self.tabs[self.activeTab].wins.trees = T.refresh()
 end
 
 ---Gets all wins that are not already registered in the given `tab`.
@@ -84,8 +84,8 @@ function State:getRegisteredWins(withMain, withSplits, withTrees)
         end
     end
 
-    if withTrees ~= nil and self.tabs[self.activeTab].wins.external.trees ~= nil then
-        for _, tree in pairs(self.tabs[self.activeTab].wins.external.trees) do
+    if withTrees ~= nil and self.tabs[self.activeTab].wins.trees ~= nil then
+        for _, tree in pairs(self.tabs[self.activeTab].wins.trees) do
             table.insert(wins, tree.id)
         end
     end
