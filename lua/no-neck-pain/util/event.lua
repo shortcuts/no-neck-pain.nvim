@@ -1,5 +1,5 @@
 local A = require("no-neck-pain.util.api")
-local T = require("no-neck-pain.trees")
+local S = require("no-neck-pain.state")
 
 local E = {}
 
@@ -25,7 +25,7 @@ function E.skip(tab)
             return true
         end
 
-        if State.isSideTheActiveWin(State, 'left') or State.isSideTheActiveWin(State, 'right') then
+        if S.isSideTheActiveWin(S, 'left') or S.isSideTheActiveWin(S, 'right') then
             return true
         end
     end
@@ -44,7 +44,7 @@ end
 ---
 ---@private
 function E.skipEnable()
-    if State.hasTabs(State) then
+    if S.hasTabs(S) then
         return true
     end
 
@@ -52,7 +52,7 @@ function E.skipEnable()
         return true
     end
 
-    local isSideTree, _ = T.isSideTree("E.skipEnable", nil)
+    local isSideTree, _ = S.isSideTree(S, "E.skipEnable", nil)
     if isSideTree or vim.bo.filetype == "dashboard" then
         return true
     end

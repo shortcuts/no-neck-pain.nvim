@@ -1,4 +1,5 @@
 local Co = require("no-neck-pain.util.constants")
+local S = require("no-neck-pain.state")
 
 local C = {}
 
@@ -139,8 +140,8 @@ end
 ---@param side "left"|"right": the side of the window being resized, used for logging only.
 ---@private
 function C.init(win, side)
-    local backgroundGroup = string.format("NoNeckPain_background_tab_%s_side_%s", State.activeTab, side)
-    local textGroup = string.format("NoNeckPain_text_tab_%s_side_%s", State.activeTab, side)
+    local backgroundGroup = string.format("NoNeckPain_background_tab_%s_side_%s", S.activeTab, side)
+    local textGroup = string.format("NoNeckPain_text_tab_%s_side_%s", S.activeTab, side)
 
     -- clear groups
     vim.cmd(string.format("highlight! clear %s NONE", backgroundGroup))

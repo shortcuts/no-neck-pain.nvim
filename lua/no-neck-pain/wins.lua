@@ -2,6 +2,7 @@ local A = require("no-neck-pain.util.api")
 local C = require("no-neck-pain.colors")
 local Co = require("no-neck-pain.util.constants")
 local D = require("no-neck-pain.util.debug")
+local S = require("no-neck-pain.state")
 local T = require("no-neck-pain.trees")
 
 local W = {}
@@ -44,7 +45,7 @@ function W.initScratchPad(side)
     end
 
     -- on cleanup we open a new buffer and set the default options
-    if State.getScratchpad(State) then
+    if S.getScratchpad(S) then
         vim.cmd("enew")
 
         for opt, val in pairs(_G.NoNeckPain.config.buffers[side].bo) do
@@ -105,14 +106,14 @@ end
 ---@private
 local function resizeOrCloseSideBuffers(scope, paddings)
     for _, side in pairs(Co.SIDES) do
-        if State.isSideRegistered(State, side) then
+        if S.isSideRegistered(S, side) then
             local padding = paddings[side].padding or W.getPadding(side)
 
             if padding > _G.NoNeckPain.config.minSideBufferWidth then
-                resize(State.getSideID(State, side), padding, side)
+                resize(S.getSideID(S, side), padding, side)
             else
-                W.close(scope, State.getSideID(State, side), side)
-                State.setSideID(State, nil, side)
+                W.close(scope, S.getSideID(S, side), side)
+                S.setSideID(S, nil, side)
             end
         end
     end
@@ -126,7 +127,7 @@ end
 ---@private
 function W.createSideBuffers(skipTrees)
     -- before creating side buffers, we determine if we should consider externals
-    State.refreshTrees(State)
+    S.refreshTrees(S)
 
     local wins = {
         left = { cmd = "topleft vnew", padding = 0 },
@@ -143,7 +144,7 @@ function W.createSideBuffers(skipTrees)
         if _G.NoNeckPain.config.buffers[side].enabled then
             wins[side].padding = W.getPadding(side)
 
-            if wins[side].padding > _G.NoNeckPain.config.minSideBufferWidth and not State.isSideWinValid(State, side) then
+            if wins[side].padding > _G.NoNeckPain.config.minSideBufferWidth and not S.isSideWinValid(S, side) then
                 vim.cmd(wins[side].cmd)
 
                 local id = vim.api.nvim_get_current_win()
@@ -168,13 +169,13 @@ function W.createSideBuffers(skipTrees)
 
                 if _G.NoNeckPain.config.buffers[side].scratchPad.enabled then
                     W.initScratchPad(side)
-                    State.setScratchpad(State, true)
+                    S.setScratchpad(S, true)
                 end
 
-                State.setSideID(State, id, side)
+                S.setSideID(S, id, side)
             end
 
-            local sideID = State.getSideID(State, side)
+            local sideID = S.getSideID(S, side)
 
             if sideID ~= nil then
                 C.init(sideID, side)
@@ -190,16 +191,16 @@ function W.createSideBuffers(skipTrees)
 
     -- if we still have side buffers open at this point, and we have vsplit opened,
     -- there might be width issues so we the resize opened vsplits.
-    if (State.isSideRegistered(State, 'left') or State.isSideRegistered(State, 'right')) and State.hasSplits(State) then
-        local side = State.getSideID(State, 'left') or State.getSideID(State, 'right')
+    if (S.isSideRegistered(S, 'left') or S.isSideRegistered(S, 'right')) and S.hasSplits(S) then
+        local side = S.getSideID(S, 'left') or S.getSideID(S, 'right')
         local sWidth, _ = A.getWidthAndHeight(side)
         local nbSide = 1
 
-        if State.getSideID(State, 'left') and State.getSideID(State, 'right') then
+        if S.getSideID(S, 'left') and S.getSideID(S, 'right') then
             nbSide = 2
         end
 
-        local tab = State.getTab(State)
+        local tab = S.getTab(S)
 
         -- get the available usable width (screen size without side paddings)
         sWidth = vim.api.nvim_list_uis()[1].width - sWidth * nbSide
@@ -213,7 +214,7 @@ function W.createSideBuffers(skipTrees)
     end
 
     -- we might have closed trees during the buffer creation process, we re-fetch the latest IDs to prevent inconsistencies
-    State.refreshTrees(State)
+    S.refreshTrees(S)
 end
 
 ---Determine the "padding" (width) of the buffer based on the `_G.NoNeckPain.config.width` and the width of the screen.
@@ -240,7 +241,7 @@ function W.getPadding(side)
         return 0
     end
 
-    local tab = State.getTab(State)
+    local tab = S.getTab(S)
 
     -- we need to see if there's enough space left to have side buffers
     local occupied = _G.NoNeckPain.config.width * tab.layers.vsplit
@@ -297,7 +298,7 @@ function W.stateWinsActive(tab, checkSplits)
     local swins = tab.wins.main
 
     if checkSplits and tab.wins.splits ~= nil then
-        swins = State.getRegisteredWins(State, true, true, false)
+        swins = S.getRegisteredWins(S, true, true, false)
     end
 
     for _, swin in pairs(swins) do

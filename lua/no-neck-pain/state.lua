@@ -1,8 +1,25 @@
 local A = require("no-neck-pain.util.api")
 local D = require("no-neck-pain.util.debug")
-local T = require("no-neck-pain.trees")
 
-State = {enabled = false, activeTab = 1, tabs = nil}
+local State = {enabled = false, activeTab = 1, tabs = nil}
+
+local trees = {
+    nvimtree = {
+        configName = "NvimTree",
+        close = "NvimTreeClose",
+        open = "NvimTreeOpen",
+    },
+    ["neo-tree"] = {
+        configName = "NeoTree",
+        close = "Neotree close",
+        open = "Neotree reveal",
+    },
+    neotest = {
+        configName = "neotest",
+        close = "lua require('neotest').summary.close()",
+        open = "lua require('neotest').summary.open()",
+    },
+}
 
 ---Sets the state to its original value.
 ---
@@ -11,6 +28,13 @@ function State:init()
     self.enabled = false
     self.activeTab = 1
     self.tabs = nil
+end
+
+---Sets the state trees to its original value.
+---
+---@private
+function State:initTrees()
+    self.tabs[self.activeTab].trees = vim.deepcopy(trees)
 end
 
 ---Iterates over the tabs in the state to remove invalid tabs.
@@ -39,7 +63,7 @@ end
 ---
 ---@private
 function State:refreshTrees()
-    self.tabs[self.activeTab].wins.trees = T.refresh()
+    self.tabs[self.activeTab].wins.trees = self.scanTrees(self)
 end
 
 ---Gets all wins that are not already registered in the given `tab`.
@@ -91,6 +115,71 @@ function State:getRegisteredWins(withMain, withSplits, withTrees)
     end
 
     return wins
+end
+
+---Whether the given `fileType` matches a supported side tree or not.
+---
+---@param scope string: caller of the method.
+---@param win integer?: the id of the win
+---@return boolean
+---@return table|nil
+---@private
+function State:isSideTree(scope, win)
+    win = win or 0
+    local tab = self.getTabSafe(self)
+    local buffer = vim.api.nvim_win_get_buf(win)
+    local fileType = vim.api.nvim_buf_get_option(buffer, "filetype")
+
+    if fileType == "" then
+        fileType = vim.api.nvim_buf_get_name(buffer)
+    end
+
+    if fileType == "" and tab ~= nil then
+        D.log(scope, "no name or filetype matching a tree, searching in wins...")
+
+        local wins = self.getUnregisteredWins(self, false)
+
+        if #wins ~= 1 or wins[1] == win then
+            D.log(scope, "too many windows to determine")
+
+            return false, nil
+        end
+
+        return self.isSideTree(self, scope, wins[1])
+    end
+
+    local registeredTrees = tab ~= nil and tab.wins.trees or trees
+
+    for treeFileType, tree in pairs(registeredTrees) do
+        if vim.startswith(string.lower(fileType), treeFileType) then
+            D.log(scope, "win '%d' is a side tree '%s'", win, fileType)
+
+            return true, tab ~= nil and tree or nil
+        end
+    end
+
+    return false, nil
+end
+
+---Scans the current tab wins to update registered side trees.
+---
+---@return table: the update state trees table.
+---@private
+function State:scanTrees()
+    local wins = vim.api.nvim_tabpage_list_wins(self.activeTab)
+    local unregisteredTrees = vim.deepcopy(trees)
+
+    for _, win in pairs(wins) do
+        local isSideTree, external = self.isSideTree(self, "S.scanTrees", win)
+        if isSideTree and external ~= nil then
+            external.width = vim.api.nvim_win_get_width(win) * 2
+            external.id = win
+
+            unregisteredTrees[external.configName] = external
+        end
+    end
+
+    return unregisteredTrees
 end
 
 -------------------------- checks
@@ -279,11 +368,10 @@ function State:setTab(id)
                 right = nil,
             },
             splits = nil,
-            external = {
-                trees = T.init(),
-            },
         },
     }
+
+    self.tabs[id].wins.trees = self.initTrees(self)
 end
 
 ---Sets the `layers` of the currently active tab.
