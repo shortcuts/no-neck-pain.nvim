@@ -1,4 +1,16 @@
 <a name="0.2.3"></a>
+## [1.3.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.2.3...v1.3.0) (2023-10-14)
+
+
+### Features
+
+* support neotest ([#247](https://github.com/shortcuts/no-neck-pain.nvim/issues/247)) ([9f2e39c](https://github.com/shortcuts/no-neck-pain.nvim/commit/9f2e39c6877ca679275084597e2d79bb42a746ef))
+
+
+### Bug Fixes
+
+* **internal:** prevent unsync state ([#244](https://github.com/shortcuts/no-neck-pain.nvim/issues/244)) ([038b924](https://github.com/shortcuts/no-neck-pain.nvim/commit/038b924e167ac45062c7e584e94e57d76683ca7f))
+
 ## [1.2.3](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.2.2...v1.2.3) (2023-06-24)
 
 
