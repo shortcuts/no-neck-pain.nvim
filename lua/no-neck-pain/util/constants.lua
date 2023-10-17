@@ -33,7 +33,7 @@ C.INTEGRATIONS = {
     ["tokyonight-storm"] = "#1f2335",
 }
 
-C.trees = {
+C.integrations = {
     nvimtree = {
         configName = "NvimTree",
         close = "NvimTreeClose",

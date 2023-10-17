@@ -2,28 +2,28 @@ local S = require("no-neck-pain.state")
 
 local T = {}
 
----Closes side trees if opened.
+---Closes side integrations if opened.
 ---
 ---@return table: the integrations mapping with a boolean set to true, if we closed one of them.
 ---@private
 function T.close()
     local tab = S.getTab(S)
 
-    for _, opts in pairs(tab.wins.trees) do
+    for _, opts in pairs(tab.wins.integrations) do
         if opts.id ~= nil and opts.close ~= nil then
             vim.cmd(opts.close)
         end
     end
 
-    return tab.wins.trees
+    return tab.wins.integrations
 end
 
----Reopens the trees if they were previously closed.
+---Reopens the integrations if they were previously closed.
 ---
----@param trees table: the integrations mappings with their associated boolean value, `true` if we closed it previously.
+---@param integrations table: the integrations mappings with their associated boolean value, `true` if we closed it previously.
 ---@private
-function T.reopen(trees)
-    for _, opts in pairs(trees) do
+function T.reopen(integrations)
+    for _, opts in pairs(integrations) do
         if
             opts.id ~= nil
             and opts.open ~= nil

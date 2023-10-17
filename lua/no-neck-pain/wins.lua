@@ -3,7 +3,7 @@ local C = require("no-neck-pain.colors")
 local Co = require("no-neck-pain.util.constants")
 local D = require("no-neck-pain.util.debug")
 local S = require("no-neck-pain.state")
-local T = require("no-neck-pain.trees")
+local T = require("no-neck-pain.integrations")
 
 local W = {}
 
@@ -96,7 +96,7 @@ function W.initScratchPad(side)
     vim.o.autowriteall = true
 end
 
----Resizes side buffers, considering the existing trees.
+---Resizes side buffers, considering the existing integrations.
 ---Closes them if there's not enough space left.
 ---
 ---@param scope string: the scope from where this function is called.
@@ -119,25 +119,25 @@ local function resizeOrCloseSideBuffers(scope, paddings)
     end
 end
 
----Creates side buffers with the correct padding, considering the side trees.
+---Creates side buffers with the correct padding, considering the side integrations.
 --- - A side buffer is not created if there's not enough space.
 --- - If it already exists, we resize it.
 ---
----@param skipTrees boolean?: skip trees action when true.
+---@param skipIntegrations boolean?: skip integrations action when true.
 ---@private
-function W.createSideBuffers(skipTrees)
+function W.createSideBuffers(skipIntegrations)
     -- before creating side buffers, we determine if we should consider externals
-    S.refreshTrees(S)
+    S.refreshIntegrations(S)
 
     local wins = {
         left = { cmd = "topleft vnew", padding = 0 },
         right = { cmd = "botright vnew", padding = 0 },
     }
 
-    local trees = nil
+    local integrations = nil
 
-    if not skipTrees then
-        trees = T.close()
+    if not skipIntegrations then
+        integrations = T.close()
     end
 
     for _, side in pairs(Co.SIDES) do
@@ -186,8 +186,8 @@ function W.createSideBuffers(skipTrees)
         end
     end
 
-    if not skipTrees and trees ~= nil then
-        T.reopen(trees)
+    if not skipIntegrations and integrations ~= nil then
+        T.reopen(integrations)
     end
 
     resizeOrCloseSideBuffers("W.createSideBuffers", wins)
@@ -216,8 +216,8 @@ function W.createSideBuffers(skipTrees)
         end
     end
 
-    -- we might have closed trees during the buffer creation process, we re-fetch the latest IDs to prevent inconsistencies
-    S.refreshTrees(S)
+    -- we might have closed integrations during the buffer creation process, we re-fetch the latest IDs to prevent inconsistencies
+    S.refreshIntegrations(S)
 end
 
 ---Determine the "padding" (width) of the buffer based on the `_G.NoNeckPain.config.width` and the width of the screen.
@@ -257,13 +257,13 @@ function W.getPadding(side)
         return 0
     end
 
-    D.log(side, "%d currently with splits - computing trees width", occupied)
+    D.log(side, "%d currently with splits - computing integrations width", occupied)
 
     -- now we need to determine how much we should substract from the remaining padding
-    -- if there's side trees open.
+    -- if there's side integrations open.
     local paddingToSubstract = 0
 
-    for name, tree in pairs(tab.wins.trees) do
+    for name, tree in pairs(tab.wins.integrations) do
         if
             tree ~= nil
             and tree.id ~= nil

@@ -13,11 +13,11 @@ function State:init()
     self.tabs = nil
 end
 
----Sets the state trees to its original value.
+---Sets the state integrations to its original value.
 ---
 ---@private
-function State:initTrees()
-    self.tabs[self.activeTab].wins.trees = vim.deepcopy(C.trees)
+function State:initIntegrations()
+    self.tabs[self.activeTab].wins.integrations = vim.deepcopy(C.integrations)
 end
 
 ---Sets the state splits to its original value.
@@ -48,21 +48,21 @@ function State:refreshTabs(id)
     return #self.tabs
 end
 
----Refresh the trees of the active state tab.
+---Refresh the integrations of the active state tab.
 ---
 ---@private
-function State:refreshTrees()
-    self.tabs[self.activeTab].wins.trees = self.scanTrees(self)
+function State:refreshIntegrations()
+    self.tabs[self.activeTab].wins.integrations = self.scanIntegrations(self)
 end
 
 ---Gets all wins that are not already registered in the given `tab`.
 ---
----@param withTrees boolean: whether we should consider external windows or not.
+---@param withIntegrations boolean: whether we should consider external windows or not.
 ---@return table: the wins that are not in `tab`.
 ---@private
-function State:getUnregisteredWins(withTrees)
+function State:getUnregisteredWins(withIntegrations)
     local wins = vim.api.nvim_tabpage_list_wins(self.activeTab)
-    local stateWins = self.getRegisteredWins(self, true, true, withTrees)
+    local stateWins = self.getRegisteredWins(self, true, true, withIntegrations)
 
     local validWins = {}
 
@@ -79,10 +79,10 @@ end
 ---
 ---@param withMain boolean: whether we should consider main windows or not.
 ---@param withSplits boolean: whether we should consider splits windows or not.
----@param withTrees boolean: whether we should consider trees windows or not.
+---@param withIntegrations boolean: whether we should consider integrations windows or not.
 ---@return table: the wins that are not in `tab`.
 ---@private
-function State:getRegisteredWins(withMain, withSplits, withTrees)
+function State:getRegisteredWins(withMain, withSplits, withIntegrations)
     local wins = {}
 
     if withMain ~= nil and self.tabs[self.activeTab].wins.main ~= nil then
@@ -97,8 +97,8 @@ function State:getRegisteredWins(withMain, withSplits, withTrees)
         end
     end
 
-    if withTrees ~= nil and self.tabs[self.activeTab].wins.trees ~= nil then
-        for _, tree in pairs(self.tabs[self.activeTab].wins.trees) do
+    if withIntegrations ~= nil and self.tabs[self.activeTab].wins.integrations ~= nil then
+        for _, tree in pairs(self.tabs[self.activeTab].wins.integrations) do
             table.insert(wins, tree.id)
         end
     end
@@ -137,9 +137,9 @@ function State:isSideTree(scope, win)
         return self.isSideTree(self, scope, wins[1])
     end
 
-    local registeredTrees = tab ~= nil and tab.wins.trees or C.trees
+    local registeredIntegrations = tab ~= nil and tab.wins.integrations or C.integrations
 
-    for treeFileType, tree in pairs(registeredTrees) do
+    for treeFileType, tree in pairs(registeredIntegrations) do
         if vim.startswith(string.lower(fileType), treeFileType) then
             D.log(scope, "win '%d' is a side tree '%s'", win, fileType)
 
@@ -150,25 +150,25 @@ function State:isSideTree(scope, win)
     return false, nil
 end
 
----Scans the current tab wins to update registered side trees.
+---Scans the current tab wins to update registered side integrations.
 ---
----@return table: the update state trees table.
+---@return table: the update state integrations table.
 ---@private
-function State:scanTrees()
+function State:scanIntegrations()
     local wins = vim.api.nvim_tabpage_list_wins(self.activeTab)
-    local unregisteredTrees = vim.deepcopy(C.trees)
+    local unregisteredIntegrations = vim.deepcopy(C.integrations)
 
     for _, win in pairs(wins) do
-        local isSideTree, external = self.isSideTree(self, "S.scanTrees", win)
+        local isSideTree, external = self.isSideTree(self, "S.scanIntegrations", win)
         if isSideTree and external ~= nil then
             external.width = vim.api.nvim_win_get_width(win) * 2
             external.id = win
 
-            unregisteredTrees[external.configName] = external
+            unregisteredIntegrations[external.configName] = external
         end
     end
 
-    return unregisteredTrees
+    return unregisteredIntegrations
 end
 
 -------------------------- checks
@@ -361,7 +361,7 @@ function State:setTab(id)
         },
     }
 
-    self.tabs[id].wins.trees = self.initTrees(self)
+    self.tabs[id].wins.integrations = self.initIntegrations(self)
 end
 
 ---Sets the `layers` of the currently active tab.

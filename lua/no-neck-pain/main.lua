@@ -44,7 +44,7 @@ end
 
 --- Creates side buffers and set the tab state, focuses the `curr` window if required.
 ---@private
-function N.init(scope, goToCurr, skipTrees)
+function N.init(scope, goToCurr, skipIntegrations)
     if not S.isActiveTabRegistered(S) then
         error("called the internal `init` method on a `nil` tab.")
     end
@@ -57,7 +57,7 @@ function N.init(scope, goToCurr, skipTrees)
         hadSideBuffers = false
     end
 
-    W.createSideBuffers(skipTrees)
+    W.createSideBuffers(skipIntegrations)
 
     if
         goToCurr
@@ -271,25 +271,28 @@ function N.enable(scope)
                     return
                 end
 
-                -- we copy the state so we can compare with the refreshed trees what changed
+                -- we copy the state so we can compare with the refreshed integrations what changed
                 -- if something changed, we will run init in order to resize buffers correctly
-                local stateTrees = vim.deepcopy(S.tabs[S.activeTab].wins.trees)
+                local stateIntegrations = vim.deepcopy(S.tabs[S.activeTab].wins.integrations)
                 local shouldInit = false
 
-                S.refreshTrees(S)
+                S.refreshIntegrations(S)
 
-                for name, tree in pairs(S.tabs[S.activeTab].wins.trees) do
+                for name, tree in pairs(S.tabs[S.activeTab].wins.integrations) do
                     if
                         -- if we had an id but it's not valid anymore or it changed
                         (
-                            stateTrees[name] ~= nil
-                            and stateTrees[name].id ~= nil
+                            stateIntegrations[name] ~= nil
+                            and stateIntegrations[name].id ~= nil
                             and (tree.id == nil or tree.id ~= tree.id)
                         )
                         -- if we registered a new side tree
                         or (
                             tree.id ~= nil
-                            and (stateTrees[name] == nil or stateTrees[name].id ~= tree.id)
+                            and (
+                                stateIntegrations[name] == nil
+                                or stateIntegrations[name].id ~= tree.id
+                            )
                         )
                     then
                         D.log(p.event, "%s has changed, resizing", name)

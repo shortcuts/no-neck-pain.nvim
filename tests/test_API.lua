@@ -227,7 +227,7 @@ T["enable"]["(single tab) sets state"] = function()
 
     eq_type_state(child, "tabs[1].wins", "table")
     eq_type_state(child, "tabs[1].wins.main", "table")
-    eq_type_state(child, "tabs[1].wins.trees", "table")
+    eq_type_state(child, "tabs[1].wins.integrations", "table")
 
     eq_state(child, "tabs[1].wins.main", {
         curr = 1000,
@@ -237,9 +237,9 @@ T["enable"]["(single tab) sets state"] = function()
 
     eq_state(child, "tabs[1].wins.splits", vim.NIL)
 
-    eq_type_state(child, "tabs[1].wins.trees", "table")
+    eq_type_state(child, "tabs[1].wins.integrations", "table")
 
-    eq_state(child, "tabs[1].wins.trees", Co.trees)
+    eq_state(child, "tabs[1].wins.integrations", Co.integrations)
 end
 
 T["enable"]["(multiple tab) sets state"] = function()
@@ -258,7 +258,7 @@ T["enable"]["(multiple tab) sets state"] = function()
 
     eq_type_state(child, "tabs[1].wins", "table")
     eq_type_state(child, "tabs[1].wins.main", "table")
-    eq_type_state(child, "tabs[1].wins.trees", "table")
+    eq_type_state(child, "tabs[1].wins.integrations", "table")
 
     eq_state(child, "tabs[1].wins.main", {
         curr = 1000,
@@ -267,9 +267,9 @@ T["enable"]["(multiple tab) sets state"] = function()
     })
     eq_state(child, "tabs[1].wins.splits", vim.NIL)
 
-    eq_type_state(child, "tabs[1].wins.trees", "table")
+    eq_type_state(child, "tabs[1].wins.integrations", "table")
 
-    eq_state(child, "tabs[1].wins.trees", Co.trees)
+    eq_state(child, "tabs[1].wins.integrations", Co.integrations)
 
     -- tab 2
     child.cmd("tabnew")
@@ -282,7 +282,7 @@ T["enable"]["(multiple tab) sets state"] = function()
 
     eq_type_state(child, "tabs[2].wins", "table")
     eq_type_state(child, "tabs[2].wins.main", "table")
-    eq_type_state(child, "tabs[2].wins.trees", "table")
+    eq_type_state(child, "tabs[2].wins.integrations", "table")
 
     eq_state(child, "tabs[2].wins.main", {
         curr = 1003,
@@ -291,9 +291,9 @@ T["enable"]["(multiple tab) sets state"] = function()
     })
     eq_state(child, "tabs[2].wins.splits", vim.NIL)
 
-    eq_type_state(child, "tabs[2].wins.trees", "table")
+    eq_type_state(child, "tabs[2].wins.integrations", "table")
 
-    eq_state(child, "tabs[2].wins.trees", Co.trees)
+    eq_state(child, "tabs[2].wins.integrations", Co.integrations)
 end
 
 T["disable"] = MiniTest.new_set()

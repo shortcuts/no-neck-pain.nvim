@@ -190,7 +190,7 @@ T["tabnew/tabclose"]["doesn't keep closed tabs in state"] = function()
             },
             scratchPadEnabled = false,
             wins = {
-                trees = Co.trees,
+                integrations = Co.integrations,
                 main = {
                     curr = 1000,
                     left = 1001,
@@ -210,7 +210,7 @@ T["tabnew/tabclose"]["doesn't keep closed tabs in state"] = function()
             },
             scratchPadEnabled = false,
             wins = {
-                trees = Co.trees,
+                integrations = Co.integrations,
                 main = {
                     curr = 1000,
                     left = 1001,
@@ -226,7 +226,7 @@ T["tabnew/tabclose"]["doesn't keep closed tabs in state"] = function()
             },
             scratchPadEnabled = false,
             wins = {
-                trees = Co.trees,
+                integrations = Co.integrations,
                 main = {
                     curr = 1003,
                     left = 1004,
@@ -246,7 +246,7 @@ T["tabnew/tabclose"]["doesn't keep closed tabs in state"] = function()
             },
             scratchPadEnabled = false,
             wins = {
-                trees = Co.trees,
+                integrations = Co.integrations,
                 main = {
                     curr = 1000,
                     left = 1001,
