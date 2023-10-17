@@ -192,7 +192,7 @@ end
 ---@return boolean
 ---@private
 function State:isActiveTabRegistered()
-    return self.tabs[self.activeTab] ~= nil
+    return self.hasTabs(self) and self.tabs[self.activeTab] ~= nil
 end
 
 ---Whether the side window is registered and enabled in the config or not.
@@ -201,7 +201,7 @@ end
 ---@return boolean
 ---@private
 function State:isSideRegistered(side)
-    if self.getTabSafe(self) == nil then
+    if not self.isActiveTabRegistered(self) then
         return false
     end
 

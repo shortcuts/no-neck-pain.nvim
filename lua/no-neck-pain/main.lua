@@ -261,7 +261,7 @@ function N.enable(scope)
     vim.api.nvim_create_autocmd({ "WinEnter", "WinClosed" }, {
         callback = function(p)
             vim.schedule(function()
-                if not S.hasTabs(S) or S.tabs[S.activeTab] == nil or E.skip(S.getTab(S)) then
+                if not S.hasTabs(S) or not S.isActiveTabRegistered(S) or E.skip(S.getTab(S)) then
                     return
                 end
 

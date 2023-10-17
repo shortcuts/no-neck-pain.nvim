@@ -44,7 +44,7 @@ end
 ---
 ---@private
 function E.skipEnable()
-    if S.getTabSafe(S) then
+    if S.isActiveTabRegistered(S) then
         return true
     end
 
