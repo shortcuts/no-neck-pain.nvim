@@ -21,7 +21,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           version: latest
-          args: --check . -g 'deps/'
+          args: --check . -g '*.lua' -g '!deps/'
 
   documentation:
     runs-on: ubuntu-latest

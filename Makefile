@@ -27,4 +27,4 @@ documentation:
 documentation-ci: deps documentation
 
 lint:
-	stylua . -g 'deps/'
+	stylua . -g '*.lua' -g '!deps/'

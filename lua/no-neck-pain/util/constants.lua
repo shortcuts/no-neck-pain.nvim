@@ -33,4 +33,22 @@ C.INTEGRATIONS = {
     ["tokyonight-storm"] = "#1f2335",
 }
 
+C.trees = {
+    nvimtree = {
+        configName = "NvimTree",
+        close = "NvimTreeClose",
+        open = "NvimTreeOpen",
+    },
+    ["neo-tree"] = {
+        configName = "NeoTree",
+        close = "Neotree close",
+        open = "Neotree reveal",
+    },
+    neotest = {
+        configName = "neotest",
+        close = "lua require('neotest').summary.close()",
+        open = "lua require('neotest').summary.open()",
+    },
+}
+
 return C

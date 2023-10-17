@@ -1,25 +1,8 @@
 local A = require("no-neck-pain.util.api")
+local C = require("no-neck-pain.util.constants")
 local D = require("no-neck-pain.util.debug")
 
-local State = {enabled = false, activeTab = 1, tabs = nil}
-
-local trees = {
-    nvimtree = {
-        configName = "NvimTree",
-        close = "NvimTreeClose",
-        open = "NvimTreeOpen",
-    },
-    ["neo-tree"] = {
-        configName = "NeoTree",
-        close = "Neotree close",
-        open = "Neotree reveal",
-    },
-    neotest = {
-        configName = "neotest",
-        close = "lua require('neotest').summary.close()",
-        open = "lua require('neotest').summary.open()",
-    },
-}
+local State = { enabled = false, activeTab = 1, tabs = nil }
 
 ---Sets the state to its original value.
 ---
@@ -34,7 +17,7 @@ end
 ---
 ---@private
 function State:initTrees()
-    self.tabs[self.activeTab].wins.trees = vim.deepcopy(trees)
+    self.tabs[self.activeTab].wins.trees = vim.deepcopy(C.trees)
 end
 
 ---Sets the state splits to its original value.
@@ -64,7 +47,6 @@ function State:refreshTabs(id)
 
     return #self.tabs
 end
-
 
 ---Refresh the trees of the active state tab.
 ---
@@ -155,7 +137,7 @@ function State:isSideTree(scope, win)
         return self.isSideTree(self, scope, wins[1])
     end
 
-    local registeredTrees = tab ~= nil and tab.wins.trees or trees
+    local registeredTrees = tab ~= nil and tab.wins.trees or C.trees
 
     for treeFileType, tree in pairs(registeredTrees) do
         if vim.startswith(string.lower(fileType), treeFileType) then
@@ -174,7 +156,7 @@ end
 ---@private
 function State:scanTrees()
     local wins = vim.api.nvim_tabpage_list_wins(self.activeTab)
-    local unregisteredTrees = vim.deepcopy(trees)
+    local unregisteredTrees = vim.deepcopy(C.trees)
 
     for _, win in pairs(wins) do
         local isSideTree, external = self.isSideTree(self, "S.scanTrees", win)
@@ -213,6 +195,10 @@ end
 ---@return boolean
 ---@private
 function State:isSideRegistered(side)
+    if self.getTabSafe(self) == nil then
+        return false
+    end
+
     if self.getSideID(self, side) == nil then
         return false
     end
@@ -268,7 +254,7 @@ end
 ---@return number
 ---@private
 function State:getSideID(side)
-    return self.tabs[self.activeTab].wins[side]
+    return self.tabs[self.activeTab].wins.main[side]
 end
 
 ---Sets the ID of the given `side`.
@@ -277,7 +263,7 @@ end
 ---@param side "left"|"right"|"curr": the side of the window.
 ---@private
 function State:setSideID(id, side)
-    self.tabs[self.activeTab].wins[side] = id
+    self.tabs[self.activeTab].wins.main[side] = id
 end
 
 ---Sets the global state as enabled.
@@ -319,7 +305,6 @@ function State:getTab(id)
     return self.tabs[id]
 end
 
-
 ---Gets the tab with the given `id` from the state, safely returns nil if we are not sure it exists.
 ---
 ---@param id number?: the id of the tab to get, fallbacks to the currently active one when `nil`.
@@ -329,7 +314,6 @@ function State:getTabSafe(id)
     if not self.hasTabs(self) then
         return nil
     end
-
 
     id = id or self.activeTab or vim.api.nvim_get_current_tabpage()
 
@@ -359,7 +343,6 @@ function State:setTab(id)
     if self.tabs == nil then
         self.tabs = {}
     end
-
 
     self.tabs[id] = {
         id = id,
@@ -409,13 +392,13 @@ end
 ---@param isVSplit boolean: whether the window is a vsplit or not.
 ---@private
 function State:decreaseLayers(isVSplit)
-    local scope = isVSplit and 'vsplit' or 'split'
+    local scope = isVSplit and "vsplit" or "split"
 
-        self.tabs[self.activeTab].layers[scope] = self.tabs[self.activeTab].layers[scope] - 1
+    self.tabs[self.activeTab].layers[scope] = self.tabs[self.activeTab].layers[scope] - 1
 
-        if self.tabs[self.activeTab].layers[scope] < 1 then
-            self.tabs[self.activeTab].layers[scope] = 1
-        end
+    if self.tabs[self.activeTab].layers[scope] < 1 then
+        self.tabs[self.activeTab].layers[scope] = 1
+    end
 end
 
 ---Determines current state of the split/vsplit windows by comparing widths and heights.
@@ -424,14 +407,14 @@ end
 ---@return boolean: whether the current window is a vsplit or not.
 ---@private
 function State:computeSplits(focusedWin)
-    local side = self.getSideID(self, 'left') or self.getSideID(self, 'right')
+    local side = self.getSideID(self, "left") or self.getSideID(self, "right")
     local sWidth, sHeight = 0, 0
 
     -- when side buffer exists we rely on them, otherwise we fallback to the UI
     if side ~= nil then
         local nbSide = 1
 
-        if self.isSideRegistered(self, 'left') and self.isSideRegistered(self, 'right') then
+        if self.isSideRegistered(self, "left") and self.isSideRegistered(self, "right") then
             nbSide = 2
         end
 

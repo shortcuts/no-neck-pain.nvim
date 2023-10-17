@@ -49,11 +49,11 @@ function N.init(scope, goToCurr, skipTrees)
         error("called the internal `init` method on a `nil` tab.")
     end
 
-    D.log(scope,"init called on tab %d for current window %d",S.activeTab,S.getSideID(S, 'curr'))
+    D.log(scope, "init called on tab %d for current window %d", S.activeTab, S.getSideID(S, "curr"))
 
     -- if we do not have side buffers, we must ensure we only trigger a focus if we re-create them
     local hadSideBuffers = true
-    if not S.isSideRegistered(S, 'left') or not S.isSideRegistered(S, 'right') then
+    if not S.isSideRegistered(S, "left") or not S.isSideRegistered(S, "right") then
         hadSideBuffers = false
     end
 
@@ -61,10 +61,10 @@ function N.init(scope, goToCurr, skipTrees)
 
     if
         goToCurr
-        or (not hadSideBuffers and (S.isSideRegistered(S, 'left') or S.isSideRegistered(S, 'right')))
-        or (S.isSideTheActiveWin(S, 'left') or S.isSideTheActiveWin(S, 'right'))
+        or (not hadSideBuffers and (S.isSideRegistered(S, "left") or S.isSideRegistered(S, "right")))
+        or (S.isSideTheActiveWin(S, "left") or S.isSideTheActiveWin(S, "right"))
     then
-        vim.fn.win_gotoid(S.getSideID(S, 'curr'))
+        vim.fn.win_gotoid(S.getSideID(S, "curr"))
     end
 
     return S
@@ -85,8 +85,8 @@ function N.enable(scope)
     local augroupName = A.getAugroupName(S.activeTab)
     vim.api.nvim_create_augroup(augroupName, { clear = true })
 
-    S.setSideID(S, vim.api.nvim_get_current_win(), 'curr')
-    S.computeSplits(S, S.getSideID(S, 'curr'))
+    S.setSideID(S, vim.api.nvim_get_current_win(), "curr")
+    S.computeSplits(S, S.getSideID(S, "curr"))
 
     N.init(scope, true)
 
@@ -131,10 +131,7 @@ function N.enable(scope)
                 end
 
                 -- there's nothing to manage when there's no side buffer, fallback to vim's default behavior
-                if
-                    not S.isSideRegistered(S, 'left')
-                    and not S.isSideRegistered(S, 'right')
-                then
+                if not S.isSideRegistered(S, "left") and not S.isSideRegistered(S, "right") then
                     return D.log(p.event, "skip split logic: no side buffer")
                 end
 
@@ -238,7 +235,7 @@ function N.enable(scope)
                 local haveCloseCurr = false
 
                 -- if curr is not valid anymore, we focus the first valid split and remove it from the state
-                if not vim.api.nvim_win_is_valid(S.getSideID(S, 'curr')) then
+                if not vim.api.nvim_win_is_valid(S.getSideID(S, "curr")) then
                     -- if neither curr and splits are remaining valids, we just disable
                     if S.tabs[S.activeTab].wins.splits == nil then
                         return N.disable(p.event)
@@ -246,11 +243,10 @@ function N.enable(scope)
 
                     haveCloseCurr = true
 
-
                     local split = S.tabs[S.activeTab].wins.splits[1]
 
                     S.decreaseLayers(S, split.vertical)
-                    S.setSideID(S, split.id, 'curr')
+                    S.setSideID(S, split.id, "curr")
                     S.removeSplit(S, split.id)
                 end
 
@@ -321,13 +317,13 @@ function N.disable(scope)
 
     pcall(vim.api.nvim_del_augroup_by_name, A.getAugroupName(S.activeTab))
 
-    local currID = S.getSideID(S, 'curr')
+    local currID = S.getSideID(S, "curr")
 
     -- shutdowns gracefully by focusing the stored `curr` buffer
     if
         currID ~= nil
         and vim.api.nvim_win_is_valid(currID)
-        and not S.isSideTheActiveWin(S, 'curr')
+        and not S.isSideTheActiveWin(S, "curr")
     then
         vim.fn.win_gotoid(currID)
 
@@ -346,11 +342,7 @@ function N.disable(scope)
             )
         )
         vim.cmd(
-            string.format(
-                "highlight! clear NoNeckPain_text_tab_%s_side_%s NONE",
-                S.activeTab,
-                side
-            )
+            string.format("highlight! clear NoNeckPain_text_tab_%s_side_%s NONE", S.activeTab, side)
         )
 
         if S.isSideRegistered(S, side) then

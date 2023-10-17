@@ -1,4 +1,4 @@
-local Trees = require("no-neck-pain.trees")
+local Co = require("no-neck-pain.util.constants")
 local helpers = dofile("tests/helpers.lua")
 
 local child = helpers.new_child_neovim()
@@ -190,9 +190,7 @@ T["tabnew/tabclose"]["doesn't keep closed tabs in state"] = function()
             },
             scratchPadEnabled = false,
             wins = {
-                external = {
-                    trees = Trees.init(),
-                },
+                trees = Co.trees,
                 main = {
                     curr = 1000,
                     left = 1001,
@@ -212,9 +210,7 @@ T["tabnew/tabclose"]["doesn't keep closed tabs in state"] = function()
             },
             scratchPadEnabled = false,
             wins = {
-                external = {
-                    trees = Trees.init(),
-                },
+                trees = Co.trees,
                 main = {
                     curr = 1000,
                     left = 1001,
@@ -230,9 +226,7 @@ T["tabnew/tabclose"]["doesn't keep closed tabs in state"] = function()
             },
             scratchPadEnabled = false,
             wins = {
-                external = {
-                    trees = Trees.init(),
-                },
+                trees = Co.trees,
                 main = {
                     curr = 1003,
                     left = 1004,
@@ -252,9 +246,7 @@ T["tabnew/tabclose"]["doesn't keep closed tabs in state"] = function()
             },
             scratchPadEnabled = false,
             wins = {
-                external = {
-                    trees = Trees.init(),
-                },
+                trees = Co.trees,
                 main = {
                     curr = 1000,
                     left = 1001,

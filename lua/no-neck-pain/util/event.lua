@@ -25,7 +25,7 @@ function E.skip(tab)
             return true
         end
 
-        if S.isSideTheActiveWin(S, 'left') or S.isSideTheActiveWin(S, 'right') then
+        if S.isSideTheActiveWin(S, "left") or S.isSideTheActiveWin(S, "right") then
             return true
         end
     end

@@ -144,7 +144,10 @@ function W.createSideBuffers(skipTrees)
         if _G.NoNeckPain.config.buffers[side].enabled then
             wins[side].padding = W.getPadding(side)
 
-            if wins[side].padding > _G.NoNeckPain.config.minSideBufferWidth and not S.isSideWinValid(S, side) then
+            if
+                wins[side].padding > _G.NoNeckPain.config.minSideBufferWidth
+                and not S.isSideWinValid(S, side)
+            then
                 vim.cmd(wins[side].cmd)
 
                 local id = vim.api.nvim_get_current_win()
@@ -191,12 +194,12 @@ function W.createSideBuffers(skipTrees)
 
     -- if we still have side buffers open at this point, and we have vsplit opened,
     -- there might be width issues so we the resize opened vsplits.
-    if (S.isSideRegistered(S, 'left') or S.isSideRegistered(S, 'right')) and S.hasSplits(S) then
-        local side = S.getSideID(S, 'left') or S.getSideID(S, 'right')
+    if (S.isSideRegistered(S, "left") or S.isSideRegistered(S, "right")) and S.hasSplits(S) then
+        local side = S.getSideID(S, "left") or S.getSideID(S, "right")
         local sWidth, _ = A.getWidthAndHeight(side)
         local nbSide = 1
 
-        if S.getSideID(S, 'left') and S.getSideID(S, 'right') then
+        if S.getSideID(S, "left") and S.getSideID(S, "right") then
             nbSide = 2
         end
 
