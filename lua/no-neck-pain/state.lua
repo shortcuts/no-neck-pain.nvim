@@ -43,6 +43,12 @@ function State:refreshTabs(id)
         end
     end
 
+    if #refreshedTabs == 0 then
+        self.tabs = nil
+
+        return 0
+    end
+
     self.tabs = refreshedTabs
 
     return #self.tabs

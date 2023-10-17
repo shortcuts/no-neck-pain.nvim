@@ -378,9 +378,7 @@ function N.disable(scope)
         end
     end
 
-    S.refreshTabs(S)
-
-    if not S.hasTabs(S) then
+    if S.refreshTabs(S) == 0 then
         D.log(scope, "no more active tabs left, reinitializing state")
 
         S.init(S)
