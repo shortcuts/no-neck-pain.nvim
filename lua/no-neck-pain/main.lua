@@ -37,7 +37,7 @@ function N.toggleScratchPad()
     vim.fn.win_gotoid(currWin)
 
     -- save new state of the scratchpad and update tabs
-    S.setScratchPad(not S.tabs[S.activeTab].scratchPadEnabled)
+    S.setScratchpad(S, not S.tabs[S.activeTab].scratchPadEnabled)
 
     return S
 end
