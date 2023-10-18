@@ -332,6 +332,7 @@ end
 
 ---Gets the scratchpad value for the active tab.
 ---
+---@return boolean: the value of the scratchpad.
 ---@private
 function State:getScratchpad()
     return self.tabs[self.activeTab].scratchPadEnabled

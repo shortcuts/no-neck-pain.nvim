@@ -38,14 +38,15 @@ end
 ---Sets options to the side buffers to toggle the scratchPad.
 ---
 ---@param side "left"|"right": the side of the window being resized, used for logging only.
+---@param cleanup boolean?: cleanup the given buffer
 ---@private
-function W.initScratchPad(side)
+function W.initScratchPad(side, cleanup)
     if not _G.NoNeckPain.config.buffers[side].enabled then
         return
     end
 
     -- on cleanup we open a new buffer and set the default options
-    if S.getScratchpad(S) then
+    if cleanup then
         vim.cmd("enew")
 
         for opt, val in pairs(_G.NoNeckPain.config.buffers[side].bo) do
