@@ -30,13 +30,10 @@ T["split"]["only one side buffer, closing help doesn't close NNP"] = function()
     child.cmd("h")
 
     eq(helpers.winsInTab(child), { 1001, 1002, 1000 })
-    eq_state(child, "tabs[1].wins.main", {
-        curr = 1000,
-        left = 1001,
-    })
-    eq_state(child, "tabs[1].wins.splits", { { id = 1002, vertical = false } })
+    eq_state(child, "tabs[1].wins.main", { curr = 1000, left = 1001 })
+    eq_state(child, "tabs[1].wins.splits[1002]", { id = 1002, vertical = false })
 
-    child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.tabs[1].wins.splits[1].id)")
+    child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.tabs[1].wins.splits[1002].id)")
     child.cmd("q")
 
     eq(helpers.winsInTab(child), { 1001, 1000 })
@@ -59,7 +56,7 @@ T["split"]["closing `curr` makes `split` the new `curr`"] = function()
         left = 1001,
         right = 1002,
     })
-    eq_state(child, "tabs[1].wins.splits", { { id = 1003, vertical = false } })
+    eq_state(child, "tabs[1].wins.splits[1003]", { id = 1003, vertical = false })
 
     child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.tabs[1].wins.main.curr)")
     child.cmd("q")
@@ -83,9 +80,9 @@ T["split"]["keeps side buffers"] = function()
         left = 1001,
         right = 1002,
     })
-    eq_state(child, "tabs[1].wins.splits", { { id = 1003, vertical = false } })
+    eq_state(child, "tabs[1].wins.splits[1003]", { id = 1003, vertical = false })
 
-    child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.tabs[1].wins.splits[1].id)")
+    child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.tabs[1].wins.splits[1003].id)")
     child.cmd("q")
 
     eq(helpers.winsInTab(child), { 1001, 1000, 1002 })
@@ -141,7 +138,7 @@ T["vsplit"]["register new non-focused windows (TSPlayground)"] = function()
         left = 1001,
         right = 1002,
     })
-    eq_state(child, "tabs[1].wins.splits", { { id = 1004, vertical = true } })
+    eq_state(child, "tabs[1].wins.splits[1004]", { id = 1004, vertical = true })
 end
 
 T["vsplit"]["does not create side buffers when there's not enough space"] = function()
@@ -170,14 +167,14 @@ T["vsplit"]["corretly size splits when opening helper with side buffers open"] =
 
     eq(helpers.winsInTab(child), { 1001, 1003, 1000, 1002 })
 
-    eq_buf_width(child, "tabs[1].wins.splits[1].id", 50)
+    eq_buf_width(child, "tabs[1].wins.splits[1003].id", 50)
     eq_buf_width(child, "tabs[1].wins.main.curr", 67)
 
     child.cmd("h")
 
     eq(helpers.winsInTab(child), { 1004, 1001, 1003, 1000, 1002 })
 
-    eq_buf_width(child, "tabs[1].wins.splits[1].id", 50)
+    eq_buf_width(child, "tabs[1].wins.splits[1004].id", 150)
     eq_buf_width(child, "tabs[1].wins.main.curr", 67)
 end
 
@@ -208,7 +205,7 @@ T["vsplit"]["preserve vsplit width when having side buffers"] = function()
 
     eq(helpers.winsInTab(child), { 1001, 1002, 1000 })
 
-    eq_buf_width(child, "tabs[1].wins.splits[1].id", 65)
+    eq_buf_width(child, "tabs[1].wins.splits[1002].id", 65)
 end
 
 T["vsplit"]["closing `curr` makes `split` the new `curr`"] = function()
@@ -226,7 +223,7 @@ T["vsplit"]["closing `curr` makes `split` the new `curr`"] = function()
         left = 1001,
         right = 1002,
     })
-    eq_state(child, "tabs[1].wins.splits", { { id = 1003, vertical = true } })
+    eq_state(child, "tabs[1].wins.splits[1003]", { id = 1003, vertical = true })
 
     child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.tabs[1].wins.main.curr)")
     child.cmd("q")
@@ -252,9 +249,9 @@ T["vsplit"]["hides side buffers"] = function()
     eq_state(child, "tabs[1].wins.main", {
         curr = 1000,
     })
-    eq_state(child, "tabs[1].wins.splits", { { id = 1003, vertical = true } })
+    eq_state(child, "tabs[1].wins.splits[1003]", { id = 1003, vertical = true })
 
-    child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.tabs[1].wins.splits[1].id)")
+    child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.tabs[1].wins.splits[1003].id)")
     child.cmd("q")
 
     eq(helpers.winsInTab(child), { 1004, 1000, 1005 })
