@@ -177,8 +177,6 @@ function State:scanIntegrations()
     return unregisteredIntegrations
 end
 
--------------------------- checks
-
 ---Whether the `activeTab` is valid or not.
 ---
 ---@return boolean
@@ -251,8 +249,6 @@ function State:hasSplits()
 
     return self.tabs[self.activeTab].wins.splits ~= nil
 end
-
--------------------------- setters and getters
 
 ---Returns the ID of the given `side`.
 ---
