@@ -172,12 +172,7 @@ function N.enable(scope)
                 end
 
                 -- if we are not in split view, we check if we killed one of the main buffers (curr, left, right) to disable NNP
-                if
-                    S.tabs[S.activeTab] == nil
-                    or S.tabs[S.activeTab].wins == nil
-                    or S.tabs[S.activeTab].wins.splits == nil
-                        and not W.stateWinsActive(S.getTab(S), false)
-                then
+                if not S.hasSplits(S) and not W.stateWinsActive(S.getTab(S), false) then
                     D.log(p.event, "one of the NNP main buffers have been closed, disabling...")
 
                     return N.disable(p.event)
@@ -206,13 +201,7 @@ function N.enable(scope)
     vim.api.nvim_create_autocmd({ "WinClosed", "BufDelete" }, {
         callback = function(p)
             vim.schedule(function()
-                if
-                    E.skip(nil)
-                    or S.tabs == nil
-                    or S.tabs[S.activeTab] == nil
-                    or S.tabs[S.activeTab].wins.splits == nil
-                    or W.stateWinsActive(S.getTab(S), true)
-                then
+                if E.skip(nil) or not S.hasSplits(S) or W.stateWinsActive(S.getTab(S), true) then
                     return
                 end
 
@@ -237,7 +226,7 @@ function N.enable(scope)
                 -- if curr is not valid anymore, we focus the first valid split and remove it from the state
                 if not vim.api.nvim_win_is_valid(S.getSideID(S, "curr")) then
                     -- if neither curr and splits are remaining valids, we just disable
-                    if S.tabs[S.activeTab].wins.splits == nil then
+                    if not S.hasSplits(S) then
                         return N.disable(p.event)
                     end
 
@@ -251,7 +240,7 @@ function N.enable(scope)
                 end
 
                 -- we only restore focus on curr if there's no split left
-                N.init(p.event, haveCloseCurr or S.tabs[S.activeTab].wins.splits == nil)
+                N.init(p.event, haveCloseCurr or not S.hasSplits(S))
             end)
         end,
         group = augroupName,

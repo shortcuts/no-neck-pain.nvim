@@ -61,6 +61,32 @@ function State:refreshIntegrations()
     self.tabs[self.activeTab].wins.integrations = self.scanIntegrations(self)
 end
 
+---Closes side integrations if opened.
+---
+---@private
+function State:closeIntegration()
+    for _, opts in pairs(self.tabs[self.activeTab].wins.integrations) do
+        if opts.id ~= nil and opts.close ~= nil then
+            vim.cmd(opts.close)
+        end
+    end
+end
+
+---Reopens the integrations if they were previously closed.
+---
+---@private
+function State:reopenIntegration()
+    for _, opts in pairs(self.tabs[self.activeTab].wins.integrations) do
+        if
+            opts.id ~= nil
+            and opts.open ~= nil
+            and _G.NoNeckPain.config.integrations[opts.configName].reopen == true
+        then
+            vim.cmd(opts.open)
+        end
+    end
+end
+
 ---Gets all wins that are not already registered in the given `tab`.
 ---
 ---@return table: the wins that are not in `tab`.
@@ -253,7 +279,9 @@ function State:hasSplits()
         return false
     end
 
-    return self.tabs[self.activeTab].wins.splits ~= nil
+    return self.tabs[self.activeTab] ~= nil
+        and self.tabs[self.activeTab].wins ~= nil
+        and self.tabs[self.activeTab].wins.splits ~= nil
 end
 
 ---Returns the ID of the given `side`.

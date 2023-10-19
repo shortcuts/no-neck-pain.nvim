@@ -3,7 +3,6 @@ local C = require("no-neck-pain.colors")
 local Co = require("no-neck-pain.util.constants")
 local D = require("no-neck-pain.util.debug")
 local S = require("no-neck-pain.state")
-local T = require("no-neck-pain.integrations")
 
 local W = {}
 
@@ -135,10 +134,8 @@ function W.createSideBuffers(skipIntegrations)
         right = { cmd = "botright vnew", padding = 0 },
     }
 
-    local integrations = nil
-
     if not skipIntegrations then
-        integrations = T.close()
+        S.closeIntegration(S)
     end
 
     for _, side in pairs(Co.SIDES) do
@@ -187,8 +184,8 @@ function W.createSideBuffers(skipIntegrations)
         end
     end
 
-    if not skipIntegrations and integrations ~= nil then
-        T.reopen(integrations)
+    if not skipIntegrations then
+        S.reopenIntegration(S)
     end
 
     resizeOrCloseSideBuffers("W.createSideBuffers", wins)
