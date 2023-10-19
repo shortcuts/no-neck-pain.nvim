@@ -63,12 +63,11 @@ end
 
 ---Gets all wins that are not already registered in the given `tab`.
 ---
----@param withIntegrations boolean: whether we should consider external windows or not.
 ---@return table: the wins that are not in `tab`.
 ---@private
-function State:getUnregisteredWins(withIntegrations)
+function State:getUnregisteredWins()
     local wins = vim.api.nvim_tabpage_list_wins(self.activeTab)
-    local stateWins = self.getRegisteredWins(self, true, true, withIntegrations)
+    local stateWins = self.getRegisteredWins(self)
 
     local validWins = {}
 
@@ -83,29 +82,20 @@ end
 
 ---Gets all wins IDs that are registered in the state for the active tab.
 ---
----@param withMain boolean: whether we should consider main windows or not.
----@param withSplits boolean: whether we should consider splits windows or not.
----@param withIntegrations boolean: whether we should consider integrations windows or not.
 ---@return table: the wins that are not in `tab`.
 ---@private
-function State:getRegisteredWins(withMain, withSplits, withIntegrations)
+function State:getRegisteredWins()
     local wins = {}
 
-    if withMain ~= nil and self.tabs[self.activeTab].wins.main ~= nil then
+    if self.tabs[self.activeTab].wins.main ~= nil then
         for _, side in pairs(self.tabs[self.activeTab].wins.main) do
             table.insert(wins, side)
         end
     end
 
-    if withSplits ~= nil and self.tabs[self.activeTab].wins.splits ~= nil then
+    if self.tabs[self.activeTab].wins.splits ~= nil then
         for _, split in pairs(self.tabs[self.activeTab].wins.splits) do
             table.insert(wins, split.id)
-        end
-    end
-
-    if withIntegrations ~= nil and self.tabs[self.activeTab].wins.integrations ~= nil then
-        for _, tree in pairs(self.tabs[self.activeTab].wins.integrations) do
-            table.insert(wins, tree.id)
         end
     end
 
@@ -132,7 +122,7 @@ function State:isSideTree(scope, win)
     if fileType == "" and tab ~= nil then
         D.log(scope, "no name or filetype matching a tree, searching in wins...")
 
-        local wins = self.getUnregisteredWins(self, false)
+        local wins = self.getUnregisteredWins(self)
 
         if #wins ~= 1 or wins[1] == win then
             D.log(scope, "too many windows to determine")
@@ -208,6 +198,22 @@ function State:isSideRegistered(side)
     end
 
     return _G.NoNeckPain.config.buffers[side].enabled
+end
+
+---Whether the sides window are registered and enabled in the config or not.
+---
+---@param condition "or"|"and"
+---@param expected boolean
+---@return boolean
+---@private
+function State:checkSides(condition, expected)
+    if condition == "or" then
+        return self.isSideRegistered(self, "left") == expected
+            or self.isSideRegistered(self, "right") == expected
+    end
+
+    return self.isSideRegistered(self, "left") == expected
+        and self.isSideRegistered(self, "right") == expected
 end
 
 ---Whether the side window is registered and a valid window.
@@ -343,9 +349,7 @@ end
 ---@param id number: the id of the tab.
 ---@private
 function State:setTab(id)
-    if self.tabs == nil then
-        self.tabs = {}
-    end
+    self.tabs = self.tabs or {}
 
     self.tabs[id] = {
         id = id,
@@ -417,7 +421,7 @@ function State:computeSplits(focusedWin)
     if side ~= nil then
         local nbSide = 1
 
-        if self.isSideRegistered(self, "left") and self.isSideRegistered(self, "right") then
+        if self.checkSides(self, "and", true) then
             nbSide = 2
         end
 

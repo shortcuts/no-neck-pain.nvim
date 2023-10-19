@@ -195,7 +195,7 @@ function W.createSideBuffers(skipIntegrations)
 
     -- if we still have side buffers open at this point, and we have vsplit opened,
     -- there might be width issues so we the resize opened vsplits.
-    if (S.isSideRegistered(S, "left") or S.isSideRegistered(S, "right")) and S.hasSplits(S) then
+    if S.checkSides(S, "or", true) and S.hasSplits(S) then
         local side = S.getSideID(S, "left") or S.getSideID(S, "right")
         local sWidth, _ = A.getWidthAndHeight(side)
         local nbSide = 1
@@ -302,7 +302,7 @@ function W.stateWinsActive(tab, checkSplits)
     local swins = tab.wins.main
 
     if checkSplits and tab.wins.splits ~= nil then
-        swins = S.getRegisteredWins(S, true, true, false)
+        swins = S.getRegisteredWins(S)
     end
 
     for _, swin in pairs(swins) do

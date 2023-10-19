@@ -53,7 +53,7 @@ function N.init(scope, goToCurr, skipIntegrations)
 
     -- if we do not have side buffers, we must ensure we only trigger a focus if we re-create them
     local hadSideBuffers = true
-    if not S.isSideRegistered(S, "left") or not S.isSideRegistered(S, "right") then
+    if S.checkSides(S, "or", false) then
         hadSideBuffers = false
     end
 
@@ -61,7 +61,7 @@ function N.init(scope, goToCurr, skipIntegrations)
 
     if
         goToCurr
-        or (not hadSideBuffers and (S.isSideRegistered(S, "left") or S.isSideRegistered(S, "right")))
+        or (not hadSideBuffers and S.checkSides(S, "or", true))
         or (S.isSideTheActiveWin(S, "left") or S.isSideTheActiveWin(S, "right"))
     then
         vim.fn.win_gotoid(S.getSideID(S, "curr"))
@@ -131,7 +131,7 @@ function N.enable(scope)
                 end
 
                 -- there's nothing to manage when there's no side buffer, fallback to vim's default behavior
-                if not S.isSideRegistered(S, "left") and not S.isSideRegistered(S, "right") then
+                if S.checkSides(S, "and", false) then
                     return D.log(p.event, "skip split logic: no side buffer")
                 end
 
@@ -141,7 +141,7 @@ function N.enable(scope)
                     return D.log(p.event, "skip split logic: side tree")
                 end
 
-                local wins = S.getUnregisteredWins(S, false)
+                local wins = S.getUnregisteredWins(S)
 
                 if #wins ~= 1 then
                     return D.log(
@@ -184,7 +184,7 @@ function N.enable(scope)
                 end
 
                 if _G.NoNeckPain.config.disableOnLastBuffer then
-                    local rwins = S.getUnregisteredWins(S, false)
+                    local rwins = S.getUnregisteredWins(S)
 
                     if
                         #rwins == 0
