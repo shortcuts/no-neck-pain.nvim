@@ -52,8 +52,8 @@ function E.skipEnable()
         return true
     end
 
-    local isSideTree, _ = S.isSideTree(S, "E.skipEnable", nil)
-    if isSideTree or vim.bo.filetype == "dashboard" then
+    local isSupportedIntegration, _ = S.isSupportedIntegration(S, "E.skipEnable", nil)
+    if isSupportedIntegration or vim.bo.filetype == "dashboard" then
         return true
     end
 

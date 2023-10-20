@@ -136,8 +136,8 @@ function N.enable(scope)
                 end
 
                 -- a side tree isn't considered as a split
-                local isSideTree, _ = S.isSideTree(S, p.event, nil)
-                if isSideTree then
+                local isSupportedIntegration, _ = S.isSupportedIntegration(S, p.event, nil)
+                if isSupportedIntegration then
                     return D.log(p.event, "skip split logic: side tree")
                 end
 
@@ -255,8 +255,8 @@ function N.enable(scope)
                 end
 
                 -- We can skip enter hooks that are not on a side tree
-                local isSideTree, _ = S.isSideTree(S, p.event, nil)
-                if p.event == "WinEnter" and not isSideTree then
+                local isSupportedIntegration, _ = S.isSupportedIntegration(S, p.event, nil)
+                if p.event == "WinEnter" and not isSupportedIntegration then
                     return
                 end
 

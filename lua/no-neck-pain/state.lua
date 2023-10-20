@@ -87,6 +87,30 @@ function State:reopenIntegration()
     end
 end
 
+---Gets the tree with the given `win` if it's already registered.
+---
+---@param id integer: the tree to search for.
+---@return table?: the registered tree.
+---@private
+function State:getIntegration(id)
+    if
+        not self.enabled
+        or not self.hasTabs(self)
+        or self.getTab(self) == nil
+        or self.tabs[self.activeTab].wins.integrations == nil
+    then
+        return nil
+    end
+
+    for _, opts in pairs(self.tabs[self.activeTab].wins.integrations) do
+        if opts.id == id then
+            return opts
+        end
+    end
+
+    return nil
+end
+
 ---Gets all wins that are not already registered in the given `tab`.
 ---
 ---@return table: the wins that are not in `tab`.
@@ -128,35 +152,37 @@ function State:getRegisteredWins()
     return wins
 end
 
----Whether the given `fileType` matches a supported side tree or not.
+---Whether the given `fileType` matches a supported integration or not.
 ---
 ---@param scope string: caller of the method.
 ---@param win integer?: the id of the win
 ---@return boolean
 ---@return table|nil
 ---@private
-function State:isSideTree(scope, win)
+function State:isSupportedIntegration(scope, win)
     win = win or 0
     local tab = self.getTabSafe(self)
     local buffer = vim.api.nvim_win_get_buf(win)
     local fileType = vim.api.nvim_buf_get_option(buffer, "filetype")
 
-    if fileType == "" then
-        fileType = vim.api.nvim_buf_get_name(buffer)
+    local existing = self.getIntegration(self, win)
+    if existing ~= nil then
+        D.log(scope, "integration already registered, skipping computing...")
+
+        return true, existing
     end
 
     if fileType == "" and tab ~= nil then
-        D.log(scope, "no name or filetype matching a tree, searching in wins...")
-
         local wins = self.getUnregisteredWins(self)
 
+        D.log(scope, "computing recursively")
         if #wins ~= 1 or wins[1] == win then
             D.log(scope, "too many windows to determine")
 
             return false, nil
         end
 
-        return self.isSideTree(self, scope, wins[1])
+        return self.isSupportedIntegration(self, scope, wins[1])
     end
 
     local registeredIntegrations = tab ~= nil and tab.wins.integrations or C.integrations
@@ -181,8 +207,9 @@ function State:scanIntegrations()
     local unregisteredIntegrations = vim.deepcopy(C.integrations)
 
     for _, win in pairs(wins) do
-        local isSideTree, external = self.isSideTree(self, "S.scanIntegrations", win)
-        if isSideTree and external ~= nil then
+        local isSupportedIntegration, external =
+            self.isSupportedIntegration(self, "S.scanIntegrations", win)
+        if isSupportedIntegration and external ~= nil then
             external.width = vim.api.nvim_win_get_width(win) * 2
             external.id = win
 

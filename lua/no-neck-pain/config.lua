@@ -277,8 +277,8 @@ NoNeckPain.options = {
         -- @link https://github.com/nvim-neotest/neotest
         neotest = {
             -- The position of the tree.
-            --- @type "none"
-            position = "none",
+            --- @type "right"
+            position = "right",
             -- When `true`, if the tree was opened before enabling the plugin, we will reopen it.
             reopen = true,
         },

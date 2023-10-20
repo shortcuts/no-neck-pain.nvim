@@ -18,4 +18,8 @@ require("neo-tree").setup({
     },
 })
 require("mini.test").setup()
-require("no-neck-pain").setup({ width = 1, minSideBufferWidth = 0 })
+require("no-neck-pain").setup({
+    width = 1,
+    minSideBufferWidth = 0,
+    integrations = { NeoTree = { reopen = true } },
+})

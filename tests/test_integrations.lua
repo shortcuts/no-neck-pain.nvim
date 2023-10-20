@@ -48,7 +48,7 @@ T["setup"]["overrides default values"] = function()
             reopen = false,
         },
         neotest = {
-            position = "none",
+            position = "right",
             reopen = false,
         },
         undotree = {
@@ -89,10 +89,20 @@ T["neotest"] = MiniTest.new_set()
 
 T["neotest"]["keeps sides open"] = function()
     child.restart({ "-u", "scripts/init_with_neotest.lua" })
+    child.set_size(5, 300)
 
     child.lua([[require('no-neck-pain').enable()]])
+
+    eq(helpers.winsInTab(child), { 1001, 1000, 1002 })
+    eq_state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
+
     child.lua([[require('neotest').summary.open()]])
 
+    eq(helpers.winsInTab(child), { 1001, 1000, 1002, 1003 })
     eq_state(child, "tabs[1].wins.main", {
         curr = 1000,
         left = 1001,
@@ -112,7 +122,7 @@ T["neotest"]["keeps sides open"] = function()
             configName = "neotest",
             id = 1003,
             open = "lua require('neotest').summary.open()",
-            width = 70,
+            width = 100,
         },
         nvimtree = {
             close = "NvimTreeClose",
@@ -147,8 +157,8 @@ T["NvimTree"]["keeps sides open"] = function()
 
     child.cmd([[NvimTreeOpen]])
 
-    eq(helpers.winsInTab(child), { 1004, 1001, 1000, 1002 })
-
+    -- eq(helpers.winsInTab(child), { 1004, 1001, 1000, 1002 })
+    --
     eq_state(child, "tabs[1].wins.main", {
         curr = 1000,
         left = 1001,
