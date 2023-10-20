@@ -35,6 +35,10 @@ T["setup"]["overrides default values"] = function()
             neotest = {
                 reopen = false,
             },
+            TSPlayground = {
+                reopen = false,
+                position = "left",
+            },
         }
     })]])
 
@@ -53,6 +57,10 @@ T["setup"]["overrides default values"] = function()
         },
         undotree = {
             position = "right",
+        },
+        TSPlayground = {
+            position = "left",
+            reopen = false,
         },
     })
 end

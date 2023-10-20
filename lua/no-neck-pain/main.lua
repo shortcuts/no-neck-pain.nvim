@@ -150,6 +150,10 @@ function N.enable(scope)
                     )
                 end
 
+                if vim.api.nvim_get_current_win() == S.getSideID(S, "curr") then
+                    return D.log(p.event, "skip split logic: current win")
+                end
+
                 local focusedWin = wins[1]
 
                 local isVSplit = S.computeSplits(S, focusedWin)

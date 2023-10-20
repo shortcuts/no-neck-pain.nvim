@@ -49,6 +49,11 @@ C.integrations = {
         close = "lua require('neotest').summary.close()",
         open = "lua require('neotest').summary.open()",
     },
+    tsplayground = {
+        configName = "TSPlayground",
+        close = "TSPlaygroundToggle",
+        open = "TSPlaygroundToggle",
+    },
 }
 
 return C
