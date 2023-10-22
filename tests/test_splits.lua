@@ -28,6 +28,7 @@ T["split"]["only one side buffer, closing help doesn't close NNP"] = function()
     ]])
 
     child.cmd("h")
+    child.loop.sleep(50)
 
     eq(helpers.winsInTab(child), { 1001, 1002, 1000 })
     eq_state(child, "tabs[1].wins.main", { curr = 1000, left = 1001 })
@@ -49,6 +50,7 @@ T["split"]["closing `curr` makes `split` the new `curr`"] = function()
     ]])
 
     child.cmd("split")
+    child.loop.sleep(50)
 
     eq(helpers.winsInTab(child), { 1001, 1003, 1000, 1002 })
     eq_state(child, "tabs[1].wins.main", {
@@ -73,6 +75,7 @@ T["split"]["keeps side buffers"] = function()
     ]])
 
     child.cmd("split")
+    child.loop.sleep(50)
 
     eq(helpers.winsInTab(child), { 1001, 1003, 1000, 1002 })
     eq_state(child, "tabs[1].wins.main", {
@@ -120,27 +123,6 @@ end
 
 T["vsplit"] = new_set()
 
-T["vsplit"]["register new non-focused windows (TSPlayground)"] = function()
-    child.restart({ "-u", "scripts/init_with_tsplayground.lua" })
-    child.set_size(300, 300)
-
-    child.lua([[ require('no-neck-pain').enable() ]])
-
-    eq(helpers.winsInTab(child), { 1001, 1000, 1002 })
-
-    child.cmd("TSPlaygroundToggle")
-    eq(helpers.currentWin(child), 1000)
-
-    eq(helpers.winsInTab(child), { 1001, 1004, 1000, 1002 })
-
-    eq_state(child, "tabs[1].wins.main", {
-        curr = 1000,
-        left = 1001,
-        right = 1002,
-    })
-    eq_state(child, "tabs[1].wins.splits[1004]", { id = 1004, vertical = true })
-end
-
 T["vsplit"]["does not create side buffers when there's not enough space"] = function()
     child.cmd("vsplit")
     child.cmd("vsplit")
@@ -164,6 +146,7 @@ T["vsplit"]["corretly size splits when opening helper with side buffers open"] =
     ]])
 
     child.cmd("vsplit")
+    child.loop.sleep(50)
 
     eq(helpers.winsInTab(child), { 1001, 1003, 1000, 1002 })
 
@@ -171,6 +154,7 @@ T["vsplit"]["corretly size splits when opening helper with side buffers open"] =
     eq_buf_width(child, "tabs[1].wins.main.curr", 67)
 
     child.cmd("h")
+    child.loop.sleep(50)
 
     eq(helpers.winsInTab(child), { 1004, 1001, 1003, 1000, 1002 })
 
@@ -202,6 +186,7 @@ T["vsplit"]["preserve vsplit width when having side buffers"] = function()
     eq(helpers.winsInTab(child), { 1001, 1000 })
 
     child.cmd("vsplit")
+    child.loop.sleep(50)
 
     eq(helpers.winsInTab(child), { 1001, 1002, 1000 })
 
@@ -216,6 +201,7 @@ T["vsplit"]["closing `curr` makes `split` the new `curr`"] = function()
     ]])
 
     child.cmd("vsplit")
+    child.loop.sleep(50)
 
     eq(helpers.winsInTab(child), { 1001, 1003, 1000, 1002 })
     eq_state(child, "tabs[1].wins.main", {
@@ -244,6 +230,7 @@ T["vsplit"]["hides side buffers"] = function()
     ]])
 
     child.cmd("vsplit")
+    child.loop.sleep(50)
 
     eq(helpers.winsInTab(child), { 1003, 1000 })
     eq_state(child, "tabs[1].wins.main", {
@@ -273,9 +260,14 @@ T["vsplit"]["many vsplit leave side buffers open as long as there's space for it
     eq(helpers.winsInTab(child), { 1001, 1000, 1002 })
 
     child.cmd("vsplit")
+    child.loop.sleep(50)
     child.cmd("vsplit")
+    child.loop.sleep(50)
+
     eq(helpers.winsInTab(child), { 1004, 1003, 1000 })
+
     child.cmd("q")
+    child.loop.sleep(50)
 
     eq(helpers.winsInTab(child), { 1005, 1003, 1000, 1006 })
     eq_state(child, "tabs[_G.NoNeckPain.state.activeTab].wins.main", {
@@ -320,10 +312,15 @@ T["vsplit/split"]["state is correctly sync'd even after many changes"] = functio
     child.cmd("q")
 
     child.cmd("vsplit")
+    child.loop.sleep(50)
+
     eq(helpers.winsInTab(child), { 1001, 1004, 1000, 1002 })
 
     child.cmd("vsplit")
+    child.loop.sleep(50)
+
     eq(helpers.winsInTab(child), { 1005, 1004, 1000 })
+
     child.cmd("q")
     child.cmd("q")
 
@@ -345,10 +342,15 @@ T["vsplit/split"]["closing side buffers because of splits restores focus"] = fun
     eq(helpers.winsInTab(child), { 1001, 1000, 1002 })
 
     child.cmd("vsplit")
+    child.loop.sleep(50)
+
     eq(helpers.winsInTab(child), { 1001, 1003, 1000, 1002 })
 
     child.cmd("vsplit")
+    child.loop.sleep(50)
     child.cmd("vsplit")
+    child.loop.sleep(50)
+
     eq(helpers.winsInTab(child), { 1005, 1004, 1003, 1000 })
 
     child.cmd("q")

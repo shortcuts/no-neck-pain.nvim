@@ -1,4 +1,6 @@
-local A = {}
+local D = require("no-neck-pain.util.debug")
+
+local A = { debouncers = {} }
 
 ---Returns the name of the augroup for the given tab ID.
 ---
@@ -41,6 +43,62 @@ function A.isRelativeWindow(win)
     end
 
     return false
+end
+
+local function timer_stop_close(timer)
+    if timer:is_active() then
+        timer:stop()
+    end
+    if not timer:is_closing() then
+        timer:close()
+    end
+end
+
+---Execute callback timeout ms after the latest invocation with context.
+---Waiting invocations for that context will be discarded.
+---Invocation will be rescheduled while a callback is being executed.
+---Caller must ensure that callback performs the same or functionally equivalent actions.
+---
+---@param context string: identifies the callback to debounce
+---@param callback function: to execute on completion
+function A.debounce(context, callback)
+    local timeout =  50
+    -- all execution here is done in a synchronous context; no thread safety required
+
+    A.debouncers[context] = A.debouncers[context] or {}
+    local debouncer = A.debouncers[context]
+
+    -- cancel waiting or executing timer
+    if debouncer.timer then
+        D.log(context, "cancelling ongoing debouncers")
+
+        timer_stop_close(debouncer.timer)
+    end
+
+    local timer = vim.loop.new_timer()
+    debouncer.timer = timer
+    timer:start(timeout, 0, function()
+        timer_stop_close(timer)
+
+        -- reschedule when callback is running
+        if debouncer.executing then
+            D.log(context, "already running, skipping")
+            return A.debounce(context, callback)
+        end
+
+        -- callback at a safe time
+        debouncer.executing = true
+        vim.schedule(function()
+            D.log(context, "running on debounce")
+            callback()
+            debouncer.executing = false
+
+            -- no other timer waiting
+            if debouncer.timer == timer then
+                A.debouncers[context] = nil
+            end
+        end)
+    end)
 end
 
 return A

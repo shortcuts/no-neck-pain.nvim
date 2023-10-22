@@ -125,7 +125,8 @@ function N.enable(scope)
 
     vim.api.nvim_create_autocmd({ "WinEnter" }, {
         callback = function(p)
-            vim.schedule(function()
+            p.event = string.format("%s:splits", p.event)
+            A.debounce(p.event, function()
                 if not S.hasTabs(S) or E.skip(S.tabs[S.activeTab]) then
                     return
                 end
@@ -135,10 +136,10 @@ function N.enable(scope)
                     return D.log(p.event, "skip split logic: no side buffer")
                 end
 
-                -- a side tree isn't considered as a split
+                -- an integration isn't considered as a split
                 local isSupportedIntegration, _ = S.isSupportedIntegration(S, p.event, nil)
                 if isSupportedIntegration then
-                    return D.log(p.event, "skip split logic: side tree")
+                    return D.log(p.event, "skip split logic: integration")
                 end
 
                 local wins = S.getUnregisteredWins(S)
@@ -253,12 +254,13 @@ function N.enable(scope)
 
     vim.api.nvim_create_autocmd({ "WinEnter", "WinClosed" }, {
         callback = function(p)
-            vim.schedule(function()
+            p.event = string.format("%s:integrations", p.event)
+            A.debounce(p.event, function()
                 if not S.hasTabs(S) or not S.isActiveTabRegistered(S) or E.skip(S.getTab(S)) then
                     return
                 end
 
-                -- We can skip enter hooks that are not on a side tree
+                -- We can skip enter hooks that are not on an integration
                 local isSupportedIntegration, _ = S.isSupportedIntegration(S, p.event, nil)
                 if p.event == "WinEnter" and not isSupportedIntegration then
                     return
@@ -269,7 +271,7 @@ function N.enable(scope)
                 local stateIntegrations = vim.deepcopy(S.tabs[S.activeTab].wins.integrations)
                 local shouldInit = false
 
-                S.refreshIntegrations(S)
+                S.refreshIntegrations(S, p.event)
 
                 for name, tree in pairs(S.tabs[S.activeTab].wins.integrations) do
                     if
@@ -279,7 +281,7 @@ function N.enable(scope)
                             and stateIntegrations[name].id ~= nil
                             and (tree.id == nil or tree.id ~= tree.id)
                         )
-                        -- if we registered a new side tree
+                        -- if we registered a new integration
                         or (
                             tree.id ~= nil
                             and (
@@ -300,7 +302,7 @@ function N.enable(scope)
             end)
         end,
         group = augroupName,
-        desc = "Resize to apply on WinEnter/Closed of external windows",
+        desc = "Resize to apply on WinEnter/Closed of an integration",
     })
 
     return S

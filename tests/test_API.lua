@@ -135,18 +135,26 @@ T["setup"]["sets exposed methods and default options value"] = function()
         })
     end
 
-    eq_config(child, "integrations.NvimTree", {
-        position = "left",
-        reopen = true,
-    })
-
-    eq_config(child, "integrations.NeoTree", {
-        position = "left",
-        reopen = true,
-    })
-
-    eq_config(child, "integrations.undotree", {
-        position = "left",
+    eq_config(child, "integrations", {
+        NeoTree = {
+            position = "left",
+            reopen = true,
+        },
+        NvimTree = {
+            position = "left",
+            reopen = true,
+        },
+        TSPlayground = {
+            position = "right",
+            reopen = true,
+        },
+        neotest = {
+            position = "right",
+            reopen = true,
+        },
+        undotree = {
+            position = "left",
+        },
     })
 end
 

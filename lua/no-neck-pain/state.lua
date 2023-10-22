@@ -56,9 +56,10 @@ end
 
 ---Refresh the integrations of the active state tab.
 ---
+---@param scope string: the caller of the method.
 ---@private
-function State:refreshIntegrations()
-    self.tabs[self.activeTab].wins.integrations = self.scanIntegrations(self)
+function State:refreshIntegrations(scope)
+    self.tabs[self.activeTab].wins.integrations = self.scanIntegrations(self, scope)
 end
 
 ---Closes side integrations if opened.
@@ -87,10 +88,10 @@ function State:reopenIntegration()
     end
 end
 
----Gets the tree with the given `win` if it's already registered.
+---Gets the integration with the given `win` if it's already registered.
 ---
----@param id integer: the tree to search for.
----@return table?: the registered tree.
+---@param id integer: the integration to search for.
+---@return table?: the registered integration.
 ---@private
 function State:getIntegration(id)
     if
@@ -103,7 +104,7 @@ function State:getIntegration(id)
     end
 
     for _, opts in pairs(self.tabs[self.activeTab].wins.integrations) do
-        if opts.id == id then
+        if opts.id ~= nil and opts.id == id then
             return opts
         end
     end
@@ -187,11 +188,11 @@ function State:isSupportedIntegration(scope, win)
 
     local registeredIntegrations = tab ~= nil and tab.wins.integrations or C.integrations
 
-    for treeFileType, tree in pairs(registeredIntegrations) do
-        if vim.startswith(string.lower(fileType), treeFileType) then
-            D.log(scope, "win '%d' is a side tree '%s'", win, fileType)
+    for integrationFileType, integration in pairs(registeredIntegrations) do
+        if vim.startswith(string.lower(fileType), integrationFileType) then
+            D.log(scope, "win '%d' is an integration '%s'", win, fileType)
 
-            return true, tab ~= nil and tree or nil
+            return true, tab ~= nil and integration or nil
         end
     end
 
@@ -200,20 +201,20 @@ end
 
 ---Scans the current tab wins to update registered side integrations.
 ---
+---@param scope string: the caller of the method.
 ---@return table: the update state integrations table.
 ---@private
-function State:scanIntegrations()
-    local wins = vim.api.nvim_tabpage_list_wins(self.activeTab)
+function State:scanIntegrations(scope)
+    local wins = self.getUnregisteredWins(self)
     local unregisteredIntegrations = vim.deepcopy(C.integrations)
 
     for _, win in pairs(wins) do
-        local isSupportedIntegration, external =
-            self.isSupportedIntegration(self, "S.scanIntegrations", win)
-        if isSupportedIntegration and external ~= nil then
-            external.width = vim.api.nvim_win_get_width(win) * 2
-            external.id = win
+        local isSupportedIntegration, integration = self.isSupportedIntegration(self, scope, win)
+        if isSupportedIntegration and integration ~= nil then
+            integration.width = vim.api.nvim_win_get_width(win) * 2
+            integration.id = win
 
-            unregisteredIntegrations[external.configName] = external
+            unregisteredIntegrations[integration.configName] = integration
         end
     end
 

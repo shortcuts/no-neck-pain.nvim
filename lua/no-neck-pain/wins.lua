@@ -127,7 +127,7 @@ end
 ---@private
 function W.createSideBuffers(skipIntegrations)
     -- before creating side buffers, we determine if we should consider externals
-    S.refreshIntegrations(S)
+    S.refreshIntegrations(S, "createSideBuffers")
 
     local wins = {
         left = { cmd = "topleft vnew", padding = 0 },
@@ -215,7 +215,7 @@ function W.createSideBuffers(skipIntegrations)
     end
 
     -- we might have closed integrations during the buffer creation process, we re-fetch the latest IDs to prevent inconsistencies
-    S.refreshIntegrations(S)
+    S.refreshIntegrations(S, "createSideBuffers")
 end
 
 ---Determine the "padding" (width) of the buffer based on the `_G.NoNeckPain.config.width` and the width of the screen.
