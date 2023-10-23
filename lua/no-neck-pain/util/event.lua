@@ -52,7 +52,7 @@ function E.skipEnable()
         return true
     end
 
-    local isSupportedIntegration, _ = S.isSupportedIntegration(S, "E.skipEnable", nil)
+    local isSupportedIntegration = S.isSupportedIntegration(S, "E.skipEnable", nil)
     if isSupportedIntegration or vim.bo.filetype == "dashboard" then
         return true
     end

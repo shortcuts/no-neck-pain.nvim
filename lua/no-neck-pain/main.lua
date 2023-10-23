@@ -141,7 +141,7 @@ function N.enable(scope)
                 end
 
                 -- an integration isn't considered as a split
-                local isSupportedIntegration, _ = S.isSupportedIntegration(S, p.event, nil)
+                local isSupportedIntegration = S.isSupportedIntegration(S, p.event, nil)
                 if isSupportedIntegration then
                     return D.log(p.event, "skip split logic: integration")
                 end
@@ -266,7 +266,7 @@ function N.enable(scope)
 
                 -- We can skip enter hooks that are not on an integration
                 if p.event == "WinEnter" then
-                    local isSupportedIntegration, _ = S.isSupportedIntegration(S, p.event, nil)
+                    local isSupportedIntegration = S.isSupportedIntegration(S, p.event, nil)
                     if not isSupportedIntegration then
                         return
                     end

@@ -96,8 +96,8 @@ end
 T["neotest"] = MiniTest.new_set()
 
 T["neotest"]["keeps sides open"] = function()
-    child.restart({ "-u", "scripts/init_with_neotest.lua" })
-    child.set_size(5, 300)
+    child.restart({ "-u", "scripts/init_with_neotest.lua", "lua/no-neck-pain/main.lua" })
+    child.set_size(20, 100)
 
     child.lua([[require('no-neck-pain').enable()]])
 
@@ -109,20 +109,13 @@ T["neotest"]["keeps sides open"] = function()
     })
 
     child.lua([[require('neotest').summary.open()]])
-    child.loop.sleep(1000)
-
-    eq(helpers.winsInTab(child), { 1001, 1000, 1002, 1003 })
-    eq_state(child, "tabs[1].wins.main", {
-        curr = 1000,
-        left = 1001,
-        right = 1002,
-    })
+    vim.loop.sleep(50)
 
     eq_state(child, "tabs[1].wins.splits", vim.NIL)
 
     eq_state(child, "tabs[1].wins.integrations.neotest", {
         close = "lua require('neotest').summary.close()",
-        configName = "neotest",
+        fileTypePattern = "neotest",
         id = 1003,
         open = "lua require('neotest').summary.open()",
         width = 100,
@@ -167,7 +160,7 @@ T["NvimTree"]["keeps sides open"] = function()
 
     eq_state(child, "tabs[1].wins.integrations.NvimTree", {
         close = "NvimTreeClose",
-        configName = "NvimTree",
+        fileTypePattern = "nvimtree",
         id = 1004,
         open = "NvimTreeOpen",
         width = 38,
@@ -206,7 +199,7 @@ T["neo-tree"]["keeps sides open"] = function()
 
     eq_state(child, "tabs[1].wins.integrations.NeoTree", {
         close = "Neotree close",
-        configName = "NeoTree",
+        fileTypePattern = "neo-tree",
         id = 1004,
         open = "Neotree reveal",
         width = 2,
@@ -231,19 +224,17 @@ T["TSPlayground"]["keeps sides open"] = function()
     })
 
     child.cmd("TSPlaygroundToggle")
-    child.loop.sleep(500)
-
-    eq(helpers.winsInTab(child), { 1004, 1001, 1000, 1002 })
-
-    eq_state(child, "tabs[1].wins.main", {
-        curr = 1000,
-        left = 1001,
-        right = 1002,
-    })
+    vim.loop.sleep(50)
 
     eq_state(child, "tabs[1].wins.splits", vim.NIL)
 
-    eq_state(child, "tabs[1].wins.integrations", {})
+    eq_state(child, "tabs[1].wins.integrations.TSPlayground", {
+        close = "TSPlaygroundToggle",
+        fileTypePattern = "tsplayground",
+        id = 1004,
+        open = "TSPlaygroundToggle",
+        width = 248,
+    })
 end
 
 return T

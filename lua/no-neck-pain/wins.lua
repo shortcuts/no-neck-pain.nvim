@@ -269,7 +269,7 @@ function W.getPadding(side)
         if
             tree ~= nil
             and tree.id ~= nil
-            and side == _G.NoNeckPain.config.integrations[tree.configName].position
+            and side == _G.NoNeckPain.config.integrations[name].position
         then
             D.log(
                 "W.getPadding",

@@ -77,11 +77,11 @@ end
 ---
 ---@private
 function State:reopenIntegration()
-    for _, opts in pairs(self.tabs[self.activeTab].wins.integrations) do
+    for name, opts in pairs(self.tabs[self.activeTab].wins.integrations) do
         if
             opts.id ~= nil
             and opts.open ~= nil
-            and _G.NoNeckPain.config.integrations[opts.configName].reopen == true
+            and _G.NoNeckPain.config.integrations[name].reopen == true
         then
             vim.cmd(opts.open)
         end
@@ -91,7 +91,8 @@ end
 ---Gets the integration with the given `win` if it's already registered.
 ---
 ---@param id integer: the integration to search for.
----@return table?: the registered integration.
+---@return string?: the integration name.
+---@return table?: the integration infos.
 ---@private
 function State:getIntegration(id)
     if
@@ -100,16 +101,16 @@ function State:getIntegration(id)
         or self.getTab(self) == nil
         or self.tabs[self.activeTab].wins.integrations == nil
     then
-        return nil
+        return nil, nil
     end
 
-    for _, opts in pairs(self.tabs[self.activeTab].wins.integrations) do
+    for name, opts in pairs(self.tabs[self.activeTab].wins.integrations) do
         if opts.id ~= nil and opts.id == id then
-            return opts
+            return name, opts
         end
     end
 
-    return nil
+    return nil, nil
 end
 
 ---Gets all wins that are not already registered in the given `tab`.
@@ -157,8 +158,9 @@ end
 ---
 ---@param scope string: caller of the method.
 ---@param win integer?: the id of the win
----@return boolean
----@return table|nil
+---@return boolean: whether the current win is a integration or not.
+---@return string?: the supported integration name.
+---@return table?: the supported integration infos.
 ---@private
 function State:isSupportedIntegration(scope, win)
     win = win or 0
@@ -166,11 +168,11 @@ function State:isSupportedIntegration(scope, win)
     local buffer = vim.api.nvim_win_get_buf(win)
     local fileType = vim.api.nvim_buf_get_option(buffer, "filetype")
 
-    local existing = self.getIntegration(self, win)
-    if existing ~= nil then
+    local integrationName, integrationInfo = self.getIntegration(self, win)
+    if integrationName and integrationInfo then
         D.log(scope, "integration already registered, skipping computing...")
 
-        return true, existing
+        return true, integrationName, integrationInfo
     end
 
     if fileType == "" and tab ~= nil then
@@ -180,7 +182,7 @@ function State:isSupportedIntegration(scope, win)
         if #wins ~= 1 or wins[1] == win then
             D.log(scope, "too many windows to determine")
 
-            return false, nil
+            return false, nil, nil
         end
 
         return self.isSupportedIntegration(self, scope, wins[1])
@@ -188,11 +190,15 @@ function State:isSupportedIntegration(scope, win)
 
     local registeredIntegrations = tab ~= nil and tab.wins.integrations or C.integrations
 
-    for integrationFileType, integration in pairs(registeredIntegrations) do
-        if vim.startswith(string.lower(fileType), integrationFileType) then
+    for name, integration in pairs(registeredIntegrations) do
+        if vim.startswith(string.lower(fileType), integration.fileTypePattern) then
             D.log(scope, "win '%d' is an integration '%s'", win, fileType)
 
-            return true, tab ~= nil and integration or nil
+            if tab ~= nil then
+                return true, name, integration
+            end
+
+            return true, nil
         end
     end
 
@@ -209,12 +215,12 @@ function State:scanIntegrations(scope)
     local unregisteredIntegrations = vim.deepcopy(C.integrations)
 
     for _, win in pairs(wins) do
-        local isSupportedIntegration, integration = self.isSupportedIntegration(self, scope, win)
-        if isSupportedIntegration and integration ~= nil then
+        local supported, name, integration = self.isSupportedIntegration(self, scope, win)
+        if supported and name and integration then
             integration.width = vim.api.nvim_win_get_width(win) * 2
             integration.id = win
 
-            unregisteredIntegrations[integration.configName] = integration
+            unregisteredIntegrations[name] = integration
         end
     end
 

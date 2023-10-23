@@ -34,23 +34,28 @@ C.INTEGRATIONS = {
 }
 
 C.integrations = {
-    nvimtree = {
-        configName = "NvimTree",
+    NvimTree = {
+        fileTypePattern = "nvimtree",
         close = "NvimTreeClose",
         open = "NvimTreeOpen",
     },
-    ["neo-tree"] = {
-        configName = "NeoTree",
+    NeoTree = {
+        fileTypePattern = "neo-tree",
         close = "Neotree close",
         open = "Neotree reveal",
     },
     neotest = {
-        configName = "neotest",
+        fileTypePattern = "neotest",
         close = "lua require('neotest').summary.close()",
         open = "lua require('neotest').summary.open()",
     },
-    tsplayground = {
-        configName = "TSPlayground",
+    undotree = {
+        fileTypePattern = "undotree",
+        close = "UndotreeToggle",
+        open = "UndotreeToggle",
+    },
+    TSPlayground = {
+        fileTypePattern = "tsplayground",
         close = "TSPlaygroundToggle",
         open = "TSPlaygroundToggle",
     },
