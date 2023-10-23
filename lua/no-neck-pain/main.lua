@@ -136,6 +136,10 @@ function N.enable(scope)
                     return D.log(p.event, "skip split logic: no side buffer")
                 end
 
+                if S.isSideTheActiveWin(S, "curr") then
+                    return D.log(p.event, "skip split logic: current win")
+                end
+
                 -- an integration isn't considered as a split
                 local isSupportedIntegration, _ = S.isSupportedIntegration(S, p.event, nil)
                 if isSupportedIntegration then
@@ -149,10 +153,6 @@ function N.enable(scope)
                         p.event,
                         "skip split logic: no new or too many unregistered windows"
                     )
-                end
-
-                if vim.api.nvim_get_current_win() == S.getSideID(S, "curr") then
-                    return D.log(p.event, "skip split logic: current win")
                 end
 
                 local focusedWin = wins[1]
@@ -260,10 +260,16 @@ function N.enable(scope)
                     return
                 end
 
+                -- if S.isSideTheActiveWin(S, "curr") then
+                --     return D.log(p.event, "skip integrations logic: current win")
+                -- end
+
                 -- We can skip enter hooks that are not on an integration
-                local isSupportedIntegration, _ = S.isSupportedIntegration(S, p.event, nil)
-                if p.event == "WinEnter" and not isSupportedIntegration then
-                    return
+                if p.event == "WinEnter" then
+                    local isSupportedIntegration, _ = S.isSupportedIntegration(S, p.event, nil)
+                    if not isSupportedIntegration then
+                        return
+                    end
                 end
 
                 -- we copy the state so we can compare with the refreshed integrations what changed
