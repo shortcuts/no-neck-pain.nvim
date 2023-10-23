@@ -71,8 +71,6 @@ function A.debounce(context, callback)
 
     -- cancel waiting or executing timer
     if debouncer.timer then
-        D.log(context, "cancelling ongoing debouncers")
-
         timer_stop_close(debouncer.timer)
     end
 
@@ -83,7 +81,7 @@ function A.debounce(context, callback)
 
         -- reschedule when callback is running
         if debouncer.executing then
-            D.log(context, "already running, skipping")
+            D.log(context, "already running on debounce, skipping")
             return A.debounce(context, callback)
         end
 

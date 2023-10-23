@@ -134,7 +134,9 @@ function W.createSideBuffers(skipIntegrations)
         right = { cmd = "botright vnew", padding = 0 },
     }
 
+    local closedIntegrations = false
     if not skipIntegrations then
+        closedIntegrations = true
         S.closeIntegration(S)
     end
 
@@ -184,7 +186,7 @@ function W.createSideBuffers(skipIntegrations)
         end
     end
 
-    if not skipIntegrations then
+    if closedIntegrations and not skipIntegrations then
         S.reopenIntegration(S)
     end
 
@@ -214,8 +216,10 @@ function W.createSideBuffers(skipIntegrations)
         end
     end
 
-    -- we might have closed integrations during the buffer creation process, we re-fetch the latest IDs to prevent inconsistencies
-    S.refreshIntegrations(S, "createSideBuffers")
+    -- closing integrations and reopening them means new window IDs
+    if closedIntegrations then
+        S.refreshIntegrations(S, "createSideBuffers")
+    end
 end
 
 ---Determine the "padding" (width) of the buffer based on the `_G.NoNeckPain.config.width` and the width of the screen.

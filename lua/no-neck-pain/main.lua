@@ -296,7 +296,7 @@ function N.enable(scope)
                             )
                         )
                     then
-                        D.log(p.event, "%s has changed, resizing", name)
+                        D.log(p.event, "'%s' has been registered or changed, resizing", name)
 
                         shouldInit = true
                     end
