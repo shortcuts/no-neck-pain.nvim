@@ -33,4 +33,37 @@ C.INTEGRATIONS = {
     ["tokyonight-storm"] = "#1f2335",
 }
 
+C.integrations = {
+    NvimTree = {
+        fileTypePattern = "nvimtree",
+        close = "NvimTreeClose",
+        open = "NvimTreeOpen",
+    },
+    NeoTree = {
+        fileTypePattern = "neo-tree",
+        close = "Neotree close",
+        open = "Neotree reveal",
+    },
+    neotest = {
+        fileTypePattern = "neotest",
+        close = "lua require('neotest').summary.close()",
+        open = "lua require('neotest').summary.open()",
+    },
+    undotree = {
+        fileTypePattern = "undotree",
+        close = "UndotreeToggle",
+        open = "UndotreeToggle",
+    },
+    TSPlayground = {
+        fileTypePattern = "tsplayground",
+        close = "TSPlaygroundToggle",
+        open = "TSPlaygroundToggle",
+    },
+    NvimDAPUI = {
+        fileTypePattern = "dap",
+        close = "lua require('dapui').close()",
+        open = "lua require('dapui').open()",
+    },
+}
+
 return C

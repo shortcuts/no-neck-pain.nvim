@@ -1,4 +1,15 @@
-local A = {}
+local D = require("no-neck-pain.util.debug")
+
+local A = { debouncers = {} }
+
+---Returns the name of the augroup for the given tab ID.
+---
+---@param id number?: the id of the tab.
+---@return string: the initialied state
+---@private
+function A.getAugroupName(id)
+    return string.format("NoNeckPain-%d", id)
+end
 
 ---returns the width and height of a given window
 ---
@@ -14,75 +25,6 @@ function A.getWidthAndHeight(win)
     end
 
     return vim.api.nvim_win_get_width(win), vim.api.nvim_win_get_height(win)
-end
-
----computes whether the "side" is defined and exists.
----
----@param tab table: the table where the tab information are stored.
----@param side "left"|"right": the side of the window being resized.
----@return boolean: whether the side exists or not.
----@private
-function A.sideExist(tab, side)
-    if tab == nil then
-        return false
-    end
-
-    return _G.NoNeckPain.config.buffers[side].enabled and tab.wins.main[side] ~= nil
-end
-
----whether the currently focused window is the provided one.
----
----@return boolean
----@param win number?: the win number, defaults to 0 if nil
----@private
-function A.isCurrentWin(win)
-    return vim.api.nvim_get_current_win() == win
-end
-
-function A.mergeState(main, splits, trees)
-    local wins = {}
-
-    if main ~= nil then
-        for _, side in pairs(main) do
-            table.insert(wins, side)
-        end
-    end
-
-    if splits ~= nil then
-        for _, split in pairs(splits) do
-            table.insert(wins, split.id)
-        end
-    end
-
-    if trees ~= nil then
-        for _, tree in pairs(trees) do
-            table.insert(wins, tree.id)
-        end
-    end
-
-    return wins
-end
-
----Gets all wins that are not already registered in the given `tab`, we consider side trees if provided.
----
----@param tab table: the table where the tab information are stored.
----@param withTrees boolean: whether we should consider external windows or not.
----@return table: the wins that are not in `tab`.
----@private
-function A.winsExceptState(tab, withTrees)
-    local wins = vim.api.nvim_tabpage_list_wins(tab.id)
-    local mergedWins =
-        A.mergeState(tab.wins.main, tab.wins.splits, withTrees and tab.wins.external.trees or nil)
-
-    local validWins = {}
-
-    for _, win in pairs(wins) do
-        if not vim.tbl_contains(mergedWins, win) and not A.isRelativeWindow(win) then
-            table.insert(validWins, win)
-        end
-    end
-
-    return validWins
 end
 
 ---Determines if the given `win` or the current window is relative.
@@ -101,6 +43,61 @@ function A.isRelativeWindow(win)
     end
 
     return false
+end
+
+local function timer_stop_close(timer)
+    if timer:is_active() then
+        timer:stop()
+    end
+    if not timer:is_closing() then
+        timer:close()
+    end
+end
+
+---Execute callback timeout ms after the latest invocation with context.
+---Waiting invocations for that context will be discarded.
+---Invocation will be rescheduled while a callback is being executed.
+---Caller must ensure that callback performs the same or functionally equivalent actions.
+---
+---@param context string: identifies the callback to debounce
+---@param callback function: to execute on completion
+---@private
+function A.debounce(context, callback)
+    local timeout = 50
+    -- all execution here is done in a synchronous context; no thread safety required
+
+    A.debouncers[context] = A.debouncers[context] or {}
+    local debouncer = A.debouncers[context]
+
+    -- cancel waiting or executing timer
+    if debouncer.timer then
+        timer_stop_close(debouncer.timer)
+    end
+
+    local timer = vim.loop.new_timer()
+    debouncer.timer = timer
+    timer:start(timeout, 0, function()
+        timer_stop_close(timer)
+
+        -- reschedule when callback is running
+        if debouncer.executing then
+            D.log(context, "already running on debounce, skipping")
+            return A.debounce(context, callback)
+        end
+
+        -- callback at a safe time
+        debouncer.executing = true
+        vim.schedule(function()
+            D.log(context, "running on debounce")
+            callback()
+            debouncer.executing = false
+
+            -- no other timer waiting
+            if debouncer.timer == timer then
+                A.debouncers[context] = nil
+            end
+        end)
+    end)
 end
 
 return A

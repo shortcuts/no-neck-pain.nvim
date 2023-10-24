@@ -29,11 +29,18 @@ T["setup"]["overrides default values"] = function()
                 position = "right",
                 reopen = false,
             },
+            NvimDAPUI = {
+                reopen = false,
+            },
             undotree = {
                 position = "right",
             },
             neotest = {
                 reopen = false,
+            },
+            TSPlayground = {
+                reopen = false,
+                position = "left",
             },
         }
     })]])
@@ -43,16 +50,24 @@ T["setup"]["overrides default values"] = function()
             position = "right",
             reopen = false,
         },
+        NvimDAPUI = {
+            position = "none",
+            reopen = false,
+        },
         NvimTree = {
             position = "right",
             reopen = false,
         },
         neotest = {
-            position = "none",
+            position = "right",
             reopen = false,
         },
         undotree = {
             position = "right",
+        },
+        TSPlayground = {
+            position = "left",
+            reopen = false,
         },
     })
 end
@@ -85,13 +100,31 @@ T["integrations"]["NeoTree throws with wrong values"] = function()
     end)
 end
 
-T["neotest"] = MiniTest.new_set()
+T["nvimdapui"] = MiniTest.new_set()
 
-T["neotest"]["keeps sides open"] = function()
-    child.restart({ "-u", "scripts/init_with_neotest.lua" })
+T["nvimdapui"]["keeps sides open"] = function()
+    if child.fn.has("nvim-0.8") == 0 then
+        MiniTest.skip("NvimDAPUI doesn't support version below 8")
+
+        return
+    end
+
+    child.restart({ "-u", "scripts/init_with_nvimdapui.lua" })
+    child.set_size(20, 100)
 
     child.lua([[require('no-neck-pain').enable()]])
-    child.lua([[require('neotest').summary.open()]])
+
+    eq(helpers.winsInTab(child), { 1001, 1000, 1002 })
+    eq_state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
+
+    child.lua([[require('dapui').open()]])
+    vim.loop.sleep(50)
+
+    eq(helpers.winsInTab(child), {1010, 1009, 1008, 1007, 1001, 1000, 1002, 1006, 1003})
 
     eq_state(child, "tabs[1].wins.main", {
         curr = 1000,
@@ -101,24 +134,41 @@ T["neotest"]["keeps sides open"] = function()
 
     eq_state(child, "tabs[1].wins.splits", vim.NIL)
 
-    eq_state(child, "tabs[1].wins.external.trees", {
-        ["neo-tree"] = {
-            close = "Neotree close",
-            configName = "NeoTree",
-            open = "Neotree reveal",
-        },
-        neotest = {
-            close = "lua require('neotest').summary.close()",
-            configName = "neotest",
-            id = 1003,
-            open = "lua require('neotest').summary.open()",
-            width = 70,
-        },
-        nvimtree = {
-            close = "NvimTreeClose",
-            configName = "NvimTree",
-            open = "NvimTreeOpen",
-        },
+    eq_state(child, "tabs[1].wins.integrations.NvimDAPUI", {
+        close = "lua require('dapui').close()",
+        fileTypePattern = "dap",
+        id = 1003,
+        open = "lua require('dapui').open()",
+        width = 58,
+    })
+end
+
+T["neotest"] = MiniTest.new_set()
+
+T["neotest"]["keeps sides open"] = function()
+    child.restart({ "-u", "scripts/init_with_neotest.lua", "lua/no-neck-pain/main.lua" })
+    child.set_size(20, 100)
+
+    child.lua([[require('no-neck-pain').enable()]])
+
+    eq(helpers.winsInTab(child), { 1001, 1000, 1002 })
+    eq_state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
+
+    child.lua([[require('neotest').summary.open()]])
+    vim.loop.sleep(50)
+
+    eq_state(child, "tabs[1].wins.splits", vim.NIL)
+
+    eq_state(child, "tabs[1].wins.integrations.neotest", {
+        close = "lua require('neotest').summary.close()",
+        fileTypePattern = "neotest",
+        id = 1003,
+        open = "lua require('neotest').summary.open()",
+        width = 100,
     })
 end
 
@@ -146,6 +196,7 @@ T["NvimTree"]["keeps sides open"] = function()
     })
 
     child.cmd([[NvimTreeOpen]])
+    child.loop.sleep(50)
 
     eq(helpers.winsInTab(child), { 1004, 1001, 1000, 1002 })
 
@@ -157,29 +208,12 @@ T["NvimTree"]["keeps sides open"] = function()
 
     eq_state(child, "tabs[1].wins.splits", vim.NIL)
 
-    eq_state(child, "tabs[1].wins.external.trees", {
-        NvimTree = {
-            close = "NvimTreeClose",
-            configName = "NvimTree",
-            id = 1004,
-            open = "NvimTreeOpen",
-            width = 60,
-        },
-        ["neo-tree"] = {
-            close = "Neotree close",
-            configName = "NeoTree",
-            open = "Neotree reveal",
-        },
-        neotest = {
-            close = "lua require('neotest').summary.close()",
-            configName = "neotest",
-            open = "lua require('neotest').summary.open()",
-        },
-        nvimtree = {
-            close = "NvimTreeClose",
-            configName = "NvimTree",
-            open = "NvimTreeOpen",
-        },
+    eq_state(child, "tabs[1].wins.integrations.NvimTree", {
+        close = "NvimTreeClose",
+        fileTypePattern = "nvimtree",
+        id = 1004,
+        open = "NvimTreeOpen",
+        width = 38,
     })
 end
 
@@ -201,6 +235,7 @@ T["neo-tree"]["keeps sides open"] = function()
     })
 
     child.cmd([[Neotree reveal]])
+    child.loop.sleep(50)
 
     eq(helpers.winsInTab(child), { 1004, 1001, 1000, 1002 })
 
@@ -212,29 +247,43 @@ T["neo-tree"]["keeps sides open"] = function()
 
     eq_state(child, "tabs[1].wins.splits", vim.NIL)
 
-    eq_state(child, "tabs[1].wins.external.trees", {
-        NeoTree = {
-            close = "Neotree close",
-            configName = "NeoTree",
-            id = 1004,
-            open = "Neotree reveal",
-            width = 2,
-        },
-        ["neo-tree"] = {
-            close = "Neotree close",
-            configName = "NeoTree",
-            open = "Neotree reveal",
-        },
-        neotest = {
-            close = "lua require('neotest').summary.close()",
-            configName = "neotest",
-            open = "lua require('neotest').summary.open()",
-        },
-        nvimtree = {
-            close = "NvimTreeClose",
-            configName = "NvimTree",
-            open = "NvimTreeOpen",
-        },
+    eq_state(child, "tabs[1].wins.integrations.NeoTree", {
+        close = "Neotree close",
+        fileTypePattern = "neo-tree",
+        id = 1004,
+        open = "Neotree reveal",
+        width = 2,
+    })
+end
+
+T["TSPlayground"] = MiniTest.new_set()
+
+T["TSPlayground"]["keeps sides open"] = function()
+    child.restart({ "-u", "scripts/init_with_tsplayground.lua" })
+    child.set_size(5, 300)
+
+    child.cmd([[NoNeckPain]])
+
+    eq(helpers.winsInTab(child), { 1001, 1000, 1002 })
+
+    eq_state(child, "enabled", true)
+    eq_state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
+
+    child.cmd("TSPlaygroundToggle")
+    vim.loop.sleep(50)
+
+    eq_state(child, "tabs[1].wins.splits", vim.NIL)
+
+    eq_state(child, "tabs[1].wins.integrations.TSPlayground", {
+        close = "TSPlaygroundToggle",
+        fileTypePattern = "tsplayground",
+        id = 1004,
+        open = "TSPlaygroundToggle",
+        width = 248,
     })
 end
 

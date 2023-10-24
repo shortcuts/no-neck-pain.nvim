@@ -1,12 +1,13 @@
 vim.cmd([[let &rtp.=','.getcwd()]])
 
 vim.cmd("set rtp+=deps/mini.nvim")
-vim.cmd("set rtp+=deps/nvimtree")
+vim.cmd("set rtp+=deps/nvimdap")
+vim.cmd("set rtp+=deps/nvimdapui")
 
-require("nvim-tree").setup({ view = { width = 1 } })
+require("dapui").setup()
 require("mini.test").setup()
 require("no-neck-pain").setup({
     width = 1,
     minSideBufferWidth = 0,
-    integrations = { NvimTree = { reopen = true } },
+    integrations = { NvimDAPUI = { reopen = true } },
 })

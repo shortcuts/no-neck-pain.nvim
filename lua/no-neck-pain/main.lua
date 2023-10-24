@@ -2,18 +2,15 @@ local A = require("no-neck-pain.util.api")
 local Co = require("no-neck-pain.util.constants")
 local D = require("no-neck-pain.util.debug")
 local E = require("no-neck-pain.util.event")
-local Sp = require("no-neck-pain.splits")
-local T = require("no-neck-pain.trees")
-local Ta = require("no-neck-pain.tabs")
+local S = require("no-neck-pain.state")
 local W = require("no-neck-pain.wins")
 
 local N = {}
-local S = Ta.initState()
 
 -- Toggle the plugin by calling the `enable`/`disable` methods respectively.
 ---@private
 function N.toggle(scope)
-    if S.tabs ~= nil and S.tabs[S.activeTab] ~= nil then
+    if S.hasTabs(S) and S.isActiveTabRegistered(S) then
         return N.disable(scope)
     end
 
@@ -23,7 +20,7 @@ end
 --- Toggles the scratchPad feature of the plugin.
 ---@private
 function N.toggleScratchPad()
-    if S.tabs[S.activeTab] == nil then
+    if not S.isActiveTabRegistered(S) then
         return
     end
 
@@ -32,60 +29,43 @@ function N.toggleScratchPad()
 
     -- map over both sides and let the init method either setup or cleanup the side buffers
     for _, side in pairs(Co.SIDES) do
-        vim.fn.win_gotoid(S.tabs[S.activeTab].wins.main[side])
-        W.initScratchPad(side, S.tabs[S.activeTab].scratchPadEnabled)
+        vim.fn.win_gotoid(S.getSideID(S, side))
+        W.initScratchPad(side, S.getScratchpad(S))
     end
 
     -- restore focus
     vim.fn.win_gotoid(currWin)
 
     -- save new state of the scratchpad and update tabs
-    S.tabs[S.activeTab].scratchPadEnabled = not S.tabs[S.activeTab].scratchPadEnabled
-    S.tabs = Ta.update(S.tabs, S.tabs[S.activeTab].id, S.tabs[S.activeTab])
+    S.setScratchpad(S, not S.tabs[S.activeTab].scratchPadEnabled)
 
     return S
 end
 
 --- Creates side buffers and set the tab state, focuses the `curr` window if required.
 ---@private
-function N.init(scope, goToCurr, skipTrees)
-    if S.tabs[S.activeTab] == nil then
+function N.init(scope, goToCurr, skipIntegrations)
+    if not S.isActiveTabRegistered(S) then
         error("called the internal `init` method on a `nil` tab.")
     end
 
-    D.log(
-        scope,
-        "init called on tab %d for current window %d",
-        S.tabs[S.activeTab].id,
-        S.tabs[S.activeTab].wins.main.curr
-    )
+    D.log(scope, "init called on tab %d for current window %d", S.activeTab, S.getSideID(S, "curr"))
 
     -- if we do not have side buffers, we must ensure we only trigger a focus if we re-create them
     local hadSideBuffers = true
-    if
-        not A.sideExist(S.tabs[S.activeTab], "left")
-        or not A.sideExist(S.tabs[S.activeTab], "right")
-    then
+    if S.checkSides(S, "and", false) then
         hadSideBuffers = false
     end
 
-    S.tabs[S.activeTab] = W.createSideBuffers(S.tabs[S.activeTab], skipTrees)
+    W.createSideBuffers(skipIntegrations)
 
     if
         goToCurr
-        or (not hadSideBuffers and (A.sideExist(S.tabs[S.activeTab], "left") or A.sideExist(
-            S.tabs[S.activeTab],
-            "right"
-        )))
-        or (
-            A.isCurrentWin(S.tabs[S.activeTab].wins.main.left)
-            or A.isCurrentWin(S.tabs[S.activeTab].wins.main.right)
-        )
+        or (not hadSideBuffers and S.checkSides(S, "or", true))
+        or (S.isSideTheActiveWin(S, "left") or S.isSideTheActiveWin(S, "right"))
     then
-        vim.fn.win_gotoid(S.tabs[S.activeTab].wins.main.curr)
+        vim.fn.win_gotoid(S.getSideID(S, "curr"))
     end
-
-    S.tabs = Ta.update(S.tabs, S.tabs[S.activeTab].id, S.tabs[S.activeTab])
 
     return S
 end
@@ -93,33 +73,33 @@ end
 --- Initializes the plugin, sets event listeners and internal state.
 ---@private
 function N.enable(scope)
-    if E.skipEnable(nil) then
+    if E.skipEnable() then
         return nil
     end
 
     D.log(scope, "calling enable for tab %d", S.activeTab)
 
     -- register the new tab.
-    S.tabs = Ta.insert(S.tabs, S.activeTab)
+    S.setTab(S, S.activeTab)
 
-    local augroupName = Ta.getAugroupName(S.activeTab)
+    local augroupName = A.getAugroupName(S.activeTab)
     vim.api.nvim_create_augroup(augroupName, { clear = true })
 
-    S.tabs[S.activeTab].wins.main.curr = vim.api.nvim_get_current_win()
-    S.tabs[S.activeTab], _ = Sp.compute(S.tabs[S.activeTab], S.tabs[S.activeTab].wins.main.curr)
+    S.setSideID(S, vim.api.nvim_get_current_win(), "curr")
+    S.computeSplits(S, S.getSideID(S, "curr"))
 
-    S = N.init(scope, true)
+    N.init(scope, true)
 
-    S.enabled = true
+    S.setEnabled(S)
 
     vim.api.nvim_create_autocmd({ "VimResized" }, {
         callback = function(p)
             vim.schedule(function()
-                if E.skip(S.tabs[S.activeTab]) then
+                if E.skip(S.getTab(S)) then
                     return
                 end
 
-                S = N.init(p.event)
+                N.init(p.event)
             end)
         end,
         group = augroupName,
@@ -130,11 +110,11 @@ function N.enable(scope)
         callback = function(p)
             vim.schedule(function()
                 -- if the left tab is not valid anymore, we can remove it from the state
-                if not vim.api.nvim_tabpage_is_valid(S.activeTab) then
-                    S.tabs = Ta.refresh(S.tabs, S.activeTab)
+                if not S.isActiveTabValid(S) then
+                    S.refreshTabs(S, S.activeTab)
                 end
 
-                S.activeTab = vim.api.nvim_get_current_tabpage()
+                S.setActiveTab(S, vim.api.nvim_get_current_tabpage())
 
                 D.log(p.event, "new tab page registered %d", S.activeTab)
             end)
@@ -145,26 +125,27 @@ function N.enable(scope)
 
     vim.api.nvim_create_autocmd({ "WinEnter" }, {
         callback = function(p)
-            vim.schedule(function()
-                if S.tabs == nil or E.skip(S.tabs[S.activeTab]) then
+            p.event = string.format("%s:splits", p.event)
+            A.debounce(p.event, function()
+                if not S.hasTabs(S) or E.skip(S.tabs[S.activeTab]) then
                     return
                 end
 
-                -- there's nothing to manage when there's no side buffer, fallback to vim's default behavior
-                if
-                    not A.sideExist(S.tabs[S.activeTab], "right")
-                    and not A.sideExist(S.tabs[S.activeTab], "left")
-                then
+                if S.checkSides(S, "and", false) then
                     return D.log(p.event, "skip split logic: no side buffer")
                 end
 
-                -- a side tree isn't considered as a split
-                local isSideTree, _ = T.isSideTree(p.event, S.tabs[S.activeTab], nil)
-                if isSideTree then
-                    return D.log(p.event, "skip split logic: side tree")
+                if S.isSideTheActiveWin(S, "curr") then
+                    return D.log(p.event, "skip split logic: current win")
                 end
 
-                local wins = A.winsExceptState(S.tabs[S.activeTab], false)
+                -- an integration isn't considered as a split
+                local isSupportedIntegration = S.isSupportedIntegration(S, p.event, nil)
+                if isSupportedIntegration then
+                    return D.log(p.event, "skip split logic: integration")
+                end
+
+                local wins = S.getUnregisteredWins(S)
 
                 if #wins ~= 1 then
                     return D.log(
@@ -174,17 +155,12 @@ function N.enable(scope)
                 end
 
                 local focusedWin = wins[1]
-                local isVSplit = true
 
-                S.tabs[S.activeTab], isVSplit = Sp.compute(S.tabs[S.activeTab], focusedWin)
-                S.tabs[S.activeTab].wins.splits = S.tabs[S.activeTab].wins.splits or {}
-                table.insert(
-                    S.tabs[S.activeTab].wins.splits,
-                    { id = focusedWin, vertical = isVSplit }
-                )
+                local isVSplit = S.computeSplits(S, focusedWin)
+                S.setSplit(S, { id = focusedWin, vertical = isVSplit })
 
                 if isVSplit then
-                    S = N.init(p.event)
+                    N.init(p.event)
                 end
             end)
         end,
@@ -200,19 +176,14 @@ function N.enable(scope)
                 end
 
                 -- if we are not in split view, we check if we killed one of the main buffers (curr, left, right) to disable NNP
-                if
-                    S.tabs[S.activeTab] == nil
-                    or S.tabs[S.activeTab].wins == nil
-                    or S.tabs[S.activeTab].wins.splits == nil
-                        and not W.stateWinsActive(S.tabs[S.activeTab], false)
-                then
+                if not S.hasSplits(S) and not W.stateWinsActive(S.getTab(S), false) then
                     D.log(p.event, "one of the NNP main buffers have been closed, disabling...")
 
                     return N.disable(p.event)
                 end
 
                 if _G.NoNeckPain.config.disableOnLastBuffer then
-                    local rwins = A.winsExceptState(S.tabs[S.activeTab], true)
+                    local rwins = S.getUnregisteredWins(S)
 
                     if
                         #rwins == 0
@@ -234,13 +205,7 @@ function N.enable(scope)
     vim.api.nvim_create_autocmd({ "WinClosed", "BufDelete" }, {
         callback = function(p)
             vim.schedule(function()
-                if
-                    E.skip(nil)
-                    or S.tabs == nil
-                    or S.tabs[S.activeTab] == nil
-                    or S.tabs[S.activeTab].wins.splits == nil
-                    or W.stateWinsActive(S.tabs[S.activeTab], true)
-                then
+                if E.skip(nil) or not S.hasSplits(S) or W.stateWinsActive(S.getTab(S), true) then
                     return
                 end
 
@@ -249,14 +214,13 @@ function N.enable(scope)
                         return true
                     end
 
-                    S.tabs[S.activeTab].layers =
-                        Sp.decreaseLayers(S.tabs[S.activeTab].layers, split.vertical)
+                    S.decreaseLayers(S, split.vertical)
 
                     return false
                 end, S.tabs[S.activeTab].wins.splits)
 
                 if #S.tabs[S.activeTab].wins.splits == 0 then
-                    S.tabs[S.activeTab].wins.splits = nil
+                    S.initSplits(S)
                 end
 
                 -- we keep track if curr have been closed because if it's the case,
@@ -264,28 +228,23 @@ function N.enable(scope)
                 local haveCloseCurr = false
 
                 -- if curr is not valid anymore, we focus the first valid split and remove it from the state
-                if not vim.api.nvim_win_is_valid(S.tabs[S.activeTab].wins.main.curr) then
+                if not vim.api.nvim_win_is_valid(S.getSideID(S, "curr")) then
                     -- if neither curr and splits are remaining valids, we just disable
-                    if S.tabs[S.activeTab].wins.splits == nil then
+                    if not S.hasSplits(S) then
                         return N.disable(p.event)
                     end
 
                     haveCloseCurr = true
 
-                    S.tabs[S.activeTab].layers = Sp.decreaseLayers(
-                        S.tabs[S.activeTab].layers,
-                        S.tabs[S.activeTab].wins.splits[1].vertical
-                    )
+                    local split = S.tabs[S.activeTab].wins.splits[1]
 
-                    S.tabs[S.activeTab].wins.main.curr = S.tabs[S.activeTab].wins.splits[1].id
-                    S.tabs[S.activeTab].wins.splits = Sp.remove(
-                        S.tabs[S.activeTab].wins.splits,
-                        S.tabs[S.activeTab].wins.splits[1].id
-                    )
+                    S.decreaseLayers(S, split.vertical)
+                    S.setSideID(S, split.id, "curr")
+                    S.removeSplit(S, split.id)
                 end
 
                 -- we only restore focus on curr if there's no split left
-                S = N.init(p.event, haveCloseCurr or S.tabs[S.activeTab].wins.splits == nil)
+                N.init(p.event, haveCloseCurr or not S.hasSplits(S))
             end)
         end,
         group = augroupName,
@@ -294,51 +253,25 @@ function N.enable(scope)
 
     vim.api.nvim_create_autocmd({ "WinEnter", "WinClosed" }, {
         callback = function(p)
-            vim.schedule(function()
-                if S.tabs == nil or S.tabs[S.activeTab] == nil or E.skip(S.tabs[S.activeTab]) then
+            p.event = string.format("%s:integrations", p.event)
+            A.debounce(p.event, function()
+                if not S.hasTabs(S) or not S.isActiveTabRegistered(S) or E.skip(S.getTab(S)) then
                     return
                 end
 
-                -- We can skip enter hooks that are not on a side tree
-                local isSideTree, _ = T.isSideTree(p.event, S.tabs[S.activeTab], nil)
-                if p.event == "WinEnter" and not isSideTree then
-                    return
+                if S.checkSides(S, "and", false) then
+                    return D.log(p.event, "skip integrations logic: no side buffer")
                 end
 
-                -- we copy the state so we can compare with the refreshed trees what changed
-                -- if something changed, we will run init in order to resize buffers correctly
-                local stateTrees = vim.deepcopy(S.tabs[S.activeTab].wins.external.trees)
-                local shouldInit = false
-
-                S.tabs[S.activeTab].wins.external.trees = T.refresh(S.tabs[S.activeTab])
-
-                for name, tree in pairs(S.tabs[S.activeTab].wins.external.trees) do
-                    if
-                        -- if we had an id but it's not valid anymore or it changed
-                        (
-                            stateTrees[name] ~= nil
-                            and stateTrees[name].id ~= nil
-                            and (tree.id == nil or tree.id ~= tree.id)
-                        )
-                        -- if we registered a new side tree
-                        or (
-                            tree.id ~= nil
-                            and (stateTrees[name] == nil or stateTrees[name].id ~= tree.id)
-                        )
-                    then
-                        D.log(p.event, "%s has changed, resizing", name)
-
-                        shouldInit = true
-                    end
+                if vim.startswith(p.event, "WinClosed") and not S.hasIntegrations(S) then
+                    return D.log(p.event, "skip integrations logic: no registered integration")
                 end
 
-                if shouldInit then
-                    S = N.init(p.event, false, true)
-                end
+                N.init(p.event, false, true)
             end)
         end,
         group = augroupName,
-        desc = "Resize to apply on WinEnter/Closed of external windows",
+        desc = "Resize to apply on WinEnter/Closed of an integration",
     })
 
     return S
@@ -347,21 +280,19 @@ end
 --- Disables the plugin for the given tab, clear highlight groups and autocmds, closes side buffers and resets the internal state.
 ---@private
 function N.disable(scope)
-    -- if S.tabs[S.activeTab] == nil then
-    --     return S
-    -- end
+    D.log(scope, "calling disable for tab %d", S.activeTab)
 
-    D.log(scope, "calling disable for tab %d", S.tabs[S.activeTab].id)
+    pcall(vim.api.nvim_del_augroup_by_name, A.getAugroupName(S.activeTab))
 
-    pcall(vim.api.nvim_del_augroup_by_name, Ta.getAugroupName(S.activeTab))
+    local currID = S.getSideID(S, "curr")
 
     -- shutdowns gracefully by focusing the stored `curr` buffer
     if
-        S.tabs[S.activeTab].wins.main.curr ~= nil
-        and vim.api.nvim_win_is_valid(S.tabs[S.activeTab].wins.main.curr)
-        and not A.isCurrentWin(S.tabs[S.activeTab].wins.main.curr)
+        currID ~= nil
+        and vim.api.nvim_win_is_valid(currID)
+        and not S.isSideTheActiveWin(S, "curr")
     then
-        vim.fn.win_gotoid(S.tabs[S.activeTab].wins.main.curr)
+        vim.fn.win_gotoid(currID)
 
         if _G.NoNeckPain.config.killAllBuffersOnDisable then
             vim.cmd("only")
@@ -373,28 +304,23 @@ function N.disable(scope)
         vim.cmd(
             string.format(
                 "highlight! clear NoNeckPain_background_tab_%s_side_%s NONE",
-                S.tabs[S.activeTab].id,
+                S.activeTab,
                 side
             )
         )
         vim.cmd(
-            string.format(
-                "highlight! clear NoNeckPain_text_tab_%s_side_%s NONE",
-                S.tabs[S.activeTab].id,
-                side
-            )
+            string.format("highlight! clear NoNeckPain_text_tab_%s_side_%s NONE", S.activeTab, side)
         )
 
-        if A.sideExist(S.tabs[S.activeTab], side) then
-            local activeWins = vim.api.nvim_tabpage_list_wins(S.tabs[S.activeTab].id)
+        if S.isSideRegistered(S, side) then
+            local activeWins = vim.api.nvim_tabpage_list_wins(S.activeTab)
             local haveOtherWins = false
+
+            local sideID = S.getSideID(S, side)
 
             -- if we have other wins active and usable, we won't quit vim
             for _, activeWin in pairs(activeWins) do
-                if
-                    S.tabs[S.activeTab].wins.main[side] ~= activeWin
-                    and not A.isRelativeWindow(activeWin)
-                then
+                if sideID ~= activeWin and not A.isRelativeWindow(activeWin) then
                     haveOtherWins = true
                 end
             end
@@ -412,16 +338,14 @@ function N.disable(scope)
             end
 
             -- when we have more than 1 window left, we can just close it
-            W.close(scope, S.tabs[S.activeTab].wins.main[side], side)
+            W.close(scope, sideID, side)
         end
     end
 
-    S.tabs = Ta.refresh(S.tabs)
-
-    if S.tabs == nil then
+    if S.refreshTabs(S) == 0 then
         D.log(scope, "no more active tabs left, reinitializing state")
 
-        S = Ta.initState()
+        S.init(S)
     end
 
     return S

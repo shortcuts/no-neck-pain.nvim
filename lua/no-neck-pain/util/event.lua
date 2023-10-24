@@ -1,5 +1,5 @@
 local A = require("no-neck-pain.util.api")
-local T = require("no-neck-pain.trees")
+local S = require("no-neck-pain.state")
 
 local E = {}
 
@@ -25,7 +25,7 @@ function E.skip(tab)
             return true
         end
 
-        if A.isCurrentWin(tab.wins.main.left) or A.isCurrentWin(tab.wins.main.right) then
+        if S.isSideTheActiveWin(S, "left") or S.isSideTheActiveWin(S, "right") then
             return true
         end
     end
@@ -42,10 +42,9 @@ end
 --- - we are focusing a floating window
 --- - we are focusing one of the side buffer
 ---
----@param tab table?: the table where the tab information are stored.
 ---@private
-function E.skipEnable(tab)
-    if tab ~= nil then
+function E.skipEnable()
+    if S.isActiveTabRegistered(S) then
         return true
     end
 
@@ -53,8 +52,8 @@ function E.skipEnable(tab)
         return true
     end
 
-    local isSideTree, _ = T.isSideTree("E.skipEnable", tab, nil)
-    if isSideTree or vim.bo.filetype == "dashboard" then
+    local isSupportedIntegration = S.isSupportedIntegration(S, "E.skipEnable", nil)
+    if isSupportedIntegration or vim.bo.filetype == "dashboard" then
         return true
     end
 

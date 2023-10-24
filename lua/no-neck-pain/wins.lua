@@ -2,7 +2,7 @@ local A = require("no-neck-pain.util.api")
 local C = require("no-neck-pain.colors")
 local Co = require("no-neck-pain.util.constants")
 local D = require("no-neck-pain.util.debug")
-local T = require("no-neck-pain.trees")
+local S = require("no-neck-pain.state")
 
 local W = {}
 
@@ -96,63 +96,58 @@ function W.initScratchPad(side, cleanup)
     vim.o.autowriteall = true
 end
 
----Resizes side buffers, considering the existing trees.
+---Resizes side buffers, considering the existing integrations.
 ---Closes them if there's not enough space left.
 ---
 ---@param scope string: the scope from where this function is called.
----@param tab table: the table where the tab information are stored.
 ---@param paddings table: the paddings of each side window.
 ---@return number?: the left window id.
 ---@return number?: the right window id.
 ---@private
-local function resizeOrCloseSideBuffers(scope, tab, paddings)
+local function resizeOrCloseSideBuffers(scope, paddings)
     for _, side in pairs(Co.SIDES) do
-        if A.sideExist(tab, side) then
-            local padding = paddings[side].padding or W.getPadding(side, tab)
+        if S.isSideRegistered(S, side) then
+            local padding = paddings[side].padding or W.getPadding(side)
 
             if padding > _G.NoNeckPain.config.minSideBufferWidth then
-                resize(tab.wins.main[side], padding, side)
+                resize(S.getSideID(S, side), padding, side)
             else
-                W.close(scope, tab.wins.main[side], side)
-                tab.wins.main[side] = nil
+                W.close(scope, S.getSideID(S, side), side)
+                S.setSideID(S, nil, side)
             end
         end
     end
-
-    return tab.wins.main.left, tab.wins.main.right
 end
 
----Creates side buffers with the correct padding, considering the side trees.
+---Creates side buffers with the correct padding, considering the side integrations.
 --- - A side buffer is not created if there's not enough space.
 --- - If it already exists, we resize it.
 ---
----@param tab table: the table where the tab information are stored.
----@param skipTrees boolean?: skip trees action when true.
----@return table: the updated tab.
+---@param skipIntegrations boolean?: skip integrations action when true.
 ---@private
-function W.createSideBuffers(tab, skipTrees)
+function W.createSideBuffers(skipIntegrations)
     -- before creating side buffers, we determine if we should consider externals
-    tab.wins.external.trees = T.refresh(tab)
+    S.refreshIntegrations(S, "createSideBuffers")
 
     local wins = {
         left = { cmd = "topleft vnew", padding = 0 },
         right = { cmd = "botright vnew", padding = 0 },
     }
 
-    local trees = nil
-
-    if not skipTrees then
-        trees = T.close(tab)
+    local closedIntegrations = false
+    if not skipIntegrations then
+        closedIntegrations = true
+        S.closeIntegration(S)
     end
 
     for _, side in pairs(Co.SIDES) do
         if _G.NoNeckPain.config.buffers[side].enabled then
-            local valid = tab.wins.main[side] ~= nil
-                and vim.api.nvim_win_is_valid(tab.wins.main[side])
+            wins[side].padding = W.getPadding(side)
 
-            wins[side].padding = W.getPadding(side, tab)
-
-            if wins[side].padding > _G.NoNeckPain.config.minSideBufferWidth and not valid then
+            if
+                wins[side].padding > _G.NoNeckPain.config.minSideBufferWidth
+                and not S.isSideWinValid(S, side)
+            then
                 vim.cmd(wins[side].cmd)
 
                 local id = vim.api.nvim_get_current_win()
@@ -177,35 +172,38 @@ function W.createSideBuffers(tab, skipTrees)
 
                 if _G.NoNeckPain.config.buffers[side].scratchPad.enabled then
                     W.initScratchPad(side)
-                    tab.scratchPadEnabled = true
+                    S.setScratchpad(S, true)
                 end
 
-                tab.wins.main[side] = id
+                S.setSideID(S, id, side)
             end
 
-            if tab.wins.main[side] ~= nil then
-                C.init(tab.wins.main[side], tab.id, side)
+            local sideID = S.getSideID(S, side)
+
+            if sideID ~= nil then
+                C.init(sideID, side)
             end
         end
     end
 
-    if not skipTrees and trees ~= nil then
-        T.reopen(trees)
+    if closedIntegrations and not skipIntegrations then
+        S.reopenIntegration(S)
     end
 
-    tab.wins.main.left, tab.wins.main.right =
-        resizeOrCloseSideBuffers("W.createSideBuffers", tab, wins)
+    resizeOrCloseSideBuffers("W.createSideBuffers", wins)
 
     -- if we still have side buffers open at this point, and we have vsplit opened,
     -- there might be width issues so we the resize opened vsplits.
-    if (A.sideExist(tab, "left") or A.sideExist(tab, "right")) and tab.wins.splits ~= nil then
-        local side = tab.wins.main.left or tab.wins.main.right
+    if S.checkSides(S, "or", true) and S.hasSplits(S) then
+        local side = S.getSideID(S, "left") or S.getSideID(S, "right")
         local sWidth, _ = A.getWidthAndHeight(side)
         local nbSide = 1
 
-        if tab.wins.main.left and tab.wins.main.right then
+        if S.getSideID(S, "left") and S.getSideID(S, "right") then
             nbSide = 2
         end
+
+        local tab = S.getTab(S)
 
         -- get the available usable width (screen size without side paddings)
         sWidth = vim.api.nvim_list_uis()[1].width - sWidth * nbSide
@@ -218,19 +216,18 @@ function W.createSideBuffers(tab, skipTrees)
         end
     end
 
-    -- we might have closed trees during the buffer creation process, we re-fetch the latest IDs to prevent inconsistencies
-    tab.wins.external.trees = T.refresh(tab)
-
-    return tab
+    -- closing integrations and reopening them means new window IDs
+    if closedIntegrations then
+        S.refreshIntegrations(S, "createSideBuffers")
+    end
 end
 
 ---Determine the "padding" (width) of the buffer based on the `_G.NoNeckPain.config.width` and the width of the screen.
 ---
 ---@param side "left"|"right": the side of the window.
----@param tab table: the table where the tab information are stored.
 ---@return number: the width of the side window.
 ---@private
-function W.getPadding(side, tab)
+function W.getPadding(side)
     local uis = vim.api.nvim_list_uis()
 
     if uis[1] == nil then
@@ -249,6 +246,8 @@ function W.getPadding(side, tab)
         return 0
     end
 
+    local tab = S.getTab(S)
+
     -- we need to see if there's enough space left to have side buffers
     local occupied = _G.NoNeckPain.config.width * tab.layers.vsplit
 
@@ -260,17 +259,17 @@ function W.getPadding(side, tab)
         return 0
     end
 
-    D.log(side, "%d currently with splits - computing trees width", occupied)
+    D.log(side, "%d currently with splits - computing integrations width", occupied)
 
     -- now we need to determine how much we should substract from the remaining padding
-    -- if there's side trees open.
+    -- if there's side integrations open.
     local paddingToSubstract = 0
 
-    for name, tree in pairs(tab.wins.external.trees) do
+    for name, tree in pairs(tab.wins.integrations) do
         if
             tree ~= nil
             and tree.id ~= nil
-            and side == _G.NoNeckPain.config.integrations[tree.configName].position
+            and side == _G.NoNeckPain.config.integrations[name].position
         then
             D.log(
                 "W.getPadding",
@@ -304,7 +303,7 @@ function W.stateWinsActive(tab, checkSplits)
     local swins = tab.wins.main
 
     if checkSplits and tab.wins.splits ~= nil then
-        swins = A.mergeState(tab.wins.main, tab.wins.splits, nil)
+        swins = S.getRegisteredWins(S)
     end
 
     for _, swin in pairs(swins) do

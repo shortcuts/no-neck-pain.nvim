@@ -1,4 +1,5 @@
 local Co = require("no-neck-pain.util.constants")
+local S = require("no-neck-pain.state")
 
 local C = {}
 
@@ -136,12 +137,11 @@ end
 ---note: `cmd` is used instead of native commands for backward compatibility with Neovim 0.7
 ---
 ---@param win number: the id of the win to init.
----@param tab table: the table where the tab information are stored.
 ---@param side "left"|"right": the side of the window being resized, used for logging only.
 ---@private
-function C.init(win, tab, side)
-    local backgroundGroup = string.format("NoNeckPain_background_tab_%s_side_%s", tab, side)
-    local textGroup = string.format("NoNeckPain_text_tab_%s_side_%s", tab, side)
+function C.init(win, side)
+    local backgroundGroup = string.format("NoNeckPain_background_tab_%s_side_%s", S.activeTab, side)
+    local textGroup = string.format("NoNeckPain_text_tab_%s_side_%s", S.activeTab, side)
 
     -- clear groups
     vim.cmd(string.format("highlight! clear %s NONE", backgroundGroup))
