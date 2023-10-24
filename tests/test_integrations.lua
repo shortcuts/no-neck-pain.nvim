@@ -29,6 +29,9 @@ T["setup"]["overrides default values"] = function()
                 position = "right",
                 reopen = false,
             },
+            NvimDAPUI = {
+                reopen = false,
+            },
             undotree = {
                 position = "right",
             },
@@ -46,6 +49,10 @@ T["setup"]["overrides default values"] = function()
         NeoTree = {
             position = "right",
             reopen = false,
+        },
+        NvimDAPUI = {
+            position = "none",
+            reopen = false
         },
         NvimTree = {
             position = "right",

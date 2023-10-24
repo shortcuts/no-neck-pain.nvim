@@ -59,6 +59,11 @@ C.integrations = {
         close = "TSPlaygroundToggle",
         open = "TSPlaygroundToggle",
     },
+    NvimDAPUI = {
+        fileTypePattern = "dap",
+        close = "lua require('dapui').close()",
+        open = "lua require('dapui').open()",
+    },
 }
 
 return C
