@@ -52,7 +52,7 @@ T["setup"]["overrides default values"] = function()
         },
         NvimDAPUI = {
             position = "none",
-            reopen = false
+            reopen = false,
         },
         NvimTree = {
             position = "right",

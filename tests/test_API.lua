@@ -142,7 +142,7 @@ T["setup"]["sets exposed methods and default options value"] = function()
         },
         NvimDAPUI = {
             position = "none",
-            reopen = true
+            reopen = true,
         },
         NvimTree = {
             position = "left",
