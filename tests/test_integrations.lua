@@ -103,6 +103,12 @@ end
 T["nvimdapui"] = MiniTest.new_set()
 
 T["nvimdapui"]["keeps sides open"] = function()
+    if child.fn.has("nvim-0.8") == 0 then
+        MiniTest.skip("NvimDAPUI doesn't support version below 8")
+
+        return
+    end
+
     child.restart({ "-u", "scripts/init_with_nvimdapui.lua" })
     child.set_size(20, 100)
 
