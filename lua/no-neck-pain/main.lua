@@ -53,7 +53,7 @@ function N.init(scope, goToCurr, skipIntegrations)
 
     -- if we do not have side buffers, we must ensure we only trigger a focus if we re-create them
     local hadSideBuffers = true
-    if S.checkSides(S, "or", false) then
+    if S.checkSides(S, "and", false) then
         hadSideBuffers = false
     end
 
@@ -131,7 +131,6 @@ function N.enable(scope)
                     return
                 end
 
-                -- there's nothing to manage when there's no side buffer, fallback to vim's default behavior
                 if S.checkSides(S, "and", false) then
                     return D.log(p.event, "skip split logic: no side buffer")
                 end
@@ -260,51 +259,15 @@ function N.enable(scope)
                     return
                 end
 
-                -- if S.isSideTheActiveWin(S, "curr") then
-                --     return D.log(p.event, "skip integrations logic: current win")
-                -- end
-
-                -- We can skip enter hooks that are not on an integration
-                if p.event == "WinEnter" then
-                    local isSupportedIntegration = S.isSupportedIntegration(S, p.event, nil)
-                    if not isSupportedIntegration then
-                        return
-                    end
+                if S.checkSides(S, "and", false) then
+                    return D.log(p.event, "skip integrations logic: no side buffer")
                 end
 
-                -- we copy the state so we can compare with the refreshed integrations what changed
-                -- if something changed, we will run init in order to resize buffers correctly
-                local stateIntegrations = vim.deepcopy(S.tabs[S.activeTab].wins.integrations)
-                local shouldInit = false
-
-                S.refreshIntegrations(S, p.event)
-
-                for name, tree in pairs(S.tabs[S.activeTab].wins.integrations) do
-                    if
-                        -- if we had an id but it's not valid anymore or it changed
-                        (
-                            stateIntegrations[name] ~= nil
-                            and stateIntegrations[name].id ~= nil
-                            and (tree.id == nil or tree.id ~= tree.id)
-                        )
-                        -- if we registered a new integration
-                        or (
-                            tree.id ~= nil
-                            and (
-                                stateIntegrations[name] == nil
-                                or stateIntegrations[name].id ~= tree.id
-                            )
-                        )
-                    then
-                        D.log(p.event, "'%s' has been registered or changed, resizing", name)
-
-                        shouldInit = true
-                    end
+                if vim.startswith(p.event, "WinClosed") and not S.hasIntegrations(S) then
+                    return D.log(p.event, "skip integrations logic: no registered integration")
                 end
 
-                if shouldInit then
-                    N.init(p.event, false, true)
-                end
+                N.init(p.event, false, true)
             end)
         end,
         group = augroupName,

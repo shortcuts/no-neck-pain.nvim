@@ -318,6 +318,24 @@ function State:hasSplits()
         and self.tabs[self.activeTab].wins.splits ~= nil
 end
 
+---Whether there is integrations registered in the active tab or not.
+---
+---@return boolean
+---@private
+function State:hasIntegrations()
+    if not self.hasTabs(self) then
+        return false
+    end
+
+    for _, integration in pairs(self.tabs[self.activeTab].wins.integrations) do
+        if integration.id ~= nil then
+            return true
+        end
+    end
+
+    return false
+end
+
 ---Returns the ID of the given `side`.
 ---
 ---@param side "left"|"right"|"curr": the side of the window.
