@@ -382,4 +382,32 @@ T["vsplit/split"]["closing help page doens't break layout"] = function()
     eq_buf_width(child, "tabs[1].wins.main.curr", 48)
 end
 
+T["vsplit/split"]["splits and vsplits keeps a correct size"] = function()
+    child.set_size(50, 500)
+    child.lua([[
+        require('no-neck-pain').setup({width=50})
+        require('no-neck-pain').enable() 
+    ]])
+
+    eq(helpers.winsInTab(child), { 1001, 1000, 1002 })
+    eq(helpers.currentWin(child), 1000)
+
+    child.cmd("split")
+    vim.loop.sleep(50)
+
+    eq(helpers.winsInTab(child), { 1001, 1003, 1000, 1002 })
+    eq(helpers.currentWin(child), 1003)
+    eq_buf_width(child, "tabs[1].wins.main.curr", 468)
+
+    child.cmd("vsplit")
+    vim.loop.sleep(50)
+
+    eq(helpers.winsInTab(child), { 1001, 1004, 1003, 1000, 1002 })
+    eq(helpers.currentWin(child), 1004)
+
+    eq_buf_width(child, "tabs[1].wins.main.curr", 468)
+    eq(child.lua_get("vim.api.nvim_win_get_width(1003)"), 417)
+    eq(child.lua_get("vim.api.nvim_win_get_width(1000)"), 468)
+end
+
 return T
