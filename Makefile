@@ -24,6 +24,9 @@ deps:
 	git clone --depth 1 https://github.com/nvim-tree/nvim-web-devicons deps/nvim-web-devicons
 	git clone --depth 1 https://github.com/MunifTanjim/nui.nvim deps/nui
 	git clone --depth 1 https://github.com/antoinemadec/FixCursorHold.nvim deps/fixcursorhold
+	git clone --depth 1 https://github.com/mfussenegger/nvim-dap deps/nvimdap
+	git clone --depth 1 https://github.com/rcarriga/nvim-dap-ui deps/nvimdapui
+	
 
 test-ci: deps test
 

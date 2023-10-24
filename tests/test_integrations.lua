@@ -100,6 +100,43 @@ T["integrations"]["NeoTree throws with wrong values"] = function()
     end)
 end
 
+T["nvimdapui"] = MiniTest.new_set()
+
+T["nvimdapui"]["keeps sides open"] = function()
+    child.restart({ "-u", "scripts/init_with_nvimdapui.lua" })
+    child.set_size(20, 100)
+
+    child.lua([[require('no-neck-pain').enable()]])
+
+    eq(helpers.winsInTab(child), { 1001, 1000, 1002 })
+    eq_state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
+
+    child.lua([[require('dapui').open()]])
+    vim.loop.sleep(50)
+
+    eq(helpers.winsInTab(child), {1010, 1009, 1008, 1007, 1001, 1000, 1002, 1006, 1003})
+
+    eq_state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
+
+    eq_state(child, "tabs[1].wins.splits", vim.NIL)
+
+    eq_state(child, "tabs[1].wins.integrations.NvimDAPUI", {
+        close = "lua require('dapui').close()",
+        fileTypePattern = "dap",
+        id = 1003,
+        open = "lua require('dapui').open()",
+        width = 58,
+    })
+end
+
 T["neotest"] = MiniTest.new_set()
 
 T["neotest"]["keeps sides open"] = function()
