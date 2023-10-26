@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [1.4.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.3.0...v1.4.0) (2023-10-24)
+
+
+### Features
+
+* rewrite no-neck-pain ([#250](https://github.com/shortcuts/no-neck-pain.nvim/issues/250)) ([7a16c73](https://github.com/shortcuts/no-neck-pain.nvim/commit/7a16c73d3f0142746a3f7346bf73e0e761c91dd5))
+
 ## [1.3.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.2.3...v1.3.0) (2023-10-14)
 
 
