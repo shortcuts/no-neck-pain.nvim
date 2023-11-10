@@ -1,4 +1,12 @@
 <a name="0.2.3"></a>
+## [1.4.1](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.4.0...v1.4.1) (2023-11-10)
+
+
+### Bug Fixes
+
+* **event:** prevent unwanted resize ([#255](https://github.com/shortcuts/no-neck-pain.nvim/issues/255)) ([9ba2907](https://github.com/shortcuts/no-neck-pain.nvim/commit/9ba2907f76ab42ac8f1a8ba80e39bd383d58ae1e))
+* **resize:** do not skip `VimResized` event ([#257](https://github.com/shortcuts/no-neck-pain.nvim/issues/257)) ([16c0e1a](https://github.com/shortcuts/no-neck-pain.nvim/commit/16c0e1a5d150ff274aa84349c58d12cdd5321157))
+
 ## [1.4.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.3.0...v1.4.0) (2023-10-24)
 
 
