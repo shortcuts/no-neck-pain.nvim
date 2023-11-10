@@ -127,8 +127,8 @@ function N.enable(scope)
         callback = function(p)
             p.event = string.format("%s:splits", p.event)
             A.debounce(p.event, function()
-                if not S.hasTabs(S) or E.skip(S.tabs[S.activeTab]) then
-                    return
+                if not S.hasTabs(S) or E.skip(S.getTab(S)) then
+                    return D.log(p.event, "skip split logic")
                 end
 
                 if S.checkSides(S, "and", false) then
@@ -256,7 +256,7 @@ function N.enable(scope)
             p.event = string.format("%s:integrations", p.event)
             A.debounce(p.event, function()
                 if not S.hasTabs(S) or not S.isActiveTabRegistered(S) or E.skip(S.getTab(S)) then
-                    return
+                    return D.log(p.event, "skip integrations logic")
                 end
 
                 if S.checkSides(S, "and", false) then
@@ -265,6 +265,10 @@ function N.enable(scope)
 
                 if vim.startswith(p.event, "WinClosed") and not S.hasIntegrations(S) then
                     return D.log(p.event, "skip integrations logic: no registered integration")
+                end
+
+                if vim.startswith(p.event, "WinEnter") and #S.getUnregisteredWins(S) == 0 then
+                    return D.log(p.event, "skip integrations logic: no new windows")
                 end
 
                 N.init(p.event, false, true)
