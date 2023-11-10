@@ -136,8 +136,7 @@ function W.createSideBuffers(skipIntegrations)
 
     local closedIntegrations = false
     if not skipIntegrations then
-        closedIntegrations = true
-        S.closeIntegration(S)
+        closedIntegrations = S.closeIntegration(S)
     end
 
     for _, side in pairs(Co.SIDES) do
@@ -259,7 +258,12 @@ function W.getPadding(side)
         return 0
     end
 
-    D.log(side, "%d currently with splits - computing integrations width", occupied)
+    D.log(
+        side,
+        "%d currently with %d vsplits - computing integrations width",
+        occupied,
+        tab.layers.vsplit
+    )
 
     -- now we need to determine how much we should substract from the remaining padding
     -- if there's side integrations open.

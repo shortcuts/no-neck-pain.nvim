@@ -124,7 +124,7 @@ T["nvimdapui"]["keeps sides open"] = function()
     child.lua([[require('dapui').open()]])
     vim.loop.sleep(50)
 
-    eq(helpers.winsInTab(child), {1010, 1009, 1008, 1007, 1001, 1000, 1002, 1006, 1003})
+    eq(helpers.winsInTab(child), { 1010, 1009, 1008, 1007, 1001, 1000, 1002, 1006, 1003 })
 
     eq_state(child, "tabs[1].wins.main", {
         curr = 1000,

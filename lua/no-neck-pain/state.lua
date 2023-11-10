@@ -64,13 +64,19 @@ end
 
 ---Closes side integrations if opened.
 ---
+---@return boolean: whether we closed something or not.
 ---@private
 function State:closeIntegration()
+    local hasClosedIntegration = false
+
     for _, opts in pairs(self.tabs[self.activeTab].wins.integrations) do
         if opts.id ~= nil and opts.close ~= nil then
             vim.cmd(opts.close)
+            hasClosedIntegration = true
         end
     end
+
+    return hasClosedIntegration
 end
 
 ---Reopens the integrations if they were previously closed.
