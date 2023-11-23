@@ -22,8 +22,21 @@ local function registerMappings(options, mappings)
             return
         end
 
-        assert(type(options[name]) == "string", string.format("`%s` must be a string", name))
-        vim.api.nvim_set_keymap("n", options[name], command, { silent = true })
+        if (name == "widthUp" or name == "widthDown") and type(options[name]) ~= "string" then
+            assert(
+                type(options[name]) == "table"
+                    and options[name]["mapping"] ~= nil
+                    and options[name]["value"] ~= nil,
+                string.format(
+                    "`%s` must be a string or a table with the following properties {mapping: 'your_mapping', value: 5}",
+                    name
+                )
+            )
+            vim.api.nvim_set_keymap("n", options[name].mapping, command, { silent = true })
+        else
+            assert(type(options[name]) == "string", string.format("`%s` must be a string", name))
+            vim.api.nvim_set_keymap("n", options[name], command, { silent = true })
+        end
     end
 end
 
@@ -205,11 +218,11 @@ NoNeckPain.options = {
         toggle = "<Leader>np",
         -- Sets a global mapping to Neovim, which allows you to increase the width (+5) of the main window.
         -- When `false`, the mapping is not created.
-        --- @type string
+        --- @type string | { mapping: string, value: number }
         widthUp = "<Leader>n=",
         -- Sets a global mapping to Neovim, which allows you to decrease the width (-5) of the main window.
         -- When `false`, the mapping is not created.
-        --- @type string
+        --- @type string | { mapping: string, value: number }
         widthDown = "<Leader>n-",
         -- Sets a global mapping to Neovim, which allows you to toggle the scratchpad feature.
         -- When `false`, the mapping is not created.
