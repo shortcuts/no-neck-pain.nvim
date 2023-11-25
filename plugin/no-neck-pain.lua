@@ -24,11 +24,15 @@ else
     end, { desc = "Resizes the main centered window for the given argument.", nargs = 1 })
 
     vim.api.nvim_create_user_command("NoNeckPainWidthUp", function()
-        require("no-neck-pain").resize(_G.NoNeckPain.config.width + 5)
+        local increment = _G.NoNeckPain.config.mappings.widthUp.value or 5
+
+        require("no-neck-pain").resize(_G.NoNeckPain.config.width + increment)
     end, { desc = "Increase the width of the main window by 5." })
 
     vim.api.nvim_create_user_command("NoNeckPainWidthDown", function()
-        require("no-neck-pain").resize(_G.NoNeckPain.config.width - 5)
+        local decrement = _G.NoNeckPain.config.mappings.widthDown.value or 5
+
+        require("no-neck-pain").resize(_G.NoNeckPain.config.width - decrement)
     end, { desc = "Decrease the width of the main window by 5." })
 
     vim.api.nvim_create_user_command("NoNeckPainScratchPad", function()

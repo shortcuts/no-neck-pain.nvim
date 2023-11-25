@@ -80,6 +80,32 @@ T["setup"]["overrides default values"] = function()
     })
 end
 
+T["setup"]["allow widthUp and widthDown to be configurable"] = function()
+    child.lua([[require('no-neck-pain').setup({
+        mappings = {
+            enabled = true,
+            toggle = "<Leader>kz",
+            widthUp = {mapping = "<Leader>k-", value = 12},
+            widthDown = {mapping = "<Leader>k=", value = 99},
+            scratchPad = "<Leader>ks"
+        }
+    })]])
+
+    eq_config(child, "mappings", {
+        enabled = true,
+        scratchPad = "<Leader>ks",
+        toggle = "<Leader>kz",
+        widthDown = {
+            mapping = "<Leader>k=",
+            value = 99,
+        },
+        widthUp = {
+            mapping = "<Leader>k-",
+            value = 12,
+        },
+    })
+end
+
 T["setup"]["does not create mappings if false"] = function()
     child.lua([[require('no-neck-pain').setup({
         mappings = {
@@ -138,8 +164,8 @@ end
 
 T["setup"]["increase the width with mapping"] = function()
     child.lua([[
-        require('no-neck-pain').setup({width=50,mappings={enabled=true,widthUp="nn"}})
-        require('no-neck-pain').enable()
+    require('no-neck-pain').setup({width=50,mappings={enabled=true,widthUp="nn"}})
+    require('no-neck-pain').enable()
     ]])
 
     eq_global(child, "_G.NoNeckPain.config.width", 50)
@@ -153,10 +179,52 @@ T["setup"]["increase the width with mapping"] = function()
     eq_global(child, "_G.NoNeckPain.config.width", 70)
 end
 
+T["setup"]["increase the width with custom mapping and value"] = function()
+    child.lua([[
+    require('no-neck-pain').setup({width=50,mappings={enabled=true,widthUp={mapping="nn", value=10}}})
+    require('no-neck-pain').enable()
+    ]])
+
+    eq_global(child, "_G.NoNeckPain.config.width", 50)
+    eq(helpers.winsInTab(child), { 1001, 1000, 1002 })
+
+    child.lua("vim.api.nvim_input('nn')")
+    child.lua("vim.api.nvim_input('nn')")
+    child.lua("vim.api.nvim_input('nn')")
+    child.lua("vim.api.nvim_input('nn')")
+
+    eq_global(child, "_G.NoNeckPain.config.width", 90)
+end
+
+
+T["setup"]["throws with wrong widthUp configuration"] = function()
+    helpers.expect.error(function()
+        child.lua([[ require('no-neck-pain').setup({
+                    mappings = {
+                        enabled = true,
+                        widthUp = { foo = bar },
+                    },
+                })
+            ]])
+    end)
+end
+
+T["setup"]["throws with wrong widthDown configuration"] = function()
+    helpers.expect.error(function()
+        child.lua([[ require('no-neck-pain').setup({
+                    mappings = {
+                        enabled = true,
+                        widthDown = { foo = bar },
+                    },
+                })
+            ]])
+    end)
+end
+
 T["setup"]["decrease the width with mapping"] = function()
     child.lua([[
-        require('no-neck-pain').setup({width=50,mappings={enabled=true,widthDown="nn"}})
-        require('no-neck-pain').enable()
+    require('no-neck-pain').setup({width=50,mappings={enabled=true,widthDown="nn"}})
+    require('no-neck-pain').enable()
     ]])
 
     eq_global(child, "_G.NoNeckPain.config.width", 50)
@@ -170,10 +238,27 @@ T["setup"]["decrease the width with mapping"] = function()
     eq_global(child, "_G.NoNeckPain.config.width", 30)
 end
 
+T["setup"]["decrease the width with custom mapping and value"] = function()
+    child.lua([[
+    require('no-neck-pain').setup({width=50,mappings={enabled=true,widthDown={mapping="nn",value=7}}})
+    require('no-neck-pain').enable()
+    ]])
+
+    eq_global(child, "_G.NoNeckPain.config.width", 50)
+    eq(helpers.winsInTab(child), { 1001, 1000, 1002 })
+
+    child.lua("vim.api.nvim_input('nn')")
+    child.lua("vim.api.nvim_input('nn')")
+    child.lua("vim.api.nvim_input('nn')")
+    child.lua("vim.api.nvim_input('nn')")
+
+    eq_global(child, "_G.NoNeckPain.config.width", 22)
+end
+
 T["setup"]["toggles scratchPad"] = function()
     child.lua([[
-        require('no-neck-pain').setup({width=50,mappings={enabled=true,scratchPad="ns"}})
-        require('no-neck-pain').enable()
+    require('no-neck-pain').setup({width=50,mappings={enabled=true,scratchPad="ns"}})
+    require('no-neck-pain').enable()
     ]])
 
     eq_global(child, "_G.NoNeckPain.config.buffers.scratchPad.enabled", false)

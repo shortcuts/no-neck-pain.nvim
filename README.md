@@ -166,11 +166,11 @@ require("no-neck-pain").setup({
         toggle = "<Leader>np",
         -- Sets a global mapping to Neovim, which allows you to increase the width (+5) of the main window.
         -- When `false`, the mapping is not created.
-        --- @type string
+        --- @type string | { mapping: string, value: number }
         widthUp = "<Leader>n=",
         -- Sets a global mapping to Neovim, which allows you to decrease the width (-5) of the main window.
         -- When `false`, the mapping is not created.
-        --- @type string
+        --- @type string | { mapping: string, value: number }
         widthDown = "<Leader>n-",
         -- Sets a global mapping to Neovim, which allows you to toggle the scratchpad feature.
         -- When `false`, the mapping is not created.
