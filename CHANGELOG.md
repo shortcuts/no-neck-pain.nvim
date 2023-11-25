@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [1.5.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.4.1...v1.5.0) (2023-11-25)
+
+
+### Features
+
+* **mappins:** allow custom values for widthUp and widthDown ([#264](https://github.com/shortcuts/no-neck-pain.nvim/issues/264)) ([47414ce](https://github.com/shortcuts/no-neck-pain.nvim/commit/47414ce5f3eba996c501492d70da65d4c3710b53))
+
 ## [1.4.1](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.4.0...v1.4.1) (2023-11-10)
 
 
