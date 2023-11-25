@@ -4,42 +4,6 @@ local Co = require("no-neck-pain.util.constants")
 
 local NoNeckPain = {}
 
---- Registers the plugin mappings if the option is enabled.
----
----@param options table The mappins provided by the user.
----@param mappings table A key value map of the mapping name and its command.
----
----@private
-local function registerMappings(options, mappings)
-    -- all of the mappings are disabled
-    if not options.enabled then
-        return
-    end
-
-    for name, command in pairs(mappings) do
-        -- this specific mapping is disabled
-        if not options[name] then
-            return
-        end
-
-        if (name == "widthUp" or name == "widthDown") and type(options[name]) ~= "string" then
-            assert(
-                type(options[name]) == "table"
-                    and options[name]["mapping"] ~= nil
-                    and options[name]["value"] ~= nil,
-                string.format(
-                    "`%s` must be a string or a table with the following properties {mapping: 'your_mapping', value: 5}",
-                    name
-                )
-            )
-            vim.api.nvim_set_keymap("n", options[name].mapping, command, { silent = true })
-        else
-            assert(type(options[name]) == "string", string.format("`%s` must be a string", name))
-            vim.api.nvim_set_keymap("n", options[name], command, { silent = true })
-        end
-    end
-end
-
 --- NoNeckPain's buffer `vim.wo` options.
 --- @see window options `:h vim.wo`
 ---
@@ -380,6 +344,43 @@ function NoNeckPain.defaults(options)
 
     return NoNeckPain.options
 end
+
+--- Registers the plugin mappings if the option is enabled.
+---
+---@param options table The mappins provided by the user.
+---@param mappings table A key value map of the mapping name and its command.
+---
+---@private
+local function registerMappings(options, mappings)
+    -- all of the mappings are disabled
+    if not options.enabled then
+        return
+    end
+
+    for name, command in pairs(mappings) do
+        -- this specific mapping is disabled
+        if not options[name] then
+            return
+        end
+
+        if (name == "widthUp" or name == "widthDown") and type(options[name]) ~= "string" then
+            assert(
+                type(options[name]) == "table"
+                    and options[name]["mapping"] ~= nil
+                    and options[name]["value"] ~= nil,
+                string.format(
+                    "`%s` must be a string or a table with the following properties {mapping: 'your_mapping', value: 5}",
+                    name
+                )
+            )
+            vim.api.nvim_set_keymap("n", options[name].mapping, command, { silent = true })
+        else
+            assert(type(options[name]) == "string", string.format("`%s` must be a string", name))
+            vim.api.nvim_set_keymap("n", options[name], command, { silent = true })
+        end
+    end
+end
+
 
 --- Define your no-neck-pain setup.
 ---

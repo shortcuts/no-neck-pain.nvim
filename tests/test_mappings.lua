@@ -196,6 +196,31 @@ T["setup"]["increase the width with custom mapping and value"] = function()
     eq_global(child, "_G.NoNeckPain.config.width", 90)
 end
 
+
+T["setup"]["throws with wrong widthUp configuration"] = function()
+    helpers.expect.error(function()
+        child.lua([[ require('no-neck-pain').setup({
+                    mappings = {
+                        enabled = true,
+                        widthUp = { foo = bar },
+                    },
+                })
+            ]])
+    end)
+end
+
+T["setup"]["throws with wrong widthDown configuration"] = function()
+    helpers.expect.error(function()
+        child.lua([[ require('no-neck-pain').setup({
+                    mappings = {
+                        enabled = true,
+                        widthDown = { foo = bar },
+                    },
+                })
+            ]])
+    end)
+end
+
 T["setup"]["decrease the width with mapping"] = function()
     child.lua([[
     require('no-neck-pain').setup({width=50,mappings={enabled=true,widthDown="nn"}})
