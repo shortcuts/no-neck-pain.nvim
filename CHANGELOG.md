@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [1.6.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.5.0...v1.6.0) (2023-11-26)
+
+
+### Features
+
+* **api:** add commands to toggle sides ([#266](https://github.com/shortcuts/no-neck-pain.nvim/issues/266)) ([0a14fbb](https://github.com/shortcuts/no-neck-pain.nvim/commit/0a14fbb9a88ccbb8fd54491d89f7aee038975a00))
+
 ## [1.5.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.4.1...v1.5.0) (2023-11-25)
 
 
