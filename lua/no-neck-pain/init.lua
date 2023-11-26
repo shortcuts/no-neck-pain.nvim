@@ -47,7 +47,7 @@ function NoNeckPain.resize(width)
     _G.NoNeckPain.state = M.init("publicAPI_resize", false)
 end
 
---- Toggles the config `side.enabled` and re-inits the plugin.
+--- Toggles the config `${side}.enabled` and re-inits the plugin.
 ---
 --- @param side "left" | "right": the side to toggle.
 function NoNeckPain.toggleSide(side)

@@ -42,7 +42,7 @@ function N.toggleScratchPad()
     return S
 end
 
---- Toggles the config `side.enabled` and re-inits the plugin.
+--- Toggles the config `${side}.enabled` and re-inits the plugin.
 ---
 --- @param scope string: internal identifier for logging purposes.
 --- @param side "left" | "right": the side to toggle.
