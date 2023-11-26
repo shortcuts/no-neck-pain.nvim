@@ -83,7 +83,8 @@ T["commands"]["NoNeckPainWidthUp increases the width by 5"] = function()
     eq_global(child, "_G.NoNeckPain.config.width", 150)
 end
 
-T["commands"]["NoNeckPainWidthUp increases the width by N when mappings.widthUp is configured"] = function()
+T["commands"]["NoNeckPainWidthUp increases the width by N when mappings.widthUp is configured"] = function(
+)
     child.lua([[require('no-neck-pain').setup({
         mappings = {
             widthUp = {mapping = "<Leader>k-", value = 12},
@@ -127,7 +128,8 @@ T["commands"]["NoNeckPainWidthUp decreases the width by 5"] = function()
     eq_global(child, "_G.NoNeckPain.config.width", 50)
 end
 
-T["commands"]["NoNeckPainWidthUp decreases the width by N when mappings.widthDown is configured"] = function()
+T["commands"]["NoNeckPainWidthUp decreases the width by N when mappings.widthDown is configured"] = function(
+)
     child.lua([[require('no-neck-pain').setup({
         mappings = {
             widthDown = {mapping = "<Leader>k-", value = 8},

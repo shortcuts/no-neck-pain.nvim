@@ -1,8 +1,11 @@
 local helpers = dofile("tests/helpers.lua")
 
 local child = helpers.new_child_neovim()
-local eq, eq_global, eq_config =
-    helpers.expect.equality, helpers.expect.global_equality, helpers.expect.config_equality
+local eq, eq_global, eq_config, eq_state =
+    helpers.expect.equality,
+    helpers.expect.global_equality,
+    helpers.expect.config_equality,
+    helpers.expect.state_equality
 
 local T = MiniTest.new_set({
     hooks = {
@@ -67,6 +70,8 @@ T["setup"]["overrides default values"] = function()
             toggle = "<Leader>kz",
             widthUp = "<Leader>k-",
             widthDown = "<Leader>k=",
+            toggleLeftSide = "<Leader>kl",
+            toggleRightSide = "<Leader>kr",
             scratchPad = "<Leader>ks"
         }
     })]])
@@ -75,6 +80,8 @@ T["setup"]["overrides default values"] = function()
         enabled = true,
         scratchPad = "<Leader>ks",
         toggle = "<Leader>kz",
+        toggleLeftSide = "<Leader>kl",
+        toggleRightSide = "<Leader>kr",
         widthDown = "<Leader>k=",
         widthUp = "<Leader>k-",
     })
@@ -84,17 +91,17 @@ T["setup"]["allow widthUp and widthDown to be configurable"] = function()
     child.lua([[require('no-neck-pain').setup({
         mappings = {
             enabled = true,
-            toggle = "<Leader>kz",
             widthUp = {mapping = "<Leader>k-", value = 12},
             widthDown = {mapping = "<Leader>k=", value = 99},
-            scratchPad = "<Leader>ks"
         }
     })]])
 
     eq_config(child, "mappings", {
         enabled = true,
-        scratchPad = "<Leader>ks",
-        toggle = "<Leader>kz",
+        scratchPad = "<Leader>ns",
+        toggle = "<Leader>np",
+        toggleLeftSide = "<Leader>nql",
+        toggleRightSide = "<Leader>nqr",
         widthDown = {
             mapping = "<Leader>k=",
             value = 99,
@@ -111,6 +118,8 @@ T["setup"]["does not create mappings if false"] = function()
         mappings = {
             enabled = true,
             toggle = false,
+            toggleLeftSide = false,
+            toggleRightSide = false,
             widthUp = false,
             widthDown = false,
             scratchPad = false
@@ -121,6 +130,8 @@ T["setup"]["does not create mappings if false"] = function()
         enabled = true,
         scratchPad = false,
         toggle = false,
+        toggleLeftSide = false,
+        toggleRightSide = false,
         widthUp = false,
         widthDown = false,
     })
@@ -160,6 +171,20 @@ T["setup"]["does not create mappings if false"] = function()
     child.lua("vim.api.nvim_input('<Leader>ns')")
 
     eq_global(child, "_G.NoNeckPain.state", vim.NIL)
+
+    -- toggle left
+    eq_global(child, "_G.NoNeckPain.state", vim.NIL)
+
+    child.lua("vim.api.nvim_input('<Leader>nql')")
+
+    eq_global(child, "_G.NoNeckPain.state", vim.NIL)
+
+    -- toggle right
+    eq_global(child, "_G.NoNeckPain.state", vim.NIL)
+
+    child.lua("vim.api.nvim_input('<Leader>nqr')")
+
+    eq_global(child, "_G.NoNeckPain.state", vim.NIL)
 end
 
 T["setup"]["increase the width with mapping"] = function()
@@ -195,7 +220,6 @@ T["setup"]["increase the width with custom mapping and value"] = function()
 
     eq_global(child, "_G.NoNeckPain.config.width", 90)
 end
-
 
 T["setup"]["throws with wrong widthUp configuration"] = function()
     helpers.expect.error(function()
@@ -268,6 +292,43 @@ T["setup"]["toggles scratchPad"] = function()
 
     eq_global(child, "_G.NoNeckPain.config.buffers.scratchPad.enabled", false)
     eq_global(child, "_G.NoNeckPain.state.tabs[1].scratchPadEnabled", true)
+end
+
+T["setup"]["toggle sides and disable if none"] = function()
+    child.lua([[
+        require('no-neck-pain').setup({width=50,mappings={enabled=true,toggleLeftSide="nl",toggleRightSide="nr"}})
+        require('no-neck-pain').enable()
+    ]])
+
+    eq_state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
+
+    child.lua("vim.api.nvim_input('nl')")
+    eq_state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = nil,
+        right = 1002,
+    })
+
+    child.lua("vim.api.nvim_input('nl')")
+    eq_state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1003,
+        right = 1002,
+    })
+
+    child.lua("vim.api.nvim_input('nr')")
+    eq_state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1003,
+        right = nil,
+    })
+
+    child.lua("vim.api.nvim_input('nl')")
+    eq_state(child, "enabled", false)
 end
 
 return T

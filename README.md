@@ -356,6 +356,8 @@ NoNeckPain.bufferOptionsColors = {
 |-------------|----------------------------|
 |`:NoNeckPain`| Toggles the plugin state, between enable and disable. |
 |`:NoNeckPainResize INT`| Updates the config `width` with the given `INT` value and resizes the no-neck-pain windows. |
+|`:NoNeckPainToggleLeftSide`| Toggles the left side buffer (open/close). |
+|`:NoNeckPainToggleRightSide`| Toggles the right side buffer (open/close). |
 |`:NoNeckPainWidthUp`| Increases the config `width` by 5 and resizes the no-neck-pain windows. |
 |`:NoNeckPainWidthDown`| Decreases the config `width` by 5 and resizes the no-neck-pain windows. |
 

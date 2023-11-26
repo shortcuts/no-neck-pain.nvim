@@ -17,6 +17,13 @@ Sets the config `width` to the given `width` value and resizes the NoNeckPain wi
 @param width number: any positive integer superior to 0.
 
 ------------------------------------------------------------------------------
+                                                       *NoNeckPain.toggleSide()*
+                        `NoNeckPain.toggleSide`({side})
+Toggles the config `side.enabled` and re-inits the plugin.
+
+@param side "left" | "right": the side to toggle.
+
+------------------------------------------------------------------------------
                                                            *NoNeckPain.enable()*
                              `NoNeckPain.enable`()
 Initializes the plugin, sets event listeners and internal state.
@@ -238,6 +245,14 @@ values:
           -- When `false`, the mapping is not created.
           --- @type string
           toggle = "<Leader>np",
+          -- Sets a global mapping to Neovim, which allows you to toggle the left side buffer.
+          -- When `false`, the mapping is not created.
+          --- @type string
+          toggleLeftSide = "<Leader>nql",
+          -- Sets a global mapping to Neovim, which allows you to toggle the right side buffer.
+          -- When `false`, the mapping is not created.
+          --- @type string
+          toggleRightSide = "<Leader>nqr",
           -- Sets a global mapping to Neovim, which allows you to increase the width (+5) of the main window.
           -- When `false`, the mapping is not created.
           --- @type string | { mapping: string, value: number }
@@ -348,6 +363,14 @@ Parameters~
 
 Usage~
 `require("no-neck-pain").setup()` (add `{}` with your |NoNeckPain.options| table)
+
+
+==============================================================================
+------------------------------------------------------------------------------
+Creates side buffers and set the tab state, focuses the `curr` window if required.
+
+------------------------------------------------------------------------------
+Disables the plugin for the given tab, clear highlight groups and autocmds, closes side buffers and resets the internal state.
 
 
  vim:tw=78:ts=8:noet:ft=help:norl:
