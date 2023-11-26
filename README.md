@@ -164,6 +164,14 @@ require("no-neck-pain").setup({
         -- When `false`, the mapping is not created.
         --- @type string
         toggle = "<Leader>np",
+        -- Sets a global mapping to Neovim, which allows you to toggle the left side buffer.
+        -- When `false`, the mapping is not created.
+        --- @type string
+        toggleLeftSide = "<Leader>nql",
+        -- Sets a global mapping to Neovim, which allows you to toggle the right side buffer.
+        -- When `false`, the mapping is not created.
+        --- @type string
+        toggleRightSide = "<Leader>nqr",
         -- Sets a global mapping to Neovim, which allows you to increase the width (+5) of the main window.
         -- When `false`, the mapping is not created.
         --- @type string | { mapping: string, value: number }
@@ -356,6 +364,8 @@ NoNeckPain.bufferOptionsColors = {
 |-------------|----------------------------|
 |`:NoNeckPain`| Toggles the plugin state, between enable and disable. |
 |`:NoNeckPainResize INT`| Updates the config `width` with the given `INT` value and resizes the no-neck-pain windows. |
+|`:NoNeckPainToggleLeftSide`| Toggles the left side buffer (open/close). |
+|`:NoNeckPainToggleRightSide`| Toggles the right side buffer (open/close). |
 |`:NoNeckPainWidthUp`| Increases the config `width` by 5 and resizes the no-neck-pain windows. |
 |`:NoNeckPainWidthDown`| Decreases the config `width` by 5 and resizes the no-neck-pain windows. |
 

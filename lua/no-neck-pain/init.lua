@@ -47,6 +47,17 @@ function NoNeckPain.resize(width)
     _G.NoNeckPain.state = M.init("publicAPI_resize", false)
 end
 
+--- Toggles the config `${side}.enabled` and re-inits the plugin.
+---
+--- @param side "left" | "right": the side to toggle.
+function NoNeckPain.toggleSide(side)
+    if _G.NoNeckPain.state == nil or not _G.NoNeckPain.state.enabled then
+        error("no-neck-pain.nvim must be enabled, run `NoNeckPain` first.")
+    end
+
+    _G.NoNeckPain.state = M.toggleSide("publicAPI_toggleSide", side)
+end
+
 --- Initializes the plugin, sets event listeners and internal state.
 function NoNeckPain.enable()
     if _G.NoNeckPain.config == nil then
@@ -106,9 +117,7 @@ function NoNeckPain.setup(opts)
                         return
                     end
 
-                    local state = NoNeckPain.enable()
-
-                    if state ~= nil then
+                    if NoNeckPain.enable() ~= nil then
                         vim.api.nvim_del_autocmd(p.id)
                     end
                 end)

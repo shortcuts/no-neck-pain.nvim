@@ -67,6 +67,8 @@ T["setup"]["sets exposed methods and default options value"] = function()
         enabled = false,
         scratchPad = "<Leader>ns",
         toggle = "<Leader>np",
+        toggleLeftSide = "<Leader>nql",
+        toggleRightSide = "<Leader>nqr",
         widthUp = "<Leader>n=",
         widthDown = "<Leader>n-",
     })

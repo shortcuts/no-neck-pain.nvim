@@ -42,7 +42,46 @@ function N.toggleScratchPad()
     return S
 end
 
+--- Toggles the config `${side}.enabled` and re-inits the plugin.
+---
+--- @param scope string: internal identifier for logging purposes.
+--- @param side "left" | "right": the side to toggle.
+--- @return table: the state of the plugin.
+---@private
+function N.toggleSide(scope, side)
+    if not S.isActiveTabRegistered(S) then
+        D.log(scope, "skipped because the current tab is not registered")
+
+        return S
+    end
+
+    _G.NoNeckPain.config = vim.tbl_deep_extend(
+        "keep",
+        { buffers = { [side] = { enabled = not _G.NoNeckPain.config.buffers[side].enabled } } },
+        _G.NoNeckPain.config
+    )
+
+    if not _G.NoNeckPain.config.buffers[side].enabled then
+        W.close(scope, S.getSideID(S, side), side)
+        S.setSideID(S, nil, side)
+    end
+
+    if not S.checkSides(S, "or", true) then
+        _G.NoNeckPain.config = vim.tbl_deep_extend(
+            "keep",
+            { buffers = { left = { enabled = true }, right = { enabled = true } } },
+            _G.NoNeckPain.config
+        )
+
+        return N.disable(scope)
+    end
+
+    return N.init(scope)
+end
+
 --- Creates side buffers and set the tab state, focuses the `curr` window if required.
+--
+--- @return table: the state of the plugin.
 ---@private
 function N.init(scope, goToCurr, skipIntegrations)
     if not S.isActiveTabRegistered(S) then
@@ -290,6 +329,8 @@ function N.enable(scope)
 end
 
 --- Disables the plugin for the given tab, clear highlight groups and autocmds, closes side buffers and resets the internal state.
+--
+--- @return table: the state of the plugin.
 ---@private
 function N.disable(scope)
     D.log(scope, "calling disable for tab %d", S.activeTab)

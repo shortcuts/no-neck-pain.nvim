@@ -7,6 +7,8 @@ _G.NoNeckPainLoaded = true
 if vim.fn.has("nvim-0.7") == 0 then
     vim.cmd("command! NoNeckPain lua require('no-neck-pain').toggle()")
     vim.cmd("command! -nargs=1 NoNeckPainResize lua require('no-neck-pain').resize(<f-args>)")
+    vim.cmd("command! NoNeckPainToggleLeftSide lua require('no-neck-pain').toggleSide('left')")
+    vim.cmd("command! NoNeckPainToggleRightSide lua require('no-neck-pain').toggleSide('right')")
     vim.cmd(
         "command! NoNeckPainWidthUp lua require('no-neck-pain').resize(_G.NoNeckPain.config.width + 5)"
     )
@@ -18,6 +20,14 @@ else
     vim.api.nvim_create_user_command("NoNeckPain", function()
         require("no-neck-pain").toggle()
     end, { desc = "Toggles the plugin." })
+
+    vim.api.nvim_create_user_command("NoNeckPainToggleLeftSide", function()
+        require("no-neck-pain").toggleSide("left")
+    end, { desc = "Toggles the left side buffer (open/close)." })
+
+    vim.api.nvim_create_user_command("NoNeckPainToggleRightSide", function()
+        require("no-neck-pain").toggleSide("right")
+    end, { desc = "Toggles the right side buffer (open/close)." })
 
     vim.api.nvim_create_user_command("NoNeckPainResize", function(tbl)
         require("no-neck-pain").resize(tbl.args)
