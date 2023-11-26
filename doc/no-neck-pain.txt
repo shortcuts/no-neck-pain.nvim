@@ -19,7 +19,7 @@ Sets the config `width` to the given `width` value and resizes the NoNeckPain wi
 ------------------------------------------------------------------------------
                                                        *NoNeckPain.toggleSide()*
                         `NoNeckPain.toggleSide`({side})
-Toggles the config `side.enabled` and re-inits the plugin.
+Toggles the config `${side}.enabled` and re-inits the plugin.
 
 @param side "left" | "right": the side to toggle.
 
