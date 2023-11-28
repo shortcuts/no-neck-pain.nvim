@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [1.6.1](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.6.0...v1.6.1) (2023-11-28)
+
+
+### Bug Fixes
+
+* **tabs:** prevent unsynced state in tab switchs ([#269](https://github.com/shortcuts/no-neck-pain.nvim/issues/269)) ([2afc30d](https://github.com/shortcuts/no-neck-pain.nvim/commit/2afc30d8ec23000c4f830310661f63ee3b581a42))
+
 ## [1.6.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.5.0...v1.6.0) (2023-11-26)
 
 
