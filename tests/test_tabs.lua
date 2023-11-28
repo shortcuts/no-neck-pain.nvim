@@ -257,4 +257,165 @@ T["tabnew/tabclose"]["doesn't keep closed tabs in state"] = function()
     })
 end
 
+T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
+    child.restart({ "-u", "scripts/init_auto_open.lua" })
+
+    child.cmd("badd 1")
+    eq_state(child, "enabled", true)
+    eq_state(child, "activeTab", 1)
+    eq_state(child, "tabs", {
+        {
+            id = 1,
+            layers = {
+                split = 1,
+                vsplit = 1,
+            },
+            scratchPadEnabled = false,
+            wins = {
+                integrations = Co.integrations,
+                main = {
+                    curr = 1000,
+                    left = 1001,
+                    right = 1002,
+                },
+            },
+        },
+    })
+
+    child.cmd("tabnew")
+    child.cmd("badd 2")
+    eq_state(child, "enabled", true)
+    eq_state(child, "activeTab", 2)
+    eq_state(child, "tabs", {
+        {
+            id = 1,
+            layers = {
+                split = 1,
+                vsplit = 1,
+            },
+            scratchPadEnabled = false,
+            wins = {
+                integrations = Co.integrations,
+                main = {
+                    curr = 1000,
+                    left = 1001,
+                    right = 1002,
+                },
+            },
+        },
+        {
+            id = 2,
+            layers = {
+                split = 1,
+                vsplit = 1,
+            },
+            scratchPadEnabled = false,
+            wins = {
+                integrations = Co.integrations,
+                main = {
+                    curr = 1003,
+                    left = 1004,
+                    right = 1005,
+                },
+            },
+        },
+    })
+
+    child.cmd("NoNeckPain")
+    eq_state(child, "tabs", {
+        {
+            id = 1,
+            layers = {
+                split = 1,
+                vsplit = 1,
+            },
+            scratchPadEnabled = false,
+            wins = {
+                integrations = Co.integrations,
+                main = {
+                    curr = 1000,
+                    left = 1001,
+                    right = 1002,
+                },
+            },
+        },
+    })
+
+    child.cmd("NoNeckPain")
+    eq_state(child, "tabs", {
+        {
+            id = 1,
+            layers = {
+                split = 1,
+                vsplit = 1,
+            },
+            scratchPadEnabled = false,
+            wins = {
+                integrations = Co.integrations,
+                main = {
+                    curr = 1000,
+                    left = 1001,
+                    right = 1002,
+                },
+            },
+        },
+        {
+            id = 2,
+            layers = {
+                split = 1,
+                vsplit = 1,
+            },
+            scratchPadEnabled = false,
+            wins = {
+                integrations = Co.integrations,
+                main = {
+                    curr = 1003,
+                    left = 1006,
+                    right = 1007,
+                },
+            },
+        },
+    })
+
+    child.cmd("tabprevious")
+    eq_state(child, "activeTab", 1)
+    eq_state(child, "tabs", {
+        {
+            id = 1,
+            layers = {
+                split = 1,
+                vsplit = 1,
+            },
+            scratchPadEnabled = false,
+            wins = {
+                integrations = Co.integrations,
+                main = {
+                    curr = 1000,
+                    left = 1001,
+                    right = 1002,
+                },
+            },
+        },
+        {
+            id = 2,
+            layers = {
+                split = 1,
+                vsplit = 1,
+            },
+            scratchPadEnabled = false,
+            wins = {
+                integrations = Co.integrations,
+                main = {
+                    curr = 1003,
+                    left = 1006,
+                    right = 1007,
+                },
+            },
+        },
+    })
+
+    child.cmd("tabprevious")
+    eq_state(child, "activeTab", 2)
+end
+
 return T

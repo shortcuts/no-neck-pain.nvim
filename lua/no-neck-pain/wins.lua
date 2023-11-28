@@ -294,25 +294,42 @@ end
 
 ---Determine if the tab wins are still active and valid.
 ---
----@param tab table: the table where the tab information are stored.
+---@param scope string: the method that called this one.
 ---@param checkSplits boolean: whether splits state should be considered or not.
 ---@return boolean: whether all windows are active and valid or not.
 ---@private
-function W.stateWinsActive(tab, checkSplits)
-    if not vim.api.nvim_tabpage_is_valid(tab.id) then
+function W.stateWinsActive(scope, checkSplits)
+    if not S.isActiveTabValid(S) then
+        D.log(scope, "active tab not valid")
+
         return false
     end
 
-    local wins = vim.api.nvim_tabpage_list_wins(tab.id)
-    local swins = tab.wins.main
+    local tab = S.getTabSafe(S)
 
-    if checkSplits and tab.wins.splits ~= nil then
-        swins = S.getRegisteredWins(S)
+    if tab == nil then
+        D.log(scope, "tab is nil")
+
+        return false
     end
 
-    for _, swin in pairs(swins) do
-        if not vim.tbl_contains(wins, swin) then
-            return false
+    if tab.wins.main ~= nil then
+        for _, side in pairs(tab.wins.main) do
+            if not vim.api.nvim_win_is_valid(side) then
+                D.log(scope, "main not valid anymore")
+
+                return false
+            end
+        end
+    end
+
+    if checkSplits and tab.wins.splits ~= nil then
+        for _, split in pairs(tab.wins.splits) do
+            if not vim.api.nvim_win_is_valid(split.id) then
+                D.log(scope, "split not valid anymore")
+
+                return false
+            end
         end
     end
 
