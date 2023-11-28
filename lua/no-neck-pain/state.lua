@@ -238,7 +238,7 @@ end
 ---@return boolean
 ---@private
 function State:isActiveTabValid()
-    return vim.api.nvim_tabpage_is_valid(self.activeTab)
+    return self.isActiveTabRegistered(self) and vim.api.nvim_tabpage_is_valid(self.activeTab)
 end
 
 ---Whether the `activeTab` is registered in the state or not.

@@ -218,12 +218,12 @@ function N.enable(scope)
     vim.api.nvim_create_autocmd({ "QuitPre", "BufDelete" }, {
         callback = function(p)
             vim.schedule(function()
-                if E.skip(nil) then
+                if E.skip(nil) or not S.isActiveTabRegistered(S) then
                     return
                 end
 
                 -- if we are not in split view, we check if we killed one of the main buffers (curr, left, right) to disable NNP
-                if not S.hasSplits(S) and not W.stateWinsActive(S.getTab(S), false) then
+                if not S.hasSplits(S) and not W.stateWinsActive(false) then
                     D.log(p.event, "one of the NNP main buffers have been closed, disabling...")
 
                     return N.disable(p.event)
@@ -252,7 +252,7 @@ function N.enable(scope)
     vim.api.nvim_create_autocmd({ "WinClosed", "BufDelete" }, {
         callback = function(p)
             vim.schedule(function()
-                if E.skip(nil) or not S.hasSplits(S) or W.stateWinsActive(S.getTab(S), true) then
+                if E.skip(nil) or not S.hasSplits(S) or W.stateWinsActive(true) then
                     return
                 end
 
