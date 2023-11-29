@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [1.6.2](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.6.1...v1.6.2) (2023-11-29)
+
+
+### Bug Fixes
+
+* **tabs:** prevent wrong activeTab index ([#271](https://github.com/shortcuts/no-neck-pain.nvim/issues/271)) ([bda33be](https://github.com/shortcuts/no-neck-pain.nvim/commit/bda33bee32dae1bdfdf3643273421a33f350ffc7))
+
 ## [1.6.1](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.6.0...v1.6.1) (2023-11-28)
 
 
