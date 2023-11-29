@@ -2,6 +2,14 @@ local D = require("no-neck-pain.util.debug")
 
 local A = { debouncers = {} }
 
+---Returns the current tab page or 1 if it's nil.
+---
+---@return number: the tabpage id.
+---@private
+function A.getCurrentTab()
+    return vim.api.nvim_get_current_tabpage() or 1
+end
+
 ---Returns the name of the augroup for the given tab ID.
 ---
 ---@param id number?: the id of the tab.

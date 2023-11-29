@@ -3,6 +3,7 @@ local helpers = dofile("tests/helpers.lua")
 
 local child = helpers.new_child_neovim()
 local eq, eq_state = helpers.expect.equality, helpers.expect.state_equality
+local eq_type_global = helpers.expect.global_type_equality
 
 local T = MiniTest.new_set({
     hooks = {
@@ -416,6 +417,115 @@ T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
 
     child.cmd("tabprevious")
     eq_state(child, "activeTab", 2)
+end
+
+T["tabnew/tabclose"]["does not pick tab 1 for the first active tab"] = function()
+    child.lua([[require('no-neck-pain').setup({width=50})]])
+    eq_type_global(child, "_G.NoNeckPain.config", "table")
+    eq_type_global(child, "_G.NoNeckPain.state", "nil")
+
+    eq(child.api.nvim_get_current_tabpage(), 1)
+    child.cmd("badd 1")
+
+    child.cmd("tabnew")
+    eq(child.api.nvim_get_current_tabpage(), 2)
+    child.cmd("badd 2")
+
+    eq_type_global(child, "_G.NoNeckPain.state", "nil")
+    child.cmd("NoNeckPain")
+    eq(child.api.nvim_get_current_tabpage(), 2)
+    eq_type_global(child, "_G.NoNeckPain.state", "table")
+    eq_state(child, "enabled", true)
+    eq_state(child, "tabs[1]", vim.NIL)
+    eq_state(child, "activeTab", 2)
+    eq_state(child, "tabs[2]", {
+        id = 2,
+        layers = {
+            split = 1,
+            vsplit = 1,
+        },
+        scratchPadEnabled = false,
+        wins = {
+            integrations = Co.integrations,
+            main = {
+                curr = 1001,
+                left = 1002,
+                right = 1003,
+            },
+        },
+    })
+
+    child.cmd("tabprevious")
+    eq(child.api.nvim_get_current_tabpage(), 1)
+    eq_type_global(child, "_G.NoNeckPain.state", "table")
+    eq_state(child, "enabled", true)
+    eq_state(child, "tabs[1]", vim.NIL)
+    eq_state(child, "activeTab", 1)
+
+    child.cmd("NoNeckPain")
+    eq_state(child, "tabs[1]", {
+        id = 1,
+        layers = {
+            split = 1,
+            vsplit = 1,
+        },
+        scratchPadEnabled = false,
+        wins = {
+            integrations = {
+                NeoTree = {
+                    close = "Neotree close",
+                    fileTypePattern = "neo-tree",
+                    open = "Neotree reveal",
+                },
+                NvimDAPUI = {
+                    close = "lua require('dapui').close()",
+                    fileTypePattern = "dap",
+                    open = "lua require('dapui').open()",
+                },
+                NvimTree = {
+                    close = "NvimTreeClose",
+                    fileTypePattern = "nvimtree",
+                    open = "NvimTreeOpen",
+                },
+                TSPlayground = {
+                    close = "TSPlaygroundToggle",
+                    fileTypePattern = "tsplayground",
+                    open = "TSPlaygroundToggle",
+                },
+                neotest = {
+                    close = "lua require('neotest').summary.close()",
+                    fileTypePattern = "neotest",
+                    open = "lua require('neotest').summary.open()",
+                },
+                undotree = {
+                    close = "UndotreeToggle",
+                    fileTypePattern = "undotree",
+                    open = "UndotreeToggle",
+                },
+            },
+            main = {
+                curr = 1000,
+                left = 1004,
+                right = 1005,
+            },
+        },
+    })
+    eq_state(child, "tabs[2]", {
+        id = 2,
+        layers = {
+            split = 1,
+            vsplit = 1,
+        },
+        scratchPadEnabled = false,
+        wins = {
+            integrations = Co.integrations,
+            main = {
+                curr = 1001,
+                left = 1002,
+                right = 1003,
+            },
+        },
+    })
 end
 
 return T

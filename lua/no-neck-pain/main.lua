@@ -116,10 +116,9 @@ function N.enable(scope)
         return nil
     end
 
-    D.log(scope, "calling enable for tab %d", S.activeTab)
+    D.log(scope, "calling enable for tab %d", A.getCurrentTab())
 
-    -- register the new tab.
-    S.setTab(S, S.activeTab)
+    S.setTab(S, A.getCurrentTab())
 
     local augroupName = A.getAugroupName(S.activeTab)
     vim.api.nvim_create_augroup(augroupName, { clear = true })
@@ -141,7 +140,7 @@ function N.enable(scope)
                 local tab = S.getTab(S)
 
                 if tab ~= nil then
-                    if vim.api.nvim_get_current_tabpage() ~= tab.id then
+                    if A.getCurrentTab() ~= tab.id then
                         return
                     end
                 end
@@ -161,9 +160,9 @@ function N.enable(scope)
                     S.refreshTabs(S, S.activeTab)
                 end
 
-                S.setActiveTab(S, vim.api.nvim_get_current_tabpage())
+                D.log(p.event, "leaving tab %d", S.activeTab)
 
-                D.log(p.event, "new tab page registered %d", S.activeTab)
+                S.setActiveTab(S, A.getCurrentTab())
             end)
         end,
         group = augroupName,

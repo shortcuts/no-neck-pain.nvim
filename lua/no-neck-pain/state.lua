@@ -2,22 +2,15 @@ local A = require("no-neck-pain.util.api")
 local C = require("no-neck-pain.util.constants")
 local D = require("no-neck-pain.util.debug")
 
-local State = { enabled = false, activeTab = 1, tabs = nil }
+local State = { enabled = false, activeTab = A.getCurrentTab(), tabs = nil }
 
 ---Sets the state to its original value.
 ---
 ---@private
 function State:init()
     self.enabled = false
-    self.activeTab = 1
+    self.activeTab = A.getCurrentTab()
     self.tabs = nil
-end
-
----Sets the state integrations to its original value.
----
----@private
-function State:initIntegrations()
-    self.tabs[self.activeTab].wins.integrations = vim.deepcopy(C.integrations)
 end
 
 ---Sets the state splits to its original value.
@@ -33,7 +26,7 @@ end
 ---@return number: the total `tabs` in the state.
 ---@private
 function State:refreshTabs(id)
-    id = id or vim.api.nvim_get_current_tabpage()
+    id = id or A.getCurrentTab()
 
     local refreshedTabs = {}
 
@@ -390,28 +383,24 @@ end
 
 ---Gets the tab with the given `id` from the state.
 ---
----@param id number?: the id of the tab to get, fallbacks to the currently active one when `nil`.
 ---@return table: the `tab` information.
 ---@private
-function State:getTab(id)
-    id = id or self.activeTab or vim.api.nvim_get_current_tabpage()
+function State:getTab()
+    local id = self.activeTab or A.getCurrentTab()
 
     return self.tabs[id]
 end
 
 ---Gets the tab with the given `id` from the state, safely returns nil if we are not sure it exists.
 ---
----@param id number?: the id of the tab to get, fallbacks to the currently active one when `nil`.
 ---@return table?: the `tab` information, or `nil` if it's not found.
 ---@private
-function State:getTabSafe(id)
+function State:getTabSafe()
     if not self.hasTabs(self) then
         return nil
     end
 
-    id = id or self.activeTab or vim.api.nvim_get_current_tabpage()
-
-    return self.tabs[id]
+    return self.getTab(self)
 end
 
 ---Sets the given `bool` value to the active tab scratchpad.
@@ -437,6 +426,8 @@ end
 function State:setTab(id)
     self.tabs = self.tabs or {}
 
+    D.log("setTab", "registered new tab %d", id)
+
     self.tabs[id] = {
         id = id,
         scratchPadEnabled = false,
@@ -451,10 +442,10 @@ function State:setTab(id)
                 right = nil,
             },
             splits = nil,
+            integrations = vim.deepcopy(C.integrations),
         },
     }
-
-    self.tabs[id].wins.integrations = self.initIntegrations(self)
+    self.activeTab = id
 end
 
 ---Sets the `layers` of the currently active tab.
