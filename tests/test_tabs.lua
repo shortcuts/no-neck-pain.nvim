@@ -528,4 +528,74 @@ T["tabnew/tabclose"]["does not pick tab 1 for the first active tab"] = function(
     })
 end
 
+T["tabnew/tabclose"]["keep state synchronized on second tab"] = function()
+    child.lua([[require('no-neck-pain').setup({width=50})]])
+    eq_type_global(child, "_G.NoNeckPain.config", "table")
+    eq_type_global(child, "_G.NoNeckPain.state", "nil")
+
+    eq(child.api.nvim_get_current_tabpage(), 1)
+    child.cmd("badd 1")
+
+    child.cmd("tabnew")
+    eq(child.api.nvim_get_current_tabpage(), 2)
+    child.cmd("badd 2")
+
+    eq_type_global(child, "_G.NoNeckPain.state", "nil")
+    child.cmd("NoNeckPain")
+    eq(child.api.nvim_get_current_tabpage(), 2)
+    eq_type_global(child, "_G.NoNeckPain.state", "table")
+    eq_state(child, "enabled", true)
+    eq_state(child, "tabs[1]", vim.NIL)
+    eq_state(child, "activeTab", 2)
+    eq_state(child, "tabs[2]", {
+        id = 2,
+        layers = {
+            split = 1,
+            vsplit = 1,
+        },
+        scratchPadEnabled = false,
+        wins = {
+            integrations = Co.integrations,
+            main = {
+                curr = 1001,
+                left = 1002,
+                right = 1003,
+            },
+        },
+    })
+
+    child.cmd("tabprevious")
+    eq(child.api.nvim_get_current_tabpage(), 1)
+    eq_type_global(child, "_G.NoNeckPain.state", "table")
+    eq_state(child, "enabled", true)
+    eq_state(child, "tabs[1]", vim.NIL)
+    eq_state(child, "activeTab", 1)
+
+    child.cmd("tabnext")
+    eq_type_global(child, "_G.NoNeckPain.state", "table")
+    eq(child.api.nvim_get_current_tabpage(), 2)
+    eq_state(child, "activeTab", 2)
+    eq_state(child, "enabled", true)
+    eq_state(child, "tabs[1]", vim.NIL)
+    eq_state(child, "tabs[2]", {
+        id = 2,
+        layers = {
+            split = 1,
+            vsplit = 1,
+        },
+        scratchPadEnabled = false,
+        wins = {
+            integrations = Co.integrations,
+            main = {
+                curr = 1001,
+                left = 1002,
+                right = 1003,
+            },
+        },
+    })
+
+    child.cmd("NoNeckPain")
+    eq_state(child, "tabs", vim.NIL)
+end
+
 return T

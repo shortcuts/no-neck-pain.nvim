@@ -155,18 +155,30 @@ function N.enable(scope)
     vim.api.nvim_create_autocmd({ "TabLeave" }, {
         callback = function(p)
             vim.schedule(function()
-                -- if the left tab is not valid anymore, we can remove it from the state
-                if not S.isActiveTabValid(S) then
+                if
+                    S.isActiveTabRegistered(S) and not vim.api.nvim_tabpage_is_valid(S.activeTab)
+                then
                     S.refreshTabs(S, S.activeTab)
+                    D.log(p.event, "tab %d is now inactive", S.activeTab)
+                else
+                    D.log(p.event, "tab %d left", S.activeTab)
                 end
-
-                D.log(p.event, "leaving tab %d", S.activeTab)
-
-                S.setActiveTab(S, A.getCurrentTab())
             end)
         end,
         group = augroupName,
-        desc = "Refreshes the active tab state",
+        desc = "Removes potentially inactive tabs from the state",
+    })
+
+    vim.api.nvim_create_autocmd({ "TabEnter" }, {
+        callback = function(p)
+            vim.schedule(function()
+                S.setActiveTab(S, A.getCurrentTab())
+
+                D.log(p.event, "tab %d entered", S.activeTab)
+            end)
+        end,
+        group = augroupName,
+        desc = "Keeps track of the currently active tab",
     })
 
     vim.api.nvim_create_autocmd({ "WinEnter" }, {

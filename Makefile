@@ -17,6 +17,11 @@ test-splits:
 	nvim --headless --noplugin -u ./scripts/minimal_init.lua \
 		-c "lua MiniTest.run_file('tests/test_splits.lua', { execute = { reporter = MiniTest.gen_reporter.stdout({ group_depth = 2 }) } })"
 
+test-tabs:
+	nvim --version | head -n 1 && echo ''
+	nvim --headless --noplugin -u ./scripts/minimal_init.lua \
+		-c "lua MiniTest.run_file('tests/test_tabs.lua', { execute = { reporter = MiniTest.gen_reporter.stdout({ group_depth = 2 }) } })"
+
 deps:
 	@mkdir -p deps
 	git clone --depth 1 https://github.com/echasnovski/mini.nvim deps/mini.nvim
