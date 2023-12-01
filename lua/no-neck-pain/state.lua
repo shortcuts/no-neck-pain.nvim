@@ -32,7 +32,7 @@ function State:refreshTabs(id)
 
     for _, tab in pairs(self.tabs) do
         if tab.id ~= id and vim.api.nvim_tabpage_is_valid(tab.id) then
-            table.insert(refreshedTabs, tab)
+            refreshedTabs[tab.id] = tab
         end
     end
 
