@@ -281,7 +281,7 @@ end
 ---@return boolean
 ---@private
 function State:isSideWinValid(side)
-    local id = self.tabs[self.activeTab].wins.main[side]
+    local id = self.getSideID(self, side)
 
     return id ~= nil and vim.api.nvim_win_is_valid(id)
 end

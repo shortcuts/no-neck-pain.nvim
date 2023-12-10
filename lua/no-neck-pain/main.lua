@@ -233,26 +233,32 @@ function N.enable(scope)
                     return
                 end
 
-                -- if we are not in split view, we check if we killed one of the main buffers (curr, left, right) to disable NNP
-                if not S.hasSplits(S) and not W.stateWinsActive(false) then
-                    D.log(p.event, "one of the NNP main buffers have been closed, disabling...")
+                if S.hasSplits(S) then
+                    return D.log(p.event, "skip: splits are still active")
+                end
+
+                if
+                    (
+                        (S.isSideRegistered(S, "left") and not S.isSideWinValid(S, "left"))
+                        or (S.isSideRegistered(S, "right") and not S.isSideWinValid(S, "right"))
+                    )
+                    or (
+                        not _G.NoNeckPain.config.fallbackOnBufferDelete
+                        and not S.isSideWinValid(S, "curr")
+                    )
+                then
+                    D.log(p.event, "one of the NNP side has been closed, disabling...")
 
                     return N.disable(p.event)
                 end
 
-                if _G.NoNeckPain.config.disableOnLastBuffer then
-                    local rwins = S.getUnregisteredWins(S)
+                -- if we still have a side valid but curr has been deleted (mostly because of a :bd),
+                -- we will fallback to the first valid side
+                if not S.isSideWinValid(S, "curr") then
+                    D.log(p.event, "curr has been closed, resetting state")
 
-                    if
-                        #rwins == 0
-                        and vim.api.nvim_buf_get_option(0, "buftype") == ""
-                        and vim.api.nvim_buf_get_option(0, "filetype") == ""
-                        and vim.api.nvim_buf_get_option(0, "bufhidden") == "wipe"
-                    then
-                        D.log(p.event, "found last `wipe` buffer in list, disabling...")
-
-                        return N.disable(p.event)
-                    end
+                    N.disable(string.format("%s:reset", p.event))
+                    N.enable(string.format("%s:reset", p.event))
                 end
             end)
         end,
