@@ -152,10 +152,11 @@ NoNeckPain.options = {
     --- @type boolean
     disableOnLastBuffer = false,
     -- When `true`, disabling the plugin closes every other windows except the initially focused one.
+    --- @usage: this parameter will be renamed `killAllWindowsOnDisable` in the next major release (^2.x.y).
     --- @type boolean
     killAllBuffersOnDisable = false,
     -- When `true`, deleting the main no-neck-pain buffer with `:bd`, `:bdelete` does not disable the plugin, it fallbacks on the newly focused window and refreshes the state by re-creating side-windows if necessary.
-    -- note: the default value will change to `true` in the next major release (^2.x.y).
+    --- @usage: the default value will change to `true` in the next major release (^2.x.y).
     --- @type boolean
     fallbackOnBufferDelete = false,
     -- Adds autocmd (@see `:h autocmd`) which aims at automatically enabling the plugin.

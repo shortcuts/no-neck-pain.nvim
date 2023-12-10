@@ -255,7 +255,13 @@ function N.enable(scope)
                 -- if we still have a side valid but curr has been deleted (mostly because of a :bd),
                 -- we will fallback to the first valid side
                 if not S.isSideWinValid(S, "curr") then
-                    D.log(p.event, "curr has been closed, resetting state")
+                    if p.event == "QuitPre" then
+                        D.log(p.event, "one of the NNP side has been closed, disabling...")
+
+                        return N.disable(p.event)
+                    end
+
+                    D.log(p.event, "`curr` has been deleted, resetting state")
 
                     N.disable(string.format("%s:reset", p.event))
                     N.enable(string.format("%s:reset", p.event))
