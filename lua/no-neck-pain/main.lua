@@ -8,6 +8,8 @@ local W = require("no-neck-pain.wins")
 local N = {}
 
 -- Toggle the plugin by calling the `enable`/`disable` methods respectively.
+--
+--- @param scope string: internal identifier for logging purposes.
 ---@private
 function N.toggle(scope)
     if S.hasTabs(S) and S.isActiveTabRegistered(S) then
@@ -81,6 +83,9 @@ end
 
 --- Creates side buffers and set the tab state, focuses the `curr` window if required.
 --
+--- @param scope string: internal identifier for logging purposes.
+--- @param goToCurr boolean?: whether we should re-focus the `curr` window.
+--- @param skipIntegrations boolean?: whether we should skip the integrations logic.
 --- @return table: the state of the plugin.
 ---@private
 function N.init(scope, goToCurr, skipIntegrations)
@@ -110,6 +115,8 @@ function N.init(scope, goToCurr, skipIntegrations)
 end
 
 --- Initializes the plugin, sets event listeners and internal state.
+---
+--- @param scope string: internal identifier for logging purposes.
 ---@private
 function N.enable(scope)
     if E.skipEnable() then
@@ -234,7 +241,7 @@ function N.enable(scope)
                 end
 
                 if S.hasSplits(S) then
-                    return D.log(p.event, "skip: splits are still active")
+                    return D.log(p.event, "skip quit logic: splits still active")
                 end
 
                 if
@@ -265,6 +272,8 @@ function N.enable(scope)
 
                     N.disable(string.format("%s:reset", p.event))
                     N.enable(string.format("%s:reset", p.event))
+
+                    vim.print(S.getSideID(S, "left"), vim.api.nvim_list_wins(), vim.api.nvim_get_current_win())
                 end
             end)
         end,
