@@ -164,11 +164,19 @@ function W.createSideBuffers(skipIntegrations)
                 local bufid = vim.api.nvim_win_get_buf(id)
 
                 for opt, val in pairs(_G.NoNeckPain.config.buffers[side].bo) do
-                    vim.api.nvim_set_option_value(opt, val, { buf = bufid })
+                    if _G.NoNeckPain.config.hasNvim9 then
+                        vim.api.nvim_set_option_value(opt, val, { buf = bufid })
+                    else
+                        vim.api.nvim_buf_set_option(bufid, opt, val)
+                    end
                 end
 
                 for opt, val in pairs(_G.NoNeckPain.config.buffers[side].wo) do
-                    vim.api.nvim_set_option_value(opt, val, { win = id, scope = "local" })
+                    if _G.NoNeckPain.config.hasNvim9 then
+                        vim.api.nvim_set_option_value(opt, val, { win = id, scope = "local" })
+                    else
+                        vim.api.nvim_win_set_option(id, opt, val)
+                    end
                 end
 
                 if _G.NoNeckPain.config.buffers[side].scratchPad.enabled then

@@ -402,6 +402,10 @@ end
 function NoNeckPain.setup(options)
     NoNeckPain.options = NoNeckPain.defaults(options or {})
 
+    if vim.fn.has("nvim-0.9") == 0 then
+        NoNeckPain.options.hasNvim9 = false
+    end
+
     D.warnDeprecation(NoNeckPain.options)
 
     registerMappings(NoNeckPain.options.mappings, {

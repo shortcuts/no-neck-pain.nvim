@@ -273,7 +273,11 @@ function N.enable(scope)
                     N.disable(string.format("%s:reset", p.event))
                     N.enable(string.format("%s:reset", p.event))
 
-                    vim.print(S.getSideID(S, "left"), vim.api.nvim_list_wins(), vim.api.nvim_get_current_win())
+                    vim.print(
+                        S.getSideID(S, "left"),
+                        vim.api.nvim_list_wins(),
+                        vim.api.nvim_get_current_win()
+                    )
                 end
             end)
         end,
