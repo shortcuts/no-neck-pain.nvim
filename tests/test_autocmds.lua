@@ -32,7 +32,7 @@ T["auto command"]["does not create side buffers window's width < options.width"]
     })
 end
 
-T["auto command"]["does not shift using when opening/closing float window"] = function()
+T["auto command"]["does not shift when opening/closing float window"] = function()
     child.set_size(5, 200)
     child.lua([[
         require('no-neck-pain').setup({width=50})

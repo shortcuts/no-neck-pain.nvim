@@ -8,6 +8,8 @@ local W = require("no-neck-pain.wins")
 local N = {}
 
 -- Toggle the plugin by calling the `enable`/`disable` methods respectively.
+--
+--- @param scope string: internal identifier for logging purposes.
 ---@private
 function N.toggle(scope)
     if S.hasTabs(S) and S.isActiveTabRegistered(S) then
@@ -81,6 +83,9 @@ end
 
 --- Creates side buffers and set the tab state, focuses the `curr` window if required.
 --
+--- @param scope string: internal identifier for logging purposes.
+--- @param goToCurr boolean?: whether we should re-focus the `curr` window.
+--- @param skipIntegrations boolean?: whether we should skip the integrations logic.
 --- @return table: the state of the plugin.
 ---@private
 function N.init(scope, goToCurr, skipIntegrations)
@@ -110,6 +115,8 @@ function N.init(scope, goToCurr, skipIntegrations)
 end
 
 --- Initializes the plugin, sets event listeners and internal state.
+---
+--- @param scope string: internal identifier for logging purposes.
 ---@private
 function N.enable(scope)
     if E.skipEnable() then
@@ -233,26 +240,38 @@ function N.enable(scope)
                     return
                 end
 
-                -- if we are not in split view, we check if we killed one of the main buffers (curr, left, right) to disable NNP
-                if not S.hasSplits(S) and not W.stateWinsActive(false) then
-                    D.log(p.event, "one of the NNP main buffers have been closed, disabling...")
+                if S.hasSplits(S) then
+                    return D.log(p.event, "skip quit logic: splits still active")
+                end
+
+                if
+                    (
+                        (S.isSideRegistered(S, "left") and not S.isSideWinValid(S, "left"))
+                        or (S.isSideRegistered(S, "right") and not S.isSideWinValid(S, "right"))
+                    )
+                    or (
+                        not _G.NoNeckPain.config.fallbackOnBufferDelete
+                        and not S.isSideWinValid(S, "curr")
+                    )
+                then
+                    D.log(p.event, "one of the NNP side has been closed, disabling...")
 
                     return N.disable(p.event)
                 end
 
-                if _G.NoNeckPain.config.disableOnLastBuffer then
-                    local rwins = S.getUnregisteredWins(S)
-
-                    if
-                        #rwins == 0
-                        and vim.api.nvim_buf_get_option(0, "buftype") == ""
-                        and vim.api.nvim_buf_get_option(0, "filetype") == ""
-                        and vim.api.nvim_buf_get_option(0, "bufhidden") == "wipe"
-                    then
-                        D.log(p.event, "found last `wipe` buffer in list, disabling...")
+                -- if we still have a side valid but curr has been deleted (mostly because of a :bd),
+                -- we will fallback to the first valid side
+                if not S.isSideWinValid(S, "curr") then
+                    if p.event == "QuitPre" then
+                        D.log(p.event, "one of the NNP side has been closed, disabling...")
 
                         return N.disable(p.event)
                     end
+
+                    D.log(p.event, "`curr` has been deleted, resetting state")
+
+                    N.disable(string.format("%s:reset", p.event))
+                    N.enable(string.format("%s:reset", p.event))
                 end
             end)
         end,

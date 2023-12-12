@@ -14,6 +14,10 @@ function Helpers.winsInTab(child, tab)
     return child.lua_get("vim.api.nvim_tabpage_list_wins(" .. tab .. ")")
 end
 
+function Helpers.listBuffers(child)
+    return child.lua_get("vim.api.nvim_list_bufs()")
+end
+
 local function errorMessage(str, pattern)
     return string.format("Pattern: %s\nObserved string: %s", vim.inspect(pattern), str)
 end

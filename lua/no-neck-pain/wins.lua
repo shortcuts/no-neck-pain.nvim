@@ -24,7 +24,7 @@ end
 ---
 ---@param scope string: the scope from where this function is called.
 ---@param id number: the id of the window.
----@param side "left"|"right": the side of the window being resized, used for logging only.
+---@param side "left"|"right": the side of the window being closed, used for logging only.
 ---@private
 function W.close(scope, id, side)
     D.log(scope, "closing %s window", side)
@@ -161,12 +161,22 @@ function W.createSideBuffers(skipIntegrations)
                     vim.api.nvim_buf_set_name(0, "no-neck-pain-" .. side)
                 end
 
+                local bufid = vim.api.nvim_win_get_buf(id)
+
                 for opt, val in pairs(_G.NoNeckPain.config.buffers[side].bo) do
-                    vim.api.nvim_buf_set_option(0, opt, val)
+                    if _G.NoNeckPain.config.hasNvim9 then
+                        vim.api.nvim_set_option_value(opt, val, { buf = bufid })
+                    else
+                        vim.api.nvim_buf_set_option(bufid, opt, val)
+                    end
                 end
 
                 for opt, val in pairs(_G.NoNeckPain.config.buffers[side].wo) do
-                    vim.api.nvim_win_set_option(id, opt, val)
+                    if _G.NoNeckPain.config.hasNvim9 then
+                        vim.api.nvim_set_option_value(opt, val, { win = id, scope = "local" })
+                    else
+                        vim.api.nvim_win_set_option(id, opt, val)
+                    end
                 end
 
                 if _G.NoNeckPain.config.buffers[side].scratchPad.enabled then
