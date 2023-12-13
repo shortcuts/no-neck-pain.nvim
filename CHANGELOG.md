@@ -1,4 +1,16 @@
 <a name="0.2.3"></a>
+## [1.7.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.6.3...v1.7.0) (2023-12-13)
+
+
+### Features
+
+* **api:** support :bdelete ([#281](https://github.com/shortcuts/no-neck-pain.nvim/issues/281)) ([ba409c3](https://github.com/shortcuts/no-neck-pain.nvim/commit/ba409c31b8d8ae9a36f560f38cfb6b718acfa6ea))
+
+
+### Bug Fixes
+
+* **hl:** prevent global highlights ([#283](https://github.com/shortcuts/no-neck-pain.nvim/issues/283)) ([938d8ea](https://github.com/shortcuts/no-neck-pain.nvim/commit/938d8ea1b13f6cea08dcc2d031acdd0ff3a3fe71))
+
 ## [1.6.3](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.6.2...v1.6.3) (2023-12-01)
 
 
