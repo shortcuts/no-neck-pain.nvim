@@ -146,6 +146,12 @@ T["setup"]["`common` options spreads it to `left` and `right` buffers"] = functi
 end
 
 T["setup"]["supports transparent bgs"] = function()
+    child.cmd([[
+        highlight Normal guibg=none
+        highlight NonText guibg=none
+        highlight Normal ctermbg=none
+        highlight NonText ctermbg=none
+    ]])
     child.lua([[require('no-neck-pain').setup()]])
 
     eq_config(child, "buffers.colors", {
@@ -229,13 +235,15 @@ T["color"]["buffers: throws with wrong background value"] = function()
 end
 
 T["color"]["refreshes the stored color when changing colorscheme"] = function()
+    child.cmd([[
+        highlight Normal guibg=none
+        highlight NonText guibg=none
+        highlight Normal ctermbg=none
+        highlight NonText ctermbg=none
+    ]])
     child.lua([[
-    require('no-neck-pain').setup({
-        autocmds = {
-            reloadOnColorSchemeChange=true,
-        },
-    })
-    require('no-neck-pain').enable()
+        require('no-neck-pain').setup({ autocmds = { reloadOnColorSchemeChange=true } })
+        require('no-neck-pain').enable()
     ]])
 
     eq_config(child, "buffers.colors", {

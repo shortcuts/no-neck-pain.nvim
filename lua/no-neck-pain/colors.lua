@@ -141,7 +141,7 @@ end
 ---@private
 function C.init(win, side)
     -- init namespace for the current tab
-    local id, name = S.setNamespace(S, side)
+    local id, _ = S.setNamespace(S, side)
     local bufnr = vim.api.nvim_win_get_buf(win)
 
     -- create groups to assign them to the namespace

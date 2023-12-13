@@ -9,6 +9,11 @@ test:
 	nvim --headless --noplugin -u ./scripts/minimal_init.lua \
 		-c "lua MiniTest.run({ execute = { reporter = MiniTest.gen_reporter.stdout({ group_depth = 2 }) } })"
 
+test-nightly:
+	./nightly/nvim-macos/bin/nvim --version | head -n 1 && echo ''
+	./nightly/nvim-macos/bin/nvim --headless --noplugin -u ./scripts/minimal_init.lua \
+		-c "lua MiniTest.run({ execute = { reporter = MiniTest.gen_reporter.stdout({ group_depth = 2 }) } })"
+
 $(addprefix test-, $(TESTFILES)): test-%:
 	nvim --version | head -n 1 && echo ''
 	nvim --headless --noplugin -u ./scripts/minimal_init.lua \
@@ -38,4 +43,4 @@ documentation:
 documentation-ci: deps documentation
 
 lint:
-	stylua . -g '*.lua' -g '!deps/'
+	stylua . -g '*.lua' -g '!deps/' -g '!nightly/'
