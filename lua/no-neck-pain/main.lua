@@ -384,22 +384,14 @@ function N.disable(scope)
 
     -- determine if we should quit vim or just close the window
     for _, side in pairs(Co.SIDES) do
-        vim.cmd(
-            string.format(
-                "highlight! clear NoNeckPain_background_tab_%s_side_%s NONE",
-                S.activeTab,
-                side
-            )
-        )
-        vim.cmd(
-            string.format("highlight! clear NoNeckPain_text_tab_%s_side_%s NONE", S.activeTab, side)
-        )
-
         if S.isSideRegistered(S, side) then
             local activeWins = vim.api.nvim_tabpage_list_wins(S.activeTab)
             local haveOtherWins = false
-
             local sideID = S.getSideID(S, side)
+
+            if S.isSideWinValid(S, side) then
+                S.removeNamespace(S, vim.api.nvim_win_get_buf(sideID), side)
+            end
 
             -- if we have other wins active and usable, we won't quit vim
             for _, activeWin in pairs(activeWins) do

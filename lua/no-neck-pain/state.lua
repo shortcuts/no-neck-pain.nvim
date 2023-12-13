@@ -360,6 +360,43 @@ function State:setEnabled()
     self.enabled = true
 end
 
+---Creates a namespace for the given `side` and stores it in the state.
+---
+---@param side "left"|"right": the side.
+--
+---@return number: the created namespace id.
+---@return string: the name of the created namespace.
+---@private
+function State:setNamespace(side)
+    if self.namespaces == nil then
+        self.namespaces = {}
+    end
+
+    local name = string.format("NoNeckPain_tab_%s_side_%s", self.activeTab, side)
+    local id = vim.api.nvim_create_namespace(name)
+
+    self.namespaces[side] = id
+
+    return id, name
+end
+
+---Clears the given `side` namespace and resets its state value.
+---
+---@param bufnr number: the buffer number.
+---@param side "left"|"right": the side.
+---@private
+function State:removeNamespace(bufnr, side)
+    if self.namespaces == nil or self.namespaces[side] == nil then
+        return
+    end
+
+    if not vim.api.nvim_buf_is_valid(bufnr) then
+        return
+    end
+
+    vim.api.nvim_buf_clear_namespace(bufnr, self.namespaces[side], 0, -1)
+end
+
 ---Sets the active tab.
 ---@param id number: the id of the active tab.
 ---

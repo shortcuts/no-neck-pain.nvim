@@ -140,39 +140,39 @@ end
 ---@param side "left"|"right": the side of the window being resized, used for logging only.
 ---@private
 function C.init(win, side)
+    -- init namespace for the current tab
+    local id, name = S.setNamespace(S, side)
+    local bufnr = vim.api.nvim_win_get_buf(win)
+
+    -- create groups to assign them to the namespace
     local backgroundGroup = string.format("NoNeckPain_background_tab_%s_side_%s", S.activeTab, side)
     local textGroup = string.format("NoNeckPain_text_tab_%s_side_%s", S.activeTab, side)
 
-    -- clear groups
-    vim.cmd(string.format("highlight! clear %s NONE", backgroundGroup))
-    vim.cmd(string.format("highlight! clear %s NONE", textGroup))
-
-    -- create group for background
     vim.cmd(
         string.format(
-            "highlight! %s guifg=%s guibg=%s",
+            "hi! %s guifg=%s guibg=%s",
             backgroundGroup,
             _G.NoNeckPain.config.buffers[side].colors.background,
             _G.NoNeckPain.config.buffers[side].colors.background
         )
     )
-
-    -- create group for text
     vim.cmd(
         string.format(
-            "highlight! %s guifg=%s guibg=%s",
+            "hi! %s guifg=%s guibg=%s",
             textGroup,
             _G.NoNeckPain.config.buffers[side].colors.text,
             _G.NoNeckPain.config.buffers[side].colors.background
         )
     )
 
-    local groups = {
-        Normal = textGroup,
-        NormalNC = textGroup,
-    }
+    -- assign groups to the namespace
+    vim.api.nvim_buf_add_highlight(bufnr, id, backgroundGroup, 0, 0, -1)
+    vim.api.nvim_buf_add_highlight(bufnr, id, textGroup, 0, 0, -1)
 
-    -- on transparent backgrounds we don't set those two to prevent white lines.
+    -- link nnp and neovim hl groups
+    local groups = { Normal = textGroup, NormalNC = textGroup }
+
+    -- we only set those for non transparent backgrouns to prevent white lines.
     if _G.NoNeckPain.config.buffers[side].colors.background ~= "NONE" then
         groups = vim.tbl_extend("keep", groups, {
             WinSeparator = backgroundGroup,
