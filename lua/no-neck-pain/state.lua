@@ -363,7 +363,6 @@ end
 ---Creates a namespace for the given `side` and stores it in the state.
 ---
 ---@param side "left"|"right": the side.
---
 ---@return number: the created namespace id.
 ---@return string: the name of the created namespace.
 ---@private
