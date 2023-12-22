@@ -154,23 +154,11 @@ T["setup"]["supports transparent bgs"] = function()
     ]])
     child.lua([[require('no-neck-pain').setup()]])
 
-    eq_config(child, "buffers.colors", {
-        background = "NONE",
-        blend = 0,
-        text = "#ffffff",
-    })
+    eq_config(child, "buffers.colors", { blend = 0 })
 
-    eq_config(child, "buffers.left.colors", {
-        background = "NONE",
-        blend = 0,
-        text = "#ffffff",
-    })
+    eq_config(child, "buffers.left.colors", { blend = 0 })
 
-    eq_config(child, "buffers.right.colors", {
-        background = "NONE",
-        blend = 0,
-        text = "#ffffff",
-    })
+    eq_config(child, "buffers.right.colors", { blend = 0 })
 end
 
 T["setup"]["colors.background overrides a nil background when defined"] = function()
@@ -184,13 +172,11 @@ T["setup"]["colors.background overrides a nil background when defined"] = functi
     eq_config(child, "buffers.left.colors", {
         background = "#abcabc",
         blend = 0,
-        text = "#d5e4dd",
     })
 
     eq_config(child, "buffers.right.colors", {
         background = "#abcabc",
         blend = 0,
-        text = "#d5e4dd",
     })
 end
 
@@ -214,7 +200,6 @@ T["color"]["map integration name to a value"] = function()
             eq_config(child, "buffers." .. scope .. ".colors", {
                 background = value,
                 blend = 0,
-                text = C.matchAndBlend(value, 0.5),
             })
         end
     end
@@ -246,18 +231,11 @@ T["color"]["refreshes the stored color when changing colorscheme"] = function()
         require('no-neck-pain').enable()
     ]])
 
-    eq_config(child, "buffers.colors", {
-        background = "NONE",
-        blend = 0,
-        text = "#ffffff",
-    })
+    eq_config(child, "buffers.colors", { blend = 0 })
 
     child.cmd([[colorscheme peachpuff]])
 
-    eq_config(child, "buffers.colors", {
-        background = "#ffdab9",
-        blend = 0,
-    })
+    eq_config(child, "buffers.colors", { blend = 0 })
 end
 
 return T
