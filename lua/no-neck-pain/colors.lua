@@ -99,29 +99,8 @@ end
 ---@return table: the parsed buffers.
 ---@private
 function C.parse(buffers)
-    if
-        skipColorParsing(buffers.colors)
-        and (not buffers.left.enabled or skipColorParsing(buffers.left.colors))
-        and (not buffers.right.enabled or skipColorParsing(buffers.right.colors))
-    then
-        return buffers
-    end
-
-    local defaultBackground = vim.api.nvim_get_hl_by_name("Normal", true).background
-
-    -- if the user did not provided a custom background color, and have a transparent bg,
-    -- we set it to the global options and let the loop do the spread below.
-    if
-        buffers.colors.background == nil
-        and (defaultBackground == nil or string.lower(defaultBackground) == "none")
-    then
-        buffers.colors.background = "NONE"
-        buffers.colors.text = "#ffffff"
-    else
-        buffers.colors.background = C.matchAndBlend(
-            buffers.colors.background or string.format("#%06X", defaultBackground),
-            buffers.colors.blend
-        )
+    if buffers.colors.background ~= nil then
+        buffers.colors.background = C.matchAndBlend(buffers.colors.background, buffers.colors.blend)
     end
 
     for _, side in pairs(Co.SIDES) do
@@ -148,7 +127,11 @@ end
 ---@param side "left"|"right": the side of the window being resized, used for logging only.
 ---@private
 function C.init(win, side)
-    if skipColorParsing(_G.NoNeckPain.config.buffers[side].colors) then
+    if
+        _G.NoNeckPain.config.buffers[side].colors.background == nil
+        and _G.NoNeckPain.config.buffers[side].colors.text == nil
+        and _G.NoNeckPain.config.buffers[side].colors.blend == 0
+    then
         return D.log("C.init", "skipping color initialization for side %s", side)
     end
 
