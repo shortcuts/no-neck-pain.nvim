@@ -1,5 +1,6 @@
 local Co = require("no-neck-pain.util.constants")
 local S = require("no-neck-pain.state")
+local D = require("no-neck-pain.util.debug")
 
 local C = {}
 
@@ -83,12 +84,29 @@ function C.matchAndBlend(colorCode, factor)
     return blend(colorCode, factor or 0)
 end
 
+---Determines whether we should skip color handling for the given `colors` or not.
+---
+---@param colors table: the colors definition for a given side or global.
+---@return boolean
+---@private
+local function skipColorParsing(colors)
+    return colors.background == nil and colors.text == nil and colors.blend == 0
+end
+
 ---Parses to color for each buffer parameters, considering transparent backgrounds.
 ---
 ---@param buffers table: the buffers table to parse.
 ---@return table: the parsed buffers.
 ---@private
 function C.parse(buffers)
+    if
+        skipColorParsing(buffers.colors)
+        and (not buffers.left.enabled or skipColorParsing(buffers.left.colors))
+        and (not buffers.right.enabled or skipColorParsing(buffers.right.colors))
+    then
+        return buffers
+    end
+
     local defaultBackground = vim.api.nvim_get_hl_by_name("Normal", true).background
 
     -- if the user did not provided a custom background color, and have a transparent bg,
@@ -114,17 +132,7 @@ function C.parse(buffers)
                 buffers[side].colors.blend or buffers.colors.blend
             ) or buffers.colors.background
 
-            local defaultTextColor = buffers[side].colors.background
-
-            -- if we have a transparent bg we won't be able,
-            -- to default a text color so we set it to white
-            if string.lower(buffers[side].colors.background) == "none" then
-                defaultTextColor = "#ffffff"
-            end
-
-            buffers[side].colors.text = buffers[side].colors.text
-                or buffers.colors.text
-                or C.matchAndBlend(defaultTextColor, 0.5)
+            buffers[side].colors.text = buffers[side].colors.text or buffers.colors.text
         end
     end
 
@@ -140,6 +148,10 @@ end
 ---@param side "left"|"right": the side of the window being resized, used for logging only.
 ---@private
 function C.init(win, side)
+    if skipColorParsing(_G.NoNeckPain.config.buffers[side].colors) then
+        return D.log("C.init", "skipping color initialization for side %s", side)
+    end
+
     -- init namespace for the current tab
     local id, _ = S.setNamespace(S, side)
     local bufnr = vim.api.nvim_win_get_buf(win)
