@@ -84,15 +84,6 @@ function C.matchAndBlend(colorCode, factor)
     return blend(colorCode, factor or 0)
 end
 
----Determines whether we should skip color handling for the given `colors` or not.
----
----@param colors table: the colors definition for a given side or global.
----@return boolean
----@private
-local function skipColorParsing(colors)
-    return colors.background == nil and colors.text == nil and colors.blend == 0
-end
-
 ---Parses to color for each buffer parameters, considering transparent backgrounds.
 ---
 ---@param buffers table: the buffers table to parse.
