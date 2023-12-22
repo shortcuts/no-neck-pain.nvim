@@ -96,7 +96,6 @@ function C.parse(buffers)
 
     for _, side in pairs(Co.SIDES) do
         if buffers[side].enabled then
-            -- if the side buffer colors.background is not defined, we fallback to the common option.
             buffers[side].colors.background = C.matchAndBlend(
                 buffers[side].colors.background,
                 buffers[side].colors.blend or buffers.colors.blend
