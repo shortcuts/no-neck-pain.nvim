@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [1.7.1](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.7.0...v1.7.1) (2023-12-24)
+
+
+### Bug Fixes
+
+* **hl:** prevent wrong bg and text colors after `:bd` ([#287](https://github.com/shortcuts/no-neck-pain.nvim/issues/287)) ([b317682](https://github.com/shortcuts/no-neck-pain.nvim/commit/b317682259a5c5b78210ff7f2e1d1362bf48b5e9))
+
 ## [1.7.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.6.3...v1.7.0) (2023-12-13)
 
 
