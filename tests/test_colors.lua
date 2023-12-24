@@ -1,9 +1,9 @@
 local helpers = dofile("tests/helpers.lua")
 local Co = require("no-neck-pain.util.constants")
-local C = require("no-neck-pain.colors")
 
 local child = helpers.new_child_neovim()
-local eq_config = helpers.expect.config_equality
+local eq, eq_config, eq_state =
+    helpers.expect.equality, helpers.expect.config_equality, helpers.expect.state_equality
 
 local T = MiniTest.new_set({
     hooks = {
@@ -112,65 +112,100 @@ T["setup"]["`left` or `right` buffer options overrides `common` ones"] = functio
 end
 
 T["setup"]["`common` options spreads it to `left` and `right` buffers"] = function()
-    child.cmd([[
-        highlight Normal guibg=black guifg=white
-        set background=dark
-    ]])
-    child.lua([[require('no-neck-pain').setup({
-        buffers = {
+    child.cmd([[colorscheme peachpuff]])
+    child.lua([[
+        require('no-neck-pain').setup({ buffers = {
             colors = {
                 background = "catppuccin-frappe",
-                blend = 1,
-                text = "#000000",
+                blend = 0.9,
+                text = "#ff0000",
             },
-        },
-    })]])
+        }})
+        require('no-neck-pain').enable() 
+    ]])
+
+    eq_state(child, "enabled", true)
 
     eq_config(child, "buffers.colors", {
-        background = "#ffffff",
-        blend = 1,
-        text = "#000000",
+        background = "#eaeaec",
+        blend = 0.9,
+        text = "#ff0000",
     })
 
     eq_config(child, "buffers.left.colors", {
-        background = "#ffffff",
-        blend = 1,
-        text = "#000000",
+        background = "#eaeaec",
+        blend = 0.9,
+        text = "#ff0000",
     })
 
     eq_config(child, "buffers.right.colors", {
-        background = "#ffffff",
-        blend = 1,
-        text = "#000000",
+        background = "#eaeaec",
+        blend = 0.9,
+        text = "#ff0000",
     })
+
+    -- TODO: enable this when mini.test accepts it
+    -- eq(
+    --     child.lua_get("vim.api.nvim_get_hl_by_name('NoNeckPain_background_tab_1_side_left', true)"),
+    --     {
+    --         background = 1,
+    --         foreground = 2,
+    --     }
+    -- )
+    --
+    -- eq(
+    --     child.lua_get("vim.api.nvim_get_hl_by_name('NoNeckPain_background_tab_1_side_right', true)"),
+    --     {
+    --         background = 1,
+    --         foreground = 2,
+    --     }
+    -- )
 end
 
-T["setup"]["supports transparent bgs"] = function()
+T["setup"]["(transparent) assert side buffers have the same colors as the main buffer"] = function()
     child.cmd([[
         highlight Normal guibg=none
         highlight NonText guibg=none
         highlight Normal ctermbg=none
         highlight NonText ctermbg=none
     ]])
-    child.lua([[require('no-neck-pain').setup()]])
+    child.lua([[
+        require('no-neck-pain').setup()
+        require('no-neck-pain').enable()
+    ]])
 
-    eq_config(child, "buffers.colors", {
-        background = "NONE",
-        blend = 0,
-        text = "#ffffff",
-    })
+    child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.tabs[1].wins.main.curr)")
+    local currbg = child.lua_get("vim.api.nvim_get_hl_by_name('Normal', true).background")
 
-    eq_config(child, "buffers.left.colors", {
-        background = "NONE",
-        blend = 0,
-        text = "#ffffff",
-    })
+    child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.tabs[1].wins.main.left)")
+    local leftbg = child.lua_get("vim.api.nvim_get_hl_by_name('Normal', true).background")
 
-    eq_config(child, "buffers.right.colors", {
-        background = "NONE",
-        blend = 0,
-        text = "#ffffff",
-    })
+    child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.tabs[1].wins.main.right)")
+    local rightbg = child.lua_get("vim.api.nvim_get_hl_by_name('Normal', true).background")
+
+    eq(currbg, vim.NIL)
+    eq(currbg, leftbg)
+    eq(currbg, rightbg)
+end
+
+T["setup"]["(normal) assert side buffers have the same colors as the main buffer"] = function()
+    child.cmd([[colorscheme blue]])
+    child.lua([[
+        require('no-neck-pain').setup()
+        require('no-neck-pain').enable()
+    ]])
+
+    child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.tabs[1].wins.main.curr)")
+    local currbg = child.lua_get("vim.api.nvim_get_hl_by_name('Normal', true).background")
+
+    child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.tabs[1].wins.main.left)")
+    local leftbg = child.lua_get("vim.api.nvim_get_hl_by_name('Normal', true).background")
+
+    child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.tabs[1].wins.main.right)")
+    local rightbg = child.lua_get("vim.api.nvim_get_hl_by_name('Normal', true).background")
+
+    eq(currbg, leftbg)
+    eq(currbg, rightbg)
 end
 
 T["setup"]["colors.background overrides a nil background when defined"] = function()
@@ -184,13 +219,11 @@ T["setup"]["colors.background overrides a nil background when defined"] = functi
     eq_config(child, "buffers.left.colors", {
         background = "#abcabc",
         blend = 0,
-        text = "#d5e4dd",
     })
 
     eq_config(child, "buffers.right.colors", {
         background = "#abcabc",
         blend = 0,
-        text = "#d5e4dd",
     })
 end
 
@@ -214,7 +247,6 @@ T["color"]["map integration name to a value"] = function()
             eq_config(child, "buffers." .. scope .. ".colors", {
                 background = value,
                 blend = 0,
-                text = C.matchAndBlend(value, 0.5),
             })
         end
     end
@@ -246,18 +278,11 @@ T["color"]["refreshes the stored color when changing colorscheme"] = function()
         require('no-neck-pain').enable()
     ]])
 
-    eq_config(child, "buffers.colors", {
-        background = "NONE",
-        blend = 0,
-        text = "#ffffff",
-    })
+    eq_config(child, "buffers.colors", { blend = 0 })
 
     child.cmd([[colorscheme peachpuff]])
 
-    eq_config(child, "buffers.colors", {
-        background = "#ffdab9",
-        blend = 0,
-    })
+    eq_config(child, "buffers.colors", { blend = 0 })
 end
 
 return T

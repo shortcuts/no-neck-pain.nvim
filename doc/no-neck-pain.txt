@@ -41,7 +41,7 @@ Disables the plugin, clear highlight groups and autocmds, closes side buffers an
 NoNeckPain's buffer `vim.wo` options.
 @see window options `:h vim.wo`
 
-Type~
+Type ~
 `(table)`
 values:
 >
@@ -74,7 +74,7 @@ values:
 NoNeckPain's buffer `vim.bo` options.
 @see buffer options `:h vim.bo`
 
-Type~
+Type ~
 `(table)`
 values:
 >
@@ -101,7 +101,7 @@ NoNeckPain's scratchpad buffer options.
 Leverages the side buffers as notepads, which work like any Neovim buffer and automatically saves its content at the given `location`.
 note: quitting an unsaved scratchpad buffer is non-blocking, and the content is still saved.
 
-Type~
+Type ~
 `(table)`
 values:
 >
@@ -129,7 +129,7 @@ values:
                         `NoNeckPain.bufferOptionsColors`
 NoNeckPain's buffer color options.
 
-Type~
+Type ~
 `(table)`
 values:
 >
@@ -172,7 +172,7 @@ values:
                            `NoNeckPain.bufferOptions`
 NoNeckPain's buffer side buffer option.
 
-Type~
+Type ~
 `(table)`
 values:
 >
@@ -197,7 +197,7 @@ values:
                               `NoNeckPain.options`
 NoNeckPain's plugin config.
 
-Type~
+Type ~
 `(table)`
 values:
 >
@@ -363,10 +363,10 @@ values:
                          `NoNeckPain.setup`({options})
 Define your no-neck-pain setup.
 
-Parameters~
+Parameters ~
 {options} `(table)` Module config table. See |NoNeckPain.options|.
 
-Usage~
+Usage ~
 `require("no-neck-pain").setup()` (add `{}` with your |NoNeckPain.options| table)
 
 
