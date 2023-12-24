@@ -90,9 +90,7 @@ end
 ---@return table: the parsed buffers.
 ---@private
 function C.parse(buffers)
-    if buffers.colors.background ~= nil then
-        buffers.colors.background = C.matchAndBlend(buffers.colors.background, buffers.colors.blend)
-    end
+    buffers.colors.background = C.matchAndBlend(buffers.colors.background, buffers.colors.blend)
 
     for _, side in pairs(Co.SIDES) do
         if buffers[side].enabled then
