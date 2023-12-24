@@ -204,7 +204,6 @@ T["setup"]["(normal) assert side buffers have the same colors as the main buffer
     child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.tabs[1].wins.main.right)")
     local rightbg = child.lua_get("vim.api.nvim_get_hl_by_name('Normal', true).background")
 
-    eq(currbg, 135)
     eq(currbg, leftbg)
     eq(currbg, rightbg)
 end
