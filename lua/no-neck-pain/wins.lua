@@ -89,10 +89,16 @@ function W.initScratchPad(side, cleanup)
         vim.api.nvim_buf_set_name(0, location)
     end
 
-    vim.api.nvim_buf_set_option(0, "bufhidden", "")
-    vim.api.nvim_buf_set_option(0, "buftype", "")
-    vim.api.nvim_buf_set_option(0, "buflisted", false)
-    vim.api.nvim_buf_set_option(0, "autoread", true)
+    vim.api.nvim_set_option_value("bufhidden",    "",      { scope="local" })
+    vim.api.nvim_set_option_value("buftype",      "",      { scope="local" })
+    vim.api.nvim_set_option_value("buflisted",    false,   { scope="local" })
+    vim.api.nvim_set_option_value("autoread",     true,    { scope="local" })
+    vim.api.nvim_set_option_value(
+        "filetype",
+        _G.NoNeckPain.config.buffers[side].bo.filetype,
+        { scope="local" }
+    )
+    vim.api.nvim_set_option_value("conceallevel", 2,       { scope="local" })
     vim.o.autowriteall = true
 end
 
