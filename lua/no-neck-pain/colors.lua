@@ -1,6 +1,7 @@
+local A = require("no-neck-pain.util.api")
 local Co = require("no-neck-pain.util.constants")
-local S = require("no-neck-pain.state")
 local D = require("no-neck-pain.util.debug")
+local S = require("no-neck-pain.state")
 
 local C = {}
 
@@ -176,7 +177,7 @@ function C.init(win, side)
         table.insert(stringGroups, string.format("%s:%s", hl, group))
     end
 
-    vim.api.nvim_win_set_option(win, "winhl", table.concat(stringGroups, ","))
+    A.setWindowOption(win, "winhl", table.concat(stringGroups, ","))
 end
 
 return C

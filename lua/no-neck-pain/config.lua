@@ -50,10 +50,10 @@ NoNeckPain.bufferOptionsBo = {
     swapfile = false,
 }
 
---- NoNeckPain's scratchpad buffer options.
+--- NoNeckPain's scratchPad buffer options.
 ---
 --- Leverages the side buffers as notepads, which work like any Neovim buffer and automatically saves its content at the given `location`.
---- note: quitting an unsaved scratchpad buffer is non-blocking, and the content is still saved.
+--- note: quitting an unsaved scratchPad buffer is non-blocking, and the content is still saved.
 ---
 ---@type table
 ---Default values:
@@ -201,7 +201,7 @@ NoNeckPain.options = {
         -- When `false`, the mapping is not created.
         --- @type string | { mapping: string, value: number }
         widthDown = "<Leader>n-",
-        -- Sets a global mapping to Neovim, which allows you to toggle the scratchpad feature.
+        -- Sets a global mapping to Neovim, which allows you to toggle the scratchPad feature.
         -- When `false`, the mapping is not created.
         --- @type string
         scratchPad = "<Leader>ns",
@@ -214,7 +214,7 @@ NoNeckPain.options = {
         --- @type boolean
         setNames = false,
         -- Leverages the side buffers as notepads, which work like any Neovim buffer and automatically saves its content at the given `location`.
-        -- note: quitting an unsaved scratchpad buffer is non-blocking, and the content is still saved.
+        -- note: quitting an unsaved scratchPad buffer is non-blocking, and the content is still saved.
         --- see |NoNeckPain.bufferOptionsScratchpad|
         scratchPad = NoNeckPain.bufferOptionsScratchpad,
         -- colors to apply to both side buffers, for buffer scopped options @see |NoNeckPain.bufferOptions|
@@ -315,13 +315,19 @@ function NoNeckPain.defaults(options)
         options.buffers[side].scratchPad =
             tde(options.buffers[side].scratchPad, options.buffers.scratchPad)
 
-        -- if the user wants scratchpads, but did not provided a custom filetype, we default to `norg`.
-        if
-            options.buffers[side].scratchPad.enabled
-            and (options.buffers[side].bo == nil or options.buffers[side].bo.filetype == nil)
-        then
-            options.buffers[side].bo = options.buffers[side].bo or {}
-            options.buffers[side].bo.filetype = "norg"
+        if options.buffers[side].scratchPad.enabled then
+            -- if the user wants scratchPads, but did not provided a custom filetype, we default to `norg`.
+            if options.buffers[side].bo == nil or options.buffers[side].bo.filetype == nil then
+                options.buffers[side].bo = options.buffers[side].bo or {}
+                options.buffers[side].bo.filetype = "norg"
+            end
+
+            if options.buffers[side].scratchPad.location ~= nil then
+                assert(
+                    type(options.buffers[side].scratchPad.location) == "string",
+                    "`scratchPad.location` must be nil or a string."
+                )
+            end
         end
     end
 

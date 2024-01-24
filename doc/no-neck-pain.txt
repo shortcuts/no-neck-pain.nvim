@@ -96,10 +96,10 @@ values:
 ------------------------------------------------------------------------------
                                             *NoNeckPain.bufferOptionsScratchpad*
                       `NoNeckPain.bufferOptionsScratchpad`
-NoNeckPain's scratchpad buffer options.
+NoNeckPain's scratchPad buffer options.
 
 Leverages the side buffers as notepads, which work like any Neovim buffer and automatically saves its content at the given `location`.
-note: quitting an unsaved scratchpad buffer is non-blocking, and the content is still saved.
+note: quitting an unsaved scratchPad buffer is non-blocking, and the content is still saved.
 
 Type ~
 `(table)`
@@ -266,7 +266,7 @@ values:
           -- When `false`, the mapping is not created.
           --- @type string | { mapping: string, value: number }
           widthDown = "<Leader>n-",
-          -- Sets a global mapping to Neovim, which allows you to toggle the scratchpad feature.
+          -- Sets a global mapping to Neovim, which allows you to toggle the scratchPad feature.
           -- When `false`, the mapping is not created.
           --- @type string
           scratchPad = "<Leader>ns",
@@ -279,7 +279,7 @@ values:
           --- @type boolean
           setNames = false,
           -- Leverages the side buffers as notepads, which work like any Neovim buffer and automatically saves its content at the given `location`.
-          -- note: quitting an unsaved scratchpad buffer is non-blocking, and the content is still saved.
+          -- note: quitting an unsaved scratchPad buffer is non-blocking, and the content is still saved.
           --- see |NoNeckPain.bufferOptionsScratchpad|
           scratchPad = NoNeckPain.bufferOptionsScratchpad,
           -- colors to apply to both side buffers, for buffer scopped options @see |NoNeckPain.bufferOptions|
