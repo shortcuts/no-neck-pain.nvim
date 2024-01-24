@@ -23,6 +23,7 @@ end
 ---Initializes the given `side` with the options from the user given configuration.
 ---@param id number: the id of the window.
 ---@param side "left"|"right"|"split": the side of the window to initialize.
+---@private
 local function initSideOptions(id, side)
     local bufid = vim.api.nvim_win_get_buf(id)
 

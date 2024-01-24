@@ -378,14 +378,4 @@ Creates side buffers and set the tab state, focuses the `curr` window if require
 Disables the plugin for the given tab, clear highlight groups and autocmds, closes side buffers and resets the internal state.
 
 
-==============================================================================
-------------------------------------------------------------------------------
-                                                             *initSideOptions()*
-                        `initSideOptions`({id}, {side})
-the given `side` with the options from the user given configuration.
-Parameters ~
-{id} `(number:)` the id of the window.
-{side} "left"|"right"|"split": the side of the window to initialize.
-
-
  vim:tw=78:ts=8:noet:ft=help:norl:
