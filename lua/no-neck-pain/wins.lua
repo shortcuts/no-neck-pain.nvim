@@ -91,7 +91,7 @@ function W.initScratchPad(side, cleanup)
     A.setBufferOption(0, "buftype", "")
     A.setBufferOption(0, "buflisted", false)
     A.setBufferOption(0, "autoread", true)
-    A.setBufferOption(0, "conceallevel", 2)
+    A.setWindowOption(0, "conceallevel", 2)
     vim.o.autowriteall = true
 end
 
