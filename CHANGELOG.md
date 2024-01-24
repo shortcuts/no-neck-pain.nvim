@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [1.7.2](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.7.1...v1.7.2) (2024-01-24)
+
+
+### Bug Fixes
+
+* **scratchPad:** properly forward buffer/window options ([#291](https://github.com/shortcuts/no-neck-pain.nvim/issues/291)) ([94fc9de](https://github.com/shortcuts/no-neck-pain.nvim/commit/94fc9de2f02f737d39bb78ff731f323e8e51b9a3))
+
 ## [1.7.1](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.7.0...v1.7.1) (2023-12-24)
 
 
