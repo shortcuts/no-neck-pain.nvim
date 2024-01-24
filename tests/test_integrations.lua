@@ -182,7 +182,6 @@ T["NvimTree"]["keeps sides open"] = function()
     end
 
     child.restart({ "-u", "scripts/init_with_nvimtree.lua", "foo" })
-    child.set_size(5, 300)
 
     child.cmd([[NoNeckPain]])
 
