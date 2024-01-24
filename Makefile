@@ -14,6 +14,11 @@ test-nightly:
 	./nightly/nvim-macos/bin/nvim --headless --noplugin -u ./scripts/minimal_init.lua \
 		-c "lua MiniTest.run({ execute = { reporter = MiniTest.gen_reporter.stdout({ group_depth = 2 }) } })"
 
+test-0.8.3:
+	~/.local/share/bob/nvim-bin/nvim --version | head -n 1 && echo ''
+	~/.local/share/bob/nvim-bin/nvim --headless --noplugin -u ./scripts/minimal_init.lua \
+		-c "lua MiniTest.run({ execute = { reporter = MiniTest.gen_reporter.stdout({ group_depth = 2 }) } })"
+
 $(addprefix test-, $(TESTFILES)): test-%:
 	nvim --version | head -n 1 && echo ''
 	nvim --headless --noplugin -u ./scripts/minimal_init.lua \
