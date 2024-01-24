@@ -11,3 +11,4 @@ NoNeckPain.setup()	no-neck-pain.txt	/*NoNeckPain.setup()*
 NoNeckPain.toggle()	no-neck-pain.txt	/*NoNeckPain.toggle()*
 NoNeckPain.toggleScratchPad()	no-neck-pain.txt	/*NoNeckPain.toggleScratchPad()*
 NoNeckPain.toggleSide()	no-neck-pain.txt	/*NoNeckPain.toggleSide()*
+initSideOptions()	no-neck-pain.txt	/*initSideOptions()*
