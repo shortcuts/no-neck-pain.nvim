@@ -10,11 +10,13 @@ test:
 		-c "lua MiniTest.run({ execute = { reporter = MiniTest.gen_reporter.stdout({ group_depth = 2 }) } })"
 
 test-nightly:
-	./nightly/nvim-macos/bin/nvim --version | head -n 1 && echo ''
-	./nightly/nvim-macos/bin/nvim --headless --noplugin -u ./scripts/minimal_init.lua \
+	bob use nightly
+	~/.local/share/bob/nvim-bin/nvim --version | head -n 1 && echo ''
+	~/.local/share/bob/nvim-bin/nvim --headless --noplugin -u ./scripts/minimal_init.lua \
 		-c "lua MiniTest.run({ execute = { reporter = MiniTest.gen_reporter.stdout({ group_depth = 2 }) } })"
 
 test-0.8.3:
+	bob use 0.8.3
 	~/.local/share/bob/nvim-bin/nvim --version | head -n 1 && echo ''
 	~/.local/share/bob/nvim-bin/nvim --headless --noplugin -u ./scripts/minimal_init.lua \
 		-c "lua MiniTest.run({ execute = { reporter = MiniTest.gen_reporter.stdout({ group_depth = 2 }) } })"

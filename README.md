@@ -373,6 +373,10 @@ NoNeckPain.bufferOptionsColors = {
 
 PRs and issues are always welcome. Make sure to provide as much context as possible when opening one.
 
+See [Makefile](./Makefile) for the available commends
+
+> You'll need to install [Bob](https://github.com/MordechaiHadad/bob), a useful nvim version manager in order to run the test suite for every supported versions.
+
 ## 🗞 Wiki
 
 You can find guides and showcase of the plugin on [the Wiki](https://github.com/shortcuts/no-neck-pain.nvim/wiki)
