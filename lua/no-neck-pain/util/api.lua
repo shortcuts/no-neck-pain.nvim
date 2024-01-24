@@ -53,6 +53,34 @@ function A.isRelativeWindow(win)
     return false
 end
 
+---Sets buffer option with backward compatibility (nvim <9).
+---
+---@param id number: the id of the buffer.
+---@param opt string: the opt name.
+---@param val string|number|boolean: the opt value.
+---@private
+function A.setBufferOption(id, opt, val)
+    if _G.NoNeckPain.config.hasNvim9 then
+        vim.api.nvim_set_option_value(opt, val, { buf = id })
+    else
+        vim.api.nvim_buf_set_option(id, opt, val)
+    end
+end
+
+---Sets window option with backward compatibility (nvim <9).
+---
+---@param id number: the id of the window.
+---@param opt string: the opt name.
+---@param val string|number: the opt value.
+---@private
+function A.setWindowOption(id, opt, val)
+    if _G.NoNeckPain.config.hasNvim9 then
+        vim.api.nvim_set_option_value(opt, val, { win = id, scope = "local" })
+    else
+        vim.api.nvim_win_set_option(id, opt, val)
+    end
+end
+
 local function timer_stop_close(timer)
     if timer:is_active() then
         timer:stop()

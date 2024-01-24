@@ -193,4 +193,13 @@ T["scratchPad"]["side buffer definition overrides global one"] = function()
     )
 end
 
+T["scratchPad"]["throws with invalid location"] = function()
+    helpers.expect.error(function()
+        child.lua(
+            [[require('no-neck-pain').setup({buffers = { scratchPad = { enabled = true, location = 10 }}})]]
+        )
+        child.lua([[require('no-neck-pain').enable()]])
+    end)
+end
+
 return T

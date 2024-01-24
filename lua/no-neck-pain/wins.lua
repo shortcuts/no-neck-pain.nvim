@@ -20,6 +20,21 @@ local function resize(id, width, side)
     end
 end
 
+---Initializes the given `side` with the options from the user given configuration.
+---@param id number: the id of the window.
+---@param side "left"|"right"|"split": the side of the window to initialize.
+local function initSideOptions(id, side)
+    local bufid = vim.api.nvim_win_get_buf(id)
+
+    for opt, val in pairs(_G.NoNeckPain.config.buffers[side].bo) do
+        A.setBufferOption(bufid, opt, val)
+    end
+
+    for opt, val in pairs(_G.NoNeckPain.config.buffers[side].wo) do
+        A.setWindowOption(id, opt, val)
+    end
+end
+
 ---Closes a window if it's valid.
 ---
 ---@param scope string: the scope from where this function is called.
@@ -44,31 +59,13 @@ function W.initScratchPad(side, cleanup)
         return
     end
 
-    -- on cleanup we open a new buffer and set the default options
+    -- cleanup is used when the `toggle` method disables the scratchPad, we then reinitialize it with the user-given configuration.
     if cleanup then
         vim.cmd("enew")
-
-        for opt, val in pairs(_G.NoNeckPain.config.buffers[side].bo) do
-            vim.api.nvim_buf_set_option(0, opt, val)
-        end
-
-        for opt, val in pairs(_G.NoNeckPain.config.buffers[side].wo) do
-            vim.api.nvim_win_set_option(0, opt, val)
-        end
-
-        return
+        return initSideOptions(S.getSideID(S, side), side)
     end
 
-    local location = ""
-
-    if _G.NoNeckPain.config.buffers[side].scratchPad.location ~= nil then
-        assert(
-            type(_G.NoNeckPain.config.buffers[side].scratchPad.location) == "string",
-            "`scratchPad.location` must be a nil or a string."
-        )
-
-        location = _G.NoNeckPain.config.buffers[side].scratchPad.location
-    end
+    local location = _G.NoNeckPain.config.buffers[side].scratchPad.location or ""
 
     if location ~= "" and string.sub(location, -1) ~= "/" then
         location = location .. "/"
@@ -89,40 +86,12 @@ function W.initScratchPad(side, cleanup)
         vim.api.nvim_buf_set_name(0, location)
     end
 
-    vim.api.nvim_set_option_value("bufhidden",    "",      { scope="local" })
-    vim.api.nvim_set_option_value("buftype",      "",      { scope="local" })
-    vim.api.nvim_set_option_value("buflisted",    false,   { scope="local" })
-    vim.api.nvim_set_option_value("autoread",     true,    { scope="local" })
-    vim.api.nvim_set_option_value(
-        "filetype",
-        _G.NoNeckPain.config.buffers[side].bo.filetype,
-        { scope="local" }
-    )
-    vim.api.nvim_set_option_value("conceallevel", 2,       { scope="local" })
+    A.setBufferOption(0, "bufhidden", "")
+    A.setBufferOption(0, "buftype", "")
+    A.setBufferOption(0, "buflisted", false)
+    A.setBufferOption(0, "autoread", true)
+    A.setBufferOption(0, "conceallevel", 2)
     vim.o.autowriteall = true
-end
-
----Resizes side buffers, considering the existing integrations.
----Closes them if there's not enough space left.
----
----@param scope string: the scope from where this function is called.
----@param paddings table: the paddings of each side window.
----@return number?: the left window id.
----@return number?: the right window id.
----@private
-local function resizeOrCloseSideBuffers(scope, paddings)
-    for _, side in pairs(Co.SIDES) do
-        if S.isSideRegistered(S, side) then
-            local padding = paddings[side].padding or W.getPadding(side)
-
-            if padding > _G.NoNeckPain.config.minSideBufferWidth then
-                resize(S.getSideID(S, side), padding, side)
-            else
-                W.close(scope, S.getSideID(S, side), side)
-                S.setSideID(S, nil, side)
-            end
-        end
-    end
 end
 
 ---Creates side buffers with the correct padding, considering the side integrations.
@@ -167,28 +136,12 @@ function W.createSideBuffers(skipIntegrations)
                     vim.api.nvim_buf_set_name(0, "no-neck-pain-" .. side)
                 end
 
-                local bufid = vim.api.nvim_win_get_buf(id)
-
-                for opt, val in pairs(_G.NoNeckPain.config.buffers[side].bo) do
-                    if _G.NoNeckPain.config.hasNvim9 then
-                        vim.api.nvim_set_option_value(opt, val, { buf = bufid })
-                    else
-                        vim.api.nvim_buf_set_option(bufid, opt, val)
-                    end
-                end
-
-                for opt, val in pairs(_G.NoNeckPain.config.buffers[side].wo) do
-                    if _G.NoNeckPain.config.hasNvim9 then
-                        vim.api.nvim_set_option_value(opt, val, { win = id, scope = "local" })
-                    else
-                        vim.api.nvim_win_set_option(id, opt, val)
-                    end
-                end
-
                 if _G.NoNeckPain.config.buffers[side].scratchPad.enabled then
                     W.initScratchPad(side)
                     S.setScratchpad(S, true)
                 end
+
+                initSideOptions(id, side)
 
                 S.setSideID(S, id, side)
             end
@@ -205,7 +158,18 @@ function W.createSideBuffers(skipIntegrations)
         S.reopenIntegration(S)
     end
 
-    resizeOrCloseSideBuffers("W.createSideBuffers", wins)
+    for _, side in pairs(Co.SIDES) do
+        if S.isSideRegistered(S, side) then
+            local padding = wins[side].padding or W.getPadding(side)
+
+            if padding > _G.NoNeckPain.config.minSideBufferWidth then
+                resize(S.getSideID(S, side), padding, side)
+            else
+                W.close("W.createSideBuffers", S.getSideID(S, side), side)
+                S.setSideID(S, nil, side)
+            end
+        end
+    end
 
     -- if we still have side buffers open at this point, and we have vsplit opened,
     -- there might be width issues so we the resize opened vsplits.
