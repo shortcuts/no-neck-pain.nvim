@@ -168,6 +168,8 @@ function C.init(win, side)
             SignColumn = backgroundGroup,
             Cursor = backgroundGroup,
             LineNr = backgroundGroup,
+            StatusLine = backgroundGroup,
+            StatusLineNC = backgroundGroup,
         })
     end
 
