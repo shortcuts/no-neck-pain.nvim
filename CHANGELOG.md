@@ -1,4 +1,16 @@
 <a name="0.2.3"></a>
+## [1.8.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.7.2...v1.8.0) (2024-02-04)
+
+
+### Features
+
+* **theme:** add StatusLine and StatusLineNC highlights to the group ([#294](https://github.com/shortcuts/no-neck-pain.nvim/issues/294)) ([3005aec](https://github.com/shortcuts/no-neck-pain.nvim/commit/3005aecdd3fabc13a170357d5347a6cc2199ab26))
+
+
+### Bug Fixes
+
+* buffer options order ([#300](https://github.com/shortcuts/no-neck-pain.nvim/issues/300)) ([fdbd8bf](https://github.com/shortcuts/no-neck-pain.nvim/commit/fdbd8bf4790389fd9d97aa1b14c6c5488bfb5c87))
+
 ## [1.7.2](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.7.1...v1.7.2) (2024-01-24)
 
 
