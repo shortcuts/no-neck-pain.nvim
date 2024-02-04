@@ -137,14 +137,13 @@ function W.createSideBuffers(skipIntegrations)
                     vim.api.nvim_buf_set_name(0, "no-neck-pain-" .. side)
                 end
 
+                S.setSideID(S, id, side)
+                initSideOptions(id, side)
+
                 if _G.NoNeckPain.config.buffers[side].scratchPad.enabled then
                     W.initScratchPad(side)
                     S.setScratchpad(S, true)
                 end
-
-                initSideOptions(id, side)
-
-                S.setSideID(S, id, side)
             end
 
             local sideID = S.getSideID(S, side)

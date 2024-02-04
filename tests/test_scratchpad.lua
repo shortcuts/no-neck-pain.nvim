@@ -210,7 +210,7 @@ T["scratchPad"]["forwards the given filetype to the scratchpad"] = function()
                 enabled = true
             },
             bo = {
-                filetype = "nnp"
+                filetype = "md"
             },
         },
     })]])
@@ -219,10 +219,10 @@ T["scratchPad"]["forwards the given filetype to the scratchpad"] = function()
     eq(helpers.winsInTab(child), { 1001, 1000, 1002 })
 
     child.lua("vim.fn.win_gotoid(1001)")
-    eq(child.lua_get("vim.api.nvim_buf_get_option(0, 'filetype')"), "nnp")
+    eq(child.lua_get("vim.api.nvim_buf_get_option(0, 'filetype')"), "markdown")
 
     child.lua("vim.fn.win_gotoid(1002)")
-    eq(child.lua_get("vim.api.nvim_buf_get_option(0, 'filetype')"), "nnp")
+    eq(child.lua_get("vim.api.nvim_buf_get_option(0, 'filetype')"), "markdown")
 end
 
 return T
