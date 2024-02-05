@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [1.8.1](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.8.0...v1.8.1) (2024-02-05)
+
+
+### Bug Fixes
+
+* **scratchPas:** set default options at config init ([#301](https://github.com/shortcuts/no-neck-pain.nvim/issues/301)) ([90a281e](https://github.com/shortcuts/no-neck-pain.nvim/commit/90a281ed5c6658a950368584ed2d6639345fbe65))
+
 ## [1.8.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.7.2...v1.8.0) (2024-02-04)
 
 
