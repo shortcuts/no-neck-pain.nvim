@@ -322,6 +322,12 @@ function NoNeckPain.defaults(options)
                 options.buffers[side].bo.filetype = "norg"
             end
 
+            options.buffers[side].bo.bufhidden = ""
+            options.buffers[side].bo.buftype = ""
+            options.buffers[side].bo.buflisted = false
+            options.buffers[side].bo.autoread = true
+            options.buffers[side].wo.conceallevel = 2
+
             if options.buffers[side].scratchPad.location ~= nil then
                 assert(
                     type(options.buffers[side].scratchPad.location) == "string",

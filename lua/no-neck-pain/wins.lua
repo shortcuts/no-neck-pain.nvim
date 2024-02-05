@@ -87,11 +87,6 @@ function W.initScratchPad(side, cleanup)
         vim.api.nvim_buf_set_name(0, location)
     end
 
-    A.setBufferOption(0, "bufhidden", "")
-    A.setBufferOption(0, "buftype", "")
-    A.setBufferOption(0, "buflisted", false)
-    A.setBufferOption(0, "autoread", true)
-    A.setWindowOption(0, "conceallevel", 2)
     vim.o.autowriteall = true
 end
 
@@ -138,12 +133,13 @@ function W.createSideBuffers(skipIntegrations)
                 end
 
                 S.setSideID(S, id, side)
-                initSideOptions(id, side)
 
                 if _G.NoNeckPain.config.buffers[side].scratchPad.enabled then
                     W.initScratchPad(side)
                     S.setScratchpad(S, true)
                 end
+
+                initSideOptions(id, side)
             end
 
             local sideID = S.getSideID(S, side)
