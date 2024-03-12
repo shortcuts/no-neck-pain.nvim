@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [1.8.2](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.8.1...v1.8.2) (2024-03-12)
+
+
+### Bug Fixes
+
+* **integrations:** faster debounce and resize padding ([#307](https://github.com/shortcuts/no-neck-pain.nvim/issues/307)) ([0861ca9](https://github.com/shortcuts/no-neck-pain.nvim/commit/0861ca9401fed248981b807966e896f5c8b1ff5e))
+
 ## [1.8.1](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.8.0...v1.8.1) (2024-02-05)
 
 
