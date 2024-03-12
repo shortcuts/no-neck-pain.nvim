@@ -335,6 +335,14 @@ function State:hasIntegrations()
     return false
 end
 
+---Whether the user wants both sides to be opened or not.
+---
+---@return boolean
+---@private
+function State:wantsSides()
+    return _G.NoNeckPain.config.buffers.left.enabled and _G.NoNeckPain.config.buffers.right.enabled
+end
+
 ---Returns the ID of the given `side`.
 ---
 ---@param side "left"|"right"|"curr": the side of the window.

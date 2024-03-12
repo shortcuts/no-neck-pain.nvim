@@ -1,8 +1,8 @@
 local helpers = dofile("tests/helpers.lua")
 
 local child = helpers.new_child_neovim()
-local eq, eq_config, eq_state =
-    helpers.expect.equality, helpers.expect.config_equality, helpers.expect.state_equality
+local eq, eq_config, eq_state, eq_buf_width =
+    helpers.expect.equality, helpers.expect.config_equality, helpers.expect.state_equality, helpers.expect.buf_width_equality
 
 local T = MiniTest.new_set({
     hooks = {
@@ -283,6 +283,51 @@ T["TSPlayground"]["keeps sides open"] = function()
         id = 1004,
         open = "TSPlaygroundToggle",
         width = 248,
+    })
+end
+
+T["TSPlayground"]["reduces `left` side if only active when integration is on `right`"] = function()
+    child.restart({ "-u", "scripts/init_with_tsplayground.lua" })
+    child.set_size(5, 300)
+
+    child.lua([[
+        require('no-neck-pain').setup({
+            width = 50,
+            buffers = {
+                right = {
+                    enabled = false,
+                },
+            },
+        })
+        require('no-neck-pain').enable()
+    ]])
+
+    eq(helpers.winsInTab(child), { 1001, 1000 })
+
+    eq_state(child, "enabled", true)
+    eq_state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = nil,
+    })
+    eq_buf_width(child, "tabs[1].wins.main.left", 15)
+
+    child.cmd("TSPlaygroundToggle")
+    vim.loop.sleep(50)
+
+    eq_state(child, "tabs[1].wins.splits", vim.NIL)
+
+    eq_state(child, "tabs[1].wins.integrations.TSPlayground", {
+        close = "TSPlaygroundToggle",
+        fileTypePattern = "tsplayground",
+        id = 1003,
+        open = "TSPlaygroundToggle",
+        width = 284,
+    })
+    eq_state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = nil,
+        right = nil,
     })
 end
 

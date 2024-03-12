@@ -99,7 +99,7 @@ end
 ---@param callback function: to execute on completion
 ---@private
 function A.debounce(context, callback)
-    local timeout = 50
+    local timeout = 30
     -- all execution here is done in a synchronous context; no thread safety required
 
     A.debouncers[context] = A.debouncers[context] or {}
@@ -115,16 +115,13 @@ function A.debounce(context, callback)
     timer:start(timeout, 0, function()
         timer_stop_close(timer)
 
-        -- reschedule when callback is running
         if debouncer.executing then
-            D.log(context, "already running on debounce, skipping")
+            D.log(context, "already running on debounce, rescheduling...")
             return A.debounce(context, callback)
         end
 
-        -- callback at a safe time
         debouncer.executing = true
         vim.schedule(function()
-            D.log(context, "running on debounce")
             callback()
             debouncer.executing = false
 
