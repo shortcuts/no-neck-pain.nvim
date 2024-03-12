@@ -247,9 +247,8 @@ function W.getPadding(side)
 
     for name, tree in pairs(tab.wins.integrations) do
         if
-            tree ~= nil
-            and tree.id ~= nil
-            and side == _G.NoNeckPain.config.integrations[name].position
+            tree.id ~= nil
+            and (not S.wantsSides(S) or side == _G.NoNeckPain.config.integrations[name].position)
         then
             D.log(
                 "W.getPadding",
