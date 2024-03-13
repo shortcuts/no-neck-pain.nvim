@@ -286,6 +286,25 @@ T["TSPlayground"]["keeps sides open"] = function()
         open = "TSPlaygroundToggle",
         width = 198,
     })
+
+    Helpers.expect.state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+    })
+
+    child.cmd("TSPlaygroundToggle")
+    vim.loop.sleep(50)
+
+    Helpers.expect.state(child, "tabs[1].wins.integrations.TSPlayground", {
+        close = "TSPlaygroundToggle",
+        fileTypePattern = "tsplayground",
+        open = "TSPlaygroundToggle",
+    })
+    Helpers.expect.state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1005,
+    })
 end
 
 T["TSPlayground"]["reduces `left` side if only active when integration is on `right`"] = function()
@@ -319,16 +338,33 @@ T["TSPlayground"]["reduces `left` side if only active when integration is on `ri
 
     Helpers.expect.state(child, "tabs[1].wins.splits", vim.NIL)
 
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1003)"), 149)
     Helpers.expect.state(child, "tabs[1].wins.integrations.TSPlayground", {
         close = "TSPlaygroundToggle",
         fileTypePattern = "tsplayground",
         id = 1003,
         open = "TSPlaygroundToggle",
-        width = 284,
+        width = 298,
     })
     Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,
         left = nil,
+        right = nil,
+    })
+
+    child.cmd("TSPlaygroundToggle")
+    vim.loop.sleep(50)
+
+    Helpers.expect.state(child, "tabs[1].wins.splits", vim.NIL)
+
+    Helpers.expect.state(child, "tabs[1].wins.integrations.TSPlayground", {
+        close = "TSPlaygroundToggle",
+        fileTypePattern = "tsplayground",
+        open = "TSPlaygroundToggle",
+    })
+    Helpers.expect.state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1004,
         right = nil,
     })
 end
