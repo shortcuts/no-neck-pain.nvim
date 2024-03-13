@@ -11,7 +11,7 @@ function NoNeckPain.toggle()
         _G.NoNeckPain.config = cfg.options
     end
 
-    M.toggle("publicAPI_toggle")
+    A.debounce("publicAPI_toggle", M.toggle)
 end
 
 --- Toggles the scratchPad feature of the plugin.
@@ -24,7 +24,7 @@ function NoNeckPain.toggleScratchPad()
         _G.NoNeckPain.config = cfg.options
     end
 
-    M.toggleScratchPad()
+    A.debounce("publicAPI_toggleScratchPad", M.toggleScratchPad)
 end
 
 --- Sets the config `width` to the given `width` value and resizes the NoNeckPain windows.
@@ -45,7 +45,9 @@ function NoNeckPain.resize(width)
         _G.NoNeckPain.config = vim.tbl_deep_extend("keep", { width = width }, _G.NoNeckPain.config)
     end
 
-    M.init("publicAPI_resize", false)
+    A.debounce("publicAPI_resize", function(scope)
+        M.init(scope, false)
+    end)
 end
 
 --- Toggles the config `${side}.enabled` and re-inits the plugin.
@@ -56,7 +58,9 @@ function NoNeckPain.toggleSide(side)
         error("no-neck-pain.nvim must be enabled, run `NoNeckPain` first.")
     end
 
-    M.toggleSide("publicAPI_toggleSide", side)
+    A.debounce("publicAPI_toggleSide", function(scope)
+        M.toggleSide(scope, side)
+    end)
 end
 
 --- Initializes the plugin, sets event listeners and internal state.
@@ -65,12 +69,12 @@ function NoNeckPain.enable()
         _G.NoNeckPain.config = cfg.options
     end
 
-    M.enable("publicAPI_enable")
+    A.debounce("publicAPI_enable", M.enable)
 end
 
 --- Disables the plugin, clear highlight groups and autocmds, closes side buffers and resets the internal state.
 function NoNeckPain.disable()
-    M.disable("publicAPI_disable")
+    A.debounce("publicAPI_disable", M.disable)
 end
 
 -- setup NoNeckPain options and merge them with user provided ones.
@@ -95,7 +99,7 @@ function NoNeckPain.setup(opts)
                     end
 
                     _G.NoNeckPain.config = cfg.defaults(opts)
-                    M.init("ColorScheme")
+                    A.debounce("ColorScheme", M.init)
                 end)
             end,
             group = "NoNeckPainAutocmd",

@@ -17,10 +17,8 @@ local T = MiniTest.new_set({
 T["auto command"] = MiniTest.new_set()
 
 T["auto command"]["does not create side buffers window's width < options.width"] = function()
-    child.lua([[
-        require('no-neck-pain').setup({width=1000})
-        require('no-neck-pain').enable()
-    ]])
+    child.lua([[ require('no-neck-pain').setup({width=1000}) ]])
+    Helpers.toggle(child)
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1000 })
     Helpers.expect.state(child, "tabs[1].wins.main", {
@@ -30,10 +28,8 @@ end
 
 T["auto command"]["does not shift when opening/closing float window"] = function()
     child.set_size(5, 200)
-    child.lua([[
-        require('no-neck-pain').setup({width=50})
-        require('no-neck-pain').enable()
-    ]])
+    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
+    Helpers.toggle(child)
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
     Helpers.expect.state(child, "tabs[1].wins.main", {

@@ -18,10 +18,8 @@ T["minSideBufferWidth"] = MiniTest.new_set()
 
 T["minSideBufferWidth"]["closes side buffer respecting the given value"] = function()
     child.set_size(500, 500)
-    child.lua([[
-        require('no-neck-pain').setup({width=50})
-        require('no-neck-pain').enable()
-    ]])
+    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
+    Helpers.toggle(child)
 
     Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1000, left = 1001, right = 1002 })
 
@@ -31,8 +29,8 @@ T["minSideBufferWidth"]["closes side buffer respecting the given value"] = funct
     child.lua([[
         require('no-neck-pain').disable()
         require('no-neck-pain').setup({width=50, minSideBufferWidth=20})
-        require('no-neck-pain').enable()
     ]])
+    Helpers.toggle(child)
 
     Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1000 })
 end
@@ -41,10 +39,8 @@ T["killAllBuffersOnDisable"] = MiniTest.new_set()
 
 T["killAllBuffersOnDisable"]["closes every windows when disabling the plugin"] = function()
     child.set_size(500, 500)
-    child.lua([[
-        require('no-neck-pain').setup({width=50,killAllBuffersOnDisable=true})
-        require('no-neck-pain').enable()
-    ]])
+    child.lua([[ require('no-neck-pain').setup({width=50,killAllBuffersOnDisable=true}) ]])
+    Helpers.toggle(child)
 
     Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1000, left = 1001, right = 1002 })
 
@@ -55,9 +51,7 @@ T["killAllBuffersOnDisable"]["closes every windows when disabling the plugin"] =
     Helpers.expect.equality(Helpers.listBuffers(child), { 1, 2, 3, 4 })
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1004, 1003, 1000, 1002 })
 
-    child.lua([[
-        require('no-neck-pain').disable()
-    ]])
+    Helpers.toggle(child)
 
     Helpers.expect.equality(Helpers.listBuffers(child), { 1, 2, 3, 4 })
     Helpers.expect.equality(Helpers.winsInTab(child), { 1000 })
@@ -67,10 +61,8 @@ T["fallbackOnBufferDelete"] = MiniTest.new_set()
 
 T["fallbackOnBufferDelete"]["invoking :bd keeps nnp enabled"] = function()
     child.set_size(500, 500)
-    child.lua([[
-        require('no-neck-pain').setup({width=50,fallbackOnBufferDelete=true})
-        require('no-neck-pain').enable()
-    ]])
+    child.lua([[ require('no-neck-pain').setup({width=50,fallbackOnBufferDelete=true}) ]])
+    Helpers.toggle(child)
 
     Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1000, left = 1001, right = 1002 })
 
@@ -83,10 +75,8 @@ end
 
 T["fallbackOnBufferDelete"]["still allows nvim to quit"] = function()
     child.set_size(500, 500)
-    child.lua([[
-        require('no-neck-pain').setup({width=50,fallbackOnBufferDelete=true})
-        require('no-neck-pain').enable()
-    ]])
+    child.lua([[ require('no-neck-pain').setup({width=50,fallbackOnBufferDelete=true}) ]])
+    Helpers.toggle(child)
 
     Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1000, left = 1001, right = 1002 })
 

@@ -99,7 +99,7 @@ end
 ---@param callback function: to execute on completion
 ---@private
 function A.debounce(context, callback)
-    local timeout = 30
+    local timeout = 5
     -- all execution here is done in a synchronous context; no thread safety required
 
     A.debouncers[context] = A.debouncers[context] or {}
@@ -122,7 +122,7 @@ function A.debounce(context, callback)
 
         debouncer.executing = true
         vim.schedule(function()
-            callback()
+            callback(context)
             debouncer.executing = false
 
             -- no other timer waiting
