@@ -4,6 +4,15 @@ local Helpers = {}
 -- Add extra expectations
 Helpers.expect = vim.deepcopy(MiniTest.expect)
 
+function Helpers.enablePlugin(child)
+    child.lua([[ require('no-neck-pain').enable() ]])
+    Helpers.wait()
+end
+
+function Helpers.wait()
+    vim.loop.sleep(5)
+end
+
 function Helpers.currentWin(child)
     return child.lua_get("vim.api.nvim_get_current_win()")
 end

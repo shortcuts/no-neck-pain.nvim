@@ -1,16 +1,7 @@
 local Co = require("no-neck-pain.util.constants")
-local helpers = dofile("tests/helpers.lua")
+local Helpers = dofile("tests/helpers.lua")
 
-local child = helpers.new_child_neovim()
-local eq, eq_global, eq_config, eq_state =
-    helpers.expect.equality,
-    helpers.expect.global_equality,
-    helpers.expect.config_equality,
-    helpers.expect.state_equality
-local eq_type_global, eq_type_config, eq_type_state =
-    helpers.expect.global_type_equality,
-    helpers.expect.config_type_equality,
-    helpers.expect.state_type_equality
+local child = Helpers.new_child_neovim()
 
 local T = MiniTest.new_set({
     hooks = {
@@ -27,8 +18,8 @@ local T = MiniTest.new_set({
 T["install"] = MiniTest.new_set()
 
 T["install"]["sets global loaded variable"] = function()
-    eq_type_global(child, "_G.NoNeckPainLoaded", "boolean")
-    eq_global(child, "_G.NoNeckPain", vim.NIL)
+    Helpers.expect.global_type_equality(child, "_G.NoNeckPainLoaded", "boolean")
+    Helpers.expect.global_equality(child, "_G.NoNeckPain", vim.NIL)
 end
 
 T["setup"] = MiniTest.new_set()
@@ -36,30 +27,30 @@ T["setup"] = MiniTest.new_set()
 T["setup"]["sets exposed methods and default options value"] = function()
     child.lua([[require('no-neck-pain').setup()]])
 
-    eq_type_global(child, "_G.NoNeckPain", "table")
+    Helpers.expect.global_type_equality(child, "_G.NoNeckPain", "table")
 
     -- public methods
-    eq_type_global(child, "_G.NoNeckPain.toggle", "function")
-    eq_type_global(child, "_G.NoNeckPain.enable", "function")
-    eq_type_global(child, "_G.NoNeckPain.setup", "function")
+    Helpers.expect.global_type_equality(child, "_G.NoNeckPain.toggle", "function")
+    Helpers.expect.global_type_equality(child, "_G.NoNeckPain.enable", "function")
+    Helpers.expect.global_type_equality(child, "_G.NoNeckPain.setup", "function")
 
     -- config
-    eq_type_global(child, "_G.NoNeckPain.config", "table")
-    eq_type_config(child, "buffers", "table")
+    Helpers.expect.global_type_equality(child, "_G.NoNeckPain.config", "table")
+    Helpers.expect.config_type_equality(child, "buffers", "table")
 
-    eq_config(child, "width", 100)
-    eq_config(child, "minSideBufferWidth", 10)
-    eq_config(child, "debug", false)
-    eq_config(child, "disableOnLastBuffer", false)
-    eq_config(child, "killAllBuffersOnDisable", false)
+    Helpers.expect.config_equality(child, "width", 100)
+    Helpers.expect.config_equality(child, "minSideBufferWidth", 10)
+    Helpers.expect.config_equality(child, "debug", false)
+    Helpers.expect.config_equality(child, "disableOnLastBuffer", false)
+    Helpers.expect.config_equality(child, "killAllBuffersOnDisable", false)
 
-    eq_config(child, "autocmds", {
+    Helpers.expect.config_equality(child, "autocmds", {
         enableOnVimEnter = false,
         enableOnTabEnter = false,
         reloadOnColorSchemeChange = false,
     })
 
-    eq_config(child, "mappings", {
+    Helpers.expect.config_equality(child, "mappings", {
         enabled = false,
         scratchPad = "<Leader>ns",
         toggle = "<Leader>np",
@@ -70,17 +61,17 @@ T["setup"]["sets exposed methods and default options value"] = function()
     })
 
     -- buffers
-    eq_type_config(child, "buffers", "table")
-    eq_type_config(child, "buffers.bo", "table")
-    eq_type_config(child, "buffers.wo", "table")
+    Helpers.expect.config_type_equality(child, "buffers", "table")
+    Helpers.expect.config_type_equality(child, "buffers.bo", "table")
+    Helpers.expect.config_type_equality(child, "buffers.wo", "table")
 
-    eq_config(child, "buffers.setNames", false)
+    Helpers.expect.config_equality(child, "buffers.setNames", false)
 
-    eq_config(child, "buffers.colors", {
+    Helpers.expect.config_equality(child, "buffers.colors", {
         blend = 0,
     })
 
-    eq_config(child, "buffers.bo", {
+    Helpers.expect.config_equality(child, "buffers.bo", {
         bufhidden = "hide",
         buflisted = false,
         buftype = "nofile",
@@ -88,7 +79,7 @@ T["setup"]["sets exposed methods and default options value"] = function()
         swapfile = false,
     })
 
-    eq_config(child, "buffers.wo", {
+    Helpers.expect.config_equality(child, "buffers.wo", {
         colorcolumn = "0",
         cursorcolumn = false,
         cursorline = false,
@@ -101,15 +92,15 @@ T["setup"]["sets exposed methods and default options value"] = function()
     })
 
     for _, scope in pairs(Co.SIDES) do
-        eq_type_config(child, "buffers." .. scope, "table")
-        eq_type_config(child, "buffers." .. scope .. ".bo", "table")
-        eq_type_config(child, "buffers." .. scope .. ".wo", "table")
+        Helpers.expect.config_type_equality(child, "buffers." .. scope, "table")
+        Helpers.expect.config_type_equality(child, "buffers." .. scope .. ".bo", "table")
+        Helpers.expect.config_type_equality(child, "buffers." .. scope .. ".wo", "table")
 
-        eq_config(child, "buffers." .. scope .. ".colors", {
+        Helpers.expect.config_equality(child, "buffers." .. scope .. ".colors", {
             blend = 0,
         })
 
-        eq_config(child, "buffers." .. scope .. ".bo", {
+        Helpers.expect.config_equality(child, "buffers." .. scope .. ".bo", {
             bufhidden = "hide",
             buflisted = false,
             buftype = "nofile",
@@ -117,7 +108,7 @@ T["setup"]["sets exposed methods and default options value"] = function()
             swapfile = false,
         })
 
-        eq_config(child, "buffers." .. scope .. ".wo", {
+        Helpers.expect.config_equality(child, "buffers." .. scope .. ".wo", {
             colorcolumn = "0",
             cursorcolumn = false,
             cursorline = false,
@@ -130,7 +121,7 @@ T["setup"]["sets exposed methods and default options value"] = function()
         })
     end
 
-    eq_config(child, "integrations", {
+    Helpers.expect.config_equality(child, "integrations", {
         NeoTree = {
             position = "left",
             reopen = true,
@@ -171,12 +162,12 @@ T["setup"]["overrides default values"] = function()
         killAllBuffersOnDisable = true,
     })]])
 
-    eq_config(child, "width", 42)
-    eq_config(child, "minSideBufferWidth", 0)
-    eq_config(child, "debug", true)
-    eq_config(child, "disableOnLastBuffer", true)
-    eq_config(child, "killAllBuffersOnDisable", true)
-    eq_config(child, "autocmds", {
+    Helpers.expect.config_equality(child, "width", 42)
+    Helpers.expect.config_equality(child, "minSideBufferWidth", 0)
+    Helpers.expect.config_equality(child, "debug", true)
+    Helpers.expect.config_equality(child, "disableOnLastBuffer", true)
+    Helpers.expect.config_equality(child, "killAllBuffersOnDisable", true)
+    Helpers.expect.config_equality(child, "autocmds", {
         enableOnVimEnter = true,
         enableOnTabEnter = true,
         reloadOnColorSchemeChange = true,
@@ -189,7 +180,7 @@ T["setup"]["width - defaults to the `textwidth` when specified"] = function()
         width = "textwidth"
     })]])
 
-    eq_config(child, "width", 30)
+    Helpers.expect.config_equality(child, "width", 30)
 end
 
 T["setup"]["width - defaults to the `textwidth` when specified"] = function()
@@ -198,11 +189,11 @@ T["setup"]["width - defaults to the `textwidth` when specified"] = function()
         width = "colorcolumn"
     })]])
 
-    eq_config(child, "width", 65)
+    Helpers.expect.config_equality(child, "width", 65)
 end
 
 T["setup"]["width - throws with non-supported string"] = function()
-    helpers.expect.error(function()
+    Helpers.expect.error(function()
         child.lua([[require('no-neck-pain').setup({ width = "foo" })]])
     end)
 end
@@ -210,8 +201,8 @@ end
 T["setup"]["starts the plugin on VimEnter"] = function()
     child.restart({ "-u", "scripts/init_auto_open.lua" })
 
-    eq(helpers.winsInTab(child), { 1001, 1000, 1002 })
-    eq_state(child, "enabled", true)
+    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+    Helpers.expect.state_equality(child, "enabled", true)
 
     child.stop()
 end
@@ -225,28 +216,28 @@ T["enable"]["(single tab) sets state"] = function()
     ]])
 
     -- state
-    eq_type_global(child, "_G.NoNeckPain.state", "table")
+    Helpers.expect.global_type_equality(child, "_G.NoNeckPain.state", "table")
 
-    eq_state(child, "enabled", true)
-    eq_state(child, "activeTab", 1)
+    Helpers.expect.state_equality(child, "enabled", true)
+    Helpers.expect.state_equality(child, "activeTab", 1)
 
-    eq_type_state(child, "tabs", "table")
+    Helpers.expect.state_type_equality(child, "tabs", "table")
 
-    eq_type_state(child, "tabs[1].wins", "table")
-    eq_type_state(child, "tabs[1].wins.main", "table")
-    eq_type_state(child, "tabs[1].wins.integrations", "table")
+    Helpers.expect.state_type_equality(child, "tabs[1].wins", "table")
+    Helpers.expect.state_type_equality(child, "tabs[1].wins.main", "table")
+    Helpers.expect.state_type_equality(child, "tabs[1].wins.integrations", "table")
 
-    eq_state(child, "tabs[1].wins.main", {
+    Helpers.expect.state_equality(child, "tabs[1].wins.main", {
         curr = 1000,
         left = 1001,
         right = 1002,
     })
 
-    eq_state(child, "tabs[1].wins.splits", vim.NIL)
+    Helpers.expect.state_equality(child, "tabs[1].wins.splits", vim.NIL)
 
-    eq_type_state(child, "tabs[1].wins.integrations", "table")
+    Helpers.expect.state_type_equality(child, "tabs[1].wins.integrations", "table")
 
-    eq_state(child, "tabs[1].wins.integrations", Co.integrations)
+    Helpers.expect.state_equality(child, "tabs[1].wins.integrations", Co.integrations)
 end
 
 T["enable"]["(multiple tab) sets state"] = function()
@@ -256,51 +247,51 @@ T["enable"]["(multiple tab) sets state"] = function()
     ]])
 
     -- tab 1
-    eq_type_global(child, "_G.NoNeckPain.state", "table")
+    Helpers.expect.global_type_equality(child, "_G.NoNeckPain.state", "table")
 
-    eq_state(child, "enabled", true)
-    eq_state(child, "activeTab", 1)
+    Helpers.expect.state_equality(child, "enabled", true)
+    Helpers.expect.state_equality(child, "activeTab", 1)
 
-    eq_type_state(child, "tabs", "table")
+    Helpers.expect.state_type_equality(child, "tabs", "table")
 
-    eq_type_state(child, "tabs[1].wins", "table")
-    eq_type_state(child, "tabs[1].wins.main", "table")
-    eq_type_state(child, "tabs[1].wins.integrations", "table")
+    Helpers.expect.state_type_equality(child, "tabs[1].wins", "table")
+    Helpers.expect.state_type_equality(child, "tabs[1].wins.main", "table")
+    Helpers.expect.state_type_equality(child, "tabs[1].wins.integrations", "table")
 
-    eq_state(child, "tabs[1].wins.main", {
+    Helpers.expect.state_equality(child, "tabs[1].wins.main", {
         curr = 1000,
         left = 1001,
         right = 1002,
     })
-    eq_state(child, "tabs[1].wins.splits", vim.NIL)
+    Helpers.expect.state_equality(child, "tabs[1].wins.splits", vim.NIL)
 
-    eq_type_state(child, "tabs[1].wins.integrations", "table")
+    Helpers.expect.state_type_equality(child, "tabs[1].wins.integrations", "table")
 
-    eq_state(child, "tabs[1].wins.integrations", Co.integrations)
+    Helpers.expect.state_equality(child, "tabs[1].wins.integrations", Co.integrations)
 
     -- tab 2
     child.cmd("tabnew")
     child.lua([[ require('no-neck-pain').enable() ]])
 
-    eq_state(child, "enabled", true)
-    eq_state(child, "activeTab", 2)
+    Helpers.expect.state_equality(child, "enabled", true)
+    Helpers.expect.state_equality(child, "activeTab", 2)
 
-    eq_type_state(child, "tabs", "table")
+    Helpers.expect.state_type_equality(child, "tabs", "table")
 
-    eq_type_state(child, "tabs[2].wins", "table")
-    eq_type_state(child, "tabs[2].wins.main", "table")
-    eq_type_state(child, "tabs[2].wins.integrations", "table")
+    Helpers.expect.state_type_equality(child, "tabs[2].wins", "table")
+    Helpers.expect.state_type_equality(child, "tabs[2].wins.main", "table")
+    Helpers.expect.state_type_equality(child, "tabs[2].wins.integrations", "table")
 
-    eq_state(child, "tabs[2].wins.main", {
+    Helpers.expect.state_equality(child, "tabs[2].wins.main", {
         curr = 1003,
         left = 1004,
         right = 1005,
     })
-    eq_state(child, "tabs[2].wins.splits", vim.NIL)
+    Helpers.expect.state_equality(child, "tabs[2].wins.splits", vim.NIL)
 
-    eq_type_state(child, "tabs[2].wins.integrations", "table")
+    Helpers.expect.state_type_equality(child, "tabs[2].wins.integrations", "table")
 
-    eq_state(child, "tabs[2].wins.integrations", Co.integrations)
+    Helpers.expect.state_equality(child, "tabs[2].wins.integrations", Co.integrations)
 end
 
 T["disable"] = MiniTest.new_set()
@@ -308,59 +299,59 @@ T["disable"] = MiniTest.new_set()
 T["disable"]["(single tab) resets state"] = function()
     child.lua([[ require('no-neck-pain').enable() ]])
 
-    eq_type_global(child, "_G.NoNeckPain.state", "table")
+    Helpers.expect.global_type_equality(child, "_G.NoNeckPain.state", "table")
 
-    eq_state(child, "enabled", true)
-    eq_state(child, "activeTab", 1)
+    Helpers.expect.state_equality(child, "enabled", true)
+    Helpers.expect.state_equality(child, "activeTab", 1)
 
-    eq_type_state(child, "tabs", "table")
+    Helpers.expect.state_type_equality(child, "tabs", "table")
 
     child.lua([[ require('no-neck-pain').disable() ]])
 
-    eq_type_global(child, "_G.NoNeckPain.state", "table")
+    Helpers.expect.global_type_equality(child, "_G.NoNeckPain.state", "table")
 
-    eq_state(child, "enabled", false)
-    eq_state(child, "activeTab", 1)
+    Helpers.expect.state_equality(child, "enabled", false)
+    Helpers.expect.state_equality(child, "activeTab", 1)
 
-    eq_state(child, "tabs", vim.NIL)
+    Helpers.expect.state_equality(child, "tabs", vim.NIL)
 end
 
 T["disable"]["(multiple tab) resets state"] = function()
     child.lua([[ require('no-neck-pain').enable() ]])
 
-    eq_type_global(child, "_G.NoNeckPain.state", "table")
+    Helpers.expect.global_type_equality(child, "_G.NoNeckPain.state", "table")
 
-    eq_state(child, "enabled", true)
-    eq_state(child, "activeTab", 1)
+    Helpers.expect.state_equality(child, "enabled", true)
+    Helpers.expect.state_equality(child, "activeTab", 1)
 
-    eq_type_state(child, "tabs", "table")
+    Helpers.expect.state_type_equality(child, "tabs", "table")
 
     child.cmd("tabnew")
     child.lua([[ require('no-neck-pain').enable() ]])
 
-    eq_type_global(child, "_G.NoNeckPain.state", "table")
+    Helpers.expect.global_type_equality(child, "_G.NoNeckPain.state", "table")
 
-    eq_state(child, "enabled", true)
-    eq_state(child, "activeTab", 2)
+    Helpers.expect.state_equality(child, "enabled", true)
+    Helpers.expect.state_equality(child, "activeTab", 2)
 
-    eq_type_state(child, "tabs", "table")
+    Helpers.expect.state_type_equality(child, "tabs", "table")
 
     -- disable tab 2
     child.lua([[ require('no-neck-pain').disable() ]])
 
-    eq_state(child, "enabled", true)
-    eq_state(child, "activeTab", 2)
+    Helpers.expect.state_equality(child, "enabled", true)
+    Helpers.expect.state_equality(child, "activeTab", 2)
 
-    eq_type_state(child, "tabs", "table")
+    Helpers.expect.state_type_equality(child, "tabs", "table")
 
     -- disable tab 1
     child.cmd("tabprevious")
     child.lua([[ require('no-neck-pain').disable() ]])
 
-    eq_state(child, "enabled", false)
-    eq_state(child, "activeTab", 1)
+    Helpers.expect.state_equality(child, "enabled", false)
+    Helpers.expect.state_equality(child, "activeTab", 1)
 
-    eq_state(child, "tabs", vim.NIL)
+    Helpers.expect.state_equality(child, "tabs", vim.NIL)
 end
 
 return T

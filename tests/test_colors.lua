@@ -1,9 +1,7 @@
-local helpers = dofile("tests/helpers.lua")
+local Helpers = dofile("tests/helpers.lua")
 local Co = require("no-neck-pain.util.constants")
 
-local child = helpers.new_child_neovim()
-local eq, eq_config, eq_state =
-    helpers.expect.equality, helpers.expect.config_equality, helpers.expect.state_equality
+local child = Helpers.new_child_neovim()
 
 local T = MiniTest.new_set({
     hooks = {
@@ -48,14 +46,14 @@ T["setup"]["overrides default values"] = function()
         },
     })]])
 
-    eq_config(child, "buffers.colors", {
+    Helpers.expect.config_equality(child, "buffers.colors", {
         background = "#828590",
         blend = 0.4,
         text = "#7480c2",
     })
 
     for _, scope in pairs(Co.SIDES) do
-        eq_config(child, "buffers." .. scope .. ".colors", {
+        Helpers.expect.config_equality(child, "buffers." .. scope .. ".colors", {
             background = "#595c6b",
             blend = 0.2,
             text = "#7480c2",
@@ -92,19 +90,19 @@ T["setup"]["`left` or `right` buffer options overrides `common` ones"] = functio
         },
     })]])
 
-    eq_config(child, "buffers.colors", {
+    Helpers.expect.config_equality(child, "buffers.colors", {
         background = "#444858",
         blend = 0.1,
         text = "#7480c2",
     })
 
-    eq_config(child, "buffers.left.colors", {
+    Helpers.expect.config_equality(child, "buffers.left.colors", {
         background = "#08080b",
         blend = -0.8,
         text = "#123123",
     })
 
-    eq_config(child, "buffers.right.colors", {
+    Helpers.expect.config_equality(child, "buffers.right.colors", {
         background = "#ffffff",
         blend = 1,
         text = "#456456",
@@ -124,28 +122,28 @@ T["setup"]["`common` options spreads it to `left` and `right` buffers"] = functi
         require('no-neck-pain').enable() 
     ]])
 
-    eq_state(child, "enabled", true)
+    Helpers.expect.state_equality(child, "enabled", true)
 
-    eq_config(child, "buffers.colors", {
+    Helpers.expect.config_equality(child, "buffers.colors", {
         background = "#eaeaec",
         blend = 0.9,
         text = "#ff0000",
     })
 
-    eq_config(child, "buffers.left.colors", {
+    Helpers.expect.config_equality(child, "buffers.left.colors", {
         background = "#eaeaec",
         blend = 0.9,
         text = "#ff0000",
     })
 
-    eq_config(child, "buffers.right.colors", {
+    Helpers.expect.config_equality(child, "buffers.right.colors", {
         background = "#eaeaec",
         blend = 0.9,
         text = "#ff0000",
     })
 
     -- TODO: enable this when mini.test accepts it
-    -- eq(
+    -- Helpers.expect.equality(
     --     child.lua_get("vim.api.nvim_get_hl_by_name('NoNeckPain_background_tab_1_side_left', true)"),
     --     {
     --         background = 1,
@@ -153,7 +151,7 @@ T["setup"]["`common` options spreads it to `left` and `right` buffers"] = functi
     --     }
     -- )
     --
-    -- eq(
+    -- Helpers.expect.equality(
     --     child.lua_get("vim.api.nvim_get_hl_by_name('NoNeckPain_background_tab_1_side_right', true)"),
     --     {
     --         background = 1,
@@ -183,9 +181,9 @@ T["setup"]["(transparent) assert side buffers have the same colors as the main b
     child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.tabs[1].wins.main.right)")
     local rightbg = child.lua_get("vim.api.nvim_get_hl_by_name('Normal', true).background")
 
-    eq(currbg, vim.NIL)
-    eq(currbg, leftbg)
-    eq(currbg, rightbg)
+    Helpers.expect.equality(currbg, vim.NIL)
+    Helpers.expect.equality(currbg, leftbg)
+    Helpers.expect.equality(currbg, rightbg)
 end
 
 T["setup"]["(normal) assert side buffers have the same colors as the main buffer"] = function()
@@ -204,24 +202,24 @@ T["setup"]["(normal) assert side buffers have the same colors as the main buffer
     child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.tabs[1].wins.main.right)")
     local rightbg = child.lua_get("vim.api.nvim_get_hl_by_name('Normal', true).background")
 
-    eq(currbg, leftbg)
-    eq(currbg, rightbg)
+    Helpers.expect.equality(currbg, leftbg)
+    Helpers.expect.equality(currbg, rightbg)
 end
 
 T["setup"]["colors.background overrides a nil background when defined"] = function()
     child.lua([[require('no-neck-pain').setup({buffers={colors={background="#abcabc"}}})]])
 
-    eq_config(child, "buffers.colors", {
+    Helpers.expect.config_equality(child, "buffers.colors", {
         background = "#abcabc",
         blend = 0,
     })
 
-    eq_config(child, "buffers.left.colors", {
+    Helpers.expect.config_equality(child, "buffers.left.colors", {
         background = "#abcabc",
         blend = 0,
     })
 
-    eq_config(child, "buffers.right.colors", {
+    Helpers.expect.config_equality(child, "buffers.right.colors", {
         background = "#abcabc",
         blend = 0,
     })
@@ -244,7 +242,7 @@ T["color"]["map integration name to a value"] = function()
             integration
         ))
         for _, scope in pairs(Co.SIDES) do
-            eq_config(child, "buffers." .. scope .. ".colors", {
+            Helpers.expect.config_equality(child, "buffers." .. scope .. ".colors", {
                 background = value,
                 blend = 0,
             })
@@ -253,7 +251,7 @@ T["color"]["map integration name to a value"] = function()
 end
 
 T["color"]["buffers: throws with wrong background value"] = function()
-    helpers.expect.error(function()
+    Helpers.expect.error(function()
         child.lua([[
         require('no-neck-pain').setup({
             buffers = {
@@ -278,11 +276,11 @@ T["color"]["refreshes the stored color when changing colorscheme"] = function()
         require('no-neck-pain').enable()
     ]])
 
-    eq_config(child, "buffers.colors", { blend = 0 })
+    Helpers.expect.config_equality(child, "buffers.colors", { blend = 0 })
 
     child.cmd([[colorscheme peachpuff]])
 
-    eq_config(child, "buffers.colors", { blend = 0 })
+    Helpers.expect.config_equality(child, "buffers.colors", { blend = 0 })
 end
 
 return T
