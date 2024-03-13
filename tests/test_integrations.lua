@@ -110,7 +110,7 @@ T["nvimdapui"]["keeps sides open"] = function()
     child.restart({ "-u", "scripts/init_with_nvimdapui.lua" })
     child.set_size(20, 100)
 
-    child.lua([[require('no-neck-pain').enable()]])
+    Helpers.toggle(child)
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
     Helpers.expect.state(child, "tabs[1].wins.main", {
@@ -150,7 +150,7 @@ T["neotest"]["keeps sides open"] = function()
     child.restart({ "-u", "scripts/init_with_neotest.lua", "lua/no-neck-pain/main.lua" })
     child.set_size(20, 100)
 
-    child.lua([[require('no-neck-pain').enable()]])
+    Helpers.toggle(child)
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
     Helpers.expect.state(child, "tabs[1].wins.main", {
@@ -184,7 +184,7 @@ T["NvimTree"]["keeps sides open"] = function()
 
     child.restart({ "-u", "scripts/init_with_nvimtree.lua", "foo" })
 
-    child.cmd([[NoNeckPain]])
+    Helpers.toggle(child)
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
 
@@ -223,7 +223,7 @@ T["neo-tree"]["keeps sides open"] = function()
     child.restart({ "-u", "scripts/init_with_neotree.lua", "foo" })
     child.set_size(5, 300)
 
-    child.cmd([[NoNeckPain]])
+    Helpers.toggle(child)
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
 
@@ -262,7 +262,7 @@ T["TSPlayground"]["keeps sides open"] = function()
     child.restart({ "-u", "scripts/init_with_tsplayground.lua" })
     child.set_size(5, 300)
 
-    child.cmd([[NoNeckPain]])
+    Helpers.toggle(child)
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
 
@@ -278,13 +278,13 @@ T["TSPlayground"]["keeps sides open"] = function()
 
     Helpers.expect.state(child, "tabs[1].wins.splits", vim.NIL)
 
-    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1004)"), 99)
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1004)"), 173)
     Helpers.expect.state(child, "tabs[1].wins.integrations.TSPlayground", {
         close = "TSPlaygroundToggle",
         fileTypePattern = "tsplayground",
         id = 1004,
         open = "TSPlaygroundToggle",
-        width = 248,
+        width = 198,
     })
 end
 
@@ -301,8 +301,8 @@ T["TSPlayground"]["reduces `left` side if only active when integration is on `ri
                 },
             },
         })
-        require('no-neck-pain').enable()
     ]])
+    Helpers.toggle(child)
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000 })
 

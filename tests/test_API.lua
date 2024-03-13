@@ -200,6 +200,7 @@ end
 
 T["setup"]["starts the plugin on VimEnter"] = function()
     child.restart({ "-u", "scripts/init_auto_open.lua" })
+    Helpers.wait(child)
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
     Helpers.expect.state(child, "enabled", true)
@@ -210,10 +211,8 @@ end
 T["enable"] = MiniTest.new_set()
 
 T["enable"]["(single tab) sets state"] = function()
-    child.lua([[
-        require('no-neck-pain').setup({width=50})
-        require('no-neck-pain').enable()
-    ]])
+    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
+    Helpers.toggle(child)
 
     -- state
     Helpers.expect.global_type(child, "_G.NoNeckPain.state", "table")
@@ -241,10 +240,8 @@ T["enable"]["(single tab) sets state"] = function()
 end
 
 T["enable"]["(multiple tab) sets state"] = function()
-    child.lua([[
-        require('no-neck-pain').setup({width=50})
-        require('no-neck-pain').enable()
-    ]])
+    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
+    Helpers.toggle(child)
 
     -- tab 1
     Helpers.expect.global_type(child, "_G.NoNeckPain.state", "table")
@@ -271,7 +268,7 @@ T["enable"]["(multiple tab) sets state"] = function()
 
     -- tab 2
     child.cmd("tabnew")
-    child.lua([[ require('no-neck-pain').enable() ]])
+    Helpers.toggle(child)
 
     Helpers.expect.state(child, "enabled", true)
     Helpers.expect.state(child, "activeTab", 2)
@@ -297,7 +294,7 @@ end
 T["disable"] = MiniTest.new_set()
 
 T["disable"]["(single tab) resets state"] = function()
-    child.lua([[ require('no-neck-pain').enable() ]])
+    Helpers.toggle(child)
 
     Helpers.expect.global_type(child, "_G.NoNeckPain.state", "table")
 
@@ -306,7 +303,7 @@ T["disable"]["(single tab) resets state"] = function()
 
     Helpers.expect.state_type(child, "tabs", "table")
 
-    child.lua([[ require('no-neck-pain').disable() ]])
+    Helpers.toggle(child)
 
     Helpers.expect.global_type(child, "_G.NoNeckPain.state", "table")
 
@@ -317,7 +314,7 @@ T["disable"]["(single tab) resets state"] = function()
 end
 
 T["disable"]["(multiple tab) resets state"] = function()
-    child.lua([[ require('no-neck-pain').enable() ]])
+    Helpers.toggle(child)
 
     Helpers.expect.global_type(child, "_G.NoNeckPain.state", "table")
 
@@ -327,7 +324,7 @@ T["disable"]["(multiple tab) resets state"] = function()
     Helpers.expect.state_type(child, "tabs", "table")
 
     child.cmd("tabnew")
-    child.lua([[ require('no-neck-pain').enable() ]])
+    Helpers.toggle(child)
 
     Helpers.expect.global_type(child, "_G.NoNeckPain.state", "table")
 
@@ -337,7 +334,7 @@ T["disable"]["(multiple tab) resets state"] = function()
     Helpers.expect.state_type(child, "tabs", "table")
 
     -- disable tab 2
-    child.lua([[ require('no-neck-pain').disable() ]])
+    Helpers.toggle(child)
 
     Helpers.expect.state(child, "enabled", true)
     Helpers.expect.state(child, "activeTab", 2)
@@ -346,7 +343,7 @@ T["disable"]["(multiple tab) resets state"] = function()
 
     -- disable tab 1
     child.cmd("tabprevious")
-    child.lua([[ require('no-neck-pain').disable() ]])
+    Helpers.toggle(child)
 
     Helpers.expect.state(child, "enabled", false)
     Helpers.expect.state(child, "activeTab", 1)

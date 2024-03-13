@@ -187,31 +187,30 @@ function N.enable(scope)
 
     vim.api.nvim_create_autocmd({ "WinEnter" }, {
         callback = function(p)
-            p.event = string.format("%s:splits", p.event)
-            A.debounce(p.event, function()
+            A.debounce(string.format("%s:splits", p.event), function(debounceScope)
                 if not S.hasTabs(S) or E.skip(S.getTab(S)) then
-                    return D.log(p.event, "skip split logic")
+                    return D.log(debounceScope, "skip split logic")
                 end
 
                 if S.checkSides(S, "and", false) then
-                    return D.log(p.event, "skip split logic: no side buffer")
+                    return D.log(debounceScope, "skip split logic: no side buffer")
                 end
 
                 if S.isSideTheActiveWin(S, "curr") then
-                    return D.log(p.event, "skip split logic: current win")
+                    return D.log(debounceScope, "skip split logic: current win")
                 end
 
                 -- an integration isn't considered as a split
-                local isSupportedIntegration = S.isSupportedIntegration(S, p.event, nil)
+                local isSupportedIntegration = S.isSupportedIntegration(S, debounceScope, nil)
                 if isSupportedIntegration then
-                    return D.log(p.event, "skip split logic: integration")
+                    return D.log(debounceScope, "skip split logic: integration")
                 end
 
                 local wins = S.getUnregisteredWins(S)
 
                 if #wins ~= 1 then
                     return D.log(
-                        p.event,
+                        debounceScope,
                         "skip split logic: no new or too many unregistered windows"
                     )
                 end
@@ -222,7 +221,7 @@ function N.enable(scope)
                 S.setSplit(S, { id = focusedWin, vertical = isVSplit })
 
                 if isVSplit then
-                    N.init(p.event)
+                    N.init(debounceScope)
                 end
             end)
         end,
@@ -331,25 +330,27 @@ function N.enable(scope)
 
     vim.api.nvim_create_autocmd({ "WinEnter", "WinClosed" }, {
         callback = function(p)
-            p.event = string.format("%s:integrations", p.event)
-            A.debounce(p.event, function()
+            A.debounce(string.format("%s:integrations", p.event), function(debounceScope)
                 if not S.hasTabs(S) or not S.isActiveTabRegistered(S) or E.skip(S.getTab(S)) then
-                    return D.log(p.event, "skip integrations logic")
+                    return D.log(debounceScope, "skip integrations logic")
                 end
 
                 if S.checkSides(S, "and", false) then
-                    return D.log(p.event, "skip integrations logic: no side buffer")
+                    return D.log(debounceScope, "skip integrations logic: no side buffer")
                 end
 
-                if vim.startswith(p.event, "WinClosed") and not S.hasIntegrations(S) then
-                    return D.log(p.event, "skip integrations logic: no registered integration")
+                if p.event == "WinClosed" and not S.hasIntegrations(S) then
+                    return D.log(
+                        debounceScope,
+                        "skip integrations logic: no registered integration"
+                    )
                 end
 
-                if vim.startswith(p.event, "WinEnter") and #S.getUnregisteredWins(S) == 0 then
-                    return D.log(p.event, "skip integrations logic: no new windows")
+                if p.event == "WinEnter" and #S.getUnregisteredWins(S) == 0 then
+                    return D.log(debounceScope, "skip integrations logic: no new windows")
                 end
 
-                N.init(p.event, false, true)
+                N.init(debounceScope, false, true)
             end)
         end,
         group = augroupName,

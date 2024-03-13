@@ -95,12 +95,15 @@ end
 ---Invocation will be rescheduled while a callback is being executed.
 ---Caller must ensure that callback performs the same or functionally equivalent actions.
 ---
----@param context string: identifies the callback to debounce
----@param callback function: to execute on completion
+---@param context string: identifies the callback to debounce.
+---@param callback function: to execute on completion.
+---@param timeout number?: ms to wait for before execution.
 ---@private
-function A.debounce(context, callback)
-    local timeout = 30
+function A.debounce(context, callback, timeout)
+    timeout = timeout or 2
     -- all execution here is done in a synchronous context; no thread safety required
+
+    D.log(context, "debouncing with %d ms timeout", timeout)
 
     A.debouncers[context] = A.debouncers[context] or {}
     local debouncer = A.debouncers[context]
@@ -117,12 +120,12 @@ function A.debounce(context, callback)
 
         if debouncer.executing then
             D.log(context, "already running on debounce, rescheduling...")
-            return A.debounce(context, callback)
+            return A.debounce(context, callback, timeout)
         end
 
         debouncer.executing = true
         vim.schedule(function()
-            callback()
+            callback(context)
             debouncer.executing = false
 
             -- no other timer waiting

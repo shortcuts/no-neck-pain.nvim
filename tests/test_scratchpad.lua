@@ -56,8 +56,7 @@ T["scratchPad"]["default to `norg` fileType"] = function()
             }
         },
     })]])
-    child.lua([[require('no-neck-pain').enable()]])
-
+    Helpers.toggle(child)
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
 
     local cwd = child.lua_get("vim.fn.getcwd()")
@@ -102,7 +101,7 @@ T["scratchPad"]["override of filetype is reflected to the buffer"] = function()
             }
         },
     })]])
-    child.lua([[require('no-neck-pain').enable()]])
+    Helpers.toggle(child)
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
 
@@ -146,7 +145,7 @@ T["scratchPad"]["side buffer can have their own definition"] = function()
             }
         },
     })]])
-    child.lua([[require('no-neck-pain').enable()]])
+    Helpers.toggle(child)
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
 
@@ -189,7 +188,7 @@ T["scratchPad"]["side buffer definition overrides global one"] = function()
             },
         },
     })]])
-    child.lua([[require('no-neck-pain').enable()]])
+    Helpers.toggle(child)
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
 
@@ -221,7 +220,7 @@ T["scratchPad"]["throws with invalid location"] = function()
         child.lua(
             [[require('no-neck-pain').setup({buffers = { scratchPad = { enabled = true, location = 10 }}})]]
         )
-        child.lua([[require('no-neck-pain').enable()]])
+        Helpers.toggle(child)
     end)
 end
 
@@ -237,7 +236,7 @@ T["scratchPad"]["forwards the given filetype to the scratchpad"] = function()
             },
         },
     })]])
-    child.lua([[require('no-neck-pain').enable()]])
+    Helpers.toggle(child)
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
 
