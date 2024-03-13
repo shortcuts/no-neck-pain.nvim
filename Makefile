@@ -1,6 +1,6 @@
 .SUFFIXES:
 
-TESTFILES=options mappings API splits tabs integrations buffers colors autocmds scratchpad
+TESTFILES=options mappings API splits tabs integrations buffers colors autocmds scratchpad commands
 
 all:
 
