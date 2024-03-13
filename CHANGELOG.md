@@ -1,4 +1,12 @@
 <a name="0.2.3"></a>
+## [1.8.3](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.8.2...v1.8.3) (2024-03-13)
+
+
+### Bug Fixes
+
+* flickering because of debounce ([#311](https://github.com/shortcuts/no-neck-pain.nvim/issues/311)) ([4e3b4f3](https://github.com/shortcuts/no-neck-pain.nvim/commit/4e3b4f386287154fdab0c5f61d9692e699b56674))
+* **integrations:** properly reopen tsplayground ([#313](https://github.com/shortcuts/no-neck-pain.nvim/issues/313)) ([429f553](https://github.com/shortcuts/no-neck-pain.nvim/commit/429f5534b777192fad6a06df3a19d7392d185ab0))
+
 ## [1.8.2](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.8.1...v1.8.2) (2024-03-12)
 
 
