@@ -82,13 +82,13 @@ T["setup"]["overrides default values"] = function()
         },
     })]])
 
-    Helpers.expect.config_type_equality(child, "buffers", "table")
-    Helpers.expect.config_type_equality(child, "buffers.bo", "table")
-    Helpers.expect.config_type_equality(child, "buffers.wo", "table")
+    Helpers.expect.config_type(child, "buffers", "table")
+    Helpers.expect.config_type(child, "buffers.bo", "table")
+    Helpers.expect.config_type(child, "buffers.wo", "table")
 
-    Helpers.expect.config_equality(child, "buffers.setNames", true)
+    Helpers.expect.config(child, "buffers.setNames", true)
 
-    Helpers.expect.config_equality(child, "buffers.bo", {
+    Helpers.expect.config(child, "buffers.bo", {
         bufhidden = "",
         buflisted = true,
         buftype = "help",
@@ -96,7 +96,7 @@ T["setup"]["overrides default values"] = function()
         swapfile = true,
     })
 
-    Helpers.expect.config_equality(child, "buffers.wo", {
+    Helpers.expect.config(child, "buffers.wo", {
         colorcolumn = "90",
         cursorcolumn = true,
         cursorline = true,
@@ -109,7 +109,7 @@ T["setup"]["overrides default values"] = function()
     })
 
     for _, scope in pairs(Co.SIDES) do
-        Helpers.expect.config_equality(child, "buffers." .. scope .. ".bo", {
+        Helpers.expect.config(child, "buffers." .. scope .. ".bo", {
             bufhidden = "",
             buflisted = true,
             buftype = "help",
@@ -117,7 +117,7 @@ T["setup"]["overrides default values"] = function()
             swapfile = true,
         })
 
-        Helpers.expect.config_equality(child, "buffers." .. scope .. ".wo", {
+        Helpers.expect.config(child, "buffers." .. scope .. ".wo", {
             colorcolumn = "30",
             cursorcolumn = true,
             cursorline = true,
@@ -159,14 +159,14 @@ T["setup"]["`left` or `right` buffer options overrides `common` ones"] = functio
         },
     })]])
 
-    Helpers.expect.config_equality(child, "buffers.bo.filetype", "TEST")
-    Helpers.expect.config_equality(child, "buffers.wo.cursorline", false)
+    Helpers.expect.config(child, "buffers.bo.filetype", "TEST")
+    Helpers.expect.config(child, "buffers.wo.cursorline", false)
 
-    Helpers.expect.config_equality(child, "buffers.left.bo.filetype", "TEST-left")
-    Helpers.expect.config_equality(child, "buffers.right.bo.filetype", "TEST-right")
+    Helpers.expect.config(child, "buffers.left.bo.filetype", "TEST-left")
+    Helpers.expect.config(child, "buffers.right.bo.filetype", "TEST-right")
 
-    Helpers.expect.config_equality(child, "buffers.left.wo.cursorline", true)
-    Helpers.expect.config_equality(child, "buffers.right.wo.number", true)
+    Helpers.expect.config(child, "buffers.left.wo.cursorline", true)
+    Helpers.expect.config(child, "buffers.right.wo.number", true)
 end
 
 T["setup"]["`common` options spreads it to `left` and `right` buffers"] = function()
@@ -181,14 +181,14 @@ T["setup"]["`common` options spreads it to `left` and `right` buffers"] = functi
         },
     })]])
 
-    Helpers.expect.config_equality(child, "buffers.bo.filetype", "TEST")
-    Helpers.expect.config_equality(child, "buffers.wo.number", true)
+    Helpers.expect.config(child, "buffers.bo.filetype", "TEST")
+    Helpers.expect.config(child, "buffers.wo.number", true)
 
-    Helpers.expect.config_equality(child, "buffers.left.wo.number", true)
-    Helpers.expect.config_equality(child, "buffers.right.wo.number", true)
+    Helpers.expect.config(child, "buffers.left.wo.number", true)
+    Helpers.expect.config(child, "buffers.right.wo.number", true)
 
-    Helpers.expect.config_equality(child, "buffers.left.bo.filetype", "TEST")
-    Helpers.expect.config_equality(child, "buffers.right.bo.filetype", "TEST")
+    Helpers.expect.config(child, "buffers.left.bo.filetype", "TEST")
+    Helpers.expect.config(child, "buffers.right.bo.filetype", "TEST")
 end
 
 T["curr"] = MiniTest.new_set()
@@ -200,7 +200,7 @@ T["curr"]["have the default width"] = function()
     ]])
 
     -- need to know why the child isn't precise enough
-    Helpers.expect.buf_width_equality(child, "tabs[1].wins.main.curr", 80)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 80)
 end
 
 T["curr"]["have the width from the config"] = function()
@@ -210,7 +210,7 @@ T["curr"]["have the width from the config"] = function()
     ]])
 
     -- need to know why the child isn't precise enough
-    Helpers.expect.buf_width_equality(child, "tabs[1].wins.main.curr", 48)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 48)
 end
 
 T["curr"]["closing `curr` window without any other window quits Neovim"] = function()
@@ -220,7 +220,7 @@ T["curr"]["closing `curr` window without any other window quits Neovim"] = funct
     ]])
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
-    Helpers.expect.state_equality(child, "tabs[1].wins.main.curr", 1000)
+    Helpers.expect.state(child, "tabs[1].wins.main.curr", 1000)
 
     child.cmd("q")
 
@@ -238,15 +238,15 @@ T["left/right"]["setNames doesn't throw when re-creating side buffers"] = functi
     -- enable
     child.cmd([[NoNeckPain]])
 
-    Helpers.expect.buf_width_equality(child, "tabs[1].wins.main.left", 15)
-    Helpers.expect.buf_width_equality(child, "tabs[1].wins.main.right", 15)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 15)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.right", 15)
 
     -- toggle
     child.cmd([[NoNeckPain]])
     child.cmd([[NoNeckPain]])
 
-    Helpers.expect.buf_width_equality(child, "tabs[1].wins.main.left", 15)
-    Helpers.expect.buf_width_equality(child, "tabs[1].wins.main.right", 15)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 15)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.right", 15)
 end
 
 T["left/right"]["have the same width"] = function()
@@ -255,8 +255,8 @@ T["left/right"]["have the same width"] = function()
         require('no-neck-pain').enable()
     ]])
 
-    Helpers.expect.buf_width_equality(child, "tabs[1].wins.main.left", 15)
-    Helpers.expect.buf_width_equality(child, "tabs[1].wins.main.right", 15)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 15)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.right", 15)
 end
 
 T["left/right"]["only creates a `left` buffer when `right.enabled` is `false`"] = function()
@@ -265,12 +265,12 @@ T["left/right"]["only creates a `left` buffer when `right.enabled` is `false`"] 
         require('no-neck-pain').enable()
     ]])
 
-    Helpers.expect.state_equality(child, "tabs[1].wins.main", {
+    Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,
         left = 1001,
     })
 
-    Helpers.expect.buf_width_equality(child, "tabs[1].wins.main.left", 15)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 15)
 end
 
 T["left/right"]["only creates a `right` buffer when `left.enabled` is `false`"] = function()
@@ -279,12 +279,12 @@ T["left/right"]["only creates a `right` buffer when `left.enabled` is `false`"] 
         require('no-neck-pain').enable()
     ]])
 
-    Helpers.expect.state_equality(child, "tabs[1].wins.main", {
+    Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,
         right = 1001,
     })
 
-    Helpers.expect.buf_width_equality(child, "tabs[1].wins.main.right", 15)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.right", 15)
 end
 
 T["left/right"]["closing the `left` buffer disables NNP"] = function()
@@ -294,7 +294,7 @@ T["left/right"]["closing the `left` buffer disables NNP"] = function()
     ]])
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
-    Helpers.expect.state_equality(child, "tabs[1].wins.main", {
+    Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,
         left = 1001,
         right = 1002,
@@ -313,7 +313,7 @@ T["left/right"]["closing the `right` buffer disables NNP"] = function()
     ]])
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
-    Helpers.expect.state_equality(child, "tabs[1].wins.main", {
+    Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,
         left = 1001,
         right = 1002,

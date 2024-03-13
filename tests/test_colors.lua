@@ -46,14 +46,14 @@ T["setup"]["overrides default values"] = function()
         },
     })]])
 
-    Helpers.expect.config_equality(child, "buffers.colors", {
+    Helpers.expect.config(child, "buffers.colors", {
         background = "#828590",
         blend = 0.4,
         text = "#7480c2",
     })
 
     for _, scope in pairs(Co.SIDES) do
-        Helpers.expect.config_equality(child, "buffers." .. scope .. ".colors", {
+        Helpers.expect.config(child, "buffers." .. scope .. ".colors", {
             background = "#595c6b",
             blend = 0.2,
             text = "#7480c2",
@@ -90,19 +90,19 @@ T["setup"]["`left` or `right` buffer options overrides `common` ones"] = functio
         },
     })]])
 
-    Helpers.expect.config_equality(child, "buffers.colors", {
+    Helpers.expect.config(child, "buffers.colors", {
         background = "#444858",
         blend = 0.1,
         text = "#7480c2",
     })
 
-    Helpers.expect.config_equality(child, "buffers.left.colors", {
+    Helpers.expect.config(child, "buffers.left.colors", {
         background = "#08080b",
         blend = -0.8,
         text = "#123123",
     })
 
-    Helpers.expect.config_equality(child, "buffers.right.colors", {
+    Helpers.expect.config(child, "buffers.right.colors", {
         background = "#ffffff",
         blend = 1,
         text = "#456456",
@@ -122,21 +122,21 @@ T["setup"]["`common` options spreads it to `left` and `right` buffers"] = functi
         require('no-neck-pain').enable() 
     ]])
 
-    Helpers.expect.state_equality(child, "enabled", true)
+    Helpers.expect.state(child, "enabled", true)
 
-    Helpers.expect.config_equality(child, "buffers.colors", {
+    Helpers.expect.config(child, "buffers.colors", {
         background = "#eaeaec",
         blend = 0.9,
         text = "#ff0000",
     })
 
-    Helpers.expect.config_equality(child, "buffers.left.colors", {
+    Helpers.expect.config(child, "buffers.left.colors", {
         background = "#eaeaec",
         blend = 0.9,
         text = "#ff0000",
     })
 
-    Helpers.expect.config_equality(child, "buffers.right.colors", {
+    Helpers.expect.config(child, "buffers.right.colors", {
         background = "#eaeaec",
         blend = 0.9,
         text = "#ff0000",
@@ -209,17 +209,17 @@ end
 T["setup"]["colors.background overrides a nil background when defined"] = function()
     child.lua([[require('no-neck-pain').setup({buffers={colors={background="#abcabc"}}})]])
 
-    Helpers.expect.config_equality(child, "buffers.colors", {
+    Helpers.expect.config(child, "buffers.colors", {
         background = "#abcabc",
         blend = 0,
     })
 
-    Helpers.expect.config_equality(child, "buffers.left.colors", {
+    Helpers.expect.config(child, "buffers.left.colors", {
         background = "#abcabc",
         blend = 0,
     })
 
-    Helpers.expect.config_equality(child, "buffers.right.colors", {
+    Helpers.expect.config(child, "buffers.right.colors", {
         background = "#abcabc",
         blend = 0,
     })
@@ -242,7 +242,7 @@ T["color"]["map integration name to a value"] = function()
             integration
         ))
         for _, scope in pairs(Co.SIDES) do
-            Helpers.expect.config_equality(child, "buffers." .. scope .. ".colors", {
+            Helpers.expect.config(child, "buffers." .. scope .. ".colors", {
                 background = value,
                 blend = 0,
             })
@@ -276,11 +276,11 @@ T["color"]["refreshes the stored color when changing colorscheme"] = function()
         require('no-neck-pain').enable()
     ]])
 
-    Helpers.expect.config_equality(child, "buffers.colors", { blend = 0 })
+    Helpers.expect.config(child, "buffers.colors", { blend = 0 })
 
     child.cmd([[colorscheme peachpuff]])
 
-    Helpers.expect.config_equality(child, "buffers.colors", { blend = 0 })
+    Helpers.expect.config(child, "buffers.colors", { blend = 0 })
 end
 
 return T

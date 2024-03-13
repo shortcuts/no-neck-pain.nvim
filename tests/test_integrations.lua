@@ -43,7 +43,7 @@ T["setup"]["overrides default values"] = function()
         }
     })]])
 
-    Helpers.expect.config_equality(child, "integrations", {
+    Helpers.expect.config(child, "integrations", {
         NeoTree = {
             position = "right",
             reopen = false,
@@ -113,7 +113,7 @@ T["nvimdapui"]["keeps sides open"] = function()
     child.lua([[require('no-neck-pain').enable()]])
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
-    Helpers.expect.state_equality(child, "tabs[1].wins.main", {
+    Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,
         left = 1001,
         right = 1002,
@@ -127,15 +127,15 @@ T["nvimdapui"]["keeps sides open"] = function()
         { 1010, 1009, 1008, 1007, 1001, 1000, 1002, 1006, 1003 }
     )
 
-    Helpers.expect.state_equality(child, "tabs[1].wins.main", {
+    Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,
         left = 1001,
         right = 1002,
     })
 
-    Helpers.expect.state_equality(child, "tabs[1].wins.splits", vim.NIL)
+    Helpers.expect.state(child, "tabs[1].wins.splits", vim.NIL)
 
-    Helpers.expect.state_equality(child, "tabs[1].wins.integrations.NvimDAPUI", {
+    Helpers.expect.state(child, "tabs[1].wins.integrations.NvimDAPUI", {
         close = "lua require('dapui').close()",
         fileTypePattern = "dap",
         id = 1003,
@@ -153,7 +153,7 @@ T["neotest"]["keeps sides open"] = function()
     child.lua([[require('no-neck-pain').enable()]])
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
-    Helpers.expect.state_equality(child, "tabs[1].wins.main", {
+    Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,
         left = 1001,
         right = 1002,
@@ -162,9 +162,9 @@ T["neotest"]["keeps sides open"] = function()
     child.lua([[require('neotest').summary.open()]])
     vim.loop.sleep(50)
 
-    Helpers.expect.state_equality(child, "tabs[1].wins.splits", vim.NIL)
+    Helpers.expect.state(child, "tabs[1].wins.splits", vim.NIL)
 
-    Helpers.expect.state_equality(child, "tabs[1].wins.integrations.neotest", {
+    Helpers.expect.state(child, "tabs[1].wins.integrations.neotest", {
         close = "lua require('neotest').summary.close()",
         fileTypePattern = "neotest",
         id = 1003,
@@ -188,8 +188,8 @@ T["NvimTree"]["keeps sides open"] = function()
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
 
-    Helpers.expect.state_equality(child, "enabled", true)
-    Helpers.expect.state_equality(child, "tabs[1].wins.main", {
+    Helpers.expect.state(child, "enabled", true)
+    Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,
         left = 1001,
         right = 1002,
@@ -200,15 +200,15 @@ T["NvimTree"]["keeps sides open"] = function()
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1004, 1001, 1000, 1002 })
 
-    Helpers.expect.state_equality(child, "tabs[1].wins.main", {
+    Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,
         left = 1001,
         right = 1002,
     })
 
-    Helpers.expect.state_equality(child, "tabs[1].wins.splits", vim.NIL)
+    Helpers.expect.state(child, "tabs[1].wins.splits", vim.NIL)
 
-    Helpers.expect.state_equality(child, "tabs[1].wins.integrations.NvimTree", {
+    Helpers.expect.state(child, "tabs[1].wins.integrations.NvimTree", {
         close = "NvimTreeClose",
         fileTypePattern = "nvimtree",
         id = 1004,
@@ -227,8 +227,8 @@ T["neo-tree"]["keeps sides open"] = function()
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
 
-    Helpers.expect.state_equality(child, "enabled", true)
-    Helpers.expect.state_equality(child, "tabs[1].wins.main", {
+    Helpers.expect.state(child, "enabled", true)
+    Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,
         left = 1001,
         right = 1002,
@@ -239,15 +239,15 @@ T["neo-tree"]["keeps sides open"] = function()
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1004, 1001, 1000, 1002 })
 
-    Helpers.expect.state_equality(child, "tabs[1].wins.main", {
+    Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,
         left = 1001,
         right = 1002,
     })
 
-    Helpers.expect.state_equality(child, "tabs[1].wins.splits", vim.NIL)
+    Helpers.expect.state(child, "tabs[1].wins.splits", vim.NIL)
 
-    Helpers.expect.state_equality(child, "tabs[1].wins.integrations.NeoTree", {
+    Helpers.expect.state(child, "tabs[1].wins.integrations.NeoTree", {
         close = "Neotree close",
         fileTypePattern = "neo-tree",
         id = 1004,
@@ -266,8 +266,8 @@ T["TSPlayground"]["keeps sides open"] = function()
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
 
-    Helpers.expect.state_equality(child, "enabled", true)
-    Helpers.expect.state_equality(child, "tabs[1].wins.main", {
+    Helpers.expect.state(child, "enabled", true)
+    Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,
         left = 1001,
         right = 1002,
@@ -276,10 +276,10 @@ T["TSPlayground"]["keeps sides open"] = function()
     child.cmd("TSPlaygroundToggle")
     vim.loop.sleep(50)
 
-    Helpers.expect.state_equality(child, "tabs[1].wins.splits", vim.NIL)
+    Helpers.expect.state(child, "tabs[1].wins.splits", vim.NIL)
 
     Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1004)"), 99)
-    Helpers.expect.state_equality(child, "tabs[1].wins.integrations.TSPlayground", {
+    Helpers.expect.state(child, "tabs[1].wins.integrations.TSPlayground", {
         close = "TSPlaygroundToggle",
         fileTypePattern = "tsplayground",
         id = 1004,
@@ -306,27 +306,27 @@ T["TSPlayground"]["reduces `left` side if only active when integration is on `ri
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000 })
 
-    Helpers.expect.state_equality(child, "enabled", true)
-    Helpers.expect.state_equality(child, "tabs[1].wins.main", {
+    Helpers.expect.state(child, "enabled", true)
+    Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,
         left = 1001,
         right = nil,
     })
-    Helpers.expect.buf_width_equality(child, "tabs[1].wins.main.left", 15)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 15)
 
     child.cmd("TSPlaygroundToggle")
     vim.loop.sleep(50)
 
-    Helpers.expect.state_equality(child, "tabs[1].wins.splits", vim.NIL)
+    Helpers.expect.state(child, "tabs[1].wins.splits", vim.NIL)
 
-    Helpers.expect.state_equality(child, "tabs[1].wins.integrations.TSPlayground", {
+    Helpers.expect.state(child, "tabs[1].wins.integrations.TSPlayground", {
         close = "TSPlaygroundToggle",
         fileTypePattern = "tsplayground",
         id = 1003,
         open = "TSPlaygroundToggle",
         width = 284,
     })
-    Helpers.expect.state_equality(child, "tabs[1].wins.main", {
+    Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,
         left = nil,
         right = nil,

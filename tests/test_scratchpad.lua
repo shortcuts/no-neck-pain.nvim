@@ -26,19 +26,19 @@ T["setup"]["overrides default values"] = function()
         },
     })]])
 
-    Helpers.expect.config_equality(child, "buffers.scratchPad", {
+    Helpers.expect.config(child, "buffers.scratchPad", {
         enabled = true,
         fileName = "no-neck-pain",
         location = "~/Documents",
     })
 
-    Helpers.expect.config_equality(child, "buffers.left.scratchPad", {
+    Helpers.expect.config(child, "buffers.left.scratchPad", {
         enabled = true,
         fileName = "no-neck-pain",
         location = "~/Documents",
     })
 
-    Helpers.expect.config_equality(child, "buffers.right.scratchPad", {
+    Helpers.expect.config(child, "buffers.right.scratchPad", {
         enabled = true,
         fileName = "no-neck-pain",
         location = "~/Documents",

@@ -23,11 +23,11 @@ T["tabs"]["keeps the active tab in state"] = function()
         require('no-neck-pain').enable()
     ]])
 
-    Helpers.expect.state_equality(child, "activeTab", 1)
+    Helpers.expect.state(child, "activeTab", 1)
 
     child.cmd("tabnew")
 
-    Helpers.expect.state_equality(child, "activeTab", 2)
+    Helpers.expect.state(child, "activeTab", 2)
 end
 
 T["tabs"]["new tab doesn't have side buffers"] = function()
@@ -37,7 +37,7 @@ T["tabs"]["new tab doesn't have side buffers"] = function()
     ]])
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
-    Helpers.expect.state_equality(child, "activeTab", 1)
+    Helpers.expect.state(child, "activeTab", 1)
 
     child.cmd("tabnew")
 
@@ -52,21 +52,21 @@ T["tabs"]["side buffers coexist on many tabs"] = function()
 
     -- tab 1
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
-    Helpers.expect.state_equality(child, "activeTab", 1)
+    Helpers.expect.state(child, "activeTab", 1)
 
     -- tab 2
     child.cmd("tabnew")
     child.lua([[ require('no-neck-pain').enable() ]])
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1004, 1003, 1005 })
-    Helpers.expect.state_equality(child, "activeTab", 2)
+    Helpers.expect.state(child, "activeTab", 2)
 
     -- tab 3
     child.cmd("tabnew")
     child.lua([[ require('no-neck-pain').enable() ]])
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1007, 1006, 1008 })
-    Helpers.expect.state_equality(child, "activeTab", 3)
+    Helpers.expect.state(child, "activeTab", 3)
 
     Helpers.expect.equality(Helpers.winsInTab(child, 1), { 1001, 1000, 1002 })
     Helpers.expect.equality(Helpers.winsInTab(child, 2), { 1004, 1003, 1005 })
@@ -81,7 +81,7 @@ T["tabs"]["previous tab kept side buffers if enabled"] = function()
 
     -- tab 1
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
-    Helpers.expect.state_equality(child, "activeTab", 1)
+    Helpers.expect.state(child, "activeTab", 1)
 
     -- tab 2
     child.cmd("tabnew")
@@ -92,7 +92,7 @@ T["tabs"]["previous tab kept side buffers if enabled"] = function()
     child.cmd("tabprevious")
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
-    Helpers.expect.state_equality(child, "activeTab", 1)
+    Helpers.expect.state(child, "activeTab", 1)
 end
 
 T["TabNewEntered"] = MiniTest.new_set()
@@ -100,16 +100,16 @@ T["TabNewEntered"] = MiniTest.new_set()
 T["TabNewEntered"]["starts the plugin on new tab"] = function()
     child.restart({ "-u", "scripts/init_auto_open.lua" })
 
-    Helpers.expect.state_equality(child, "enabled", true)
+    Helpers.expect.state(child, "enabled", true)
 
     -- tab 1
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
 
-    Helpers.expect.state_equality(child, "activeTab", 1)
+    Helpers.expect.state(child, "activeTab", 1)
 
     -- tab 2
     child.cmd("tabnew")
-    Helpers.expect.state_equality(child, "activeTab", 2)
+    Helpers.expect.state(child, "activeTab", 2)
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1004, 1003, 1005 })
 
@@ -119,31 +119,31 @@ end
 T["TabNewEntered"]["does not re-enable if the user disables it"] = function()
     child.restart({ "-u", "scripts/init_auto_open.lua" })
 
-    Helpers.expect.state_equality(child, "enabled", true)
+    Helpers.expect.state(child, "enabled", true)
 
     -- tab 1
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
 
-    Helpers.expect.state_equality(child, "activeTab", 1)
+    Helpers.expect.state(child, "activeTab", 1)
 
     -- tab 2
     child.cmd("tabnew")
-    Helpers.expect.state_equality(child, "activeTab", 2)
+    Helpers.expect.state(child, "activeTab", 2)
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1004, 1003, 1005 })
 
     child.cmd("NoNeckPain")
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1003 })
-    Helpers.expect.state_equality(child, "activeTab", 2)
+    Helpers.expect.state(child, "activeTab", 2)
 
     -- tab 1
     child.cmd("tabprevious")
-    Helpers.expect.state_equality(child, "activeTab", 1)
+    Helpers.expect.state(child, "activeTab", 1)
 
     -- tab 2
     child.cmd("tabnext")
-    Helpers.expect.state_equality(child, "activeTab", 2)
+    Helpers.expect.state(child, "activeTab", 2)
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1003 })
 
@@ -155,32 +155,32 @@ T["tabnew/tabclose"] = MiniTest.new_set()
 T["tabnew/tabclose"]["opening and closing tabs does not throw any error"] = function()
     child.restart({ "-u", "scripts/init_auto_open.lua" })
 
-    Helpers.expect.state_equality(child, "enabled", true)
-    Helpers.expect.state_equality(child, "activeTab", 1)
+    Helpers.expect.state(child, "enabled", true)
+    Helpers.expect.state(child, "activeTab", 1)
 
     child.cmd("tabnew")
-    Helpers.expect.state_equality(child, "activeTab", 2)
+    Helpers.expect.state(child, "activeTab", 2)
 
     child.cmd("tabclose")
-    Helpers.expect.state_equality(child, "activeTab", 1)
+    Helpers.expect.state(child, "activeTab", 1)
 
     child.cmd("tabnew")
     child.cmd("tabnew")
-    Helpers.expect.state_equality(child, "activeTab", 4)
+    Helpers.expect.state(child, "activeTab", 4)
 
     child.cmd("tabclose")
-    Helpers.expect.state_equality(child, "activeTab", 3)
+    Helpers.expect.state(child, "activeTab", 3)
 
     child.cmd("tabclose")
-    Helpers.expect.state_equality(child, "activeTab", 1)
+    Helpers.expect.state(child, "activeTab", 1)
 end
 
 T["tabnew/tabclose"]["doesn't keep closed tabs in state"] = function()
     child.restart({ "-u", "scripts/init_auto_open.lua" })
 
-    Helpers.expect.state_equality(child, "enabled", true)
-    Helpers.expect.state_equality(child, "activeTab", 1)
-    Helpers.expect.state_equality(child, "tabs", {
+    Helpers.expect.state(child, "enabled", true)
+    Helpers.expect.state(child, "activeTab", 1)
+    Helpers.expect.state(child, "tabs", {
         {
             id = 1,
             layers = {
@@ -200,7 +200,7 @@ T["tabnew/tabclose"]["doesn't keep closed tabs in state"] = function()
     })
 
     child.cmd("tabnew")
-    Helpers.expect.state_equality(child, "tabs", {
+    Helpers.expect.state(child, "tabs", {
         {
             id = 1,
             layers = {
@@ -236,7 +236,7 @@ T["tabnew/tabclose"]["doesn't keep closed tabs in state"] = function()
     })
 
     child.cmd("tabclose")
-    Helpers.expect.state_equality(child, "tabs", {
+    Helpers.expect.state(child, "tabs", {
         {
             id = 1,
             layers = {
@@ -260,9 +260,9 @@ T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
     child.restart({ "-u", "scripts/init_auto_open.lua" })
 
     child.cmd("badd 1")
-    Helpers.expect.state_equality(child, "enabled", true)
-    Helpers.expect.state_equality(child, "activeTab", 1)
-    Helpers.expect.state_equality(child, "tabs", {
+    Helpers.expect.state(child, "enabled", true)
+    Helpers.expect.state(child, "activeTab", 1)
+    Helpers.expect.state(child, "tabs", {
         {
             id = 1,
             layers = {
@@ -283,9 +283,9 @@ T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
 
     child.cmd("tabnew")
     child.cmd("badd 2")
-    Helpers.expect.state_equality(child, "enabled", true)
-    Helpers.expect.state_equality(child, "activeTab", 2)
-    Helpers.expect.state_equality(child, "tabs", {
+    Helpers.expect.state(child, "enabled", true)
+    Helpers.expect.state(child, "activeTab", 2)
+    Helpers.expect.state(child, "tabs", {
         {
             id = 1,
             layers = {
@@ -321,7 +321,7 @@ T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
     })
 
     child.cmd("NoNeckPain")
-    Helpers.expect.state_equality(child, "tabs", {
+    Helpers.expect.state(child, "tabs", {
         {
             id = 1,
             layers = {
@@ -341,7 +341,7 @@ T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
     })
 
     child.cmd("NoNeckPain")
-    Helpers.expect.state_equality(child, "tabs", {
+    Helpers.expect.state(child, "tabs", {
         {
             id = 1,
             layers = {
@@ -377,8 +377,8 @@ T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
     })
 
     child.cmd("tabprevious")
-    Helpers.expect.state_equality(child, "activeTab", 1)
-    Helpers.expect.state_equality(child, "tabs", {
+    Helpers.expect.state(child, "activeTab", 1)
+    Helpers.expect.state(child, "tabs", {
         {
             id = 1,
             layers = {
@@ -414,13 +414,13 @@ T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
     })
 
     child.cmd("tabprevious")
-    Helpers.expect.state_equality(child, "activeTab", 2)
+    Helpers.expect.state(child, "activeTab", 2)
 end
 
 T["tabnew/tabclose"]["does not pick tab 1 for the first active tab"] = function()
     child.lua([[require('no-neck-pain').setup({width=50})]])
-    Helpers.expect.global_type_equality(child, "_G.NoNeckPain.config", "table")
-    Helpers.expect.global_type_equality(child, "_G.NoNeckPain.state", "nil")
+    Helpers.expect.global_type(child, "_G.NoNeckPain.config", "table")
+    Helpers.expect.global_type(child, "_G.NoNeckPain.state", "nil")
 
     Helpers.expect.equality(child.api.nvim_get_current_tabpage(), 1)
     child.cmd("badd 1")
@@ -429,14 +429,14 @@ T["tabnew/tabclose"]["does not pick tab 1 for the first active tab"] = function(
     Helpers.expect.equality(child.api.nvim_get_current_tabpage(), 2)
     child.cmd("badd 2")
 
-    Helpers.expect.global_type_equality(child, "_G.NoNeckPain.state", "nil")
+    Helpers.expect.global_type(child, "_G.NoNeckPain.state", "nil")
     child.cmd("NoNeckPain")
     Helpers.expect.equality(child.api.nvim_get_current_tabpage(), 2)
-    Helpers.expect.global_type_equality(child, "_G.NoNeckPain.state", "table")
-    Helpers.expect.state_equality(child, "enabled", true)
-    Helpers.expect.state_equality(child, "tabs[1]", vim.NIL)
-    Helpers.expect.state_equality(child, "activeTab", 2)
-    Helpers.expect.state_equality(child, "tabs[2]", {
+    Helpers.expect.global_type(child, "_G.NoNeckPain.state", "table")
+    Helpers.expect.state(child, "enabled", true)
+    Helpers.expect.state(child, "tabs[1]", vim.NIL)
+    Helpers.expect.state(child, "activeTab", 2)
+    Helpers.expect.state(child, "tabs[2]", {
         id = 2,
         layers = {
             split = 1,
@@ -455,13 +455,13 @@ T["tabnew/tabclose"]["does not pick tab 1 for the first active tab"] = function(
 
     child.cmd("tabprevious")
     Helpers.expect.equality(child.api.nvim_get_current_tabpage(), 1)
-    Helpers.expect.global_type_equality(child, "_G.NoNeckPain.state", "table")
-    Helpers.expect.state_equality(child, "enabled", true)
-    Helpers.expect.state_equality(child, "tabs[1]", vim.NIL)
-    Helpers.expect.state_equality(child, "activeTab", 1)
+    Helpers.expect.global_type(child, "_G.NoNeckPain.state", "table")
+    Helpers.expect.state(child, "enabled", true)
+    Helpers.expect.state(child, "tabs[1]", vim.NIL)
+    Helpers.expect.state(child, "activeTab", 1)
 
     child.cmd("NoNeckPain")
-    Helpers.expect.state_equality(child, "tabs[1]", {
+    Helpers.expect.state(child, "tabs[1]", {
         id = 1,
         layers = {
             split = 1,
@@ -508,7 +508,7 @@ T["tabnew/tabclose"]["does not pick tab 1 for the first active tab"] = function(
             },
         },
     })
-    Helpers.expect.state_equality(child, "tabs[2]", {
+    Helpers.expect.state(child, "tabs[2]", {
         id = 2,
         layers = {
             split = 1,
@@ -528,8 +528,8 @@ end
 
 T["tabnew/tabclose"]["keep state synchronized on second tab"] = function()
     child.lua([[require('no-neck-pain').setup({width=50})]])
-    Helpers.expect.global_type_equality(child, "_G.NoNeckPain.config", "table")
-    Helpers.expect.global_type_equality(child, "_G.NoNeckPain.state", "nil")
+    Helpers.expect.global_type(child, "_G.NoNeckPain.config", "table")
+    Helpers.expect.global_type(child, "_G.NoNeckPain.state", "nil")
 
     Helpers.expect.equality(child.api.nvim_get_current_tabpage(), 1)
     child.cmd("badd 1")
@@ -538,14 +538,14 @@ T["tabnew/tabclose"]["keep state synchronized on second tab"] = function()
     Helpers.expect.equality(child.api.nvim_get_current_tabpage(), 2)
     child.cmd("badd 2")
 
-    Helpers.expect.global_type_equality(child, "_G.NoNeckPain.state", "nil")
+    Helpers.expect.global_type(child, "_G.NoNeckPain.state", "nil")
     child.cmd("NoNeckPain")
     Helpers.expect.equality(child.api.nvim_get_current_tabpage(), 2)
-    Helpers.expect.global_type_equality(child, "_G.NoNeckPain.state", "table")
-    Helpers.expect.state_equality(child, "enabled", true)
-    Helpers.expect.state_equality(child, "tabs[1]", vim.NIL)
-    Helpers.expect.state_equality(child, "activeTab", 2)
-    Helpers.expect.state_equality(child, "tabs[2]", {
+    Helpers.expect.global_type(child, "_G.NoNeckPain.state", "table")
+    Helpers.expect.state(child, "enabled", true)
+    Helpers.expect.state(child, "tabs[1]", vim.NIL)
+    Helpers.expect.state(child, "activeTab", 2)
+    Helpers.expect.state(child, "tabs[2]", {
         id = 2,
         layers = {
             split = 1,
@@ -564,18 +564,18 @@ T["tabnew/tabclose"]["keep state synchronized on second tab"] = function()
 
     child.cmd("tabprevious")
     Helpers.expect.equality(child.api.nvim_get_current_tabpage(), 1)
-    Helpers.expect.global_type_equality(child, "_G.NoNeckPain.state", "table")
-    Helpers.expect.state_equality(child, "enabled", true)
-    Helpers.expect.state_equality(child, "tabs[1]", vim.NIL)
-    Helpers.expect.state_equality(child, "activeTab", 1)
+    Helpers.expect.global_type(child, "_G.NoNeckPain.state", "table")
+    Helpers.expect.state(child, "enabled", true)
+    Helpers.expect.state(child, "tabs[1]", vim.NIL)
+    Helpers.expect.state(child, "activeTab", 1)
 
     child.cmd("tabnext")
-    Helpers.expect.global_type_equality(child, "_G.NoNeckPain.state", "table")
+    Helpers.expect.global_type(child, "_G.NoNeckPain.state", "table")
     Helpers.expect.equality(child.api.nvim_get_current_tabpage(), 2)
-    Helpers.expect.state_equality(child, "activeTab", 2)
-    Helpers.expect.state_equality(child, "enabled", true)
-    Helpers.expect.state_equality(child, "tabs[1]", vim.NIL)
-    Helpers.expect.state_equality(child, "tabs[2]", {
+    Helpers.expect.state(child, "activeTab", 2)
+    Helpers.expect.state(child, "enabled", true)
+    Helpers.expect.state(child, "tabs[1]", vim.NIL)
+    Helpers.expect.state(child, "tabs[2]", {
         id = 2,
         layers = {
             split = 1,
@@ -593,7 +593,7 @@ T["tabnew/tabclose"]["keep state synchronized on second tab"] = function()
     })
 
     child.cmd("NoNeckPain")
-    Helpers.expect.state_equality(child, "tabs", vim.NIL)
+    Helpers.expect.state(child, "tabs", vim.NIL)
 end
 
 return T

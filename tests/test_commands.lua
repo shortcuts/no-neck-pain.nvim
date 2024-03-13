@@ -18,26 +18,26 @@ T["commands"] = MiniTest.new_set()
 
 T["commands"]["NoNeckPain toggles the plugin state"] = function()
     child.cmd("NoNeckPain")
-    Helpers.expect.state_equality(child, "enabled", true)
+    Helpers.expect.state(child, "enabled", true)
 
     child.cmd("NoNeckPain")
-    Helpers.expect.state_equality(child, "enabled", false)
+    Helpers.expect.state(child, "enabled", false)
 end
 
 T["commands"]["NoNeckPainResize sets the config width and resizes windows"] = function()
     child.cmd("NoNeckPain")
 
-    Helpers.expect.global_equality(child, "_G.NoNeckPain.config.width", 100)
+    Helpers.expect.global(child, "_G.NoNeckPain.config.width", 100)
 
     -- need to know why the child isn't precise enough
-    Helpers.expect.buf_width_equality(child, "tabs[1].wins.main.curr", 80)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 80)
 
     child.cmd("NoNeckPainResize 20")
 
-    Helpers.expect.global_equality(child, "_G.NoNeckPain.config.width", 20)
+    Helpers.expect.global(child, "_G.NoNeckPain.config.width", 20)
 
     -- need to know why the child isn't precise enough
-    Helpers.expect.buf_width_equality(child, "tabs[1].wins.main.curr", 20)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 20)
 end
 
 T["commands"]["NoNeckPainResize throws with the plugin disabled"] = function()
@@ -49,23 +49,23 @@ end
 T["commands"]["NoNeckPainResize does nothing with the same width"] = function()
     child.cmd("NoNeckPain")
 
-    Helpers.expect.global_equality(child, "_G.NoNeckPain.config.width", 100)
+    Helpers.expect.global(child, "_G.NoNeckPain.config.width", 100)
 
     -- need to know why the child isn't precise enough
-    Helpers.expect.buf_width_equality(child, "tabs[1].wins.main.curr", 80)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 80)
 
     child.cmd("NoNeckPainResize 100")
 
-    Helpers.expect.global_equality(child, "_G.NoNeckPain.config.width", 100)
+    Helpers.expect.global(child, "_G.NoNeckPain.config.width", 100)
 
     -- need to know why the child isn't precise enough
-    Helpers.expect.buf_width_equality(child, "tabs[1].wins.main.curr", 80)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 80)
 end
 
 T["commands"]["NoNeckPainWidthUp increases the width by 5"] = function()
     child.cmd("NoNeckPain")
 
-    Helpers.expect.global_equality(child, "_G.NoNeckPain.config.width", 100)
+    Helpers.expect.global(child, "_G.NoNeckPain.config.width", 100)
 
     child.cmd("NoNeckPainWidthUp")
     child.cmd("NoNeckPainWidthUp")
@@ -78,7 +78,7 @@ T["commands"]["NoNeckPainWidthUp increases the width by 5"] = function()
     child.cmd("NoNeckPainWidthUp")
     child.cmd("NoNeckPainWidthUp")
 
-    Helpers.expect.global_equality(child, "_G.NoNeckPain.config.width", 150)
+    Helpers.expect.global(child, "_G.NoNeckPain.config.width", 150)
 end
 
 T["commands"]["NoNeckPainWidthUp increases the width by N when mappings.widthUp is configured"] = function(
@@ -91,7 +91,7 @@ T["commands"]["NoNeckPainWidthUp increases the width by N when mappings.widthUp 
 
     child.cmd("NoNeckPain")
 
-    Helpers.expect.global_equality(child, "_G.NoNeckPain.config.width", 100)
+    Helpers.expect.global(child, "_G.NoNeckPain.config.width", 100)
 
     child.cmd("NoNeckPainWidthUp")
     child.cmd("NoNeckPainWidthUp")
@@ -104,13 +104,13 @@ T["commands"]["NoNeckPainWidthUp increases the width by N when mappings.widthUp 
     child.cmd("NoNeckPainWidthUp")
     child.cmd("NoNeckPainWidthUp")
 
-    Helpers.expect.global_equality(child, "_G.NoNeckPain.config.width", 220)
+    Helpers.expect.global(child, "_G.NoNeckPain.config.width", 220)
 end
 
 T["commands"]["NoNeckPainWidthUp decreases the width by 5"] = function()
     child.cmd("NoNeckPain")
 
-    Helpers.expect.global_equality(child, "_G.NoNeckPain.config.width", 100)
+    Helpers.expect.global(child, "_G.NoNeckPain.config.width", 100)
 
     child.cmd("NoNeckPainWidthDown")
     child.cmd("NoNeckPainWidthDown")
@@ -123,7 +123,7 @@ T["commands"]["NoNeckPainWidthUp decreases the width by 5"] = function()
     child.cmd("NoNeckPainWidthDown")
     child.cmd("NoNeckPainWidthDown")
 
-    Helpers.expect.global_equality(child, "_G.NoNeckPain.config.width", 50)
+    Helpers.expect.global(child, "_G.NoNeckPain.config.width", 50)
 end
 
 T["commands"]["NoNeckPainWidthUp decreases the width by N when mappings.widthDown is configured"] = function(
@@ -136,7 +136,7 @@ T["commands"]["NoNeckPainWidthUp decreases the width by N when mappings.widthDow
 
     child.cmd("NoNeckPain")
 
-    Helpers.expect.global_equality(child, "_G.NoNeckPain.config.width", 100)
+    Helpers.expect.global(child, "_G.NoNeckPain.config.width", 100)
 
     child.cmd("NoNeckPainWidthDown")
     child.cmd("NoNeckPainWidthDown")
@@ -149,7 +149,7 @@ T["commands"]["NoNeckPainWidthUp decreases the width by N when mappings.widthDow
     child.cmd("NoNeckPainWidthDown")
     child.cmd("NoNeckPainWidthDown")
 
-    Helpers.expect.global_equality(child, "_G.NoNeckPain.config.width", 20)
+    Helpers.expect.global(child, "_G.NoNeckPain.config.width", 20)
 end
 
 return T

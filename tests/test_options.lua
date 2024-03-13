@@ -23,14 +23,10 @@ T["minSideBufferWidth"]["closes side buffer respecting the given value"] = funct
         require('no-neck-pain').enable()
     ]])
 
-    Helpers.expect.state_equality(
-        child,
-        "tabs[1].wins.main",
-        { curr = 1000, left = 1001, right = 1002 }
-    )
+    Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1000, left = 1001, right = 1002 })
 
-    Helpers.expect.buf_width_equality(child, "tabs[1].wins.main.left", 15)
-    Helpers.expect.buf_width_equality(child, "tabs[1].wins.main.right", 15)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 15)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.right", 15)
 
     child.lua([[
         require('no-neck-pain').disable()
@@ -38,7 +34,7 @@ T["minSideBufferWidth"]["closes side buffer respecting the given value"] = funct
         require('no-neck-pain').enable()
     ]])
 
-    Helpers.expect.state_equality(child, "tabs[1].wins.main", { curr = 1000 })
+    Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1000 })
 end
 
 T["killAllBuffersOnDisable"] = MiniTest.new_set()
@@ -50,11 +46,7 @@ T["killAllBuffersOnDisable"]["closes every windows when disabling the plugin"] =
         require('no-neck-pain').enable()
     ]])
 
-    Helpers.expect.state_equality(
-        child,
-        "tabs[1].wins.main",
-        { curr = 1000, left = 1001, right = 1002 }
-    )
+    Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1000, left = 1001, right = 1002 })
 
     Helpers.expect.equality(Helpers.listBuffers(child), { 1, 2, 3 })
     child.cmd("badd 1")
@@ -80,21 +72,13 @@ T["fallbackOnBufferDelete"]["invoking :bd keeps nnp enabled"] = function()
         require('no-neck-pain').enable()
     ]])
 
-    Helpers.expect.state_equality(
-        child,
-        "tabs[1].wins.main",
-        { curr = 1000, left = 1001, right = 1002 }
-    )
+    Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1000, left = 1001, right = 1002 })
 
     child.cmd("badd 1")
     child.cmd("bd")
     child.loop.sleep(500)
 
-    Helpers.expect.state_equality(
-        child,
-        "tabs[1].wins.main",
-        { curr = 1003, left = 1004, right = 1005 }
-    )
+    Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1003, left = 1004, right = 1005 })
 end
 
 T["fallbackOnBufferDelete"]["still allows nvim to quit"] = function()
@@ -104,21 +88,13 @@ T["fallbackOnBufferDelete"]["still allows nvim to quit"] = function()
         require('no-neck-pain').enable()
     ]])
 
-    Helpers.expect.state_equality(
-        child,
-        "tabs[1].wins.main",
-        { curr = 1000, left = 1001, right = 1002 }
-    )
+    Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1000, left = 1001, right = 1002 })
 
     child.cmd("badd 1")
     child.cmd("q")
 
     Helpers.expect.error(function()
-        Helpers.expect.state_equality(
-            child,
-            "tabs[1].wins.main",
-            { curr = 1003, left = 1004, right = 1005 }
-        )
+        Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1003, left = 1004, right = 1005 })
     end)
 end
 
