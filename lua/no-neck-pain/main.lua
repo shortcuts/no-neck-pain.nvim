@@ -81,7 +81,6 @@ function N.toggleSide(scope, side)
 end
 
 --- Creates side buffers and set the tab state, focuses the `curr` window if required.
---
 --- @param scope string: internal identifier for logging purposes.
 --- @param goToCurr boolean?: whether we should re-focus the `curr` window.
 --- @param skipIntegrations boolean?: whether we should skip the integrations logic.

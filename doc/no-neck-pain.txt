@@ -370,9 +370,4 @@ Usage ~
 `require("no-neck-pain").setup()` (add `{}` with your |NoNeckPain.options| table)
 
 
-==============================================================================
-------------------------------------------------------------------------------
-Creates side buffers and set the tab state, focuses the `curr` window if required.
-
-
  vim:tw=78:ts=8:noet:ft=help:norl:
