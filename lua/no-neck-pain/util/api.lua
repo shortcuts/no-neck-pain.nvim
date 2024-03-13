@@ -99,7 +99,7 @@ end
 ---@param callback function: to execute on completion
 ---@private
 function A.debounce(context, callback)
-    local timeout = 5
+    local timeout = 2
     -- all execution here is done in a synchronous context; no thread safety required
 
     A.debouncers[context] = A.debouncers[context] or {}
