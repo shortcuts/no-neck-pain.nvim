@@ -103,8 +103,6 @@ function A.debounce(context, callback, timeout)
     timeout = timeout or 2
     -- all execution here is done in a synchronous context; no thread safety required
 
-    D.log(context, "debouncing with %d ms timeout", timeout)
-
     A.debouncers[context] = A.debouncers[context] or {}
     local debouncer = A.debouncers[context]
 

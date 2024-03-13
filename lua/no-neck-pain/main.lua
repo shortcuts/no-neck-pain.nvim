@@ -335,7 +335,7 @@ function N.enable(scope)
                     return D.log(debounceScope, "skip integrations logic")
                 end
 
-                if S.checkSides(S, "and", false) then
+                if S.wantsSides(S) and S.checkSides(S, "and", false) then
                     return D.log(debounceScope, "skip integrations logic: no side buffer")
                 end
 
