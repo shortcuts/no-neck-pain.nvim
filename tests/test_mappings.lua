@@ -281,7 +281,7 @@ T["setup"]["toggles scratchPad"] = function()
     Helpers.expect.global(child, "_G.NoNeckPain.config.buffers.scratchPad.enabled", false)
     Helpers.expect.global(child, "_G.NoNeckPain.state.tabs[1].scratchPadEnabled", false)
 
-    child.api.nvim_input('ns')
+    child.api.nvim_input("ns")
     Helpers.wait(child)
 
     Helpers.expect.global(child, "_G.NoNeckPain.config.buffers.scratchPad.enabled", false)
@@ -300,7 +300,7 @@ T["setup"]["toggle sides and disable if none"] = function()
         right = 1002,
     })
 
-    child.api.nvim_input('nl')
+    child.api.nvim_input("nl")
     Helpers.wait(child)
 
     Helpers.expect.state(child, "tabs[1].wins.main", {
@@ -309,7 +309,7 @@ T["setup"]["toggle sides and disable if none"] = function()
         right = 1002,
     })
 
-    child.api.nvim_input('nl')
+    child.api.nvim_input("nl")
     Helpers.wait(child)
 
     Helpers.expect.state(child, "tabs[1].wins.main", {
@@ -318,7 +318,7 @@ T["setup"]["toggle sides and disable if none"] = function()
         right = 1002,
     })
 
-    child.api.nvim_input('nr')
+    child.api.nvim_input("nr")
     Helpers.wait(child)
 
     Helpers.expect.state(child, "tabs[1].wins.main", {
@@ -327,7 +327,7 @@ T["setup"]["toggle sides and disable if none"] = function()
         right = nil,
     })
 
-    child.api.nvim_input('nl')
+    child.api.nvim_input("nl")
     Helpers.wait(child)
 
     Helpers.expect.state(child, "enabled", false)

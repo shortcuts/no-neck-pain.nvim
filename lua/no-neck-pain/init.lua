@@ -69,7 +69,7 @@ function NoNeckPain.enable()
         _G.NoNeckPain.config = cfg.options
     end
 
-    A.debounce("publicAPI_enable", M.enable)
+    A.debounce("publicAPI_enable", M.enable, 10)
 end
 
 --- Disables the plugin, clear highlight groups and autocmds, closes side buffers and resets the internal state.
