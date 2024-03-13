@@ -1,5 +1,6 @@
 local M = require("no-neck-pain.main")
 local D = require("no-neck-pain.util.debug")
+local A = require("no-neck-pain.util.api")
 local cfg = require("no-neck-pain.config")
 
 local NoNeckPain = {}
@@ -10,7 +11,7 @@ function NoNeckPain.toggle()
         _G.NoNeckPain.config = cfg.options
     end
 
-    _G.NoNeckPain.state = M.toggle("publicAPI_toggle")
+    M.toggle("publicAPI_toggle")
 end
 
 --- Toggles the scratchPad feature of the plugin.
@@ -23,7 +24,7 @@ function NoNeckPain.toggleScratchPad()
         _G.NoNeckPain.config = cfg.options
     end
 
-    _G.NoNeckPain.state = M.toggleScratchPad()
+    M.toggleScratchPad()
 end
 
 --- Sets the config `width` to the given `width` value and resizes the NoNeckPain windows.
@@ -44,7 +45,7 @@ function NoNeckPain.resize(width)
         _G.NoNeckPain.config = vim.tbl_deep_extend("keep", { width = width }, _G.NoNeckPain.config)
     end
 
-    _G.NoNeckPain.state = M.init("publicAPI_resize", false)
+    M.init("publicAPI_resize", false)
 end
 
 --- Toggles the config `${side}.enabled` and re-inits the plugin.
@@ -55,7 +56,7 @@ function NoNeckPain.toggleSide(side)
         error("no-neck-pain.nvim must be enabled, run `NoNeckPain` first.")
     end
 
-    _G.NoNeckPain.state = M.toggleSide("publicAPI_toggleSide", side)
+    M.toggleSide("publicAPI_toggleSide", side)
 end
 
 --- Initializes the plugin, sets event listeners and internal state.
@@ -64,18 +65,12 @@ function NoNeckPain.enable()
         _G.NoNeckPain.config = cfg.options
     end
 
-    local state = M.enable("publicAPI_enable")
-
-    if state ~= nil then
-        _G.NoNeckPain.state = state
-    end
-
-    return state
+    M.enable("publicAPI_enable")
 end
 
 --- Disables the plugin, clear highlight groups and autocmds, closes side buffers and resets the internal state.
 function NoNeckPain.disable()
-    _G.NoNeckPain.state = M.disable("publicAPI_disable")
+    M.disable("publicAPI_disable")
 end
 
 -- setup NoNeckPain options and merge them with user provided ones.
@@ -117,7 +112,9 @@ function NoNeckPain.setup(opts)
                         return
                     end
 
-                    if NoNeckPain.enable() ~= nil then
+                    NoNeckPain.enable()
+
+                    if _G.NoNeckPain.state ~= nil then
                         vim.api.nvim_del_autocmd(p.id)
                     end
                 end)

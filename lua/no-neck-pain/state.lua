@@ -13,6 +13,13 @@ function State:init()
     self.tabs = nil
 end
 
+---Saves the state in the global _G.NoNeckPain.state object.
+---
+---@private
+function State:save()
+    _G.NoNeckPain.state = self
+end
+
 ---Sets the state splits to its original value.
 ---
 ---@private

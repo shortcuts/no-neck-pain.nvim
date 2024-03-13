@@ -16,7 +16,7 @@ function N.toggle(scope)
         return N.disable(scope)
     end
 
-    return N.enable(scope)
+    N.enable(scope)
 end
 
 --- Toggles the scratchPad feature of the plugin.
@@ -41,20 +41,19 @@ function N.toggleScratchPad()
     -- save new state of the scratchpad and update tabs
     S.setScratchpad(S, not S.tabs[S.activeTab].scratchPadEnabled)
 
-    return S
+    S.save(S)
 end
 
 --- Toggles the config `${side}.enabled` and re-inits the plugin.
 ---
 --- @param scope string: internal identifier for logging purposes.
 --- @param side "left" | "right": the side to toggle.
---- @return table: the state of the plugin.
 ---@private
 function N.toggleSide(scope, side)
     if not S.isActiveTabRegistered(S) then
         D.log(scope, "skipped because the current tab is not registered")
 
-        return S
+        return S.save(S)
     end
 
     _G.NoNeckPain.config = vim.tbl_deep_extend(
@@ -78,7 +77,7 @@ function N.toggleSide(scope, side)
         return N.disable(scope)
     end
 
-    return N.init(scope)
+    N.init(scope)
 end
 
 --- Creates side buffers and set the tab state, focuses the `curr` window if required.
@@ -86,7 +85,6 @@ end
 --- @param scope string: internal identifier for logging purposes.
 --- @param goToCurr boolean?: whether we should re-focus the `curr` window.
 --- @param skipIntegrations boolean?: whether we should skip the integrations logic.
---- @return table: the state of the plugin.
 ---@private
 function N.init(scope, goToCurr, skipIntegrations)
     if not S.isActiveTabRegistered(S) then
@@ -111,7 +109,7 @@ function N.init(scope, goToCurr, skipIntegrations)
         vim.fn.win_gotoid(S.getSideID(S, "curr"))
     end
 
-    return S
+    S.save(S)
 end
 
 --- Initializes the plugin, sets event listeners and internal state.
@@ -359,12 +357,10 @@ function N.enable(scope)
         desc = "Resize to apply on WinEnter/Closed of an integration",
     })
 
-    return S
+    S.save(S)
 end
 
 --- Disables the plugin for the given tab, clear highlight groups and autocmds, closes side buffers and resets the internal state.
---
---- @return table: the state of the plugin.
 ---@private
 function N.disable(scope)
     D.log(scope, "calling disable for tab %d", S.activeTab)
@@ -427,7 +423,7 @@ function N.disable(scope)
         S.init(S)
     end
 
-    return S
+    S.save(S)
 end
 
 return N
