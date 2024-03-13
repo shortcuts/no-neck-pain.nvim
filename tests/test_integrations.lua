@@ -324,7 +324,7 @@ T["TSPlayground"]["reduces `left` side if only active when integration is on `ri
         fileTypePattern = "tsplayground",
         id = 1003,
         open = "TSPlaygroundToggle",
-        width = 284,
+        width = 298,
     })
     Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,
