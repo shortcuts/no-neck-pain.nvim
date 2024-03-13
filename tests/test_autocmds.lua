@@ -1,12 +1,8 @@
-local helpers = dofile("tests/helpers.lua")
+local Helpers = dofile("tests/helpers.lua")
 
-local child = helpers.new_child_neovim()
-local eq = helpers.expect.equality
-local eq_state, eq_buf_width = helpers.expect.state_equality, helpers.expect.buf_width_equality
+local child = Helpers.new_child_neovim()
 
-local new_set = MiniTest.new_set
-
-local T = new_set({
+local T = MiniTest.new_set({
     hooks = {
         -- This will be executed before every (even nested) case
         pre_case = function()
@@ -18,7 +14,7 @@ local T = new_set({
     },
 })
 
-T["auto command"] = new_set()
+T["auto command"] = MiniTest.new_set()
 
 T["auto command"]["does not create side buffers window's width < options.width"] = function()
     child.lua([[
@@ -26,8 +22,8 @@ T["auto command"]["does not create side buffers window's width < options.width"]
         require('no-neck-pain').enable()
     ]])
 
-    eq(helpers.winsInTab(child), { 1000 })
-    eq_state(child, "tabs[1].wins.main", {
+    Helpers.expect.equality(Helpers.winsInTab(child), { 1000 })
+    Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,
     })
 end
@@ -39,41 +35,41 @@ T["auto command"]["does not shift when opening/closing float window"] = function
         require('no-neck-pain').enable()
     ]])
 
-    eq(helpers.winsInTab(child), { 1001, 1000, 1002 })
-    eq_state(child, "tabs[1].wins.main", {
+    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+    Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,
         left = 1001,
         right = 1002,
     })
 
-    eq_buf_width(child, "tabs[1].wins.main.left", 15)
-    eq_buf_width(child, "tabs[1].wins.main.right", 15)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 15)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.right", 15)
 
     child.lua("vim.api.nvim_open_win(0,true, {width=100,height=100,relative='cursor',row=0,col=0})")
 
-    eq(helpers.winsInTab(child), { 1001, 1000, 1002, 1003 })
-    eq_state(child, "tabs[1].wins.main", {
+    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002, 1003 })
+    Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,
         left = 1001,
         right = 1002,
     })
 
-    eq_buf_width(child, "tabs[1].wins.main.left", 15)
-    eq_buf_width(child, "tabs[1].wins.main.right", 15)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 15)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.right", 15)
 
     -- Close float window keeps the buffer here with the same width
     child.lua("vim.fn.win_gotoid(1003)")
     child.cmd("q")
 
-    eq(helpers.winsInTab(child), { 1001, 1000, 1002 })
-    eq_state(child, "tabs[1].wins.main", {
+    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+    Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,
         left = 1001,
         right = 1002,
     })
 
-    eq_buf_width(child, "tabs[1].wins.main.left", 15)
-    eq_buf_width(child, "tabs[1].wins.main.right", 15)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 15)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.right", 15)
 end
 
 return T

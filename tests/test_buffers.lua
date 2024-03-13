@@ -1,13 +1,7 @@
-local helpers = dofile("tests/helpers.lua")
+local Helpers = dofile("tests/helpers.lua")
 local Co = require("no-neck-pain.util.constants")
 
-local child = helpers.new_child_neovim()
-local eq, eq_config, eq_state, eq_buf_width =
-    helpers.expect.equality,
-    helpers.expect.config_equality,
-    helpers.expect.state_equality,
-    helpers.expect.buf_width_equality
-local eq_type_config = helpers.expect.config_type_equality
+local child = Helpers.new_child_neovim()
 
 local T = MiniTest.new_set({
     hooks = {
@@ -88,13 +82,13 @@ T["setup"]["overrides default values"] = function()
         },
     })]])
 
-    eq_type_config(child, "buffers", "table")
-    eq_type_config(child, "buffers.bo", "table")
-    eq_type_config(child, "buffers.wo", "table")
+    Helpers.expect.config_type(child, "buffers", "table")
+    Helpers.expect.config_type(child, "buffers.bo", "table")
+    Helpers.expect.config_type(child, "buffers.wo", "table")
 
-    eq_config(child, "buffers.setNames", true)
+    Helpers.expect.config(child, "buffers.setNames", true)
 
-    eq_config(child, "buffers.bo", {
+    Helpers.expect.config(child, "buffers.bo", {
         bufhidden = "",
         buflisted = true,
         buftype = "help",
@@ -102,7 +96,7 @@ T["setup"]["overrides default values"] = function()
         swapfile = true,
     })
 
-    eq_config(child, "buffers.wo", {
+    Helpers.expect.config(child, "buffers.wo", {
         colorcolumn = "90",
         cursorcolumn = true,
         cursorline = true,
@@ -115,7 +109,7 @@ T["setup"]["overrides default values"] = function()
     })
 
     for _, scope in pairs(Co.SIDES) do
-        eq_config(child, "buffers." .. scope .. ".bo", {
+        Helpers.expect.config(child, "buffers." .. scope .. ".bo", {
             bufhidden = "",
             buflisted = true,
             buftype = "help",
@@ -123,7 +117,7 @@ T["setup"]["overrides default values"] = function()
             swapfile = true,
         })
 
-        eq_config(child, "buffers." .. scope .. ".wo", {
+        Helpers.expect.config(child, "buffers." .. scope .. ".wo", {
             colorcolumn = "30",
             cursorcolumn = true,
             cursorline = true,
@@ -165,14 +159,14 @@ T["setup"]["`left` or `right` buffer options overrides `common` ones"] = functio
         },
     })]])
 
-    eq_config(child, "buffers.bo.filetype", "TEST")
-    eq_config(child, "buffers.wo.cursorline", false)
+    Helpers.expect.config(child, "buffers.bo.filetype", "TEST")
+    Helpers.expect.config(child, "buffers.wo.cursorline", false)
 
-    eq_config(child, "buffers.left.bo.filetype", "TEST-left")
-    eq_config(child, "buffers.right.bo.filetype", "TEST-right")
+    Helpers.expect.config(child, "buffers.left.bo.filetype", "TEST-left")
+    Helpers.expect.config(child, "buffers.right.bo.filetype", "TEST-right")
 
-    eq_config(child, "buffers.left.wo.cursorline", true)
-    eq_config(child, "buffers.right.wo.number", true)
+    Helpers.expect.config(child, "buffers.left.wo.cursorline", true)
+    Helpers.expect.config(child, "buffers.right.wo.number", true)
 end
 
 T["setup"]["`common` options spreads it to `left` and `right` buffers"] = function()
@@ -187,14 +181,14 @@ T["setup"]["`common` options spreads it to `left` and `right` buffers"] = functi
         },
     })]])
 
-    eq_config(child, "buffers.bo.filetype", "TEST")
-    eq_config(child, "buffers.wo.number", true)
+    Helpers.expect.config(child, "buffers.bo.filetype", "TEST")
+    Helpers.expect.config(child, "buffers.wo.number", true)
 
-    eq_config(child, "buffers.left.wo.number", true)
-    eq_config(child, "buffers.right.wo.number", true)
+    Helpers.expect.config(child, "buffers.left.wo.number", true)
+    Helpers.expect.config(child, "buffers.right.wo.number", true)
 
-    eq_config(child, "buffers.left.bo.filetype", "TEST")
-    eq_config(child, "buffers.right.bo.filetype", "TEST")
+    Helpers.expect.config(child, "buffers.left.bo.filetype", "TEST")
+    Helpers.expect.config(child, "buffers.right.bo.filetype", "TEST")
 end
 
 T["curr"] = MiniTest.new_set()
@@ -206,7 +200,7 @@ T["curr"]["have the default width"] = function()
     ]])
 
     -- need to know why the child isn't precise enough
-    eq_buf_width(child, "tabs[1].wins.main.curr", 80)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 80)
 end
 
 T["curr"]["have the width from the config"] = function()
@@ -216,7 +210,7 @@ T["curr"]["have the width from the config"] = function()
     ]])
 
     -- need to know why the child isn't precise enough
-    eq_buf_width(child, "tabs[1].wins.main.curr", 48)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 48)
 end
 
 T["curr"]["closing `curr` window without any other window quits Neovim"] = function()
@@ -225,13 +219,13 @@ T["curr"]["closing `curr` window without any other window quits Neovim"] = funct
         require('no-neck-pain').enable()
     ]])
 
-    eq(helpers.winsInTab(child), { 1001, 1000, 1002 })
-    eq_state(child, "tabs[1].wins.main.curr", 1000)
+    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+    Helpers.expect.state(child, "tabs[1].wins.main.curr", 1000)
 
     child.cmd("q")
 
     -- neovim is closed, so it errors
-    helpers.expect.error(function()
+    Helpers.expect.error(function()
         helpers.winsInTab(child)
     end)
 end
@@ -244,15 +238,15 @@ T["left/right"]["setNames doesn't throw when re-creating side buffers"] = functi
     -- enable
     child.cmd([[NoNeckPain]])
 
-    eq_buf_width(child, "tabs[1].wins.main.left", 15)
-    eq_buf_width(child, "tabs[1].wins.main.right", 15)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 15)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.right", 15)
 
     -- toggle
     child.cmd([[NoNeckPain]])
     child.cmd([[NoNeckPain]])
 
-    eq_buf_width(child, "tabs[1].wins.main.left", 15)
-    eq_buf_width(child, "tabs[1].wins.main.right", 15)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 15)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.right", 15)
 end
 
 T["left/right"]["have the same width"] = function()
@@ -261,8 +255,8 @@ T["left/right"]["have the same width"] = function()
         require('no-neck-pain').enable()
     ]])
 
-    eq_buf_width(child, "tabs[1].wins.main.left", 15)
-    eq_buf_width(child, "tabs[1].wins.main.right", 15)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 15)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.right", 15)
 end
 
 T["left/right"]["only creates a `left` buffer when `right.enabled` is `false`"] = function()
@@ -271,12 +265,12 @@ T["left/right"]["only creates a `left` buffer when `right.enabled` is `false`"] 
         require('no-neck-pain').enable()
     ]])
 
-    eq_state(child, "tabs[1].wins.main", {
+    Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,
         left = 1001,
     })
 
-    eq_buf_width(child, "tabs[1].wins.main.left", 15)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 15)
 end
 
 T["left/right"]["only creates a `right` buffer when `left.enabled` is `false`"] = function()
@@ -285,12 +279,12 @@ T["left/right"]["only creates a `right` buffer when `left.enabled` is `false`"] 
         require('no-neck-pain').enable()
     ]])
 
-    eq_state(child, "tabs[1].wins.main", {
+    Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,
         right = 1001,
     })
 
-    eq_buf_width(child, "tabs[1].wins.main.right", 15)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.right", 15)
 end
 
 T["left/right"]["closing the `left` buffer disables NNP"] = function()
@@ -299,8 +293,8 @@ T["left/right"]["closing the `left` buffer disables NNP"] = function()
         require('no-neck-pain').enable()
     ]])
 
-    eq(helpers.winsInTab(child), { 1001, 1000, 1002 })
-    eq_state(child, "tabs[1].wins.main", {
+    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+    Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,
         left = 1001,
         right = 1002,
@@ -309,7 +303,7 @@ T["left/right"]["closing the `left` buffer disables NNP"] = function()
     child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.tabs[1].wins.main.left)")
     child.cmd("q")
 
-    eq(helpers.winsInTab(child), { 1000 })
+    Helpers.expect.equality(Helpers.winsInTab(child), { 1000 })
 end
 
 T["left/right"]["closing the `right` buffer disables NNP"] = function()
@@ -318,8 +312,8 @@ T["left/right"]["closing the `right` buffer disables NNP"] = function()
         require('no-neck-pain').enable()
     ]])
 
-    eq(helpers.winsInTab(child), { 1001, 1000, 1002 })
-    eq_state(child, "tabs[1].wins.main", {
+    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+    Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,
         left = 1001,
         right = 1002,
@@ -328,7 +322,7 @@ T["left/right"]["closing the `right` buffer disables NNP"] = function()
     child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.tabs[1].wins.main.right)")
     child.cmd("q")
 
-    eq(helpers.winsInTab(child), { 1000 })
+    Helpers.expect.equality(Helpers.winsInTab(child), { 1000 })
 end
 
 return T

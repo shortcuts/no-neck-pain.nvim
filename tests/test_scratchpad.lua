@@ -1,7 +1,6 @@
-local helpers = dofile("tests/helpers.lua")
+local Helpers = dofile("tests/helpers.lua")
 
-local child = helpers.new_child_neovim()
-local eq, eq_config = helpers.expect.equality, helpers.expect.config_equality
+local child = Helpers.new_child_neovim()
 
 local T = MiniTest.new_set({
     hooks = {
@@ -27,19 +26,19 @@ T["setup"]["overrides default values"] = function()
         },
     })]])
 
-    eq_config(child, "buffers.scratchPad", {
+    Helpers.expect.config(child, "buffers.scratchPad", {
         enabled = true,
         fileName = "no-neck-pain",
         location = "~/Documents",
     })
 
-    eq_config(child, "buffers.left.scratchPad", {
+    Helpers.expect.config(child, "buffers.left.scratchPad", {
         enabled = true,
         fileName = "no-neck-pain",
         location = "~/Documents",
     })
 
-    eq_config(child, "buffers.right.scratchPad", {
+    Helpers.expect.config(child, "buffers.right.scratchPad", {
         enabled = true,
         fileName = "no-neck-pain",
         location = "~/Documents",
@@ -59,20 +58,26 @@ T["scratchPad"]["default to `norg` fileType"] = function()
     })]])
     child.lua([[require('no-neck-pain').enable()]])
 
-    eq(helpers.winsInTab(child), { 1001, 1000, 1002 })
+    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
 
     local cwd = child.lua_get("vim.fn.getcwd()")
     local left = cwd .. "/no-neck-pain-left.norg"
     local right = cwd .. "/no-neck-pain-right.norg"
 
-    eq(child.lua_get("vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(1001))"), left)
-    eq(
+    Helpers.expect.equality(
+        child.lua_get("vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(1001))"),
+        left
+    )
+    Helpers.expect.equality(
         child.lua_get("vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(1001), 'buflisted')"),
         false
     )
 
-    eq(child.lua_get("vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(1002))"), right)
-    eq(
+    Helpers.expect.equality(
+        child.lua_get("vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(1002))"),
+        right
+    )
+    Helpers.expect.equality(
         child.lua_get("vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(1002), 'buflisted')"),
         false
     )
@@ -99,20 +104,26 @@ T["scratchPad"]["override of filetype is reflected to the buffer"] = function()
     })]])
     child.lua([[require('no-neck-pain').enable()]])
 
-    eq(helpers.winsInTab(child), { 1001, 1000, 1002 })
+    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
 
     local cwd = child.lua_get("vim.fn.getcwd()")
     local left = cwd .. "/no-neck-pain-left.md"
     local right = cwd .. "/no-neck-pain-right.txt"
 
-    eq(child.lua_get("vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(1001))"), left)
-    eq(
+    Helpers.expect.equality(
+        child.lua_get("vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(1001))"),
+        left
+    )
+    Helpers.expect.equality(
         child.lua_get("vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(1001), 'buflisted')"),
         false
     )
 
-    eq(child.lua_get("vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(1002))"), right)
-    eq(
+    Helpers.expect.equality(
+        child.lua_get("vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(1002))"),
+        right
+    )
+    Helpers.expect.equality(
         child.lua_get("vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(1002), 'buflisted')"),
         false
     )
@@ -137,20 +148,26 @@ T["scratchPad"]["side buffer can have their own definition"] = function()
     })]])
     child.lua([[require('no-neck-pain').enable()]])
 
-    eq(helpers.winsInTab(child), { 1001, 1000, 1002 })
+    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
 
     local cwd = child.lua_get("vim.fn.getcwd()")
     local left = cwd .. "/lua/no-neck-pain-left.norg"
     local right = cwd .. "/no-neck-pain-right.norg"
 
-    eq(child.lua_get("vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(1001))"), left)
-    eq(
+    Helpers.expect.equality(
+        child.lua_get("vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(1001))"),
+        left
+    )
+    Helpers.expect.equality(
         child.lua_get("vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(1001), 'buflisted')"),
         false
     )
 
-    eq(child.lua_get("vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(1002))"), right)
-    eq(
+    Helpers.expect.equality(
+        child.lua_get("vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(1002))"),
+        right
+    )
+    Helpers.expect.equality(
         child.lua_get("vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(1002), 'buflisted')"),
         false
     )
@@ -174,27 +191,33 @@ T["scratchPad"]["side buffer definition overrides global one"] = function()
     })]])
     child.lua([[require('no-neck-pain').enable()]])
 
-    eq(helpers.winsInTab(child), { 1001, 1000, 1002 })
+    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
 
     local cwd = child.lua_get("vim.fn.getcwd()")
     local left = cwd .. "/lua/no-neck-pain-left.norg"
     local right = cwd .. "/doc/no-neck-pain-right.norg"
 
-    eq(child.lua_get("vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(1001))"), left)
-    eq(
+    Helpers.expect.equality(
+        child.lua_get("vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(1001))"),
+        left
+    )
+    Helpers.expect.equality(
         child.lua_get("vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(1001), 'buflisted')"),
         false
     )
 
-    eq(child.lua_get("vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(1002))"), right)
-    eq(
+    Helpers.expect.equality(
+        child.lua_get("vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(1002))"),
+        right
+    )
+    Helpers.expect.equality(
         child.lua_get("vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(1002), 'buflisted')"),
         false
     )
 end
 
 T["scratchPad"]["throws with invalid location"] = function()
-    helpers.expect.error(function()
+    Helpers.expect.error(function()
         child.lua(
             [[require('no-neck-pain').setup({buffers = { scratchPad = { enabled = true, location = 10 }}})]]
         )
@@ -216,13 +239,13 @@ T["scratchPad"]["forwards the given filetype to the scratchpad"] = function()
     })]])
     child.lua([[require('no-neck-pain').enable()]])
 
-    eq(helpers.winsInTab(child), { 1001, 1000, 1002 })
+    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
 
     child.lua("vim.fn.win_gotoid(1001)")
-    eq(child.lua_get("vim.api.nvim_buf_get_option(0, 'filetype')"), "custom")
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_buf_get_option(0, 'filetype')"), "custom")
 
     child.lua("vim.fn.win_gotoid(1002)")
-    eq(child.lua_get("vim.api.nvim_buf_get_option(0, 'filetype')"), "custom")
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_buf_get_option(0, 'filetype')"), "custom")
 end
 
 return T

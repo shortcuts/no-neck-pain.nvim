@@ -4,6 +4,15 @@ local Helpers = {}
 -- Add extra expectations
 Helpers.expect = vim.deepcopy(MiniTest.expect)
 
+function Helpers.enablePlugin(child)
+    child.lua([[ require('no-neck-pain').enable() ]])
+    Helpers.wait()
+end
+
+function Helpers.wait()
+    vim.loop.sleep(5)
+end
+
 function Helpers.currentWin(child)
     return child.lua_get("vim.api.nvim_get_current_win()")
 end
@@ -22,7 +31,7 @@ local function errorMessage(str, pattern)
     return string.format("Pattern: %s\nObserved string: %s", vim.inspect(pattern), str)
 end
 
-Helpers.expect.buf_width_equality = MiniTest.new_expectation(
+Helpers.expect.buf_width = MiniTest.new_expectation(
     "variable in child process matches",
     function(child, field, value)
         return Helpers.expect.equality(
@@ -33,7 +42,7 @@ Helpers.expect.buf_width_equality = MiniTest.new_expectation(
     errorMessage
 )
 
-Helpers.expect.global_equality = MiniTest.new_expectation(
+Helpers.expect.global = MiniTest.new_expectation(
     "variable in child process matches",
     function(child, field, value)
         return Helpers.expect.equality(child.lua_get(field), value)
@@ -41,50 +50,38 @@ Helpers.expect.global_equality = MiniTest.new_expectation(
     errorMessage
 )
 
-Helpers.expect.global_type_equality = MiniTest.new_expectation(
+Helpers.expect.global_type = MiniTest.new_expectation(
     "variable type in child process matches",
     function(child, field, value)
-        return Helpers.expect.global_equality(child, "type(" .. field .. ")", value)
+        return Helpers.expect.global(child, "type(" .. field .. ")", value)
     end,
     errorMessage
 )
 
-Helpers.expect.config_equality = MiniTest.new_expectation(
+Helpers.expect.config = MiniTest.new_expectation(
     "config option matches",
     function(child, field, value)
-        return Helpers.expect.global_equality(child, "_G.NoNeckPain.config." .. field, value)
+        return Helpers.expect.global(child, "_G.NoNeckPain.config." .. field, value)
     end,
     errorMessage
 )
 
-Helpers.expect.config_type_equality = MiniTest.new_expectation(
+Helpers.expect.config_type = MiniTest.new_expectation(
     "config option type matches",
     function(child, field, value)
-        return Helpers.expect.global_equality(
-            child,
-            "type(_G.NoNeckPain.config." .. field .. ")",
-            value
-        )
+        return Helpers.expect.global(child, "type(_G.NoNeckPain.config." .. field .. ")", value)
     end,
     errorMessage
 )
 
-Helpers.expect.state_equality = MiniTest.new_expectation(
-    "state matches",
-    function(child, field, value)
-        return Helpers.expect.global_equality(child, "_G.NoNeckPain.state." .. field, value)
-    end,
-    errorMessage
-)
+Helpers.expect.state = MiniTest.new_expectation("state matches", function(child, field, value)
+    return Helpers.expect.global(child, "_G.NoNeckPain.state." .. field, value)
+end, errorMessage)
 
-Helpers.expect.state_type_equality = MiniTest.new_expectation(
+Helpers.expect.state_type = MiniTest.new_expectation(
     "state type matches",
     function(child, field, value)
-        return Helpers.expect.global_equality(
-            child,
-            "type(_G.NoNeckPain.state." .. field .. ")",
-            value
-        )
+        return Helpers.expect.global(child, "type(_G.NoNeckPain.state." .. field .. ")", value)
     end,
     errorMessage
 )
