@@ -117,7 +117,7 @@ end
 ---@private
 function N.enable(scope)
     if E.skipEnable() then
-        return nil
+        return
     end
 
     D.log(scope, "calling enable for tab %d", A.getCurrentTab())

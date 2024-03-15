@@ -1,14 +1,14 @@
 local M = require("no-neck-pain.main")
 local D = require("no-neck-pain.util.debug")
 local A = require("no-neck-pain.util.api")
-local cfg = require("no-neck-pain.config")
+local C = require("no-neck-pain.config")
 
 local NoNeckPain = {}
 
 --- Toggle the plugin by calling the `enable`/`disable` methods respectively.
 function NoNeckPain.toggle()
     if _G.NoNeckPain.config == nil then
-        _G.NoNeckPain.config = cfg.options
+        _G.NoNeckPain.config = C.options
     end
 
     A.debounce("publicAPI_toggle", M.toggle)
@@ -21,7 +21,7 @@ function NoNeckPain.toggleScratchPad()
     end
 
     if _G.NoNeckPain.config == nil then
-        _G.NoNeckPain.config = cfg.options
+        _G.NoNeckPain.config = C.options
     end
 
     A.debounce("publicAPI_toggleScratchPad", M.toggleScratchPad)
@@ -66,7 +66,7 @@ end
 --- Initializes the plugin, sets event listeners and internal state.
 function NoNeckPain.enable()
     if _G.NoNeckPain.config == nil then
-        _G.NoNeckPain.config = cfg.options
+        _G.NoNeckPain.config = C.options
     end
 
     A.debounce("publicAPI_enable", M.enable, 10)
@@ -79,7 +79,7 @@ end
 
 -- setup NoNeckPain options and merge them with user provided ones.
 function NoNeckPain.setup(opts)
-    _G.NoNeckPain.config = cfg.setup(opts)
+    _G.NoNeckPain.config = C.setup(opts)
 
     if
         _G.NoNeckPain.config.autocmds.enableOnVimEnter
@@ -98,7 +98,7 @@ function NoNeckPain.setup(opts)
                         return
                     end
 
-                    _G.NoNeckPain.config = cfg.defaults(opts)
+                    _G.NoNeckPain.config = C.defaults(opts)
                     A.debounce("ColorScheme", M.init)
                 end)
             end,

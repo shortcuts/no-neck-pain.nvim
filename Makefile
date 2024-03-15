@@ -11,15 +11,11 @@ test:
 
 test-nightly:
 	bob use nightly
-	~/.local/share/bob/nvim-bin/nvim --version | head -n 1 && echo ''
-	~/.local/share/bob/nvim-bin/nvim --headless --noplugin -u ./scripts/minimal_init.lua \
-		-c "lua MiniTest.run({ execute = { reporter = MiniTest.gen_reporter.stdout({ group_depth = 2 }) } })"
+	make test
 
 test-0.8.3:
 	bob use 0.8.3
-	~/.local/share/bob/nvim-bin/nvim --version | head -n 1 && echo ''
-	~/.local/share/bob/nvim-bin/nvim --headless --noplugin -u ./scripts/minimal_init.lua \
-		-c "lua MiniTest.run({ execute = { reporter = MiniTest.gen_reporter.stdout({ group_depth = 2 }) } })"
+	make test
 
 $(addprefix test-, $(TESTFILES)): test-%:
 	nvim --version | head -n 1 && echo ''
