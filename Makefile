@@ -47,7 +47,9 @@ documentation-ci: deps documentation
 lint:
 	stylua . -g '*.lua' -g '!deps/' -g '!nightly/'
 
-luals: deps
+luals-ci:
 	rm -rf deps/lua-ls/log
 	lua-language-server --configpath .luarc.json --logpath deps/lua-ls/log --check .
 	[ -f deps/lua-ls/log/check.json ] && { cat deps/lua-ls/log/check.json 2>/dev/null; exit 1; } || true
+
+luals: deps luals-ci
