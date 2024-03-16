@@ -64,16 +64,16 @@ jobs:
           path: _neovim
           key: ${{ runner.os }}-x64-${{ hashFiles('todays-date') }}
 
-      - name: Restore cache for lua LS
+      - name: restore luals cache
         uses: actions/cache@v4
         id: cache
         with:
           path: .ci/lua-ls
           key: 3.7.4
 
-      - name: Prepare
+      - name: setup luals
         if: ${{ steps.cache.outputs.cache-hit != 'true' }}
-        run: make depsluals
+        run: mkdir -p .ci/lua-ls && curl -sL "https://github.com/LuaLS/lua-language-server/releases/download/3.7.4/lua-language-server-3.7.4-linux-x64.tar.gz" | tar xzf - -C "${PWD}/.ci/lua-ls"
 
       - name: setup neovim
         uses: rhysd/action-setup-vim@v1
@@ -81,7 +81,7 @@ jobs:
           neovim: true
           version: ${{ matrix.neovim_version }}
 
-      - name: Run check
+      - name: run luals
         run: |
           export PATH="${PWD}/.ci/lua-ls/bin:${PATH}"
           nvim --version
