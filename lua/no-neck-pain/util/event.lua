@@ -53,7 +53,7 @@ function E.skipEnable()
     end
 
     local isSupportedIntegration = S.isSupportedIntegration(S, "E.skipEnable", nil)
-    if isSupportedIntegration or vim.bo.filetype == "dashboard" then
+    if isSupportedIntegration or vim.bo.filetype == "dashboard" or vim.bo.filetype == "alpha" then
         return true
     end
 
