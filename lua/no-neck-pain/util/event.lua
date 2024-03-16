@@ -1,4 +1,5 @@
 local A = require("no-neck-pain.util.api")
+local Co = require("no-neck-pain.util.constants")
 local S = require("no-neck-pain.state")
 
 local E = {}
@@ -52,12 +53,12 @@ function E.skipEnable()
         return true
     end
 
-    local isSupportedIntegration = S.isSupportedIntegration(S, "E.skipEnable", nil)
-    if isSupportedIntegration or vim.bo.filetype == "dashboard" or vim.bo.filetype == "alpha" then
+    -- dashboards delays the plugin enable step until next buffer entered
+    if vim.tbl_contains(Co.DASHBOARDS, vim.bo.filetype) then
         return true
     end
 
-    return false
+    return S.isSupportedIntegration(S, "E.skipEnable", nil)
 end
 
 return E

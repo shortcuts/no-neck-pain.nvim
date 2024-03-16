@@ -66,8 +66,8 @@ function C.matchAndBlend(colorCode, factor)
         )
     end
 
-    if Co.INTEGRATIONS[colorCode] ~= nil then
-        colorCode = Co.INTEGRATIONS[colorCode]
+    if Co.THEMES[colorCode] ~= nil then
+        colorCode = Co.THEMES[colorCode]
     end
 
     local hexPattern = "^#" .. "[abcdef0-9]" .. ("[abcdef0-9]"):rep(5) .. "$"
