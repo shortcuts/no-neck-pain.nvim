@@ -22,15 +22,19 @@ $(addprefix test-, $(TESTFILES)): test-%:
 	nvim --headless --noplugin -u ./scripts/minimal_init.lua \
 		-c "lua MiniTest.run_file('tests/test_$*.lua', { execute = { reporter = MiniTest.gen_reporter.stdout({ group_depth = 2 }) } })"
 
-deps:
+depsluals:
 	@mkdir -p deps
+	git clone --depth 1 https://github.com/nvim-lua/plenary.nvim deps/plenary
+	git clone --depth 1 https://github.com/folke/neodev.nvim deps/neodev.nvim
+
+deps:
+	make depsluals
 	git clone --depth 1 https://github.com/echasnovski/mini.nvim deps/mini.nvim
 	git clone --depth 1 https://github.com/nvim-treesitter/nvim-treesitter deps/nvim-treesitter
 	git clone --depth 1 https://github.com/nvim-treesitter/playground deps/playground
 	git clone --depth 1 https://github.com/nvim-neotest/neotest deps/neotest
 	git clone --depth 1 https://github.com/nvim-tree/nvim-tree.lua deps/nvimtree
 	git clone --depth 1 https://github.com/nvim-neo-tree/neo-tree.nvim deps/neo-tree
-	git clone --depth 1 https://github.com/nvim-lua/plenary.nvim deps/plenary
 	git clone --depth 1 https://github.com/nvim-tree/nvim-web-devicons deps/nvim-web-devicons
 	git clone --depth 1 https://github.com/MunifTanjim/nui.nvim deps/nui
 	git clone --depth 1 https://github.com/antoinemadec/FixCursorHold.nvim deps/fixcursorhold
@@ -47,3 +51,8 @@ documentation-ci: deps documentation
 
 lint:
 	stylua . -g '*.lua' -g '!deps/' -g '!nightly/'
+
+luals: deps
+	rm -rf .ci/lua-language-server-log
+	lua-language-server --configpath .luarc.json --logpath .ci/lua-language-server-log --check .
+	[ -f .ci/lua-language-server-log/check.json ] && { cat .ci/lua-language-server-log/check.json 2>/dev/null; exit 1; } || true

@@ -64,11 +64,28 @@ jobs:
           path: _neovim
           key: ${{ runner.os }}-x64-${{ hashFiles('todays-date') }}
 
+      - name: Restore cache for lua LS
+        uses: actions/cache@v4
+        id: cache
+        with:
+          path: .ci/lua-ls
+          key: 3.7.4
+
+      - name: Prepare
+        if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+        run: make depsluals
+
       - name: setup neovim
         uses: rhysd/action-setup-vim@v1
         with:
           neovim: true
           version: ${{ matrix.neovim_version }}
+
+      - name: Run check
+        run: |
+          export PATH="${PWD}/.ci/lua-ls/bin:${PATH}"
+          nvim --version
+          make luals
 
       - name: run tests
         run: make test-ci
