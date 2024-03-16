@@ -220,7 +220,7 @@ T["curr"]["closing `curr` window without any other window quits Neovim"] = funct
 
     -- neovim is closed, so it errors
     Helpers.expect.error(function()
-        helpers.winsInTab(child)
+        Helpers.winsInTab(child)
     end)
 end
 
