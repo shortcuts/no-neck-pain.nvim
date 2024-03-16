@@ -6,6 +6,9 @@ on:
   pull_request:
     types: [opened, synchronize]
 
+env:
+  LUA_LS_VERSION: 3.7.4
+
 concurrency:
   group: github.head_ref
   cancel-in-progress: true
@@ -64,11 +67,28 @@ jobs:
           path: _neovim
           key: ${{ runner.os }}-x64-${{ hashFiles('todays-date') }}
 
+      - name: restore luals cache
+        uses: actions/cache@v4
+        id: cache
+        with:
+          path: .ci/lua-ls
+          key: ${{ env.LUA_LS_VERSION }}
+
+      - name: setup luals
+        if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+        run: mkdir -p .ci/lua-ls && curl -sL "https://github.com/LuaLS/lua-language-server/releases/download/${{ env.LUA_LS_VERSION }}/lua-language-server-${{ env.LUA_LS_VERSION }}-linux-x64.tar.gz" | tar xzf - -C "${PWD}/.ci/lua-ls"
+
       - name: setup neovim
         uses: rhysd/action-setup-vim@v1
         with:
           neovim: true
           version: ${{ matrix.neovim_version }}
+
+      - name: run luals
+        run: |
+          export PATH="${PWD}/.ci/lua-ls/bin:${PATH}"
+          nvim --version
+          make luals-ci
 
       - name: run tests
         run: make test-ci
