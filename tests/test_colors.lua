@@ -224,7 +224,7 @@ end
 T["color"] = MiniTest.new_set()
 
 T["color"]["map integration name to a value"] = function()
-    for integration, value in pairs(Co.INTEGRATIONS) do
+    for integration, value in pairs(Co.THEMES) do
         child.lua(string.format(
             [[ require('no-neck-pain').setup({
                 buffers = {

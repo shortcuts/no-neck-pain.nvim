@@ -1,14 +1,14 @@
-local C = {}
+local Co = {}
 
 ---Sides where the buffers are created.
 ---
 ---@private
-C.SIDES = { "left", "right" }
+Co.SIDES = { "left", "right" }
 
 ---Available color integrations aliases.
 ---
 ---@private
-C.INTEGRATIONS = {
+Co.THEMES = {
     ["catppuccin-frappe"] = "#303446",
     ["catppuccin-frappe-dark"] = "#292c3c",
     ["catppuccin-latte"] = "#eff1f5",
@@ -33,7 +33,10 @@ C.INTEGRATIONS = {
     ["tokyonight-storm"] = "#1f2335",
 }
 
-C.integrations = {
+---Supported integrations in order to properly interact with the buffers.
+---
+---@private
+Co.INTEGRATIONS = {
     NvimTree = {
         fileTypePattern = "nvimtree",
         close = "NvimTreeClose",
@@ -66,4 +69,9 @@ C.integrations = {
     },
 }
 
-return C
+---Dashboards filetypes that delays the plugin enable step until next buffer entered.
+---
+---@private
+Co.DASHBOARDS = { "dashboard", "alpha" }
+
+return Co

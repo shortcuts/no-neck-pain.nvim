@@ -236,7 +236,7 @@ T["enable"]["(single tab) sets state"] = function()
 
     Helpers.expect.state_type(child, "tabs[1].wins.integrations", "table")
 
-    Helpers.expect.state(child, "tabs[1].wins.integrations", Co.integrations)
+    Helpers.expect.state(child, "tabs[1].wins.integrations", Co.INTEGRATIONS)
 end
 
 T["enable"]["(multiple tab) sets state"] = function()
@@ -264,7 +264,7 @@ T["enable"]["(multiple tab) sets state"] = function()
 
     Helpers.expect.state_type(child, "tabs[1].wins.integrations", "table")
 
-    Helpers.expect.state(child, "tabs[1].wins.integrations", Co.integrations)
+    Helpers.expect.state(child, "tabs[1].wins.integrations", Co.INTEGRATIONS)
 
     -- tab 2
     child.cmd("tabnew")
@@ -288,7 +288,7 @@ T["enable"]["(multiple tab) sets state"] = function()
 
     Helpers.expect.state_type(child, "tabs[2].wins.integrations", "table")
 
-    Helpers.expect.state(child, "tabs[2].wins.integrations", Co.integrations)
+    Helpers.expect.state(child, "tabs[2].wins.integrations", Co.INTEGRATIONS)
 end
 
 T["disable"] = MiniTest.new_set()

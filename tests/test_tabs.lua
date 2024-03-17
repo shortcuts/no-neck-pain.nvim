@@ -191,7 +191,7 @@ T["tabnew/tabclose"]["doesn't keep closed tabs in state"] = function()
             },
             scratchPadEnabled = false,
             wins = {
-                integrations = Co.integrations,
+                integrations = Co.INTEGRATIONS,
                 main = {
                     curr = 1000,
                     left = 1001,
@@ -212,7 +212,7 @@ T["tabnew/tabclose"]["doesn't keep closed tabs in state"] = function()
             },
             scratchPadEnabled = false,
             wins = {
-                integrations = Co.integrations,
+                integrations = Co.INTEGRATIONS,
                 main = {
                     curr = 1000,
                     left = 1001,
@@ -228,7 +228,7 @@ T["tabnew/tabclose"]["doesn't keep closed tabs in state"] = function()
             },
             scratchPadEnabled = false,
             wins = {
-                integrations = Co.integrations,
+                integrations = Co.INTEGRATIONS,
                 main = {
                     curr = 1003,
                     left = 1004,
@@ -248,7 +248,7 @@ T["tabnew/tabclose"]["doesn't keep closed tabs in state"] = function()
             },
             scratchPadEnabled = false,
             wins = {
-                integrations = Co.integrations,
+                integrations = Co.INTEGRATIONS,
                 main = {
                     curr = 1000,
                     left = 1001,
@@ -275,7 +275,7 @@ T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
             },
             scratchPadEnabled = false,
             wins = {
-                integrations = Co.integrations,
+                integrations = Co.INTEGRATIONS,
                 main = {
                     curr = 1000,
                     left = 1001,
@@ -299,7 +299,7 @@ T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
             },
             scratchPadEnabled = false,
             wins = {
-                integrations = Co.integrations,
+                integrations = Co.INTEGRATIONS,
                 main = {
                     curr = 1000,
                     left = 1001,
@@ -315,7 +315,7 @@ T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
             },
             scratchPadEnabled = false,
             wins = {
-                integrations = Co.integrations,
+                integrations = Co.INTEGRATIONS,
                 main = {
                     curr = 1003,
                     left = 1004,
@@ -335,7 +335,7 @@ T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
             },
             scratchPadEnabled = false,
             wins = {
-                integrations = Co.integrations,
+                integrations = Co.INTEGRATIONS,
                 main = {
                     curr = 1000,
                     left = 1001,
@@ -355,7 +355,7 @@ T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
             },
             scratchPadEnabled = false,
             wins = {
-                integrations = Co.integrations,
+                integrations = Co.INTEGRATIONS,
                 main = {
                     curr = 1000,
                     left = 1001,
@@ -371,7 +371,7 @@ T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
             },
             scratchPadEnabled = false,
             wins = {
-                integrations = Co.integrations,
+                integrations = Co.INTEGRATIONS,
                 main = {
                     curr = 1003,
                     left = 1006,
@@ -392,7 +392,7 @@ T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
             },
             scratchPadEnabled = false,
             wins = {
-                integrations = Co.integrations,
+                integrations = Co.INTEGRATIONS,
                 main = {
                     curr = 1000,
                     left = 1001,
@@ -408,7 +408,7 @@ T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
             },
             scratchPadEnabled = false,
             wins = {
-                integrations = Co.integrations,
+                integrations = Co.INTEGRATIONS,
                 main = {
                     curr = 1003,
                     left = 1006,
@@ -449,7 +449,7 @@ T["tabnew/tabclose"]["does not pick tab 1 for the first active tab"] = function(
         },
         scratchPadEnabled = false,
         wins = {
-            integrations = Co.integrations,
+            integrations = Co.INTEGRATIONS,
             main = {
                 curr = 1001,
                 left = 1002,
@@ -521,7 +521,7 @@ T["tabnew/tabclose"]["does not pick tab 1 for the first active tab"] = function(
         },
         scratchPadEnabled = false,
         wins = {
-            integrations = Co.integrations,
+            integrations = Co.INTEGRATIONS,
             main = {
                 curr = 1001,
                 left = 1002,
@@ -558,7 +558,7 @@ T["tabnew/tabclose"]["keep state synchronized on second tab"] = function()
         },
         scratchPadEnabled = false,
         wins = {
-            integrations = Co.integrations,
+            integrations = Co.INTEGRATIONS,
             main = {
                 curr = 1001,
                 left = 1002,
@@ -588,7 +588,7 @@ T["tabnew/tabclose"]["keep state synchronized on second tab"] = function()
         },
         scratchPadEnabled = false,
         wins = {
-            integrations = Co.integrations,
+            integrations = Co.INTEGRATIONS,
             main = {
                 curr = 1001,
                 left = 1002,

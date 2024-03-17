@@ -1,5 +1,5 @@
 local A = require("no-neck-pain.util.api")
-local C = require("no-neck-pain.util.constants")
+local Co = require("no-neck-pain.util.constants")
 local D = require("no-neck-pain.util.debug")
 
 local State = { enabled = false, activeTab = A.getCurrentTab(), tabs = nil }
@@ -194,7 +194,7 @@ function State:isSupportedIntegration(scope, win)
         return self.isSupportedIntegration(self, scope, wins[1])
     end
 
-    local registeredIntegrations = tab ~= nil and tab.wins.integrations or C.integrations
+    local registeredIntegrations = tab ~= nil and tab.wins.integrations or Co.INTEGRATIONS
 
     for name, integration in pairs(registeredIntegrations) do
         if vim.startswith(string.lower(fileType), integration.fileTypePattern) then
@@ -218,7 +218,7 @@ end
 ---@private
 function State:scanIntegrations(scope)
     local wins = self.getUnregisteredWins(self)
-    local unregisteredIntegrations = vim.deepcopy(C.integrations)
+    local unregisteredIntegrations = vim.deepcopy(Co.INTEGRATIONS)
 
     for _, win in pairs(wins) do
         local supported, name, integration = self.isSupportedIntegration(self, scope, win)
@@ -493,7 +493,7 @@ function State:setTab(id)
                 right = nil,
             },
             splits = nil,
-            integrations = vim.deepcopy(C.integrations),
+            integrations = vim.deepcopy(Co.INTEGRATIONS),
         },
     }
     self.activeTab = id
