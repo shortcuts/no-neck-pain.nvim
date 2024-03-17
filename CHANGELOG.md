@@ -1,7 +1,6 @@
 <a name="0.2.3"></a>
 ## [1.9.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.8.3...v1.9.0) (2024-03-17)
 
-
 ### Features
 
 * **integrations:** support alpha.nvim ([#317](https://github.com/shortcuts/no-neck-pain.nvim/issues/317)) ([73b4e17](https://github.com/shortcuts/no-neck-pain.nvim/commit/73b4e17a7f052d879f1b0b8fafadcbc3b17f2396))
