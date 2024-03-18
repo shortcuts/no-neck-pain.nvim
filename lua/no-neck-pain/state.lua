@@ -67,13 +67,36 @@ end
 ---@return boolean: whether we closed something or not.
 ---@private
 function State:closeIntegration()
+    local wins = vim.api.nvim_list_wins()
     local hasClosedIntegration = false
 
-    for _, opts in pairs(self.tabs[self.activeTab].wins.integrations) do
+    for name, opts in pairs(self.tabs[self.activeTab].wins.integrations) do
         if opts.id ~= nil and opts.close ~= nil then
+            -- if this integration doesn't belong to any side we don't have to
+            -- close it to redraw side buffers
+            local side = _G.NoNeckPain.config.integrations[name].position
+            if side ~= "left" and side ~= "right" then
+                goto continue
+            end
+
+            -- first element in the current wins list means it's the far left one,
+            -- if the integration is already at this spot then we don't have to close anything
+            if side == "left" and wins[1] == self.tabs[self.activeTab].wins.main[side] then
+                goto continue
+            end
+
+            -- last element in the current wins list means it's the far right one,
+            -- if the integration is already at this spot then we don't have to close anything
+            if side == "right" and wins[#wins] == self.tabs[self.activeTab].wins.main[side] then
+                goto continue
+            end
+
+            D.log(string.format("closeIntegration:%s", name), "integration was opened")
+
             vim.cmd(opts.close)
             hasClosedIntegration = true
         end
+        ::continue::
     end
 
     return hasClosedIntegration
@@ -89,6 +112,8 @@ function State:reopenIntegration()
             and opts.open ~= nil
             and _G.NoNeckPain.config.integrations[name].reopen == true
         then
+            D.log(string.format("reopenIntegration:%s", name), "integration was closed previously")
+
             vim.cmd(opts.open)
         end
     end
