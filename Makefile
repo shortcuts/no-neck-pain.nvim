@@ -24,6 +24,7 @@ $(addprefix test-, $(TESTFILES)): test-%:
 		-c "lua MiniTest.run_file('tests/test_$*.lua', { execute = { reporter = MiniTest.gen_reporter.stdout({ group_depth = 2 }) } })"
 deps:
 	git clone --depth 1 https://github.com/nvim-lua/plenary.nvim deps/plenary
+	git clone --depth 1 https://github.com/nvim-neotest/nvim-nio deps/nvim-nio
 	git clone --depth 1 https://github.com/echasnovski/mini.nvim deps/mini.nvim
 	git clone --depth 1 https://github.com/nvim-treesitter/nvim-treesitter deps/nvim-treesitter
 	git clone --depth 1 https://github.com/nvim-treesitter/playground deps/playground

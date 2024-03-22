@@ -2,6 +2,7 @@ vim.cmd([[let &rtp.=','.getcwd()]])
 
 vim.cmd("set rtp+=deps/mini.nvim")
 vim.cmd("set rtp+=deps/plenary")
+vim.cmd("set rtp+=deps/nvim-nio")
 vim.cmd("set rtp+=deps/fixcursorhold")
 vim.cmd("set rtp+=deps/neotest")
 

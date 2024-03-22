@@ -24,7 +24,7 @@ function NoNeckPain.toggleScratchPad()
         _G.NoNeckPain.config = C.options
     end
 
-    A.debounce("publicAPI_toggleScratchPad", M.toggleScratchPad)
+    M.toggleScratchPad()
 end
 
 --- Sets the config `width` to the given `width` value and resizes the NoNeckPain windows.
@@ -45,9 +45,7 @@ function NoNeckPain.resize(width)
         _G.NoNeckPain.config = vim.tbl_deep_extend("keep", { width = width }, _G.NoNeckPain.config)
     end
 
-    A.debounce("publicAPI_resize", function(scope)
-        M.init(scope, false)
-    end)
+    M.init("publicAPI_resize", false)
 end
 
 --- Toggles the config `${side}.enabled` and re-inits the plugin.
@@ -99,7 +97,7 @@ function NoNeckPain.setup(opts)
                     end
 
                     _G.NoNeckPain.config = C.defaults(opts)
-                    A.debounce("ColorScheme", M.init)
+                    M.init("ColorScheme")
                 end)
             end,
             group = "NoNeckPainAutocmd",

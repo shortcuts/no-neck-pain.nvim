@@ -284,7 +284,7 @@ T["TSPlayground"]["keeps sides open"] = function()
         fileTypePattern = "tsplayground",
         id = 1004,
         open = "TSPlaygroundToggle",
-        width = 198,
+        width = 346,
     })
 
     Helpers.expect.state(child, "tabs[1].wins.main", {
