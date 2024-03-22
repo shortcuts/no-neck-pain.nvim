@@ -72,22 +72,29 @@ function State:closeIntegration()
 
     for name, opts in pairs(self.tabs[self.activeTab].wins.integrations) do
         if opts.id ~= nil and opts.close ~= nil then
+            local scope = string.format("closeIntegration:%s", name)
             -- if this integration doesn't belong to any side we don't have to
             -- close it to redraw side buffers
             local side = _G.NoNeckPain.config.integrations[name].position
             if side ~= "left" and side ~= "right" then
+                D.log(scope, "skipped because not a side integration")
+
                 goto continue
             end
 
             -- first element in the current wins list means it's the far left one,
             -- if the integration is already at this spot then we don't have to close anything
             if side == "left" and wins[1] == self.tabs[self.activeTab].wins.main[side] then
+                D.log(scope, "skipped because already at the far left side")
+
                 goto continue
             end
 
             -- last element in the current wins list means it's the far right one,
             -- if the integration is already at this spot then we don't have to close anything
             if side == "right" and wins[#wins] == self.tabs[self.activeTab].wins.main[side] then
+                D.log(scope, "skipped because already at the far right side")
+
                 goto continue
             end
 
