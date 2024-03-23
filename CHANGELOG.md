@@ -1,4 +1,12 @@
 <a name="0.2.3"></a>
+## [1.10.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.9.0...v1.10.0) (2024-03-23)
+
+
+### Features
+
+* **api:** add autocmd to skip entering side buffer ([#321](https://github.com/shortcuts/no-neck-pain.nvim/issues/321)) ([5539239](https://github.com/shortcuts/no-neck-pain.nvim/commit/55392392a1852ab21fd6e44084103ea2e476de96))
+* **integrations:** skip redraw on every calls ([#319](https://github.com/shortcuts/no-neck-pain.nvim/issues/319)) ([96afa97](https://github.com/shortcuts/no-neck-pain.nvim/commit/96afa978e39e45290c37a087bb40a1862dc2896f))
+
 ## [1.9.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.8.3...v1.9.0) (2024-03-17)
 
 ### Features
