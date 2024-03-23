@@ -188,31 +188,29 @@ function N.enable(scope)
     vim.api.nvim_create_autocmd({ "WinEnter" }, {
         callback = function(p)
             vim.schedule(function()
+                p.event = string.format("%s:split", p.event)
                 if not S.hasTabs(S) or E.skip(S.getTab(S)) then
-                    return D.log(p.event, "skip split logic")
+                    return D.log(p.event, "skip")
                 end
 
                 if S.checkSides(S, "and", false) then
-                    return D.log(p.event, "skip split logic: no side buffer")
+                    return D.log(p.event, "no side buffer")
                 end
 
                 if S.isSideTheActiveWin(S, "curr") then
-                    return D.log(p.event, "skip split logic: current win")
+                    return D.log(p.event, "current win")
                 end
 
                 -- an integration isn't considered as a split
                 local isSupportedIntegration = S.isSupportedIntegration(S, p.event, nil)
                 if isSupportedIntegration then
-                    return D.log(p.event, "skip split logic: integration")
+                    return D.log(p.event, "on an integration")
                 end
 
                 local wins = S.getUnregisteredWins(S)
 
                 if #wins ~= 1 then
-                    return D.log(
-                        p.event,
-                        "skip split logic: no new or too many unregistered windows"
-                    )
+                    return D.log( p.event, "no new or too many unregistered windows")
                 end
 
                 local focusedWin = wins[1]
@@ -331,28 +329,69 @@ function N.enable(scope)
     vim.api.nvim_create_autocmd({ "WinEnter", "WinClosed" }, {
         callback = function(p)
             vim.schedule(function()
+                local s = string.format("%s:integration", p.event)
                 if not S.hasTabs(S) or not S.isActiveTabRegistered(S) or E.skip(S.getTab(S)) then
-                    return D.log(p.event, "skip integrations logic")
+                    return D.log(s, "skip")
                 end
 
                 if S.wantsSides(S) and S.checkSides(S, "and", false) then
-                    return D.log(p.event, "skip integrations logic: no side buffer")
+                    return D.log(s, "no side buffer")
                 end
 
                 if p.event == "WinClosed" and not S.hasIntegrations(S) then
-                    return D.log(p.event, "skip integrations logic: no registered integration")
+                    return D.log(s, "no registered integration")
                 end
 
                 if p.event == "WinEnter" and #S.getUnregisteredWins(S) == 0 then
-                    return D.log(p.event, "skip integrations logic: no new windows")
+                    return D.log(s, "no new windows")
                 end
 
-                N.init(p.event, false, true)
+                N.init(s, false, true)
             end)
         end,
         group = augroupName,
         desc = "Resize to apply on WinEnter/Closed of an integration",
     })
+
+    if _G.NoNeckPain.config.autocmds.skipEnteringNoNeckPainBuffer then
+        vim.api.nvim_create_autocmd({ "WinEnter" }, {
+            callback = function(p)
+                vim.schedule(function()
+                    p.event = string.format("%s:skipEnteringNoNeckPainBuffer", p.event)
+                    if
+                        not S.hasTabs(S)
+                        or not S.isActiveTabRegistered(S)
+                        or E.skip()
+                    then
+                        return D.log(p.event, "skip")
+                    end
+
+                    local currentWin = vim.api.nvim_get_current_win()
+
+                    if
+                        currentWin ~= S.getSideID(S, "left")
+                        and currentWin ~= S.getSideID(S, "right")
+                    then
+                        return
+                    end
+
+                    local wins = vim.api.nvim_list_wins()
+
+                    for i = 1, #wins do
+                        if wins[i] ~= currentWin then
+                            goto continue
+                        end
+
+                        vim.fn.win_gotoid(wins[i == #wins and 1 or i + 1])
+
+                        ::continue::
+                    end
+                end)
+            end,
+            group = augroupName,
+            desc = "Entering a no-neck-pain side buffer skips to the next available buffer",
+        })
+    end
 
     S.save(S)
 end

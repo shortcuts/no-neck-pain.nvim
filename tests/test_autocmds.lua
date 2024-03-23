@@ -68,4 +68,46 @@ T["auto command"]["does not shift when opening/closing float window"] = function
     Helpers.expect.buf_width(child, "tabs[1].wins.main.right", 15)
 end
 
+T["skipEnteringNoNeckPainBuffer"] = MiniTest.new_set()
+
+T["skipEnteringNoNeckPainBuffer"]["goes to new valid buffer when entering side"] = function()
+    child.set_size(5, 200)
+    child.lua([[ require('no-neck-pain').setup({width=50, autocmds = { skipEnteringNoNeckPainBuffer = true }}) ]])
+    Helpers.toggle(child)
+
+    Helpers.expect.config(child, "autocmds.skipEnteringNoNeckPainBuffer", true)
+
+    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+    Helpers.expect.equality(child.api.nvim_get_current_win(), 1000)
+
+    child.fn.win_gotoid(1001)
+    Helpers.wait(child)
+    Helpers.expect.equality(child.api.nvim_get_current_win(), 1000)
+
+    child.fn.win_gotoid(1002)
+    Helpers.wait(child)
+    Helpers.expect.equality(child.api.nvim_get_current_win(), 1000)
+
+    child.cmd("split")
+
+    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1003, 1000, 1002 })
+    Helpers.expect.equality(child.api.nvim_get_current_win(), 1003)
+
+    child.fn.win_gotoid(1000)
+    Helpers.wait(child)
+    Helpers.expect.equality(child.api.nvim_get_current_win(), 1000)
+
+    child.fn.win_gotoid(1003)
+    Helpers.wait(child)
+    Helpers.expect.equality(child.api.nvim_get_current_win(), 1003)
+
+    child.fn.win_gotoid(1001)
+    Helpers.wait(child)
+    Helpers.expect.equality(child.api.nvim_get_current_win(), 1003)
+
+    child.fn.win_gotoid(1002)
+    Helpers.wait(child)
+    Helpers.expect.equality(child.api.nvim_get_current_win(), 1003)
+end
+
 return T
