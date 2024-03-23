@@ -153,6 +153,9 @@ require("no-neck-pain").setup({
         -- When `true`, reloads the plugin configuration after a colorscheme change.
         --- @type boolean
         reloadOnColorSchemeChange = false,
+        -- When `true`, entering one of no-neck-pain side buffer will automatically skip it and go to the next available buffer.
+        --- @type boolean
+        skipEnteringNoNeckPainBuffer = false,
     },
     -- Creates mappings for you to easily interact with the exposed commands.
     --- @type table

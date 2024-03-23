@@ -48,6 +48,7 @@ T["setup"]["sets exposed methods and default options value"] = function()
         enableOnVimEnter = false,
         enableOnTabEnter = false,
         reloadOnColorSchemeChange = false,
+        skipEnteringNoNeckPainBuffer = false,
     })
 
     Helpers.expect.config(child, "mappings", {
@@ -156,6 +157,7 @@ T["setup"]["overrides default values"] = function()
             enableOnVimEnter = true,
             enableOnTabEnter = true,
             reloadOnColorSchemeChange = true,
+            skipEnteringNoNeckPainBuffer = true,
         },
         debug = true,
         disableOnLastBuffer = true,
@@ -171,6 +173,7 @@ T["setup"]["overrides default values"] = function()
         enableOnVimEnter = true,
         enableOnTabEnter = true,
         reloadOnColorSchemeChange = true,
+        skipEnteringNoNeckPainBuffer = true,
     })
 end
 
