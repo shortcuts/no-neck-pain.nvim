@@ -210,7 +210,7 @@ function N.enable(scope)
                 local wins = S.getUnregisteredWins(S)
 
                 if #wins ~= 1 then
-                    return D.log( p.event, "no new or too many unregistered windows")
+                    return D.log(p.event, "no new or too many unregistered windows")
                 end
 
                 local focusedWin = wins[1]
@@ -230,12 +230,13 @@ function N.enable(scope)
     vim.api.nvim_create_autocmd({ "QuitPre", "BufDelete" }, {
         callback = function(p)
             vim.schedule(function()
+                local s = string.format("%s:quit", p.event)
                 if E.skip(nil) or not S.isActiveTabRegistered(S) then
                     return
                 end
 
                 if S.hasSplits(S) then
-                    return D.log(p.event, "skip quit logic: splits still active")
+                    return D.log(s, "splits still active")
                 end
 
                 if
@@ -248,13 +249,13 @@ function N.enable(scope)
                         and not S.isSideWinValid(S, "curr")
                     )
                 then
-                    D.log(p.event, "one of the NNP side has been closed, disabling...")
+                    D.log(s, "one of the NNP side has been closed, disabling...")
 
                     return N.disable(p.event)
                 end
 
                 if S.isSideWinValid(S, "curr") then
-                    D.log(p.event, "curr is still valid, skipping")
+                    D.log(s, "curr is still valid, skipping")
 
                     return
                 end
@@ -262,15 +263,15 @@ function N.enable(scope)
                 -- if we still have a side valid but curr has been deleted (mostly because of a :bd),
                 -- we will fallback to the first valid side
                 if p.event == "QuitPre" then
-                    D.log(p.event, "one of the NNP side has been closed, disabling...")
+                    D.log(s, "one of the NNP side has been closed, disabling...")
 
                     return N.disable(p.event)
                 end
 
-                D.log(p.event, "`curr` has been deleted, resetting state")
+                D.log(s, "`curr` has been deleted, resetting state")
 
-                N.disable(string.format("%s:reset", p.event))
-                N.enable(string.format("%s:reset", p.event))
+                N.disable(string.format("%s:reset", s))
+                N.enable(string.format("%s:reset", s))
             end)
         end,
         group = augroupName,
@@ -353,38 +354,43 @@ function N.enable(scope)
         desc = "Resize to apply on WinEnter/Closed of an integration",
     })
 
-    if _G.NoNeckPain.config.autocmds.skipEnteringNoNeckPainBuffer then
-        vim.api.nvim_create_autocmd({ "WinEnter" }, {
+    if
+        _G.NoNeckPain.config.autocmds.skipEnteringNoNeckPainBuffer and not S.hasScratchPadEnabled(S)
+    then
+        vim.api.nvim_create_autocmd({ "WinLeave" }, {
             callback = function(p)
                 vim.schedule(function()
                     p.event = string.format("%s:skipEnteringNoNeckPainBuffer", p.event)
-                    if
-                        not S.hasTabs(S)
-                        or not S.isActiveTabRegistered(S)
-                        or E.skip()
-                    then
+                    if not S.hasTabs(S) or not S.isActiveTabRegistered(S) or E.skip() then
                         return D.log(p.event, "skip")
                     end
 
                     local currentWin = vim.api.nvim_get_current_win()
+                    local leftID = S.getSideID(S, "left")
+                    local rightID = S.getSideID(S, "right")
 
-                    if
-                        currentWin ~= S.getSideID(S, "left")
-                        and currentWin ~= S.getSideID(S, "right")
-                    then
+                    if currentWin ~= leftID and currentWin ~= rightID then
                         return
                     end
 
                     local wins = vim.api.nvim_list_wins()
 
                     for i = 1, #wins do
-                        if wins[i] ~= currentWin then
-                            goto continue
+                        local id = i == #wins and 1 or i + 1
+                        if
+                            wins[id] ~= currentWin
+                            and wins[id] ~= leftID
+                            and wins[id] ~= rightID
+                        then
+                            vim.fn.win_gotoid(wins[id])
+
+                            return D.log(
+                                p.event,
+                                "rerouted focus of %d to %d",
+                                currentWin,
+                                wins[id]
+                            )
                         end
-
-                        vim.fn.win_gotoid(wins[i == #wins and 1 or i + 1])
-
-                        ::continue::
                     end
                 end)
             end,

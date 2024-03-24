@@ -502,6 +502,17 @@ function State:getScratchpad()
     return self.tabs[self.activeTab].scratchPadEnabled
 end
 
+---Whether the scratchPad feature is enabled or not.
+---
+---@return boolean: the config value of the scratchPad
+---@private
+function State:hasScratchPadEnabled()
+    return _G.NoNeckPain.config.buffers.scratchPad.enabled
+        or _G.NoNeckPain.config.buffers.left.scratchPad.enabled
+        or _G.NoNeckPain.config.buffers.right.scratchPad.enabled
+        or self.getScratchpad(self)
+end
+
 ---Register a new `tab` with the given `id` in the state.
 ---
 ---@param id number: the id of the tab.
