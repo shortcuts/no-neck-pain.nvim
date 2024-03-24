@@ -510,6 +510,7 @@ function State:hasScratchPadEnabled()
     return _G.NoNeckPain.config.buffers.scratchPad.enabled
         or _G.NoNeckPain.config.buffers.left.scratchPad.enabled
         or _G.NoNeckPain.config.buffers.right.scratchPad.enabled
+        or self.getScratchpad(self)
 end
 
 ---Register a new `tab` with the given `id` in the state.
