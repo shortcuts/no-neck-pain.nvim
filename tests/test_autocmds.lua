@@ -116,4 +116,61 @@ T["skipEnteringNoNeckPainBuffer"]["goes to new valid buffer when entering side"]
     Helpers.expect.equality(child.api.nvim_get_current_win(), 1003)
 end
 
+T["skipEnteringNoNeckPainBuffer"]["does not register if scratchPad feature is enabled (global)"] = function()
+    child.set_size(5, 200)
+    child.lua(
+        [[ require('no-neck-pain').setup({width=50, buffers = { scratchPad = { enabled = true } }, autocmds = { skipEnteringNoNeckPainBuffer = true }}) ]]
+    )
+    Helpers.toggle(child)
+
+    Helpers.expect.config(child, "buffers.scratchPad.enabled", true)
+    Helpers.expect.config(child, "autocmds.skipEnteringNoNeckPainBuffer", true)
+
+    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+    Helpers.expect.equality(child.api.nvim_get_current_win(), 1000)
+
+    child.fn.win_gotoid(1001)
+    Helpers.wait(child)
+    Helpers.expect.equality(child.api.nvim_get_current_win(), 1001)
+end
+
+T["skipEnteringNoNeckPainBuffer"]["does not register if scratchPad feature is enabled (left)"] = function()
+    child.set_size(5, 200)
+    child.lua(
+        [[ require('no-neck-pain').setup({width=50, buffers = { left = { scratchPad = { enabled = true } } }, autocmds = { skipEnteringNoNeckPainBuffer = true }}) ]]
+    )
+    Helpers.toggle(child)
+
+    Helpers.expect.config(child, "buffers.scratchPad.enabled", false)
+    Helpers.expect.config(child, "buffers.left.scratchPad.enabled", true)
+    Helpers.expect.config(child, "autocmds.skipEnteringNoNeckPainBuffer", true)
+
+    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+    Helpers.expect.equality(child.api.nvim_get_current_win(), 1000)
+
+    child.fn.win_gotoid(1001)
+    Helpers.wait(child)
+    Helpers.expect.equality(child.api.nvim_get_current_win(), 1001)
+end
+
+T["skipEnteringNoNeckPainBuffer"]["does not register if scratchPad feature is enabled (right)"] = function()
+    child.set_size(5, 200)
+    child.lua(
+        [[ require('no-neck-pain').setup({width=50, buffers = { right = { scratchPad = { enabled = true } } }, autocmds = { skipEnteringNoNeckPainBuffer = true }}) ]]
+    )
+    Helpers.toggle(child)
+
+    Helpers.expect.config(child, "buffers.scratchPad.enabled", false)
+    Helpers.expect.config(child, "buffers.left.scratchPad.enabled", false)
+    Helpers.expect.config(child, "buffers.right.scratchPad.enabled", true)
+    Helpers.expect.config(child, "autocmds.skipEnteringNoNeckPainBuffer", true)
+
+    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+    Helpers.expect.equality(child.api.nvim_get_current_win(), 1000)
+
+    child.fn.win_gotoid(1001)
+    Helpers.wait(child)
+    Helpers.expect.equality(child.api.nvim_get_current_win(), 1001)
+end
+
 return T

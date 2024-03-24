@@ -354,7 +354,9 @@ function N.enable(scope)
         desc = "Resize to apply on WinEnter/Closed of an integration",
     })
 
-    if _G.NoNeckPain.config.autocmds.skipEnteringNoNeckPainBuffer then
+    if
+        _G.NoNeckPain.config.autocmds.skipEnteringNoNeckPainBuffer and not S.hasScratchPadEnabled(S)
+    then
         vim.api.nvim_create_autocmd({ "WinLeave" }, {
             callback = function(p)
                 vim.schedule(function()
