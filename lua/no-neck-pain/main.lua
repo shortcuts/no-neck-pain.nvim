@@ -251,7 +251,7 @@ function N.enable(scope)
                 then
                     D.log(s, "one of the NNP side has been closed, disabling...")
 
-                    return N.disable(s)
+                    return N.disable(p.event)
                 end
 
                 if S.isSideWinValid(S, "curr") then
