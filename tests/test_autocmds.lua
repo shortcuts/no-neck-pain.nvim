@@ -41,7 +41,11 @@ T["auto command"]["does not shift when opening/closing float window"] = function
     Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 15)
     Helpers.expect.buf_width(child, "tabs[1].wins.main.right", 15)
 
-    child.lua("vim.api.nvim_open_win(0,true, {width=100,height=100,relative='cursor',row=0,col=0})")
+    child.api.nvim_open_win(
+        0,
+        true,
+        { width = 100, height = 100, relative = "cursor", row = 0, col = 0 }
+    )
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002, 1003 })
     Helpers.expect.state(child, "tabs[1].wins.main", {
@@ -54,7 +58,7 @@ T["auto command"]["does not shift when opening/closing float window"] = function
     Helpers.expect.buf_width(child, "tabs[1].wins.main.right", 15)
 
     -- Close float window keeps the buffer here with the same width
-    child.lua("vim.fn.win_gotoid(1003)")
+    child.fn.win_gotoid(1003)
     child.cmd("q")
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
@@ -72,7 +76,9 @@ T["skipEnteringNoNeckPainBuffer"] = MiniTest.new_set()
 
 T["skipEnteringNoNeckPainBuffer"]["goes to new valid buffer when entering side"] = function()
     child.set_size(5, 200)
-    child.lua([[ require('no-neck-pain').setup({width=50, autocmds = { skipEnteringNoNeckPainBuffer = true }}) ]])
+    child.lua(
+        [[ require('no-neck-pain').setup({width=50, autocmds = { skipEnteringNoNeckPainBuffer = true }}) ]]
+    )
     Helpers.toggle(child)
 
     Helpers.expect.config(child, "autocmds.skipEnteringNoNeckPainBuffer", true)
