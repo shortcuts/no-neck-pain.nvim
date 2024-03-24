@@ -85,6 +85,7 @@ function NoNeckPain.setup(opts)
         or _G.NoNeckPain.config.autocmds.reloadOnColorSchemeChange
     then
         vim.api.nvim_create_augroup("NoNeckPainAutocmd", { clear = true })
+        vim.api.nvim_create_augroup("NoNeckPainVimEnterAutocmd", { clear = true })
     end
 
     if _G.NoNeckPain.config.autocmds.reloadOnColorSchemeChange then
@@ -108,7 +109,7 @@ function NoNeckPain.setup(opts)
     if _G.NoNeckPain.config.autocmds.enableOnVimEnter then
         vim.api.nvim_create_autocmd({ "BufEnter" }, {
             pattern = "*",
-            callback = function(p)
+            callback = function()
                 vim.schedule(function()
                     if _G.NoNeckPain.state ~= nil and _G.NoNeckPain.state.enabled then
                         return
@@ -116,9 +117,11 @@ function NoNeckPain.setup(opts)
 
                     NoNeckPain.enable()
 
-                    if _G.NoNeckPain.state ~= nil then
-                        vim.api.nvim_del_autocmd(p.id)
-                    end
+                    A.debounce("enableOnVimEnter", function()
+                        if _G.NoNeckPain.state ~= nil then
+                            pcall(vim.api.nvim_del_augroup_by_name, "NoNeckPainVimEnterAutocmd")
+                        end
+                    end, 20)
                 end)
             end,
             group = "NoNeckPainAutocmd",
