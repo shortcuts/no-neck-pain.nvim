@@ -26,6 +26,16 @@ T["auto command"]["does not create side buffers window's width < options.width"]
     })
 end
 
+T["auto command"]["disabling clears VimEnter autocmd"] = function()
+    child.restart({ "-u", "scripts/init_auto_open.lua" })
+    Helpers.toggle(child)
+
+    Helpers.expect.equality(
+        child.api.nvim_get_autocmds({ group = "NoNeckPainVimEnterAutocmd" }),
+        {}
+    )
+end
+
 T["auto command"]["does not shift when opening/closing float window"] = function()
     child.set_size(5, 200)
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])

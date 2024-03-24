@@ -359,7 +359,12 @@ function N.enable(scope)
             callback = function(p)
                 vim.schedule(function()
                     p.event = string.format("%s:skipEnteringNoNeckPainBuffer", p.event)
-                    if not S.hasTabs(S) or not S.isActiveTabRegistered(S) or E.skip() or S.hasScratchPadEnabled(S) then
+                    if
+                        not S.hasTabs(S)
+                        or not S.isActiveTabRegistered(S)
+                        or E.skip()
+                        or S.hasScratchPadEnabled(S)
+                    then
                         return D.log(p.event, "skip")
                     end
 
@@ -458,6 +463,8 @@ function N.disable(scope)
     end
 
     if S.refreshTabs(S) == 0 then
+        pcall(vim.api.nvim_del_augroup_by_name, "NoNeckPainVimEnterAutocmd")
+
         D.log(scope, "no more active tabs left, reinitializing state")
 
         S.init(S)
