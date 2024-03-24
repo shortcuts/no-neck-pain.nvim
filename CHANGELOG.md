@@ -1,4 +1,12 @@
 <a name="0.2.3"></a>
+## [1.10.2](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.10.1...v1.10.2) (2024-03-24)
+
+
+### Bug Fixes
+
+* **autocmds:** allow registering rerouting for toggle option ([#324](https://github.com/shortcuts/no-neck-pain.nvim/issues/324)) ([28f433c](https://github.com/shortcuts/no-neck-pain.nvim/commit/28f433c93da9d360f7f930a9052770af26ab895a))
+* **autocmds:** clear after debounce ([#326](https://github.com/shortcuts/no-neck-pain.nvim/issues/326)) ([1befb94](https://github.com/shortcuts/no-neck-pain.nvim/commit/1befb94faaebe8f85176fb31fe83f0bc47b162cd))
+
 ## [1.10.1](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.10.0...v1.10.1) (2024-03-24)
 
 
