@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [1.10.1](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.10.0...v1.10.1) (2024-03-24)
+
+
+### Bug Fixes
+
+* **autocmds:** buffer rerouting and with scratchPads ([#322](https://github.com/shortcuts/no-neck-pain.nvim/issues/322)) ([c053da4](https://github.com/shortcuts/no-neck-pain.nvim/commit/c053da46343e38e79239dbf508d8baca3bee59f4))
+
 ## [1.10.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.9.0...v1.10.0) (2024-03-23)
 
 
