@@ -80,12 +80,9 @@ function W.initScratchPad(side, cleanup)
         _G.NoNeckPain.config.buffers[side].bo.filetype
     )
 
-    -- we edit the file if it exists, otherwise we create it
-    if vim.fn.filereadable(location) then
-        vim.cmd(string.format("edit %s", location))
-    else
-        vim.api.nvim_buf_set_name(0, location)
-    end
+    D.log(string.format("W.initScratchPad:%s", side), "enabled with location %s", location)
+
+    vim.cmd(string.format("edit %s", location))
 
     vim.o.autowriteall = true
 end

@@ -363,7 +363,7 @@ function N.enable(scope)
                         not S.hasTabs(S)
                         or not S.isActiveTabRegistered(S)
                         or E.skip()
-                        or S.hasScratchPadEnabled(S)
+                        or S.getScratchpad(S)
                     then
                         return D.log(p.event, "skip")
                     end
