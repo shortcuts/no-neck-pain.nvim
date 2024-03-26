@@ -262,6 +262,14 @@ T["scratchPad"]["toggling the scratchPad sets the buffer/window options"] = func
 
     child.fn.win_gotoid(1002)
     Helpers.expect.equality(child.lua_get("vim.api.nvim_buf_get_option(0, 'buflisted')"), false)
+
+    child.api.nvim_input('foo')
+
+    child.fn.win_gotoid(1001)
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_buf_get_option(0, 'buflisted')"), false)
+
+    child.fn.win_gotoid(1002)
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_buf_get_option(0, 'buflisted')"), false)
 end
 
 return T

@@ -22,38 +22,38 @@ T["setup"]["does not create mappings by default"] = function()
     Helpers.expect.config(child, "mappings.enabled", false)
 
     -- toggle plugin state
-    child.lua("vim.api.nvim_input('<Leader>np')")
+    child.api.nvim_input('<Leader>np')
 
     Helpers.expect.global(child, "_G.NoNeckPain.state", vim.NIL)
 
     -- decrease width
     Helpers.expect.global(child, "_G.NoNeckPain.config.width", 100)
 
-    child.lua("vim.api.nvim_input('<Leader>n-')")
-    child.lua("vim.api.nvim_input('<Leader>n-')")
-    child.lua("vim.api.nvim_input('<Leader>n-')")
-    child.lua("vim.api.nvim_input('<Leader>n-')")
-    child.lua("vim.api.nvim_input('<Leader>n-')")
-    child.lua("vim.api.nvim_input('<Leader>n-')")
+    child.api.nvim_input('<Leader>n-')
+    child.api.nvim_input('<Leader>n-')
+    child.api.nvim_input('<Leader>n-')
+    child.api.nvim_input('<Leader>n-')
+    child.api.nvim_input('<Leader>n-')
+    child.api.nvim_input('<Leader>n-')
 
     Helpers.expect.global(child, "_G.NoNeckPain.config.width", 100)
 
     -- increase width
     Helpers.expect.global(child, "_G.NoNeckPain.config.width", 100)
 
-    child.lua("vim.api.nvim_input('<Leader>n+')")
-    child.lua("vim.api.nvim_input('<Leader>n+')")
-    child.lua("vim.api.nvim_input('<Leader>n+')")
-    child.lua("vim.api.nvim_input('<Leader>n+')")
-    child.lua("vim.api.nvim_input('<Leader>n+')")
-    child.lua("vim.api.nvim_input('<Leader>n+')")
+    child.api.nvim_input('<Leader>n+')
+    child.api.nvim_input('<Leader>n+')
+    child.api.nvim_input('<Leader>n+')
+    child.api.nvim_input('<Leader>n+')
+    child.api.nvim_input('<Leader>n+')
+    child.api.nvim_input('<Leader>n+')
 
     Helpers.expect.global(child, "_G.NoNeckPain.config.width", 100)
 
     -- toggle scratchPad
     Helpers.expect.global(child, "_G.NoNeckPain.state", vim.NIL)
 
-    child.lua("vim.api.nvim_input('<Leader>ns')")
+    child.api.nvim_input('<Leader>ns')
 
     Helpers.expect.global(child, "_G.NoNeckPain.state", vim.NIL)
 end
@@ -132,52 +132,52 @@ T["setup"]["does not create mappings if false"] = function()
     })
 
     -- toggle plugin state
-    child.lua("vim.api.nvim_input('<Leader>np')")
+    child.api.nvim_input('<Leader>np')
 
     Helpers.expect.global(child, "_G.NoNeckPain.state", vim.NIL)
 
     -- decrease width
     Helpers.expect.global(child, "_G.NoNeckPain.config.width", 100)
 
-    child.lua("vim.api.nvim_input('<Leader>n-')")
-    child.lua("vim.api.nvim_input('<Leader>n-')")
-    child.lua("vim.api.nvim_input('<Leader>n-')")
-    child.lua("vim.api.nvim_input('<Leader>n-')")
-    child.lua("vim.api.nvim_input('<Leader>n-')")
-    child.lua("vim.api.nvim_input('<Leader>n-')")
+    child.api.nvim_input('<Leader>n-')
+    child.api.nvim_input('<Leader>n-')
+    child.api.nvim_input('<Leader>n-')
+    child.api.nvim_input('<Leader>n-')
+    child.api.nvim_input('<Leader>n-')
+    child.api.nvim_input('<Leader>n-')
 
     Helpers.expect.global(child, "_G.NoNeckPain.config.width", 100)
 
     -- increase width
     Helpers.expect.global(child, "_G.NoNeckPain.config.width", 100)
 
-    child.lua("vim.api.nvim_input('<Leader>n+')")
-    child.lua("vim.api.nvim_input('<Leader>n+')")
-    child.lua("vim.api.nvim_input('<Leader>n+')")
-    child.lua("vim.api.nvim_input('<Leader>n+')")
-    child.lua("vim.api.nvim_input('<Leader>n+')")
-    child.lua("vim.api.nvim_input('<Leader>n+')")
+    child.api.nvim_input('<Leader>n+')
+    child.api.nvim_input('<Leader>n+')
+    child.api.nvim_input('<Leader>n+')
+    child.api.nvim_input('<Leader>n+')
+    child.api.nvim_input('<Leader>n+')
+    child.api.nvim_input('<Leader>n+')
 
     Helpers.expect.global(child, "_G.NoNeckPain.config.width", 100)
 
     -- toggle scratchPad
     Helpers.expect.global(child, "_G.NoNeckPain.state", vim.NIL)
 
-    child.lua("vim.api.nvim_input('<Leader>ns')")
+    child.api.nvim_input('<Leader>ns')
 
     Helpers.expect.global(child, "_G.NoNeckPain.state", vim.NIL)
 
     -- toggle left
     Helpers.expect.global(child, "_G.NoNeckPain.state", vim.NIL)
 
-    child.lua("vim.api.nvim_input('<Leader>nql')")
+    child.api.nvim_input('<Leader>nql')
 
     Helpers.expect.global(child, "_G.NoNeckPain.state", vim.NIL)
 
     -- toggle right
     Helpers.expect.global(child, "_G.NoNeckPain.state", vim.NIL)
 
-    child.lua("vim.api.nvim_input('<Leader>nqr')")
+    child.api.nvim_input('<Leader>nqr')
 
     Helpers.expect.global(child, "_G.NoNeckPain.state", vim.NIL)
 end
@@ -189,10 +189,10 @@ T["setup"]["increase the width with mapping"] = function()
     Helpers.expect.global(child, "_G.NoNeckPain.config.width", 50)
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
 
-    child.lua("vim.api.nvim_input('nn')")
-    child.lua("vim.api.nvim_input('nn')")
-    child.lua("vim.api.nvim_input('nn')")
-    child.lua("vim.api.nvim_input('nn')")
+    child.api.nvim_input('nn')
+    child.api.nvim_input('nn')
+    child.api.nvim_input('nn')
+    child.api.nvim_input('nn')
 
     Helpers.expect.global(child, "_G.NoNeckPain.config.width", 70)
 end
@@ -206,10 +206,10 @@ T["setup"]["increase the width with custom mapping and value"] = function()
     Helpers.expect.global(child, "_G.NoNeckPain.config.width", 50)
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
 
-    child.lua("vim.api.nvim_input('nn')")
-    child.lua("vim.api.nvim_input('nn')")
-    child.lua("vim.api.nvim_input('nn')")
-    child.lua("vim.api.nvim_input('nn')")
+    child.api.nvim_input('nn')
+    child.api.nvim_input('nn')
+    child.api.nvim_input('nn')
+    child.api.nvim_input('nn')
 
     Helpers.expect.global(child, "_G.NoNeckPain.config.width", 90)
 end
@@ -247,10 +247,11 @@ T["setup"]["decrease the width with mapping"] = function()
     Helpers.expect.global(child, "_G.NoNeckPain.config.width", 50)
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
 
-    child.lua("vim.api.nvim_input('nn')")
-    child.lua("vim.api.nvim_input('nn')")
-    child.lua("vim.api.nvim_input('nn')")
-    child.lua("vim.api.nvim_input('nn')")
+
+    child.api.nvim_input('nn')
+    child.api.nvim_input('nn')
+    child.api.nvim_input('nn')
+    child.api.nvim_input('nn')
 
     Helpers.expect.global(child, "_G.NoNeckPain.config.width", 30)
 end
@@ -264,10 +265,10 @@ T["setup"]["decrease the width with custom mapping and value"] = function()
     Helpers.expect.global(child, "_G.NoNeckPain.config.width", 50)
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
 
-    child.lua("vim.api.nvim_input('nn')")
-    child.lua("vim.api.nvim_input('nn')")
-    child.lua("vim.api.nvim_input('nn')")
-    child.lua("vim.api.nvim_input('nn')")
+    child.api.nvim_input('nn')
+    child.api.nvim_input('nn')
+    child.api.nvim_input('nn')
+    child.api.nvim_input('nn')
 
     Helpers.expect.global(child, "_G.NoNeckPain.config.width", 22)
 end
