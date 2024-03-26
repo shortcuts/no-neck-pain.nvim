@@ -31,8 +31,12 @@ function N.toggleScratchPad()
 
     -- map over both sides and let the init method either setup or cleanup the side buffers
     for _, side in pairs(Co.SIDES) do
-        vim.fn.win_gotoid(S.getSideID(S, side))
-        W.initScratchPad(side, S.getScratchpad(S))
+        local id = S.getSideID(S, side)
+        if id ~= nil then
+            vim.fn.win_gotoid(id)
+            W.initScratchPad(side, S.getScratchpad(S))
+            W.initSideOptions(side, id)
+        end
     end
 
     -- restore focus
