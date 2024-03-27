@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [1.11.1](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.11.0...v1.11.1) (2024-03-27)
+
+
+### Bug Fixes
+
+* **scratchPad:** option defined in wrong order ([#333](https://github.com/shortcuts/no-neck-pain.nvim/issues/333)) ([0e27d1f](https://github.com/shortcuts/no-neck-pain.nvim/commit/0e27d1f5f05a3df79037352fe021f5c5001e661b))
+
 ## [1.11.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.10.2...v1.11.0) (2024-03-27)
 
 
