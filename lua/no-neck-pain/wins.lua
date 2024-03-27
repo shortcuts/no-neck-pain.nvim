@@ -71,33 +71,30 @@ function W.initScratchPad(side, id, cleanup)
         return W.initSideOptions(side, id)
     end
 
-    local bufID = vim.api.nvim_win_get_buf(id)
-
-    A.setBufferOption(bufID, "bufhidden", "")
-    A.setBufferOption(bufID, "buftype", "")
-    A.setBufferOption(bufID, "buflisted", false)
-    A.setBufferOption(bufID, "autoread", true)
-    A.setWindowOption(id, "conceallevel", 2)
-
     D.log(
         string.format("W.initScratchPad:%s", side),
         "enabled with location %s",
         _G.NoNeckPain.config.buffers[side].scratchPad.pathToFile
     )
 
+    W.initSideOptions(side, id)
+
     vim.cmd(string.format("edit %s", _G.NoNeckPain.config.buffers[side].scratchPad.pathToFile))
 
-    W.initSideOptions(side, id)
+    A.setBufferOption(0, "bufhidden", "")
+    A.setBufferOption(0, "buftype", "")
+    A.setBufferOption(0, "buflisted", false)
+    A.setBufferOption(0, "autoread", true)
+    A.setWindowOption(id, "conceallevel", 2)
 
     -- users might want to use a filetype that isn't supported by neovim, we should let them
     -- if they've defined it on the configuration side.
-    if vim.api.nvim_buf_get_option(bufID, "filetype") == "" then
+    if vim.api.nvim_buf_get_option(0, "filetype") == "" then
         local filetype = _G.NoNeckPain.config.buffers[side].bo.filetype
-        if filetype == "" or "no-neck-pain" then
+        if filetype == "" or filetype == "no-neck-pain" then
             filetype = "norg"
         end
-
-        A.setBufferOption(bufID, "filetype", "norg")
+        A.setBufferOption(0, "filetype", filetype)
     end
 
     vim.o.autowriteall = true
@@ -148,8 +145,8 @@ function W.createSideBuffers(skipIntegrations)
                 S.setSideID(S, id, side)
 
                 if _G.NoNeckPain.config.buffers[side].scratchPad.enabled then
-                    W.initScratchPad(side, id)
                     S.setScratchPad(S, true)
+                    W.initScratchPad(side, id)
                 else
                     W.initSideOptions(side, id)
                 end
