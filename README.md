@@ -334,19 +334,6 @@ NoNeckPain.bufferOptionsScratchPad = {
     -- - `autoread`.
     --- @type boolean
     enabled = false,
-    -- The name of the generated file. See `location` for more information.
-    -- /!\ deprecated /!\ use `pathToFile` instead.
-    --- @type string
-    --- @example: `no-neck-pain-left.norg`
-    --- @deprecated: use `pathToFile` instead.
-    fileName = "no-neck-pain",
-    -- By default, files are saved at the same location as the current Neovim session.
-    -- note: filetype is defaulted to `norg` (https://github.com/nvim-neorg/neorg), but can be changed in `buffers.bo.filetype` or |NoNeckPain.bufferOptions| for option scoped to the `left` and/or `right` buffer.
-    -- /!\ deprecated /!\ use `pathToFile` instead.
-    --- @type string?
-    --- @example: `no-neck-pain-left.norg`
-    --- @deprecated: use `pathToFile` instead.
-    location = nil,
     -- The path to the file to save the scratchPad content to and load it in the buffer.
     --- @type string?
     --- @example: `~/notes.norg`
