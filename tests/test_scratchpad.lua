@@ -233,13 +233,13 @@ T["scratchPad"]["forwards the given filetype to the scratchPad"] = function()
     child.lua([[require('no-neck-pain').setup({
         width = 50,
         buffers = {
+            bo = {
+                filetype = "custom"
+            },
             scratchPad = {
                 enabled = true,
                 pathToFile = "foo.custom"
             },
-            bo = {
-                filetype = "custom"
-            }
         },
     })]])
     Helpers.toggle(child)

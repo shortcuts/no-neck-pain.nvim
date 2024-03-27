@@ -28,7 +28,11 @@ function W.initSideOptions(side, id)
     local bufid = vim.api.nvim_win_get_buf(id)
 
     for opt, val in pairs(_G.NoNeckPain.config.buffers[side].bo) do
+        if S.getScratchPad(S) and opt == "filetype" then
+            goto continue
+        end
         A.setBufferOption(bufid, opt, val)
+        ::continue::
     end
 
     for opt, val in pairs(_G.NoNeckPain.config.buffers[side].wo) do
@@ -83,6 +87,19 @@ function W.initScratchPad(side, id, cleanup)
 
     vim.cmd(string.format("edit %s", _G.NoNeckPain.config.buffers[side].scratchPad.pathToFile))
 
+    W.initSideOptions(side, id)
+
+    -- users might want to use a filetype that isn't supported by neovim, we should let them
+    -- if they've defined it on the configuration side.
+    if vim.api.nvim_buf_get_option(bufID, "filetype") == "" then
+        local filetype = _G.NoNeckPain.config.buffers[side].bo.filetype
+        if filetype == "" or "no-neck-pain" then
+            filetype = "norg"
+        end
+
+        A.setBufferOption(bufID, "filetype", "norg")
+    end
+
     vim.o.autowriteall = true
 end
 
@@ -133,9 +150,9 @@ function W.createSideBuffers(skipIntegrations)
                 if _G.NoNeckPain.config.buffers[side].scratchPad.enabled then
                     W.initScratchPad(side, id)
                     S.setScratchPad(S, true)
+                else
+                    W.initSideOptions(side, id)
                 end
-
-                W.initSideOptions(side, id)
             end
 
             local sideID = S.getSideID(S, side)

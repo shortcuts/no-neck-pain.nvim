@@ -39,9 +39,6 @@ function N.toggleScratchPad()
         if id ~= nil then
             vim.fn.win_gotoid(id)
             W.initScratchPad(side, id, currentState)
-            if not currentState then
-                W.initSideOptions(side, id)
-            end
         end
     end
 
