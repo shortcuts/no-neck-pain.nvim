@@ -1,3 +1,4 @@
+local A = require("no-neck-pain.util.api")
 local D = require("no-neck-pain.util.debug")
 local C = require("no-neck-pain.colors")
 local Co = require("no-neck-pain.util.constants")
@@ -58,21 +59,29 @@ NoNeckPain.bufferOptionsBo = {
 ---@type table
 ---Default values:
 ---@eval return MiniDoc.afterlines_to_code(MiniDoc.current.eval_section)
-NoNeckPain.bufferOptionsScratchpad = {
+NoNeckPain.bufferOptionsScratchPad = {
     -- When `true`, automatically sets the following options to the side buffers:
     -- - `autowriteall`
     -- - `autoread`.
     --- @type boolean
     enabled = false,
     -- The name of the generated file. See `location` for more information.
+    -- /!\ deprecated /!\ use `pathToFile` instead.
     --- @type string
     --- @example: `no-neck-pain-left.norg`
+    --- @deprecated: use `pathToFile` instead.
     fileName = "no-neck-pain",
     -- By default, files are saved at the same location as the current Neovim session.
     -- note: filetype is defaulted to `norg` (https://github.com/nvim-neorg/neorg), but can be changed in `buffers.bo.filetype` or |NoNeckPain.bufferOptions| for option scoped to the `left` and/or `right` buffer.
+    -- /!\ deprecated /!\ use `pathToFile` instead.
     --- @type string?
     --- @example: `no-neck-pain-left.norg`
+    --- @deprecated: use `pathToFile` instead.
     location = nil,
+    -- The path to the file to save the scratchPad content to and load it in the buffer.
+    --- @type string?
+    --- @example: `~/notes.norg`
+    pathToFile = "",
 }
 
 --- NoNeckPain's buffer color options.
@@ -127,8 +136,8 @@ NoNeckPain.bufferOptions = {
     bo = NoNeckPain.bufferOptionsBo,
     --- @see NoNeckPain.bufferOptionsWo `:h NoNeckPain.bufferOptionsWo`
     wo = NoNeckPain.bufferOptionsWo,
-    --- @see NoNeckPain.bufferOptionsScratchpad `:h NoNeckPain.bufferOptionsScratchpad`
-    scratchPad = NoNeckPain.bufferOptionsScratchpad,
+    --- @see NoNeckPain.bufferOptionsScratchPad `:h NoNeckPain.bufferOptionsScratchPad`
+    scratchPad = NoNeckPain.bufferOptionsScratchPad,
 }
 
 --- NoNeckPain's plugin config.
@@ -218,8 +227,8 @@ NoNeckPain.options = {
         setNames = false,
         -- Leverages the side buffers as notepads, which work like any Neovim buffer and automatically saves its content at the given `location`.
         -- note: quitting an unsaved scratchPad buffer is non-blocking, and the content is still saved.
-        --- see |NoNeckPain.bufferOptionsScratchpad|
-        scratchPad = NoNeckPain.bufferOptionsScratchpad,
+        --- see |NoNeckPain.bufferOptionsScratchPad|
+        scratchPad = NoNeckPain.bufferOptionsScratchPad,
         -- colors to apply to both side buffers, for buffer scopped options @see |NoNeckPain.bufferOptions|
         --- see |NoNeckPain.bufferOptionsColors|
         colors = NoNeckPain.bufferOptionsColors,
@@ -297,6 +306,38 @@ NoNeckPain.options = {
 ---@private
 local defaults = vim.deepcopy(NoNeckPain.options)
 
+--- Parses the deprecated scratchPad options into the new `pathToFile` option.
+---
+---@param side "left"|"right" The side of the buffer.
+---@param options table Module config table. See |NoNeckPain.bufferOptionsScratchPads|.
+---@param fileType string The file extension to leverage.
+---
+---@private
+local function parseDeprecatedScratchPad(side, options, fileType)
+    -- set the defaults if the user rely on them
+    if A.length(options) == 0 or options.pathToFile == nil then
+        options = A.tde(options, defaults.buffers.scratchPad)
+    end
+
+    -- handle the deprecation to `fileName` and `location`
+    if options.pathToFile == "" then
+        if options.location ~= nil then
+            options.pathToFile = options.location
+        end
+
+        if options.pathToFile ~= "" and string.sub(options.pathToFile, -1) ~= "/" then
+            options.pathToFile = options.pathToFile .. "/"
+        end
+
+        fileType = fileType or "norg"
+
+        options.pathToFile =
+            string.format("%s%s-%s.%s", options.pathToFile, options.fileName, side, fileType)
+    end
+
+    return options
+end
+
 --- Defaults NoNeckPain options by merging user provided options with the default plugin values.
 ---
 ---@param options table Module config table. See |NoNeckPain.options|.
@@ -305,42 +346,20 @@ local defaults = vim.deepcopy(NoNeckPain.options)
 function NoNeckPain.defaults(options)
     options.buffers = options.buffers or {}
 
-    local tde = function(t1, t2)
-        return vim.deepcopy(vim.tbl_deep_extend("keep", t1 or {}, t2 or {}))
-    end
-
     for _, side in pairs(Co.SIDES) do
         options.buffers[side] = options.buffers[side] or {}
 
-        options.buffers[side].bo = tde(options.buffers[side].bo, options.buffers.bo)
-        options.buffers[side].wo = tde(options.buffers[side].wo, options.buffers.wo)
-        options.buffers[side].colors = tde(options.buffers[side].colors, options.buffers.colors)
-        options.buffers[side].scratchPad =
-            tde(options.buffers[side].scratchPad, options.buffers.scratchPad)
-
-        if options.buffers[side].scratchPad.enabled then
-            -- if the user wants scratchPads, but did not provided a custom filetype, we default to `norg`.
-            if options.buffers[side].bo == nil or options.buffers[side].bo.filetype == nil then
-                options.buffers[side].bo = options.buffers[side].bo or {}
-                options.buffers[side].bo.filetype = "norg"
-            end
-
-            options.buffers[side].bo.bufhidden = ""
-            options.buffers[side].bo.buftype = ""
-            options.buffers[side].bo.buflisted = false
-            options.buffers[side].bo.autoread = true
-            options.buffers[side].wo.conceallevel = 2
-
-            if options.buffers[side].scratchPad.location ~= nil then
-                assert(
-                    type(options.buffers[side].scratchPad.location) == "string",
-                    "`scratchPad.location` must be nil or a string."
-                )
-            end
-        end
+        options.buffers[side].bo = A.tde(options.buffers[side].bo, options.buffers.bo)
+        options.buffers[side].wo = A.tde(options.buffers[side].wo, options.buffers.wo)
+        options.buffers[side].colors = A.tde(options.buffers[side].colors, options.buffers.colors)
+        options.buffers[side].scratchPad = parseDeprecatedScratchPad(
+            side,
+            A.tde(options.buffers[side].scratchPad, options.buffers.scratchPad),
+            options.buffers[side].bo.filetype
+        )
     end
 
-    NoNeckPain.options = tde(options, defaults)
+    NoNeckPain.options = A.tde(options, defaults)
     NoNeckPain.options.buffers = C.parse(NoNeckPain.options.buffers)
 
     -- assert `width` values through vim options
@@ -369,6 +388,13 @@ function NoNeckPain.defaults(options)
             string.format("%s position can only be `left` or `right`", tree)
         )
     end
+
+    -- cleanup deprecated options to sanitize the saved config
+    NoNeckPain.options.buffers.left.scratchPad.location = nil
+    NoNeckPain.options.buffers.left.scratchPad.fileName = nil
+    NoNeckPain.options.buffers.right.scratchPad.location = nil
+    NoNeckPain.options.buffers.right.scratchPad.fileName = nil
+    NoNeckPain.options.buffers.scratchPad = nil
 
     return NoNeckPain.options
 end

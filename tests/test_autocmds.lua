@@ -133,7 +133,8 @@ T["skipEnteringNoNeckPainBuffer"]["does not register if scratchPad feature is en
     )
     Helpers.toggle(child)
 
-    Helpers.expect.config(child, "buffers.scratchPad.enabled", true)
+    Helpers.expect.config(child, "buffers.left.scratchPad.enabled", true)
+    Helpers.expect.config(child, "buffers.right.scratchPad.enabled", true)
     Helpers.expect.config(child, "autocmds.skipEnteringNoNeckPainBuffer", true)
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
@@ -151,8 +152,8 @@ T["skipEnteringNoNeckPainBuffer"]["does not register if scratchPad feature is en
     )
     Helpers.toggle(child)
 
-    Helpers.expect.config(child, "buffers.scratchPad.enabled", false)
     Helpers.expect.config(child, "buffers.left.scratchPad.enabled", true)
+    Helpers.expect.config(child, "buffers.right.scratchPad.enabled", false)
     Helpers.expect.config(child, "autocmds.skipEnteringNoNeckPainBuffer", true)
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
@@ -170,7 +171,6 @@ T["skipEnteringNoNeckPainBuffer"]["does not register if scratchPad feature is en
     )
     Helpers.toggle(child)
 
-    Helpers.expect.config(child, "buffers.scratchPad.enabled", false)
     Helpers.expect.config(child, "buffers.left.scratchPad.enabled", false)
     Helpers.expect.config(child, "buffers.right.scratchPad.enabled", true)
     Helpers.expect.config(child, "autocmds.skipEnteringNoNeckPainBuffer", true)

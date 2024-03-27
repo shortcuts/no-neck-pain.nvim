@@ -10,6 +10,23 @@ function A.getCurrentTab()
     return vim.api.nvim_get_current_tabpage() or 1
 end
 
+---Returns the number of keys in the given table
+---
+---@param tbl table: the table to count the keys.
+---@return number: the number of keys in the table.
+---@private
+function A.length(tbl)
+    local count = 0
+    for _ in pairs(tbl) do
+        count = count + 1
+    end
+    return count
+end
+
+function A.tde(t1, t2)
+    return vim.deepcopy(vim.tbl_deep_extend("keep", t1 or {}, t2 or {}))
+end
+
 ---Returns the name of the augroup for the given tab ID.
 ---
 ---@param id number?: the id of the tab.
