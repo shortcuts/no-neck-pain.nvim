@@ -25,7 +25,7 @@ _Creates evenly sized empty buffers on each side of your focused buffer, which a
 - Multiple tabs support
 - [Highly customizable experience](https://github.com/shortcuts/no-neck-pain.nvim#configuration)
 - [Support split/vsplit windows](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase#window-layout-support)
-- [Built-in scratchpad feature](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase#side-buffer-as-scratch-pad)
+- [Built-in scratchPad feature](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase#side-buffer-as-scratch-pad)
 - [Themed side buffers](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase#custom-background-color)
 - Fully integrates with [neo-tree.nvim](https://github.com/nvim-neo-tree/neo-tree.nvim), [nvim-tree.lua](https://github.com/nvim-tree/nvim-tree.lua), [undotree](https://github.com/mbbill/undotree), [tmux, and more!](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase#window-layout-support)
 - Keep your workflow intact
@@ -183,7 +183,7 @@ require("no-neck-pain").setup({
         -- When `false`, the mapping is not created.
         --- @type string | { mapping: string, value: number }
         widthDown = "<Leader>n-",
-        -- Sets a global mapping to Neovim, which allows you to toggle the scratchpad feature.
+        -- Sets a global mapping to Neovim, which allows you to toggle the scratchPad feature.
         -- When `false`, the mapping is not created.
         --- @type string
         scratchPad = "<Leader>ns",
@@ -196,9 +196,9 @@ require("no-neck-pain").setup({
         --- @type boolean
         setNames = false,
         -- Leverages the side buffers as notepads, which work like any Neovim buffer and automatically saves its content at the given `location`.
-        -- note: quitting an unsaved scratchpad buffer is non-blocking, and the content is still saved.
-        --- see |NoNeckPain.bufferOptionsScratchpad|
-        scratchPad = NoNeckPain.bufferOptionsScratchpad,
+        -- note: quitting an unsaved scratchPad buffer is non-blocking, and the content is still saved.
+        --- see |NoNeckPain.bufferOptionsScratchPad|
+        scratchPad = NoNeckPain.bufferOptionsScratchPad,
         -- colors to apply to both side buffers, for buffer scopped options @see |NoNeckPain.bufferOptions|
         --- see |NoNeckPain.bufferOptionsColors|
         colors = NoNeckPain.bufferOptionsColors,
@@ -282,8 +282,8 @@ NoNeckPain.bufferOptions = {
     bo = NoNeckPain.bufferOptionsBo,
     --- @see NoNeckPain.bufferOptionsWo `:h NoNeckPain.bufferOptionsWo`
     wo = NoNeckPain.bufferOptionsWo,
-    --- @see NoNeckPain.bufferOptionsScratchpad `:h NoNeckPain.bufferOptionsScratchpad`
-    scratchPad = NoNeckPain.bufferOptionsScratchpad,
+    --- @see NoNeckPain.bufferOptionsScratchPad `:h NoNeckPain.bufferOptionsScratchPad`
+    scratchPad = NoNeckPain.bufferOptionsScratchPad,
 }
 
 NoNeckPain.bufferOptionsWo = {
@@ -320,29 +320,37 @@ NoNeckPain.bufferOptionsBo = {
     swapfile = false,
 }
 
---- NoNeckPain's scratchpad buffer options.
+--- NoNeckPain's scratchPad buffer options.
 ---
 --- Leverages the side buffers as notepads, which work like any Neovim buffer and automatically saves its content at the given `location`.
---- note: quitting an unsaved scratchpad buffer is non-blocking, and the content is still saved.
+--- note: quitting an unsaved scratchPad buffer is non-blocking, and the content is still saved.
 ---
 ---@type table
 ---Default values:
 ---@eval return MiniDoc.afterlines_to_code(MiniDoc.current.eval_section)
-NoNeckPain.bufferOptionsScratchpad = {
+NoNeckPain.bufferOptionsScratchPad = {
     -- When `true`, automatically sets the following options to the side buffers:
     -- - `autowriteall`
     -- - `autoread`.
     --- @type boolean
     enabled = false,
     -- The name of the generated file. See `location` for more information.
+    -- /!\ deprecated /!\ use `pathToFile` instead.
     --- @type string
     --- @example: `no-neck-pain-left.norg`
+    --- @deprecated use `pathToFile` instead.
     fileName = "no-neck-pain",
     -- By default, files are saved at the same location as the current Neovim session.
     -- note: filetype is defaulted to `norg` (https://github.com/nvim-neorg/neorg), but can be changed in `buffers.bo.filetype` or |NoNeckPain.bufferOptions| for option scoped to the `left` and/or `right` buffer.
+    -- /!\ deprecated /!\ use `pathToFile` instead.
     --- @type string?
     --- @example: `no-neck-pain-left.norg`
+    --- @deprecated use `pathToFile` instead.
     location = nil,
+    -- The path to the file to save the scratchPad content to and load it in the buffer.
+    --- @type string?
+    --- @example: `~/notes.norg`
+    pathToFile = "",
 }
 
 NoNeckPain.bufferOptionsColors = {

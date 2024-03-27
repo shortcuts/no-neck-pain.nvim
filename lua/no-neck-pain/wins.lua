@@ -123,7 +123,7 @@ function W.createSideBuffers(skipIntegrations)
 
                 if _G.NoNeckPain.config.buffers[side].scratchPad.enabled then
                     W.initScratchPad(side)
-                    S.setScratchpad(S, true)
+                    S.setScratchPad(S, true)
                 end
 
                 W.initSideOptions(side, id)

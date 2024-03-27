@@ -239,7 +239,7 @@ T["scratchPad"]["side buffer definition overrides global one"] = function()
     )
 end
 
-T["scratchPad"]["forwards the given filetype to the scratchpad"] = function()
+T["scratchPad"]["forwards the given filetype to the scratchPad"] = function()
     child.lua([[require('no-neck-pain').setup({
         width = 50,
         buffers = {

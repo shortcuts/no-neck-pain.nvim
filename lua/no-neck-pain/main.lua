@@ -28,10 +28,10 @@ function N.toggleScratchPad()
 
     -- store the current win to later restore focus
     local currWin = vim.api.nvim_get_current_win()
-    local currState = S.getScratchpad(S)
+    local currState = S.getScratchPad(S)
 
-    -- save new state of the scratchpad and update tabs
-    S.setScratchpad(S, not currState)
+    -- save new state of the scratchPad and update tabs
+    S.setScratchPad(S, not currState)
 
     -- map over both sides and let the init method either setup or cleanup the side buffers
     for _, side in pairs(Co.SIDES) do
@@ -369,7 +369,7 @@ function N.enable(scope)
                         not S.hasTabs(S)
                         or not S.isActiveTabRegistered(S)
                         or E.skip()
-                        or S.getScratchpad(S)
+                        or S.getScratchPad(S)
                     then
                         return D.log(p.event, "skip")
                     end

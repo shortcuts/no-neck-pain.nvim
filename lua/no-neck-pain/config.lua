@@ -59,7 +59,7 @@ NoNeckPain.bufferOptionsBo = {
 ---@type table
 ---Default values:
 ---@eval return MiniDoc.afterlines_to_code(MiniDoc.current.eval_section)
-NoNeckPain.bufferOptionsScratchpad = {
+NoNeckPain.bufferOptionsScratchPad = {
     -- When `true`, automatically sets the following options to the side buffers:
     -- - `autowriteall`
     -- - `autoread`.
@@ -136,8 +136,8 @@ NoNeckPain.bufferOptions = {
     bo = NoNeckPain.bufferOptionsBo,
     --- @see NoNeckPain.bufferOptionsWo `:h NoNeckPain.bufferOptionsWo`
     wo = NoNeckPain.bufferOptionsWo,
-    --- @see NoNeckPain.bufferOptionsScratchpad `:h NoNeckPain.bufferOptionsScratchpad`
-    scratchPad = NoNeckPain.bufferOptionsScratchpad,
+    --- @see NoNeckPain.bufferOptionsScratchPad `:h NoNeckPain.bufferOptionsScratchPad`
+    scratchPad = NoNeckPain.bufferOptionsScratchPad,
 }
 
 --- NoNeckPain's plugin config.
@@ -227,8 +227,8 @@ NoNeckPain.options = {
         setNames = false,
         -- Leverages the side buffers as notepads, which work like any Neovim buffer and automatically saves its content at the given `location`.
         -- note: quitting an unsaved scratchPad buffer is non-blocking, and the content is still saved.
-        --- see |NoNeckPain.bufferOptionsScratchpad|
-        scratchPad = NoNeckPain.bufferOptionsScratchpad,
+        --- see |NoNeckPain.bufferOptionsScratchPad|
+        scratchPad = NoNeckPain.bufferOptionsScratchPad,
         -- colors to apply to both side buffers, for buffer scopped options @see |NoNeckPain.bufferOptions|
         --- see |NoNeckPain.bufferOptionsColors|
         colors = NoNeckPain.bufferOptionsColors,
