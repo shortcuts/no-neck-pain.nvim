@@ -1,4 +1,16 @@
 <a name="0.2.3"></a>
+## [1.11.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.10.2...v1.11.0) (2024-03-27)
+
+
+### Features
+
+* **scratchPad:** provide `pathToFile` option ([#332](https://github.com/shortcuts/no-neck-pain.nvim/issues/332)) ([9a8d96d](https://github.com/shortcuts/no-neck-pain.nvim/commit/9a8d96dbf30611e033a828298f7e811ca4c29ed3))
+
+
+### Bug Fixes
+
+* **autocmds:** better state check for scratchpads ([#327](https://github.com/shortcuts/no-neck-pain.nvim/issues/327)) ([a54ffe9](https://github.com/shortcuts/no-neck-pain.nvim/commit/a54ffe9c61a30b8351fb3686cf83cf5840ddeaf0))
+
 ## [1.10.2](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.10.1...v1.10.2) (2024-03-24)
 
 
