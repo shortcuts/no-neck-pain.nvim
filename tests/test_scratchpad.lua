@@ -246,11 +246,16 @@ T["scratchPad"]["forwards the given filetype to the scratchPad"] = function()
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
 
+    Helpers.expect.config(child, "buffers.left.bo.filetype", "custom")
+    Helpers.expect.config(child, "buffers.right.bo.filetype", "custom")
+
     child.fn.win_gotoid(1001)
     Helpers.expect.equality(child.lua_get("vim.api.nvim_buf_get_option(0, 'filetype')"), "custom")
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_buf_get_option(0, 'buftype')"), "")
 
     child.fn.win_gotoid(1002)
     Helpers.expect.equality(child.lua_get("vim.api.nvim_buf_get_option(0, 'filetype')"), "custom")
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_buf_get_option(0, 'buftype')"), "")
 end
 
 T["scratchPad"]["toggling the scratchPad sets the buffer/window options"] = function()
