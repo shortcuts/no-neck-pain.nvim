@@ -21,10 +21,10 @@ local function resize(id, width, side)
 end
 
 ---Initializes the given `side` with the options from the user given configuration.
----@param id number: the id of the window.
 ---@param side "left"|"right"|"split": the side of the window to initialize.
+---@param id number: the id of the window.
 ---@private
-local function initSideOptions(id, side)
+function W.initSideOptions(side, id)
     local bufid = vim.api.nvim_win_get_buf(id)
 
     for opt, val in pairs(_G.NoNeckPain.config.buffers[side].bo) do
@@ -63,26 +63,16 @@ function W.initScratchPad(side, cleanup)
     -- cleanup is used when the `toggle` method disables the scratchPad, we then reinitialize it with the user-given configuration.
     if cleanup then
         vim.cmd("enew")
-        return initSideOptions(S.getSideID(S, side), side)
+        return W.initSideOptions(side, S.getSideID(S, side))
     end
 
-    local location = _G.NoNeckPain.config.buffers[side].scratchPad.location or ""
-
-    if location ~= "" and string.sub(location, -1) ~= "/" then
-        location = location .. "/"
-    end
-
-    location = string.format(
-        "%s%s-%s.%s",
-        location,
-        _G.NoNeckPain.config.buffers[side].scratchPad.fileName,
-        side,
-        _G.NoNeckPain.config.buffers[side].bo.filetype
+    D.log(
+        string.format("W.initScratchPad:%s", side),
+        "enabled with location %s",
+        _G.NoNeckPain.config.buffers[side].scratchPad.pathToFile
     )
 
-    D.log(string.format("W.initScratchPad:%s", side), "enabled with location %s", location)
-
-    vim.cmd(string.format("edit %s", location))
+    vim.cmd(string.format("edit %s", _G.NoNeckPain.config.buffers[side].scratchPad.pathToFile))
 
     vim.o.autowriteall = true
 end
@@ -136,7 +126,7 @@ function W.createSideBuffers(skipIntegrations)
                     S.setScratchpad(S, true)
                 end
 
-                initSideOptions(id, side)
+                W.initSideOptions(side, id)
             end
 
             local sideID = S.getSideID(S, side)

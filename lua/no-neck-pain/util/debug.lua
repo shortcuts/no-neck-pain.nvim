@@ -59,7 +59,11 @@ function D.warnDeprecation(options)
         then
             usesDeprecatedOption = true
             print(
-                string.format("[no-neck-pain.nvim] `%s` %s", name, string.format(notice, warning))
+                string.format(
+                    "[no-neck-pain.nvim] `buffers.%s` %s",
+                    name,
+                    string.format(notice, warning)
+                )
             )
         end
     end

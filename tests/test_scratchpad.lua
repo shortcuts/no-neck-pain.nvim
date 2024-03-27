@@ -21,27 +21,51 @@ T["setup"]["overrides default values"] = function()
         buffers = {
             scratchPad = {
                 enabled = true,
-                location = "~/Documents",
+                pathToFile = "~/Documents/foo.md"
             }
         },
     })]])
 
     Helpers.expect.config(child, "buffers.scratchPad", {
         enabled = true,
-        fileName = "no-neck-pain",
-        location = "~/Documents",
+        pathToFile = "~/Documents/foo.md",
     })
 
     Helpers.expect.config(child, "buffers.left.scratchPad", {
         enabled = true,
-        fileName = "no-neck-pain",
-        location = "~/Documents",
+        pathToFile = "~/Documents/foo.md",
     })
 
     Helpers.expect.config(child, "buffers.right.scratchPad", {
         enabled = true,
-        fileName = "no-neck-pain",
-        location = "~/Documents",
+        pathToFile = "~/Documents/foo.md",
+    })
+end
+
+T["setup"]["converts deprecate options to pathToFile"] = function()
+    child.lua([[require('no-neck-pain').setup({
+        buffers = {
+            scratchPad = {
+                enabled = true,
+                fileName = "foo",
+                location = "~/bar"
+            }
+        },
+    })]])
+
+    Helpers.expect.config(child, "buffers.scratchPad", {
+        enabled = true,
+        pathToFile = "",
+    })
+
+    Helpers.expect.config(child, "buffers.left.scratchPad", {
+        enabled = true,
+        pathToFile = "~/bar/foo-left.norg",
+    })
+
+    Helpers.expect.config(child, "buffers.right.scratchPad", {
+        enabled = true,
+        pathToFile = "~/bar/foo-right.norg",
     })
 end
 
@@ -215,36 +239,53 @@ T["scratchPad"]["side buffer definition overrides global one"] = function()
     )
 end
 
-T["scratchPad"]["throws with invalid location"] = function()
-    Helpers.expect.error(function()
-        child.lua(
-            [[require('no-neck-pain').setup({buffers = { scratchPad = { enabled = true, location = 10 }}})]]
-        )
-        Helpers.toggle(child)
-    end)
-end
-
 T["scratchPad"]["forwards the given filetype to the scratchpad"] = function()
     child.lua([[require('no-neck-pain').setup({
         width = 50,
         buffers = {
             scratchPad = {
-                enabled = true
+                enabled = true,
+                pathToFile = "foo.custom"
             },
             bo = {
                 filetype = "custom"
-            },
+            }
         },
     })]])
     Helpers.toggle(child)
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
 
-    child.lua("vim.fn.win_gotoid(1001)")
+    child.fn.win_gotoid(1001)
     Helpers.expect.equality(child.lua_get("vim.api.nvim_buf_get_option(0, 'filetype')"), "custom")
 
-    child.lua("vim.fn.win_gotoid(1002)")
+    child.fn.win_gotoid(1002)
     Helpers.expect.equality(child.lua_get("vim.api.nvim_buf_get_option(0, 'filetype')"), "custom")
+end
+
+T["scratchPad"]["toggling the scratchPad sets the buffer/window options"] = function()
+    child.lua([[require('no-neck-pain').setup({
+        width = 50,
+        buffers = { scratchPad = { enabled = false }, },
+        mappings = { scratchPad = "foo" },
+    })]])
+    Helpers.toggle(child)
+
+    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+
+    child.fn.win_gotoid(1001)
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_buf_get_option(0, 'buflisted')"), false)
+
+    child.fn.win_gotoid(1002)
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_buf_get_option(0, 'buflisted')"), false)
+
+    child.api.nvim_input("foo")
+
+    child.fn.win_gotoid(1001)
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_buf_get_option(0, 'buflisted')"), false)
+
+    child.fn.win_gotoid(1002)
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_buf_get_option(0, 'buflisted')"), false)
 end
 
 return T

@@ -1,3 +1,4 @@
+local A = require("no-neck-pain.util.api")
 local D = require("no-neck-pain.util.debug")
 local C = require("no-neck-pain.colors")
 local Co = require("no-neck-pain.util.constants")
@@ -65,14 +66,22 @@ NoNeckPain.bufferOptionsScratchpad = {
     --- @type boolean
     enabled = false,
     -- The name of the generated file. See `location` for more information.
+    -- /!\ deprecated /!\ use `pathToFile` instead.
     --- @type string
     --- @example: `no-neck-pain-left.norg`
+    --- @deprecated use `pathToFile` instead.
     fileName = "no-neck-pain",
     -- By default, files are saved at the same location as the current Neovim session.
     -- note: filetype is defaulted to `norg` (https://github.com/nvim-neorg/neorg), but can be changed in `buffers.bo.filetype` or |NoNeckPain.bufferOptions| for option scoped to the `left` and/or `right` buffer.
+    -- /!\ deprecated /!\ use `pathToFile` instead.
     --- @type string?
     --- @example: `no-neck-pain-left.norg`
+    --- @deprecated use `pathToFile` instead.
     location = nil,
+    -- The path to the file to save the scratchPad content to and load it in the buffer.
+    --- @type string?
+    --- @example: `~/notes.norg`
+    pathToFile = "",
 }
 
 --- NoNeckPain's buffer color options.
@@ -303,38 +312,63 @@ local defaults = vim.deepcopy(NoNeckPain.options)
 ---
 ---@private
 function NoNeckPain.defaults(options)
-    options.buffers = options.buffers or {}
-
     local tde = function(t1, t2)
         return vim.deepcopy(vim.tbl_deep_extend("keep", t1 or {}, t2 or {}))
     end
 
+    options.buffers = options.buffers or {}
+
     for _, side in pairs(Co.SIDES) do
         options.buffers[side] = options.buffers[side] or {}
-
         options.buffers[side].bo = tde(options.buffers[side].bo, options.buffers.bo)
         options.buffers[side].wo = tde(options.buffers[side].wo, options.buffers.wo)
         options.buffers[side].colors = tde(options.buffers[side].colors, options.buffers.colors)
         options.buffers[side].scratchPad =
             tde(options.buffers[side].scratchPad, options.buffers.scratchPad)
 
-        if options.buffers[side].scratchPad.enabled then
-            -- if the user wants scratchPads, but did not provided a custom filetype, we default to `norg`.
-            if options.buffers[side].bo == nil or options.buffers[side].bo.filetype == nil then
-                options.buffers[side].bo = options.buffers[side].bo or {}
-                options.buffers[side].bo.filetype = "norg"
-            end
+        if
+            A.length(options.buffers[side].scratchPad) == 0
+            or options.buffers[side].scratchPad.pathToFile == nil
+        then
+            options.buffers[side].scratchPad =
+                tde(options.buffers[side].scratchPad, defaults.buffers.scratchPad)
+        end
 
+        if options.buffers[side].scratchPad.enabled then
             options.buffers[side].bo.bufhidden = ""
             options.buffers[side].bo.buftype = ""
             options.buffers[side].bo.buflisted = false
             options.buffers[side].bo.autoread = true
             options.buffers[side].wo.conceallevel = 2
+        end
 
+        -- The logic below handles the deprecated `fileName` and `location` options and converts it to the `pathToFile` option.
+        options.buffers[side].scratchPad.pathToFile = options.buffers[side].scratchPad.pathToFile
+            or ""
+
+        if options.buffers[side].scratchPad.pathToFile == "" then
             if options.buffers[side].scratchPad.location ~= nil then
-                assert(
-                    type(options.buffers[side].scratchPad.location) == "string",
-                    "`scratchPad.location` must be nil or a string."
+                options.buffers[side].scratchPad.pathToFile =
+                    options.buffers[side].scratchPad.location
+            end
+
+            local fileType = options.buffers[side].bo.filetype or "norg"
+
+            if options.buffers[side].scratchPad.fileName ~= nil then
+                if
+                    options.buffers[side].scratchPad.pathToFile ~= ""
+                    and string.sub(options.buffers[side].scratchPad.pathToFile, -1) ~= "/"
+                then
+                    options.buffers[side].scratchPad.pathToFile = options.buffers[side].scratchPad.pathToFile
+                        .. "/"
+                end
+
+                options.buffers[side].scratchPad.pathToFile = string.format(
+                    "%s%s-%s.%s",
+                    options.buffers[side].scratchPad.pathToFile,
+                    options.buffers[side].scratchPad.fileName,
+                    side,
+                    fileType
                 )
             end
         end
@@ -362,13 +396,22 @@ function NoNeckPain.defaults(options)
     )
 
     -- assert `integrations` values
-    for _, tree in pairs({ "NvimTree", "NeoTree" }) do
+    for _, tree in pairs({ "NvimTree", "NeoTree", "undotree", "TSPlayground" }) do
         assert(
             NoNeckPain.options.integrations[tree].position == "left"
                 or NoNeckPain.options.integrations[tree].position == "right",
             string.format("%s position can only be `left` or `right`", tree)
         )
     end
+
+    -- cleanup step that removes deprecated option from the config in order to only keep the latest API
+    for _, side in pairs(Co.SIDES) do
+        NoNeckPain.options.buffers[side].scratchPad.fileName = nil
+        NoNeckPain.options.buffers[side].scratchPad.location = nil
+    end
+
+    NoNeckPain.options.buffers.scratchPad.fileName = nil
+    NoNeckPain.options.buffers.scratchPad.location = nil
 
     return NoNeckPain.options
 end
