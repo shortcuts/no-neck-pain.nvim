@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [1.12.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.11.1...v1.12.0) (2024-03-28)
+
+
+### Features
+
+* **integrations:** support outline.nvim ([#335](https://github.com/shortcuts/no-neck-pain.nvim/issues/335)) ([aec69e6](https://github.com/shortcuts/no-neck-pain.nvim/commit/aec69e60330442a32dbd663a5cfea48a68f2c519))
+
 ## [1.11.1](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.11.0...v1.11.1) (2024-03-27)
 
 
