@@ -146,6 +146,10 @@ T["setup"]["sets exposed methods and default options value"] = function()
         undotree = {
             position = "left",
         },
+        outline = {
+            position = "right",
+            reopen = true,
+        },
     })
 end
 

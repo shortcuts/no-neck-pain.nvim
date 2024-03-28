@@ -67,6 +67,10 @@ T["setup"]["overrides default values"] = function()
             position = "left",
             reopen = false,
         },
+        outline = {
+            position = "right",
+            reopen = true,
+        }
     })
 end
 
@@ -170,6 +174,35 @@ T["neotest"]["keeps sides open"] = function()
         id = 1003,
         open = "lua require('neotest').summary.open()",
         width = 100,
+    })
+end
+
+T["outline"] = MiniTest.new_set()
+
+T["outline"]["keeps sides open"] = function()
+    child.restart({ "-u", "scripts/init_with_outline.lua", "lua/no-neck-pain/main.lua" })
+    child.set_size(20, 100)
+
+    Helpers.toggle(child)
+
+    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+    Helpers.expect.state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
+
+    child.cmd("Outline")
+    vim.loop.sleep(50)
+
+    Helpers.expect.state(child, "tabs[1].wins.splits", vim.NIL)
+
+    Helpers.expect.state(child, "tabs[1].wins.integrations.outline", {
+        close = "Outline",
+        fileTypePattern = "outline",
+        id = 1004,
+        open = "Outline",
+        width = 40,
     })
 end
 

@@ -36,6 +36,7 @@ deps:
 	git clone --depth 1 https://github.com/antoinemadec/FixCursorHold.nvim deps/fixcursorhold
 	git clone --depth 1 https://github.com/mfussenegger/nvim-dap deps/nvimdap
 	git clone --depth 1 https://github.com/rcarriga/nvim-dap-ui deps/nvimdapui
+	git clone --depth 1 https://github.com/hedyhli/outline.nvim deps/outline
 
 test-ci: deps test
 
