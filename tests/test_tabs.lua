@@ -505,6 +505,11 @@ T["tabnew/tabclose"]["does not pick tab 1 for the first active tab"] = function(
                     fileTypePattern = "undotree",
                     open = "UndotreeToggle",
                 },
+                outline = {
+                    close = "Outline",
+                    fileTypePattern = "outline",
+                    open = "Outline",
+                },
             },
             main = {
                 curr = 1000,

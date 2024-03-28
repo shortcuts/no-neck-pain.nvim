@@ -67,6 +67,11 @@ Co.INTEGRATIONS = {
         close = "lua require('dapui').close()",
         open = "lua require('dapui').open()",
     },
+    outline = {
+        fileTypePattern = "outline",
+        close = "Outline",
+        open = "Outline",
+    },
 }
 
 ---Dashboards filetypes that delays the plugin enable step until next buffer entered.
