@@ -29,11 +29,12 @@ end
 T["auto command"]["disabling clears VimEnter autocmd"] = function()
     child.restart({ "-u", "scripts/init_auto_open.lua" })
     Helpers.toggle(child)
+    Helpers.wait(child)
 
-    Helpers.expect.equality(
-        child.api.nvim_get_autocmds({ group = "NoNeckPainVimEnterAutocmd" }),
-        {}
-    )
+    -- errors because it doesn't exist
+    Helpers.expect.error(function()
+        child.api.nvim_get_autocmds({ group = "NoNeckPainVimEnterAutocmd" })
+    end)
 end
 
 T["auto command"]["does not shift when opening/closing float window"] = function()
