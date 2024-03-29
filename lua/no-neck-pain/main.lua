@@ -347,8 +347,17 @@ function N.enable(scope)
                     return D.log(s, "no registered integration")
                 end
 
-                if p.event == "WinEnter" and #S.getUnregisteredWins(S) == 0 then
+                local unregistered = S.getUnregisteredWins(S)
+                if p.event == "WinEnter" and #unregistered == 0 then
                     return D.log(s, "no new windows")
+                end
+
+                if
+                    p.event == "WinEnter"
+                    and #unregistered == 1
+                    and not S.isSupportedIntegration(S, s, unregistered[1])
+                then
+                    return D.log(s, "encountered a new window, not an integration")
                 end
 
                 N.init(s, false, true)

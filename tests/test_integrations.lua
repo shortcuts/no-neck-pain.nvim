@@ -70,7 +70,7 @@ T["setup"]["overrides default values"] = function()
         outline = {
             position = "right",
             reopen = true,
-        }
+        },
     })
 end
 

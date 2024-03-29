@@ -124,7 +124,7 @@ function NoNeckPain.setup(opts)
                     end, 20)
                 end)
             end,
-            group = "NoNeckPainAutocmd",
+            group = "NoNeckPainVimEnterAutocmd",
             desc = "Triggers until it finds the correct moment/buffer to enable the plugin.",
         })
     end
