@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [1.12.1](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.12.0...v1.12.1) (2024-03-29)
+
+
+### Bug Fixes
+
+* **autocmds:** wrong registered group ([#338](https://github.com/shortcuts/no-neck-pain.nvim/issues/338)) ([59f5c1a](https://github.com/shortcuts/no-neck-pain.nvim/commit/59f5c1a550bc0558c98727aefd8eb45336f27870))
+
 ## [1.12.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.11.1...v1.12.0) (2024-03-28)
 
 
