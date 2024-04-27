@@ -24,6 +24,7 @@ end
 ---
 ---@private
 function State:initSplits()
+    self.tabs[self.activeTab].layers = { vsplit = 1, split = 1 }
     self.tabs[self.activeTab].wins.splits = nil
 end
 
@@ -531,100 +532,52 @@ function State:setTab(id)
     self.activeTab = id
 end
 
----Sets the `layers` of the currently active tab.
+---Increases the given layer `scope`.
 ---
----@param vsplit number?: the number of opened vsplits.
----@param split number?: the number of opened splits.
+---@param scope "split"|"vsplit": the scope to increase.
 ---@private
-function State:setLayers(vsplit, split)
-    if vsplit ~= nil then
-        self.tabs[self.activeTab].layers.vsplit = vsplit
-    end
-
-    if vsplit ~= nil then
-        self.tabs[self.activeTab].layers.split = split
-    end
+function State:increaseLayer(scope)
+    self.tabs[self.activeTab].layers[scope] = self.tabs[self.activeTab].layers[scope] + 1
 end
 
----Removes the split with the given `id` from the state.
----
----@param id number: the id of the split to remove.
----@private
-function State:removeSplit(id)
-    self.tabs[self.activeTab].wins.splits[id] = nil
-end
+function State:iterateOverLayout(scope, curr)
+    for _, group in ipairs(curr) do
+        if type(group) == "string" and group ~= "leaf" then
+            scope = group
 
----Decreases the layers of splits state values.
----
----@param isVSplit boolean: whether the window is a vsplit or not.
----@private
-function State:decreaseLayers(isVSplit)
-    local scope = isVSplit and "vsplit" or "split"
+            D.log("iterateOverLayout", "found scope %s", scope)
+        elseif type(group) == "table" then
+            D.log("iterateOverLayout", "found group %s for scope %s", vim.inspect(group), scope)
 
-    self.tabs[self.activeTab].layers[scope] = self.tabs[self.activeTab].layers[scope] - 1
+            self.iterateOverLayout(self, scope, group)
+        elseif type(group) == "number" then
+            if
+                group == self.getSideID(self, "curr")
+                or group == self.getSideID(self, "left")
+                or group == self.getSideID(self, "right")
+            then
+                D.log("iterateOverLayout", "skipping %s is a main window", group)
 
-    if self.tabs[self.activeTab].layers[scope] < 1 then
-        self.tabs[self.activeTab].layers[scope] = 1
-    end
-end
+                return
+            end
 
----Determines current state of the split/vsplit windows by comparing widths and heights.
----
----@param focusedWin number: the id of the current window.
----@return boolean: whether the current window is a vsplit or not.
----@private
-function State:computeSplits(focusedWin)
-    local side = self.getSideID(self, "left") or self.getSideID(self, "right")
-    local sWidth, sHeight = 0, 0
+            scope = scope == "col" and "split" or "vsplit"
+            D.log("iterateOverLayout", "found '%s' window %s", scope, group)
 
-    -- when side buffer exists we rely on them, otherwise we fallback to the UI
-    if side ~= nil then
-        local nbSide = 1
-
-        if self.checkSides(self, "and", true) then
-            nbSide = 2
+            self.increaseLayer(self, scope)
+            self.setSplit(self, { id = group, vertical = scope == "vsplit" })
         end
-
-        sWidth, sHeight = A.getWidthAndHeight(side)
-        sWidth = vim.api.nvim_list_uis()[1].width - sWidth * nbSide
-    else
-        sWidth = vim.api.nvim_list_uis()[1].width
-        sHeight = vim.api.nvim_list_uis()[1].height
     end
+end
 
-    local fWidth, fHeight = A.getWidthAndHeight(focusedWin)
-    local isVSplit = true
+---Refresh layers and splits state based on the `winlayout`.
+---
+---@private
+function State:refreshSplits()
+    self.initSplits(self)
+    self.iterateOverLayout(self, nil, vim.fn.winlayout(self.activeTab))
 
-    local splitInF = math.floor(sHeight / fHeight)
-    if splitInF < 1 then
-        splitInF = 1
-    end
-
-    if splitInF > self.tabs[self.activeTab].layers.split then
-        isVSplit = false
-    end
-
-    local vsplitInF = math.floor(sWidth / fWidth)
-    if vsplitInF < 1 then
-        vsplitInF = 1
-    end
-
-    if vsplitInF > self.tabs[self.activeTab].layers.vsplit then
-        isVSplit = true
-    end
-
-    -- update anyway because we want state consistency
-    self.setLayers(self, vsplitInF, splitInF)
-
-    D.log(
-        "Sp.compute",
-        "[split %d | vsplit %d] new split, vertical: %s",
-        self.tabs[self.activeTab].layers.split,
-        self.tabs[self.activeTab].layers.vsplit,
-        isVSplit
-    )
-
-    return isVSplit
+    D.log("refreshSplits", "layers computed: %s", vim.inspect(self.tabs[self.activeTab].layers))
 end
 
 return State

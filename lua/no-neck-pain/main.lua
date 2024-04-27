@@ -132,7 +132,7 @@ function N.enable(scope)
     vim.api.nvim_create_augroup(augroupName, { clear = true })
 
     S.setSideID(S, vim.api.nvim_get_current_win(), "curr")
-    S.computeSplits(S, S.getSideID(S, "curr"))
+    S.refreshSplits(S)
 
     N.init(scope, true)
 
@@ -217,14 +217,9 @@ function N.enable(scope)
                     return D.log(p.event, "no new or too many unregistered windows")
                 end
 
-                local focusedWin = wins[1]
-
-                local isVSplit = S.computeSplits(S, focusedWin)
-                S.setSplit(S, { id = focusedWin, vertical = isVSplit })
-
-                if isVSplit then
-                    N.init(p.event)
-                end
+                S.refreshSplits(S)
+                -- TODO: find a way to skip this ui refresh
+                N.init(p.event)
             end)
         end,
         group = augroupName,
@@ -289,19 +284,7 @@ function N.enable(scope)
                     return
                 end
 
-                S.tabs[S.activeTab].wins.splits = vim.tbl_filter(function(split)
-                    if vim.api.nvim_win_is_valid(split.id) then
-                        return true
-                    end
-
-                    S.decreaseLayers(S, split.vertical)
-
-                    return false
-                end, S.tabs[S.activeTab].wins.splits)
-
-                if #S.tabs[S.activeTab].wins.splits == 0 then
-                    S.initSplits(S)
-                end
+                S.refreshSplits(S)
 
                 -- we keep track if curr have been closed because if it's the case,
                 -- the focus will be on a side buffer which is wrong
@@ -316,11 +299,15 @@ function N.enable(scope)
 
                     haveCloseCurr = true
 
-                    local split = S.tabs[S.activeTab].wins.splits[1]
+                    vim.print(S.getTab(S))
 
-                    S.decreaseLayers(S, split.vertical)
-                    S.setSideID(S, split.id, "curr")
-                    S.removeSplit(S, split.id)
+                    for _, split in pairs(S.tabs[S.activeTab].wins.splits) do
+                        if vim.api.nvim_win_is_valid(split.id) then
+                            S.setSideID(S, split.id, "curr")
+                            S.refreshSplits(S)
+                            break
+                        end
+                    end
                 end
 
                 -- we only restore focus on curr if there's no split left

@@ -21,6 +21,15 @@ function D.log(scope, str, ...)
     )
 end
 
+---same as `log` but intended for no scope usage.
+---
+---@param str string: the formatted string.
+---@param ... any: the arguments of the formatted string.
+---@private
+function D.print(str, ...)
+    return D.log("<<<<<<<<<DEBUG>>>>>>>>>", str, ...)
+end
+
 ---analyzes the user provided `setup` parameters and sends a message if they use a deprecated option, then gives the new option to use.
 ---
 ---@param options table: the options provided by the user.
