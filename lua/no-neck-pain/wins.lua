@@ -109,6 +109,7 @@ end
 function W.createSideBuffers(skipIntegrations)
     -- before creating side buffers, we determine if we should consider externals
     S.refreshIntegrations(S, "createSideBuffers")
+    S.refreshVSplits(S)
 
     local wins = {
         left = { cmd = "topleft vnew", padding = 0 },
@@ -210,12 +211,12 @@ function W.getPadding(side)
     local tab = S.getTab(S)
 
     -- we need to see if there's enough space left to have side buffers
-    local occupied = _G.NoNeckPain.config.width * tab.layers.vsplit
+    local occupied = _G.NoNeckPain.config.width * tab.wins.vsplits
 
     -- if there's no space left according to the config width,
     -- then we don't have to create side buffers.
     if occupied >= width then
-        D.log(side, "%d vsplits - no space left to create side buffers", tab.layers.vsplit)
+        D.log(side, "%d vsplits - no space left to create side buffers", tab.wins.vsplits)
 
         return 0
     end
@@ -224,7 +225,7 @@ function W.getPadding(side)
         side,
         "%d currently with %d vsplits - computing integrations width",
         occupied,
-        tab.layers.vsplit
+        tab.wins.vsplits
     )
 
     -- now we need to determine how much we should substract from the remaining padding
@@ -244,12 +245,13 @@ function W.getPadding(side)
                 tree.width
             )
 
+            -- TODO: do not store width, get it at runtime instead.
             paddingToSubstract = paddingToSubstract + tree.width
         end
     end
 
     return math.floor(
-        (width - paddingToSubstract - (_G.NoNeckPain.config.width * tab.layers.vsplit)) / 2
+        (width - paddingToSubstract - (_G.NoNeckPain.config.width * (tab.wins.vsplits - 2))) / 2
     )
 end
 

@@ -132,7 +132,6 @@ function N.enable(scope)
     vim.api.nvim_create_augroup(augroupName, { clear = true })
 
     S.setSideID(S, vim.api.nvim_get_current_win(), "curr")
-    S.refreshLayers(S)
 
     N.init(scope, true)
 
@@ -210,19 +209,12 @@ function N.enable(scope)
                     return D.log(p.event, "on an integration")
                 end
 
-                local wins = S.getUnregisteredWins(S)
-
-                if #wins ~= 1 then
-                    return D.log(p.event, "no new or too many unregistered windows")
-                end
-
-                S.refreshLayers(S)
                 -- TODO: find a way to skip this ui refresh
                 N.init(p.event)
             end)
         end,
         group = augroupName,
-        desc = "WinEnter covers the layers refreshing",
+        desc = "WinEnter covers the vsplits refreshing",
     })
 
     vim.api.nvim_create_autocmd({ "QuitPre", "BufDelete" }, {
@@ -233,7 +225,7 @@ function N.enable(scope)
                     return
                 end
 
-                if S.hasLayers(S) then
+                if S.hasVSplits(S) then
                     return D.log(s, "splits still active")
                 end
 
@@ -279,11 +271,11 @@ function N.enable(scope)
     vim.api.nvim_create_autocmd({ "WinClosed", "BufDelete" }, {
         callback = function(p)
             vim.schedule(function()
-                if E.skip(nil) or not S.hasLayers(S) or W.stateWinsActive() then
+                if E.skip(nil) or not S.hasVSplits(S) or W.stateWinsActive() then
                     return
                 end
 
-                S.refreshLayers(S)
+                S.refreshVSplits(S)
 
                 -- we keep track if curr have been closed because if it's the case,
                 -- the focus will be on a side buffer which is wrong
@@ -292,7 +284,7 @@ function N.enable(scope)
                 -- if curr is not valid anymore, we focus the first valid split and remove it from the state
                 if not vim.api.nvim_win_is_valid(S.getSideID(S, "curr")) then
                     -- if neither curr and splits are remaining valids, we just disable
-                    if not S.hasLayers(S) then
+                    if not S.hasVSplits(S) then
                         return N.disable(p.event)
                     end
 
@@ -308,7 +300,7 @@ function N.enable(scope)
                 end
 
                 -- we only restore focus on curr if there's no split left
-                N.init(p.event, haveCloseCurr or not S.hasLayers(S))
+                N.init(p.event, haveCloseCurr or not S.hasVSplits(S))
             end)
         end,
         group = augroupName,

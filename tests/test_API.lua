@@ -239,8 +239,6 @@ T["enable"]["(single tab) sets state"] = function()
         right = 1002,
     })
 
-    Helpers.expect.state(child, "tabs[1].wins.splits", vim.NIL)
-
     Helpers.expect.state_type(child, "tabs[1].wins.integrations", "table")
 
     Helpers.expect.state(child, "tabs[1].wins.integrations", Co.INTEGRATIONS)
@@ -267,8 +265,6 @@ T["enable"]["(multiple tab) sets state"] = function()
         left = 1001,
         right = 1002,
     })
-    Helpers.expect.state(child, "tabs[1].wins.splits", vim.NIL)
-
     Helpers.expect.state_type(child, "tabs[1].wins.integrations", "table")
 
     Helpers.expect.state(child, "tabs[1].wins.integrations", Co.INTEGRATIONS)
@@ -291,8 +287,6 @@ T["enable"]["(multiple tab) sets state"] = function()
         left = 1004,
         right = 1005,
     })
-    Helpers.expect.state(child, "tabs[2].wins.splits", vim.NIL)
-
     Helpers.expect.state_type(child, "tabs[2].wins.integrations", "table")
 
     Helpers.expect.state(child, "tabs[2].wins.integrations", Co.INTEGRATIONS)

@@ -20,22 +20,11 @@ function State:save()
     _G.NoNeckPain.state = self
 end
 
----Sets the state layers to its original value.
+---Sets the vsplits counter to 1.
 ---
 ---@private
-function State:initLayers()
-    self.tabs[self.activeTab].layers = { vsplit = 1, split = 1 }
-end
-
----Whether layers are actives or not.
----
----@private
-function State:hasLayers()
-    if self.tabs[self.activeTab].layers == nil then
-        return false
-    end
-
-    return self.tabs[self.activeTab].layers.vsplit > 1 or self.tabs[self.activeTab].layers.split > 1
+function State:initVSplits()
+    self.tabs[self.activeTab].wins.vsplits = 0
 end
 
 ---Iterates over the tabs in the state to remove invalid tabs.
@@ -442,6 +431,22 @@ function State:setActiveTab(id)
     self.activeTab = id
 end
 
+---Whether there is vsplits registered or not.
+---
+---@return boolean
+---@private
+function State:hasVSplits()
+    return self.tabs[self.activeTab].wins.vsplits > 0
+end
+
+---Gets the tab vsplits counter.
+---
+---@return number: the number of active vsplits.
+---@private
+function State:getVSplits()
+    return self.tabs[self.activeTab].wins.vsplits
+end
+
 ---Gets the tab with the given `id` from the state.
 ---
 ---@return table: the `tab` information.
@@ -492,11 +497,8 @@ function State:setTab(id)
     self.tabs[id] = {
         id = id,
         scratchPadEnabled = false,
-        layers = {
-            vsplit = 1,
-            split = 1,
-        },
         wins = {
+            vsplits = 0,
             main = {
                 curr = nil,
                 left = nil,
@@ -508,56 +510,47 @@ function State:setTab(id)
     self.activeTab = id
 end
 
----Increases the given layer `scope`.
+---Increases the vsplits counter.
 ---
----@param vertical boolean: true if it's a vertical layer.
+---@param nb number: the number of columns in the given row.
 ---@private
-function State:increaseLayer(vertical)
-    local scope = vertical and "vsplit" or "split"
-    self.tabs[self.activeTab].layers[scope] = self.tabs[self.activeTab].layers[scope] + 1
+function State:increaseVSplits(nb)
+    self.tabs[self.activeTab].wins.vsplits = self.tabs[self.activeTab].wins.vsplits + nb
 end
 
-function State:iterateOverLayout(parent, scope, curr)
+function State:iterateOverLayout(parent, curr)
+    local vsplit = false
+    parent = parent or false
+
     for _, group in ipairs(curr) do
-        if type(group) == "string" and group ~= "leaf" then
-            parent = scope
-            scope = group
-
-            D.log("iterateOverLayout", "found scope %s", scope)
+        if type(group) == "string" and group == "row" then
+            vsplit = true
         elseif type(group) == "table" then
-            self.iterateOverLayout(self, parent, scope, group)
-        elseif type(group) == "number" then
-            if
-                group == self.getSideID(self, "curr")
-                or group == self.getSideID(self, "left")
-                or group == self.getSideID(self, "right")
-            then
-                D.log("iterateOverLayout", "skipping %s is a main window", group)
-
-                return
+            if vsplit then
+                local length = parent and #group - 1 or #group
+                vim.print(length, parent, #group)
+                self.increaseVSplits(self, length)
             end
 
-            D.log(
-                "iterateOverLayout",
-                "window '%s' on scope '%s' and parent '%s'",
-                group,
-                scope,
-                parent
-            )
-
-            self.increaseLayer(self, scope == "row" or parent == "row")
+            self.iterateOverLayout(self, vsplit, group)
         end
     end
 end
 
----Refresh layers state based on the `winlayout`.
+---Refresh vsplits counter based on the `winlayout`.
 ---
 ---@private
-function State:refreshLayers()
-    self.initLayers(self)
-    self.iterateOverLayout(self, nil, nil, vim.fn.winlayout(self.activeTab))
+function State:refreshVSplits()
+    self.initVSplits(self)
 
-    D.log("initLayers", "layers computed: %s", vim.inspect(self.tabs[self.activeTab].layers))
+    local layout = vim.fn.winlayout(self.activeTab)
+    if #layout == 2 and type(layout[1]) == "string" and type(layout[2]) == "number" then
+        self.increaseVSplits(self, 1)
+    else
+        self.iterateOverLayout(self, nil, layout)
+    end
+
+    D.log("refreshVSplits", "computed %d", self.tabs[self.activeTab].wins.vsplits)
 end
 
 return State
