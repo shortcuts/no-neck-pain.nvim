@@ -10,7 +10,7 @@ local W = {}
 ---
 ---@param id number: the id of the window.
 ---@param width number: the width to apply to the window.
----@param side "left"|"right"|"split": the side of the window being resized, used for logging only.
+---@param side "left"|"right"|"curr": the side of the window being resized, used for logging only.
 ---@private
 local function resize(id, width, side)
     D.log(side, "resizing %d with padding %d", id, width)
@@ -21,7 +21,7 @@ local function resize(id, width, side)
 end
 
 ---Initializes the given `side` with the options from the user given configuration.
----@param side "left"|"right"|"split": the side of the window to initialize.
+---@param side "left"|"right": the side of the window to initialize.
 ---@param id number: the id of the window.
 ---@private
 function W.initSideOptions(side, id)
@@ -177,30 +177,6 @@ function W.createSideBuffers(skipIntegrations)
         end
     end
 
-    -- if we still have side buffers open at this point, and we have vsplit opened,
-    -- there might be width issues so we the resize opened vsplits.
-    if S.checkSides(S, "or", true) and S.hasSplits(S) then
-        local side = S.getSideID(S, "left") or S.getSideID(S, "right")
-        local sWidth, _ = A.getWidthAndHeight(side)
-        local nbSide = 1
-
-        if S.getSideID(S, "left") and S.getSideID(S, "right") then
-            nbSide = 2
-        end
-
-        local tab = S.getTab(S)
-
-        -- get the available usable width (screen size without side paddings)
-        sWidth = vim.api.nvim_list_uis()[1].width - sWidth * nbSide
-        sWidth = math.floor(sWidth / tab.layers.vsplit)
-
-        for _, split in pairs(tab.wins.splits) do
-            if split.vertical then
-                resize(split.id, sWidth, "split")
-            end
-        end
-    end
-
     -- closing integrations and reopening them means new window IDs
     if closedIntegrations then
         S.refreshIntegrations(S, "createSideBuffers")
@@ -279,10 +255,9 @@ end
 
 ---Determine if the tab wins are still active and valid.
 ---
----@param checkSplits boolean: whether splits state should be considered or not.
 ---@return boolean: whether all windows are active and valid or not.
 ---@private
-function W.stateWinsActive(checkSplits)
+function W.stateWinsActive()
     if not S.isActiveTabValid(S) then
         return false
     end
@@ -296,14 +271,6 @@ function W.stateWinsActive(checkSplits)
     if tab.wins.main ~= nil then
         for _, side in pairs(tab.wins.main) do
             if not vim.api.nvim_win_is_valid(side) then
-                return false
-            end
-        end
-    end
-
-    if checkSplits and tab.wins.splits ~= nil then
-        for _, split in pairs(tab.wins.splits) do
-            if not vim.api.nvim_win_is_valid(split.id) then
                 return false
             end
         end

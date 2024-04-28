@@ -20,12 +20,22 @@ function State:save()
     _G.NoNeckPain.state = self
 end
 
----Sets the state splits to its original value.
+---Sets the state layers to its original value.
 ---
 ---@private
-function State:initSplits()
+function State:initLayers()
     self.tabs[self.activeTab].layers = { vsplit = 1, split = 1 }
-    self.tabs[self.activeTab].wins.splits = nil
+end
+
+---Whether layers are actives or not.
+---
+---@private
+function State:hasLayers()
+    if self.tabs[self.activeTab].layers == nil then
+        return false
+    end
+
+    return self.tabs[self.activeTab].layers.vsplit > 1 or self.tabs[self.activeTab].layers.split > 1
 end
 
 ---Iterates over the tabs in the state to remove invalid tabs.
@@ -184,12 +194,6 @@ function State:getRegisteredWins()
         end
     end
 
-    if self.tabs[self.activeTab].wins.splits ~= nil then
-        for _, split in pairs(self.tabs[self.activeTab].wins.splits) do
-            table.insert(wins, split.id)
-        end
-    end
-
     return wins
 end
 
@@ -343,20 +347,6 @@ function State:hasTabs()
     return self.tabs ~= nil
 end
 
----Whether there is splits registered in the active tab or not.
----
----@return boolean
----@private
-function State:hasSplits()
-    if not self.hasTabs(self) then
-        return false
-    end
-
-    return self.tabs[self.activeTab] ~= nil
-        and self.tabs[self.activeTab].wins ~= nil
-        and self.tabs[self.activeTab].wins.splits ~= nil
-end
-
 ---Whether there is integrations registered in the active tab or not.
 ---
 ---@return boolean
@@ -452,19 +442,6 @@ function State:setActiveTab(id)
     self.activeTab = id
 end
 
----Set a split in the state at the given id.
----
----@param split table: the id of the split.
----
----@private
-function State:setSplit(split)
-    if self.tabs[self.activeTab].wins.splits == nil then
-        self.tabs[self.activeTab].wins.splits = {}
-    end
-
-    self.tabs[self.activeTab].wins.splits[split.id] = split
-end
-
 ---Gets the tab with the given `id` from the state.
 ---
 ---@return table: the `tab` information.
@@ -525,7 +502,6 @@ function State:setTab(id)
                 left = nil,
                 right = nil,
             },
-            splits = nil,
             integrations = vim.deepcopy(Co.INTEGRATIONS),
         },
     }
@@ -534,22 +510,22 @@ end
 
 ---Increases the given layer `scope`.
 ---
----@param scope "split"|"vsplit": the scope to increase.
+---@param vertical boolean: true if it's a vertical layer.
 ---@private
-function State:increaseLayer(scope)
+function State:increaseLayer(vertical)
+    local scope = vertical and "vsplit" or "split"
     self.tabs[self.activeTab].layers[scope] = self.tabs[self.activeTab].layers[scope] + 1
 end
 
-function State:iterateOverLayout(scope, curr)
+function State:iterateOverLayout(parent, scope, curr)
     for _, group in ipairs(curr) do
         if type(group) == "string" and group ~= "leaf" then
+            parent = scope
             scope = group
 
             D.log("iterateOverLayout", "found scope %s", scope)
         elseif type(group) == "table" then
-            D.log("iterateOverLayout", "found group %s for scope %s", vim.inspect(group), scope)
-
-            self.iterateOverLayout(self, scope, group)
+            self.iterateOverLayout(self, parent, scope, group)
         elseif type(group) == "number" then
             if
                 group == self.getSideID(self, "curr")
@@ -561,23 +537,27 @@ function State:iterateOverLayout(scope, curr)
                 return
             end
 
-            scope = scope == "col" and "split" or "vsplit"
-            D.log("iterateOverLayout", "found '%s' window %s", scope, group)
+            D.log(
+                "iterateOverLayout",
+                "window '%s' on scope '%s' and parent '%s'",
+                group,
+                scope,
+                parent
+            )
 
-            self.increaseLayer(self, scope)
-            self.setSplit(self, { id = group, vertical = scope == "vsplit" })
+            self.increaseLayer(self, scope == "row" or parent == "row")
         end
     end
 end
 
----Refresh layers and splits state based on the `winlayout`.
+---Refresh layers state based on the `winlayout`.
 ---
 ---@private
-function State:refreshSplits()
-    self.initSplits(self)
-    self.iterateOverLayout(self, nil, vim.fn.winlayout(self.activeTab))
+function State:refreshLayers()
+    self.initLayers(self)
+    self.iterateOverLayout(self, nil, nil, vim.fn.winlayout(self.activeTab))
 
-    D.log("refreshSplits", "layers computed: %s", vim.inspect(self.tabs[self.activeTab].layers))
+    D.log("initLayers", "layers computed: %s", vim.inspect(self.tabs[self.activeTab].layers))
 end
 
 return State

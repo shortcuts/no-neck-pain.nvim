@@ -132,7 +132,7 @@ function N.enable(scope)
     vim.api.nvim_create_augroup(augroupName, { clear = true })
 
     S.setSideID(S, vim.api.nvim_get_current_win(), "curr")
-    S.refreshSplits(S)
+    S.refreshLayers(S)
 
     N.init(scope, true)
 
@@ -206,8 +206,7 @@ function N.enable(scope)
                 end
 
                 -- an integration isn't considered as a split
-                local isSupportedIntegration = S.isSupportedIntegration(S, p.event, nil)
-                if isSupportedIntegration then
+                if S.isSupportedIntegration(S, p.event, nil) then
                     return D.log(p.event, "on an integration")
                 end
 
@@ -217,13 +216,13 @@ function N.enable(scope)
                     return D.log(p.event, "no new or too many unregistered windows")
                 end
 
-                S.refreshSplits(S)
+                S.refreshLayers(S)
                 -- TODO: find a way to skip this ui refresh
                 N.init(p.event)
             end)
         end,
         group = augroupName,
-        desc = "WinEnter covers the split/vsplit management",
+        desc = "WinEnter covers the layers refreshing",
     })
 
     vim.api.nvim_create_autocmd({ "QuitPre", "BufDelete" }, {
@@ -234,7 +233,7 @@ function N.enable(scope)
                     return
                 end
 
-                if S.hasSplits(S) then
+                if S.hasLayers(S) then
                     return D.log(s, "splits still active")
                 end
 
@@ -280,11 +279,11 @@ function N.enable(scope)
     vim.api.nvim_create_autocmd({ "WinClosed", "BufDelete" }, {
         callback = function(p)
             vim.schedule(function()
-                if E.skip(nil) or not S.hasSplits(S) or W.stateWinsActive(true) then
+                if E.skip(nil) or not S.hasLayers(S) or W.stateWinsActive() then
                     return
                 end
 
-                S.refreshSplits(S)
+                S.refreshLayers(S)
 
                 -- we keep track if curr have been closed because if it's the case,
                 -- the focus will be on a side buffer which is wrong
@@ -293,13 +292,11 @@ function N.enable(scope)
                 -- if curr is not valid anymore, we focus the first valid split and remove it from the state
                 if not vim.api.nvim_win_is_valid(S.getSideID(S, "curr")) then
                     -- if neither curr and splits are remaining valids, we just disable
-                    if not S.hasSplits(S) then
+                    if not S.hasLayers(S) then
                         return N.disable(p.event)
                     end
 
                     haveCloseCurr = true
-
-                    vim.print(S.getTab(S))
 
                     for _, split in pairs(S.tabs[S.activeTab].wins.splits) do
                         if vim.api.nvim_win_is_valid(split.id) then
@@ -311,7 +308,7 @@ function N.enable(scope)
                 end
 
                 -- we only restore focus on curr if there's no split left
-                N.init(p.event, haveCloseCurr or not S.hasSplits(S))
+                N.init(p.event, haveCloseCurr or not S.hasLayers(S))
             end)
         end,
         group = augroupName,

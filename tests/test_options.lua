@@ -48,6 +48,7 @@ T["killAllBuffersOnDisable"]["closes every windows when disabling the plugin"] =
     child.cmd("badd 1")
     child.cmd("vsplit")
     child.cmd("split")
+    child.loop.sleep(500)
     Helpers.expect.equality(Helpers.listBuffers(child), { 1, 2, 3, 4 })
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1004, 1003, 1000, 1002 })
 
