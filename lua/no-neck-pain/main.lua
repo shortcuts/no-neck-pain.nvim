@@ -167,9 +167,11 @@ function N.enable(scope)
                 then
                     S.refreshTabs(S, S.activeTab)
                     D.log(p.event, "tab %d is now inactive", S.activeTab)
-                else
-                    D.log(p.event, "tab %d left", S.activeTab)
+
+                    return
                 end
+
+                D.log(p.event, "tab %d left", S.activeTab)
             end)
         end,
         group = augroupName,
@@ -271,11 +273,11 @@ function N.enable(scope)
     vim.api.nvim_create_autocmd({ "WinClosed", "BufDelete" }, {
         callback = function(p)
             vim.schedule(function()
-                if E.skip(nil) or not S.hasVSplits(S) or W.stateWinsActive() then
+                vim.print(E.skip(nil))
+                vim.print(not S.hasVSplits(S))
+                if E.skip(nil) or not S.hasVSplits(S) then
                     return
                 end
-
-                S.refreshVSplits(S)
 
                 -- we keep track if curr have been closed because if it's the case,
                 -- the focus will be on a side buffer which is wrong
@@ -283,6 +285,8 @@ function N.enable(scope)
 
                 -- if curr is not valid anymore, we focus the first valid split and remove it from the state
                 if not vim.api.nvim_win_is_valid(S.getSideID(S, "curr")) then
+                    D.log(p.event, "curr has been closed")
+
                     -- if neither curr and splits are remaining valids, we just disable
                     if not S.hasVSplits(S) then
                         return N.disable(p.event)
@@ -290,17 +294,12 @@ function N.enable(scope)
 
                     haveCloseCurr = true
 
-                    for _, split in pairs(S.tabs[S.activeTab].wins.splits) do
-                        if vim.api.nvim_win_is_valid(split.id) then
-                            S.setSideID(S, split.id, "curr")
-                            S.refreshSplits(S)
-                            break
-                        end
-                    end
+                    -- TODO: find an other win if curr is closed
                 end
 
-                -- we only restore focus on curr if there's no split left
-                N.init(p.event, haveCloseCurr or not S.hasVSplits(S))
+                if S.checkSides(S, "or", true) then
+                    N.init(p.event, haveCloseCurr or not S.hasVSplits(S))
+                end
             end)
         end,
         group = augroupName,

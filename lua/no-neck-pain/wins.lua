@@ -109,7 +109,7 @@ end
 function W.createSideBuffers(skipIntegrations)
     -- before creating side buffers, we determine if we should consider externals
     S.refreshIntegrations(S, "createSideBuffers")
-    S.refreshVSplits(S)
+    S.refreshVSplits(S, "createSideBuffers")
 
     local wins = {
         left = { cmd = "topleft vnew", padding = 0 },
@@ -190,6 +190,7 @@ end
 ---@return number: the width of the side window.
 ---@private
 function W.getPadding(side)
+    local scope = string.format("W.getPadding:%s", side)
     local uis = vim.api.nvim_list_uis()
 
     if uis[1] == nil then
@@ -200,85 +201,63 @@ function W.getPadding(side)
 
     local width = uis[1].width
 
+    D.log(scope, "screen width %d", width)
+
     -- if the available screen size is lower than the config width,
     -- we don't have to create side buffers.
     if _G.NoNeckPain.config.width >= width then
-        D.log("W.getPadding", "[%s] - ui %s - no space left to create side buffers", side, width)
+        D.log(scope, "no space left to create side buffers", side, width)
 
         return 0
     end
 
-    local tab = S.getTab(S)
+    local columns = S.getVSplits(S)
+
+    if _G.NoNeckPain.config.buffers.left.enabled then
+        columns = columns - 1
+    end
+
+    if _G.NoNeckPain.config.buffers.right.enabled then
+        columns = columns - 1
+    end
+
+    if columns < 1 then
+        columns = 1
+    end
 
     -- we need to see if there's enough space left to have side buffers
-    local occupied = _G.NoNeckPain.config.width * tab.wins.vsplits
+    local occupied = _G.NoNeckPain.config.width * columns
+
+    D.log(scope, "have %d vsplits", columns)
 
     -- if there's no space left according to the config width,
     -- then we don't have to create side buffers.
     if occupied >= width then
-        D.log(side, "%d vsplits - no space left to create side buffers", tab.wins.vsplits)
+        D.log(scope, "%d occupied - no space left to create side", occupied)
 
         return 0
     end
 
-    D.log(
-        side,
-        "%d currently with %d vsplits - computing integrations width",
-        occupied,
-        tab.wins.vsplits
-    )
+    D.log(scope, "%d/%d with vsplits, computing integrations", occupied, width)
 
     -- now we need to determine how much we should substract from the remaining padding
     -- if there's side integrations open.
-    local paddingToSubstract = 0
-
-    for name, tree in pairs(tab.wins.integrations) do
+    for name, tree in pairs(S.getIntegrations(S)) do
         if
             tree.id ~= nil
             and (not S.wantsSides(S) or side == _G.NoNeckPain.config.integrations[name].position)
         then
-            D.log(
-                "W.getPadding",
-                "[%s] - have an external open: %s with width %d",
-                side,
-                name,
-                tree.width
-            )
+            D.log(scope, "%s opened with width %d", name, tree.width)
 
-            -- TODO: do not store width, get it at runtime instead.
-            paddingToSubstract = paddingToSubstract + tree.width
+            occupied = occupied + tree.width
         end
     end
 
-    return math.floor(
-        (width - paddingToSubstract - (_G.NoNeckPain.config.width * (tab.wins.vsplits - 2))) / 2
-    )
-end
+    local final = math.floor((width - occupied) / 2)
 
----Determine if the tab wins are still active and valid.
----
----@return boolean: whether all windows are active and valid or not.
----@private
-function W.stateWinsActive()
-    if not S.isActiveTabValid(S) then
-        return false
-    end
+    D.log(scope, "%d/%d with integrations - final %d", occupied, width, final)
 
-    local tab = S.getTabSafe(S)
-
-    if tab == nil then
-        return false
-    end
-
-    if tab.wins.main ~= nil then
-        for _, side in pairs(tab.wins.main) do
-            if not vim.api.nvim_win_is_valid(side) then
-                return false
-            end
-        end
-    end
-
-    return true
+    return final
 end
 
 return W

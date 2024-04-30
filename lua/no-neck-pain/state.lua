@@ -126,6 +126,14 @@ function State:reopenIntegration()
     end
 end
 
+---Gets all integrations.
+---
+---@return table: the integration infos.
+---@private
+function State:getIntegrations()
+    return self.tabs[self.activeTab].wins.integrations
+end
+
 ---Gets the integration with the given `win` if it's already registered.
 ---
 ---@param id integer: the integration to search for.
@@ -518,39 +526,54 @@ function State:increaseVSplits(nb)
     self.tabs[self.activeTab].wins.vsplits = self.tabs[self.activeTab].wins.vsplits + nb
 end
 
-function State:iterateOverLayout(parent, curr)
-    local vsplit = false
-    parent = parent or false
-
+---Recursively iterates over the `winlayout` until it has computed every column present in the UI.
+---
+---When we find a `row`, we set `vsplit` to true, the next element will always be a `table` so once on it -we can increase the `vsplits` counter.
+---
+---In order to also compute nested vsplits, we need to keep track how deep we are in the layout, we remove
+---that depth from the number of elements in the current `row` in order to avoid counting all parents many times.
+---
+---@private
+function State:iterateOverLayout(depth, vsplit, curr)
     for _, group in ipairs(curr) do
+        -- a row indicates a `vsplit` window container
         if type(group) == "string" and group == "row" then
             vsplit = true
         elseif type(group) == "table" then
+            local len = #group
             if vsplit then
-                local length = parent and #group - 1 or #group
-                vim.print(length, parent, #group)
-                self.increaseVSplits(self, length)
-            end
+                -- even if we are super deep in the field, len minimal value is always 1.
+                if len <= depth then
+                    len = depth + 1
+                end
 
-            self.iterateOverLayout(self, vsplit, group)
+                -- we remove the depth from the len in order to avoid counting parents multiple times.
+                self.increaseVSplits(self, len - depth)
+
+                -- reset vsplit as this layer as been computed already, increase depth as we will dug again.
+                depth = depth + 1
+                vsplit = false
+            end
+            self.iterateOverLayout(self, depth, vsplit, group)
         end
     end
 end
 
 ---Refresh vsplits counter based on the `winlayout`.
 ---
+---@param scope string: the caller of the method.
 ---@private
-function State:refreshVSplits()
+function State:refreshVSplits(scope)
     self.initVSplits(self)
 
     local layout = vim.fn.winlayout(self.activeTab)
     if #layout == 2 and type(layout[1]) == "string" and type(layout[2]) == "number" then
         self.increaseVSplits(self, 1)
     else
-        self.iterateOverLayout(self, nil, layout)
+        self.iterateOverLayout(self, 0, false, layout)
     end
 
-    D.log("refreshVSplits", "computed %d", self.tabs[self.activeTab].wins.vsplits)
+    D.log(scope, "computed %d", self.tabs[self.activeTab].wins.vsplits)
 end
 
 return State
