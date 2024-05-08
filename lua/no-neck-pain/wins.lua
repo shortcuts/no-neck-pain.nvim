@@ -107,10 +107,6 @@ end
 ---@param skipIntegrations boolean?: skip integrations action when true.
 ---@private
 function W.createSideBuffers(skipIntegrations)
-    -- before creating side buffers, we determine if we should consider externals
-    S.refreshIntegrations(S, "createSideBuffers")
-    S.refreshVSplits(S, "createSideBuffers")
-
     local wins = {
         left = { cmd = "topleft vnew", padding = 0 },
         right = { cmd = "botright vnew", padding = 0 },

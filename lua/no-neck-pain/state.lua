@@ -27,39 +27,27 @@ function State:initVSplits()
     self.tabs[self.activeTab].wins.vsplits = 0
 end
 
----Iterates over the tabs in the state to remove invalid tabs.
+---Iterates over the tabs in the state to remove invalid tabs, if `id` is provided, removes it from the list..
+---@param id number?: the id of the tab to remove.
 ---
----@param id number?: the `id` of the tab to remove from the state, defaults to the current tabpage.
----@return number: the total `tabs` in the state.
+---@return table?: the refreshed `tabs` state
 ---@private
 function State:refreshTabs(id)
-    id = id or A.getCurrentTab()
-
     local refreshedTabs = {}
 
     for _, tab in pairs(self.tabs) do
-        if tab.id ~= id and vim.api.nvim_tabpage_is_valid(tab.id) then
+        if vim.api.nvim_tabpage_is_valid(tab.id) and (id == nil or tab.id ~= id) then
             refreshedTabs[tab.id] = tab
         end
     end
 
     if #refreshedTabs == 0 then
-        self.tabs = nil
-
-        return 0
+        refreshedTabs = nil
     end
 
     self.tabs = refreshedTabs
 
-    return #self.tabs
-end
-
----Refresh the integrations of the active state tab.
----
----@param scope string: the caller of the method.
----@private
-function State:refreshIntegrations(scope)
-    self.tabs[self.activeTab].wins.integrations = self.scanIntegrations(self, scope)
+    return refreshedTabs
 end
 
 ---Closes side integrations if opened.
@@ -250,7 +238,7 @@ end
 ---@param scope string: the caller of the method.
 ---@return table: the update state integrations table.
 ---@private
-function State:scanIntegrations(scope)
+function State:refreshIntegrations(scope)
     local wins = self.getUnregisteredWins(self)
     local unregisteredIntegrations = vim.deepcopy(Co.INTEGRATIONS)
 
@@ -439,6 +427,14 @@ function State:setActiveTab(id)
     self.activeTab = id
 end
 
+---Gets the active tab.
+---
+---@return number
+---@private
+function State:getActiveTab()
+    return self.activeTab
+end
+
 ---Whether there is vsplits registered or not.
 ---
 ---@return boolean
@@ -573,7 +569,7 @@ function State:refreshVSplits(scope)
         self.iterateOverLayout(self, 0, false, layout)
     end
 
-    D.log(scope, "computed %d", self.tabs[self.activeTab].wins.vsplits)
+    D.log(scope, "computed %d vsplits", self.tabs[self.activeTab].wins.vsplits)
 end
 
 return State

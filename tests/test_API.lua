@@ -207,12 +207,10 @@ end
 
 T["setup"]["starts the plugin on VimEnter"] = function()
     child.restart({ "-u", "scripts/init_auto_open.lua" })
-    Helpers.wait(child)
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
-    Helpers.expect.state(child, "enabled", true)
-
-    child.stop()
+    Helpers.expect.state_type(child, "", "table")
+    Helpers.expect.state(child, "enabled", "foo")
 end
 
 T["enable"] = MiniTest.new_set()

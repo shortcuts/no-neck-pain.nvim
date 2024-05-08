@@ -107,8 +107,6 @@ T["TabNewEntered"]["starts the plugin on new tab"] = function()
     Helpers.expect.state(child, "activeTab", 2)
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1004, 1003, 1005 })
-
-    child.stop()
 end
 
 T["TabNewEntered"]["does not re-enable if the user disables it"] = function()
@@ -143,8 +141,6 @@ T["TabNewEntered"]["does not re-enable if the user disables it"] = function()
     Helpers.expect.state(child, "activeTab", 2)
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1003 })
-
-    child.stop()
 end
 
 T["tabnew/tabclose"] = MiniTest.new_set()
