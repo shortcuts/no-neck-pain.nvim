@@ -88,7 +88,7 @@ end
 --- @param scope string: internal identifier for logging purposes.
 ---@private
 function N.init(scope)
-    -- assert(S.isActiveTabRegistered(S) == true, "called the internal `init` method on a `nil` tab.")
+    assert(S.isActiveTabRegistered(S) == true, "called the internal `init` method on a `nil` tab.")
 
     D.log(
         scope,
@@ -158,7 +158,7 @@ function N.enable(scope)
         callback = function(p)
             vim.schedule(function()
                 if p.event == "TabLeave" then
-                    S.refreshTabs(S, S.getActiveTab(S))
+                    S.refreshTabs(S)
                     D.log(p.event, "tab %d left", S.getActiveTab(S))
 
                     return
