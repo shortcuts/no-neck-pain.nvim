@@ -83,6 +83,30 @@ T["split"]["keeps side buffers"] = function()
     Helpers.expect.buf_width(child, "tabs[1].wins.main.right", 15)
 end
 
+T["split"]["qf list keeps both buffer and is well positionned"] = function()
+    child.set_size(200, 200)
+    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
+    Helpers.toggle(child)
+
+    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+    Helpers.expect.state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
+
+    child.cmd("copen")
+    child.loop.sleep(50)
+
+    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1003, 1000, 1002 })
+    Helpers.expect.state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
+    Helpers.expect.state(child, "tabs[1].wins.splits[1003]", { id = 1003, vertical = false })
+end
+
 T["split"]["keeps correct focus"] = function()
     child.set_size(300, 300)
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])

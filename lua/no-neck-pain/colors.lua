@@ -129,8 +129,9 @@ function C.init(win, side)
     local bufnr = vim.api.nvim_win_get_buf(win)
 
     -- create groups to assign them to the namespace
-    local backgroundGroup = string.format("NoNeckPain_background_tab_%s_side_%s", S.activeTab, side)
-    local textGroup = string.format("NoNeckPain_text_tab_%s_side_%s", S.activeTab, side)
+    local backgroundGroup =
+        string.format("NoNeckPain_background_tab_%s_side_%s", S.getActiveTab(S), side)
+    local textGroup = string.format("NoNeckPain_text_tab_%s_side_%s", S.getActiveTab(S), side)
 
     vim.cmd(
         string.format(

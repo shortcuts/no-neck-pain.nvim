@@ -207,12 +207,10 @@ end
 
 T["setup"]["starts the plugin on VimEnter"] = function()
     child.restart({ "-u", "scripts/init_auto_open.lua" })
-    Helpers.wait(child)
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
-    Helpers.expect.state(child, "enabled", true)
-
-    child.stop()
+    Helpers.expect.state_type(child, "", "table")
+    Helpers.expect.state(child, "enabled", "foo")
 end
 
 T["enable"] = MiniTest.new_set()
@@ -238,8 +236,6 @@ T["enable"]["(single tab) sets state"] = function()
         left = 1001,
         right = 1002,
     })
-
-    Helpers.expect.state(child, "tabs[1].wins.splits", vim.NIL)
 
     Helpers.expect.state_type(child, "tabs[1].wins.integrations", "table")
 
@@ -267,8 +263,6 @@ T["enable"]["(multiple tab) sets state"] = function()
         left = 1001,
         right = 1002,
     })
-    Helpers.expect.state(child, "tabs[1].wins.splits", vim.NIL)
-
     Helpers.expect.state_type(child, "tabs[1].wins.integrations", "table")
 
     Helpers.expect.state(child, "tabs[1].wins.integrations", Co.INTEGRATIONS)
@@ -291,8 +285,6 @@ T["enable"]["(multiple tab) sets state"] = function()
         left = 1004,
         right = 1005,
     })
-    Helpers.expect.state(child, "tabs[2].wins.splits", vim.NIL)
-
     Helpers.expect.state_type(child, "tabs[2].wins.integrations", "table")
 
     Helpers.expect.state(child, "tabs[2].wins.integrations", Co.INTEGRATIONS)
