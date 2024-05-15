@@ -439,8 +439,6 @@ function N.disable(scope)
         S.init(S)
     end
 
-    S.save(S)
-
     for side, id in pairs(sides) do
         if vim.api.nvim_win_is_valid(id) then
             if #vim.api.nvim_tabpage_list_wins(activeTab) == 1 then
