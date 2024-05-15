@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [1.12.2](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.12.1...v1.12.2) (2024-05-15)
+
+
+### Bug Fixes
+
+* **autocmds:** do not force close unsaved buffers ([#349](https://github.com/shortcuts/no-neck-pain.nvim/issues/349)) ([9a529ec](https://github.com/shortcuts/no-neck-pain.nvim/commit/9a529ecdee2b5101ec565b905fc012194e09cc72))
+
 ## [1.12.1](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.12.0...v1.12.1) (2024-03-29)
 
 
