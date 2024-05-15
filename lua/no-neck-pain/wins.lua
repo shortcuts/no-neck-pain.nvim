@@ -50,7 +50,7 @@ function W.close(scope, id, side)
     D.log(scope, "closing %s window", side)
 
     if vim.api.nvim_win_is_valid(id) then
-        vim.api.nvim_win_close(id, false)
+        vim.api.nvim_win_close(id, true)
     end
 end
 

@@ -364,7 +364,6 @@ T["disable"]["does not close the window if unsaved buffer"] = function()
     Helpers.toggle(child)
 
     Helpers.expect.state(child, "enabled", true)
-
     Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,
         left = 1001,
@@ -373,11 +372,14 @@ T["disable"]["does not close the window if unsaved buffer"] = function()
     Helpers.expect.equality(Helpers.listBuffers(child), { 1, 2, 3 })
 
     child.api.nvim_buf_set_lines(1, 0, 1, false, { "foo" })
+
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_buf_get_option(1, 'modified')"), true)
+
     child.cmd("quit")
 
-    Helpers.expect.equality(Helpers.listBuffers(child), { 2 })
-    Helpers.expect.state(child, "enabled", false)
-    Helpers.expect.equality(Helpers.listBuffers(child), { 1 })
+    Helpers.expect.error(function()
+        child.cmd("quit")
+    end)
 end
 
 return T

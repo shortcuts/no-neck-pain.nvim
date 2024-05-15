@@ -429,6 +429,7 @@ function N.disable(scope)
 
     local sides = { left = S.getSideID(S, "left"), right = S.getSideID(S, "right") }
     local currID = S.getSideID(S, "curr")
+    local activeTab = S.activeTab
 
     if S.refreshTabs(S) == 0 then
         pcall(vim.api.nvim_del_augroup_by_name, "NoNeckPainVimEnterAutocmd")
@@ -442,7 +443,7 @@ function N.disable(scope)
 
     for side, id in pairs(sides) do
         if vim.api.nvim_win_is_valid(id) then
-            if #vim.api.nvim_tabpage_list_wins(S.activeTab) == 1 then
+            if #vim.api.nvim_tabpage_list_wins(activeTab) == 1 then
                 return vim.cmd("quit")
             end
 
@@ -452,17 +453,15 @@ function N.disable(scope)
     end
 
     -- shutdowns gracefully by focusing the stored `curr` buffer
-    if
-        currID ~= nil
-        and vim.api.nvim_win_is_valid(currID)
-        and not vim.api.nvim_get_current_win() == currID
-    then
+    if currID ~= nil and vim.api.nvim_win_is_valid(currID) then
         vim.fn.win_gotoid(currID)
 
         if _G.NoNeckPain.config.killAllBuffersOnDisable then
             vim.cmd("only")
         end
     end
+
+    S.save(S)
 end
 
 return N
