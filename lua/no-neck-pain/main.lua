@@ -431,6 +431,14 @@ function N.disable(scope)
     local currID = S.getSideID(S, "curr")
     local activeTab = S.activeTab
 
+    local wins = vim.tbl_filter(function(win)
+        return win ~= sides.left and win ~= sides.right
+    end, vim.api.nvim_tabpage_list_wins(activeTab))
+
+    if #wins == 0 then
+        return vim.cmd("quitall")
+    end
+
     if S.refreshTabs(S) == 0 then
         pcall(vim.api.nvim_del_augroup_by_name, "NoNeckPainVimEnterAutocmd")
 
@@ -441,10 +449,6 @@ function N.disable(scope)
 
     for side, id in pairs(sides) do
         if vim.api.nvim_win_is_valid(id) then
-            if #vim.api.nvim_tabpage_list_wins(activeTab) == 1 then
-                return vim.cmd("quit")
-            end
-
             S.removeNamespace(S, vim.api.nvim_win_get_buf(id), side)
             W.close(scope, id, side)
         end
