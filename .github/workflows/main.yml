@@ -51,10 +51,10 @@ jobs:
       - lint
       - documentation
     runs-on: ubuntu-latest
-    timeout-minutes: 2
+    timeout-minutes: 1
     strategy:
       matrix:
-        neovim_version: ['v0.7.2', 'v0.8.3', 'v0.9.4', 'nightly']
+        neovim_version: ['v0.7.2', 'v0.8.3', 'v0.9.5', 'v0.10.0', 'nightly']
 
     steps:
       - uses: actions/checkout@v4
