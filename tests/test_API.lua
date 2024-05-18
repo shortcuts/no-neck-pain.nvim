@@ -377,8 +377,36 @@ T["disable"]["does not close the window if unsaved buffer"] = function()
 
     child.cmd("quit")
 
+    -- error because e37 requires confirmation
+    Helpers.expect.equality(child.is_blocked(), true)
+end
+
+T["disable"]["relative window doesn't prevent quitting nvim"] = function()
+    if child.fn.has("nvim-0.8") == 0 then
+        MiniTest.skip("incline doesn't support version below 8")
+
+        return
+    end
+
+    child.set_size(500, 500)
+    child.restart({ "-u", "scripts/init_with_incline.lua" })
+    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
+    Helpers.toggle(child)
+
+    Helpers.expect.state(child, "enabled", true)
+    Helpers.expect.state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1003,
+        right = 1004,
+    })
+    Helpers.expect.equality(Helpers.winsInTab(child), { 1003, 1000, 1004, 1002 })
+    vim.fn.win_gotoid(1000)
+
+    child.cmd("quit")
+
     Helpers.expect.error(function()
-        child.cmd("quit")
+        -- error because instance is closed
+        Helpers.expect.equality(Helpers.winsInTab(child), { 1003, 1000, 1004, 1002 })
     end)
 end
 
