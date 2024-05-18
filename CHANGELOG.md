@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [1.12.3](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.12.2...v1.12.3) (2024-05-18)
+
+
+### Bug Fixes
+
+* **disable:** prevent blocked quit with relative windows ([#354](https://github.com/shortcuts/no-neck-pain.nvim/issues/354)) ([d80b5a8](https://github.com/shortcuts/no-neck-pain.nvim/commit/d80b5a8d126f01416407bfc9de2c26cedc8f9681))
+
 ## [1.12.2](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.12.1...v1.12.2) (2024-05-15)
 
 
