@@ -382,8 +382,8 @@ T["disable"]["does not close the window if unsaved buffer"] = function()
 end
 
 T["disable"]["relative window doesn't prevent quitting nvim"] = function()
-    if child.fn.has("nvim-0.7") == 0 then
-        MiniTest.skip("incline doesn't support version below 7")
+    if child.fn.has("nvim-0.8") == 0 then
+        MiniTest.skip("incline doesn't support version below 8")
 
         return
     end
