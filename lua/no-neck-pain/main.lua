@@ -441,7 +441,12 @@ function N.disable(scope)
 
     for side, id in pairs(sides) do
         if vim.api.nvim_win_is_valid(id) then
-            if #vim.api.nvim_tabpage_list_wins(activeTab) == 1 then
+            local wins = vim.tbl_filter(function(win)
+                return win ~= id and not A.isRelativeWindow(win)
+                -- return win ~= id
+            end, vim.api.nvim_tabpage_list_wins(activeTab))
+
+            if #wins == 0 then
                 return vim.cmd("quit")
             end
 
