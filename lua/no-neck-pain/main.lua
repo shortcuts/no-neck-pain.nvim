@@ -306,7 +306,7 @@ function N.disable(scope)
     then
         vim.fn.win_gotoid(currID)
 
-        if _G.NoNeckPain.config.autocmds.killAllWinsowsOnDisable then
+        if _G.NoNeckPain.config.autocmds.killAllWindowsOnDisable then
             vim.cmd("only")
         end
     end

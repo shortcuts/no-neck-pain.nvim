@@ -189,7 +189,7 @@ T["killAllWindowsOnDisable"] = MiniTest.new_set()
 T["killAllWindowsOnDisable"]["closes every windows when disabling the plugin"] = function()
     child.set_size(500, 500)
     child.lua(
-        [[ require('no-neck-pain').setup({width=50,autocmds={killAllWindowsOnDisable=true}}) ]]
+        [[ require('no-neck-pain').setup({width=20,autocmds={killAllWindowsOnDisable=true}}) ]]
     )
     Helpers.toggle(child)
 
