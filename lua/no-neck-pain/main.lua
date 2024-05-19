@@ -206,6 +206,17 @@ function N.enable(scope)
                 if not vim.api.nvim_win_is_valid(S.getSideID(S, "curr")) then
                     local wins = S.getUnregisteredWins(S)
                     if #wins == 0 then
+                        if _G.NoNeckPain.config.autocmds.fallbackOnBufferDelete then
+                            D.log(p.event, "`curr` has been deleted and user asked for a fallback")
+
+                            vim.cmd("new")
+
+                            N.disable(string.format("%s:reset", p.event))
+                            N.enable(string.format("%s:reset", p.event))
+
+                            return
+                        end
+
                         D.log(
                             p.event,
                             "curr has been closed and no active windows found, disabling"
@@ -228,8 +239,6 @@ function N.enable(scope)
 
                     return N.disable(p.event)
                 end
-
-                -- TODO(next): handle fallbackOnBufferDelete and default it to true
 
                 N.init(p.event)
             end)
@@ -292,59 +301,13 @@ end
 --- Disables the plugin for the given tab, clear highlight groups and autocmds, closes side buffers and resets the internal state.
 ---@private
 function N.disable(scope)
-    D.log(scope, "calling disable for tab %d", S.getActiveTab(S))
+    D.log(scope, "calling disable for tab %d", S.activeTab)
 
-    pcall(vim.api.nvim_del_augroup_by_name, A.getAugroupName(S.getActiveTab(S)))
+    pcall(vim.api.nvim_del_augroup_by_name, A.getAugroupName(S.activeTab))
 
+    local sides = { left = S.getSideID(S, "left"), right = S.getSideID(S, "right") }
     local currID = S.getSideID(S, "curr")
-
-    -- shutdowns gracefully by focusing the stored `curr` buffer
-    if
-        currID ~= nil
-        and vim.api.nvim_win_is_valid(currID)
-        and not S.isSideTheActiveWin(S, "curr")
-    then
-        vim.fn.win_gotoid(currID)
-
-        if _G.NoNeckPain.config.autocmds.killAllWindowsOnDisable then
-            vim.cmd("only")
-        end
-    end
-
-    -- determine if we should quit vim or just close the window
-    for _, side in pairs(Co.SIDES) do
-        if S.isSideRegistered(S, side) then
-            local activeWins = vim.api.nvim_tabpage_list_wins(S.getActiveTab(S))
-            local haveOtherWins = false
-            local sideID = S.getSideID(S, side)
-
-            if S.isSideWinValid(S, side) then
-                S.removeNamespace(S, vim.api.nvim_win_get_buf(sideID), side)
-            end
-
-            -- if we have other wins active and usable, we won't quit vim
-            for _, activeWin in pairs(activeWins) do
-                if sideID ~= activeWin and not A.isRelativeWindow(activeWin) then
-                    haveOtherWins = true
-                end
-            end
-
-            -- we don't have any window left if we close this one
-            if not haveOtherWins then
-                -- either triggered by a :wq or quit event, we can just quit
-                if scope == "QuitPre" then
-                    return vim.cmd("quit!")
-                end
-
-                -- mostly triggered by :bd or similar
-                -- we will create a new window and close the other
-                vim.cmd("new")
-            end
-
-            -- when we have more than 1 window left, we can just close it
-            W.close(scope, sideID, side)
-        end
-    end
+    local activeTab = S.activeTab
 
     if S.refreshTabs(S, S.getActiveTab(S)) == nil then
         pcall(vim.api.nvim_del_augroup_by_name, "NoNeckPainVimEnterAutocmd")
@@ -352,6 +315,30 @@ function N.disable(scope)
         D.log(scope, "no more active tabs left, reinitializing state")
 
         S.init(S)
+    end
+
+    for side, id in pairs(sides) do
+        if vim.api.nvim_win_is_valid(id) then
+            local wins = vim.tbl_filter(function(win)
+                return win ~= id and not A.isRelativeWindow(win)
+            end, vim.api.nvim_tabpage_list_wins(activeTab))
+
+            if #wins == 0 then
+                -- return vim.cmd("quit")
+            end
+
+            S.removeNamespace(S, vim.api.nvim_win_get_buf(id), side)
+            W.close(scope, id, side)
+        end
+    end
+
+    -- shutdowns gracefully by focusing the stored `curr` buffer
+    if currID ~= nil and vim.api.nvim_win_is_valid(currID) then
+        vim.fn.win_gotoid(currID)
+
+        if _G.NoNeckPain.config.autocmds.killAllWindowsOnDisable then
+            vim.cmd("only")
+        end
     end
 
     S.save(S)
