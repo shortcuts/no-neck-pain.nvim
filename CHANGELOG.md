@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [1.13.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.12.3...v1.13.0) (2024-05-19)
+
+
+### Features
+
+* **integrations:** support aerial.nvim ([#360](https://github.com/shortcuts/no-neck-pain.nvim/issues/360)) ([75f6a53](https://github.com/shortcuts/no-neck-pain.nvim/commit/75f6a53eec03907e3c04f22235c80b61c1819eb3))
+
 ## [1.12.3](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.12.2...v1.12.3) (2024-05-18)
 
 
