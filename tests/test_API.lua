@@ -150,6 +150,10 @@ T["setup"]["sets exposed methods and default options value"] = function()
             position = "right",
             reopen = true,
         },
+        aerial = {
+            position = "right",
+            reopen = true,
+        },
     })
 end
 

@@ -40,6 +40,14 @@ T["setup"]["overrides default values"] = function()
                 reopen = false,
                 position = "left",
             },
+            outline = {
+                reopen = false,
+                position = "left",
+            },
+            aerial = {
+                position = "left",
+                reopen = false,
+            },
         }
     })]])
 
@@ -68,8 +76,12 @@ T["setup"]["overrides default values"] = function()
             reopen = false,
         },
         outline = {
-            position = "right",
-            reopen = true,
+            position = "left",
+            reopen = false,
+        },
+        aerial = {
+            position = "left",
+            reopen = false,
         },
     })
 end
@@ -311,13 +323,13 @@ T["TSPlayground"]["keeps sides open"] = function()
 
     Helpers.expect.state(child, "tabs[1].wins.splits", vim.NIL)
 
-    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1004)"), 173)
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1004)"), 159)
     Helpers.expect.state(child, "tabs[1].wins.integrations.TSPlayground", {
         close = "TSPlaygroundToggle",
         fileTypePattern = "tsplayground",
         id = 1004,
         open = "TSPlaygroundToggle",
-        width = 346,
+        width = 318,
     })
 
     Helpers.expect.state(child, "tabs[1].wins.main", {
@@ -399,6 +411,58 @@ T["TSPlayground"]["reduces `left` side if only active when integration is on `ri
         curr = 1000,
         left = 1004,
         right = nil,
+    })
+end
+
+T["aerial"] = MiniTest.new_set()
+
+T["aerial"]["keeps sides open"] = function()
+    child.restart({ "-u", "scripts/init_with_aerial.lua" })
+    child.set_size(5, 500)
+
+    Helpers.toggle(child)
+
+    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+
+    Helpers.expect.state(child, "enabled", true)
+    Helpers.expect.state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
+
+    child.cmd("AerialToggle")
+    vim.loop.sleep(50)
+
+    Helpers.expect.state(child, "tabs[1].wins.splits", vim.NIL)
+
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1004)"), 25)
+    Helpers.expect.state(child, "tabs[1].wins.integrations.aerial", {
+        close = "AerialToggle",
+        fileTypePattern = "aerial",
+        id = 1004,
+        open = "AerialToggle",
+        width = 2,
+    })
+
+    Helpers.expect.state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
+
+    child.cmd("AerialToggle")
+    vim.loop.sleep(50)
+
+    Helpers.expect.state(child, "tabs[1].wins.integrations.aerial", {
+        close = "AerialToggle",
+        fileTypePattern = "aerial",
+        open = "AerialToggle",
+    })
+    Helpers.expect.state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
     })
 end
 

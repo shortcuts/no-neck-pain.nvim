@@ -72,6 +72,11 @@ Co.INTEGRATIONS = {
         close = "Outline",
         open = "Outline",
     },
+    aerial = {
+        fileTypePattern = "aerial",
+        close = "AerialToggle",
+        open = "AerialToggle",
+    },
 }
 
 ---Dashboards filetypes that delays the plugin enable step until next buffer entered.
