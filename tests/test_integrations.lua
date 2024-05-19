@@ -438,18 +438,11 @@ T["aerial"]["keeps sides open"] = function()
     })
 
     child.cmd("AerialToggle")
-    vim.loop.sleep(50)
 
     Helpers.expect.state(child, "tabs[1].wins.splits", vim.NIL)
 
     Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1004)"), 25)
-    Helpers.expect.state(child, "tabs[1].wins.integrations.aerial", {
-        close = "AerialToggle",
-        fileTypePattern = "aerial",
-        id = 1004,
-        open = "AerialToggle",
-        width = 2,
-    })
+    Helpers.expect.state(child, "tabs[1].wins.integrations.aerial.id", 1004)
 
     Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,

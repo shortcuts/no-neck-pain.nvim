@@ -7,7 +7,7 @@ vim.cmd("set rtp+=deps/aerial")
 
 require("mini.test").setup()
 require("no-neck-pain").setup({
-    width = 1,
+    width = 20,
     minSideBufferWidth = 0,
     integrations = { aerial = { reopen = true } },
 })
