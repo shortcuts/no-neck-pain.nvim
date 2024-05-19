@@ -38,6 +38,7 @@ deps:
 	git clone --depth 1 https://github.com/rcarriga/nvim-dap-ui deps/nvimdapui
 	git clone --depth 1 https://github.com/hedyhli/outline.nvim deps/outline
 	git clone --depth 1 https://github.com/b0o/incline.nvim deps/incline
+	git clone --depth 1 https://github.com/stevearc/aerial.nvim deps/aerial
 
 test-ci: deps test
 
