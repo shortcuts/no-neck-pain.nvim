@@ -41,12 +41,12 @@ T["setup"]["sets exposed methods and default options value"] = function()
     Helpers.expect.config(child, "width", 100)
     Helpers.expect.config(child, "minSideBufferWidth", 10)
     Helpers.expect.config(child, "debug", false)
-    Helpers.expect.config(child, "disableOnLastBuffer", false)
-    Helpers.expect.config(child, "killAllBuffersOnDisable", false)
 
     Helpers.expect.config(child, "autocmds", {
-        enableOnVimEnter = false,
         enableOnTabEnter = false,
+        enableOnVimEnter = false,
+        fallbackOnBufferDelete = true,
+        killAllWindowsOnDisable = false,
         reloadOnColorSchemeChange = false,
         skipEnteringNoNeckPainBuffer = false,
     })
@@ -158,24 +158,26 @@ T["setup"]["overrides default values"] = function()
         width = 42,
         minSideBufferWidth = 0,
         autocmds = {
-            enableOnVimEnter = true,
             enableOnTabEnter = true,
+            enableOnVimEnter = true,
+            fallbackOnBufferDelete = false,
+            killAllWindowsOnDisable = true,
             reloadOnColorSchemeChange = true,
             skipEnteringNoNeckPainBuffer = true,
         },
         debug = true,
-        disableOnLastBuffer = true,
-        killAllBuffersOnDisable = true,
+        killAllWindowsOnDisable = true,
     })]])
 
     Helpers.expect.config(child, "width", 42)
     Helpers.expect.config(child, "minSideBufferWidth", 0)
     Helpers.expect.config(child, "debug", true)
-    Helpers.expect.config(child, "disableOnLastBuffer", true)
-    Helpers.expect.config(child, "killAllBuffersOnDisable", true)
+    Helpers.expect.config(child, "killAllWindowsOnDisable", true)
     Helpers.expect.config(child, "autocmds", {
-        enableOnVimEnter = true,
         enableOnTabEnter = true,
+        enableOnVimEnter = true,
+        fallbackOnBufferDelete = false,
+        killAllWindowsOnDisable = true,
         reloadOnColorSchemeChange = true,
         skipEnteringNoNeckPainBuffer = true,
     })
@@ -348,6 +350,27 @@ T["disable"]["(multiple tab) resets state"] = function()
     Helpers.expect.state(child, "activeTab", 1)
 
     Helpers.expect.state(child, "tabs", vim.NIL)
+end
+
+T["minSideBufferWidth"] = MiniTest.new_set()
+
+T["minSideBufferWidth"]["closes side buffer respecting the given value"] = function()
+    child.set_size(500, 500)
+    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
+    Helpers.toggle(child)
+
+    Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1000, left = 1001, right = 1002 })
+
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 15)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.right", 15)
+
+    child.lua([[
+        require('no-neck-pain').disable()
+        require('no-neck-pain').setup({width=50, minSideBufferWidth=20})
+    ]])
+    Helpers.toggle(child)
+
+    Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1000 })
 end
 
 return T

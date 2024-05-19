@@ -194,7 +194,7 @@ function N.enable(scope)
     vim.api.nvim_create_autocmd({ "WinClosed", "QuitPre", "BufDelete" }, {
         callback = function(p)
             vim.schedule(function()
-                if not S.isActiveTabValid(S) or E.skip(S.getTab(S)) then
+                if not S.isActiveTabValid(S) then
                     return
                 end
 
@@ -219,9 +219,10 @@ function N.enable(scope)
                     D.log(p.event, "curr has been closed, re-routing to %d", S.getSideID(S, "curr"))
                 end
 
+                -- if the user wants both side and one is closed, or if they only want one and none is opened
                 if
-                    (S.wantsSides(S) and S.checkSides(S, "and", true))
-                    or S.checkSides(S, "or", true)
+                    (S.wantsSides(S) and not S.checkSides(S, "and", true))
+                    or not S.checkSides(S, "or", true)
                 then
                     D.log(p.event, "one of the side window has been closed, disabling")
 
@@ -305,7 +306,7 @@ function N.disable(scope)
     then
         vim.fn.win_gotoid(currID)
 
-        if _G.NoNeckPain.config.killAllBuffersOnDisable then
+        if _G.NoNeckPain.config.autocmds.killAllWinsowsOnDisable then
             vim.cmd("only")
         end
     end

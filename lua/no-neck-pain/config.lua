@@ -157,17 +157,6 @@ NoNeckPain.options = {
     -- in full screen screen, width is 210, you define an NNP `width` of 100, which creates each side buffer with a width of 50. If you resize your terminal to the half of the screen, each side buffer would be of width 5 and thereforce might not be useful and/or add "noise" to your workflow.
     --- @type integer
     minSideBufferWidth = 10,
-    -- Disables the plugin if the last valid buffer in the list have been closed.
-    --- @type boolean
-    disableOnLastBuffer = false,
-    -- When `true`, disabling the plugin closes every other windows except the initially focused one.
-    --- @usage: this parameter will be renamed `killAllWindowsOnDisable` in the next major release (^2.x.y).
-    --- @type boolean
-    killAllBuffersOnDisable = false,
-    -- When `true`, deleting the main no-neck-pain buffer with `:bd`, `:bdelete` does not disable the plugin, it fallbacks on the newly focused window and refreshes the state by re-creating side-windows if necessary.
-    --- @usage: the default value will change to `true` in the next major release (^2.x.y).
-    --- @type boolean
-    fallbackOnBufferDelete = false,
     -- Adds autocmd (@see `:h autocmd`) which aims at automatically enabling the plugin.
     --- @type table
     autocmds = {
@@ -180,6 +169,12 @@ NoNeckPain.options = {
         -- note: it does not trigger if you come back to an existing tab, to prevent unwanted interfer with user's decisions.
         --- @type boolean
         enableOnTabEnter = false,
+        -- When `true`, deleting the main no-neck-pain buffer with `:bd`, `:bdelete` does not disable the plugin, it fallbacks on the newly focused window and refreshes the state by re-creating side-windows if necessary.
+        --- @type boolean
+        fallbackOnBufferDelete = true,
+        -- When `true`, disabling the plugin closes every other windows except the initially focused one.
+        --- @type boolean
+        killAllWindowsOnDisable = false,
         -- When `true`, reloads the plugin configuration after a colorscheme change.
         --- @type boolean
         reloadOnColorSchemeChange = false,

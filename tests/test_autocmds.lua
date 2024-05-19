@@ -184,4 +184,60 @@ T["skipEnteringNoNeckPainBuffer"]["does not register if scratchPad feature is en
     Helpers.expect.equality(child.api.nvim_get_current_win(), 1001)
 end
 
+T["killAllWindowsOnDisable"] = MiniTest.new_set()
+
+T["killAllWindowsOnDisable"]["closes every windows when disabling the plugin"] = function()
+    child.set_size(500, 500)
+    child.lua(
+        [[ require('no-neck-pain').setup({width=50,autocmds={killAllWindowsOnDisable=true}}) ]]
+    )
+    Helpers.toggle(child)
+
+    Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1000, left = 1001, right = 1002 })
+
+    Helpers.expect.equality(Helpers.listBuffers(child), { 1, 2, 3 })
+    child.cmd("badd 1")
+    child.cmd("vsplit")
+    child.cmd("split")
+    child.loop.sleep(500)
+    Helpers.expect.equality(Helpers.listBuffers(child), { 1, 2, 3, 4 })
+    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1004, 1003, 1000, 1002 })
+
+    Helpers.toggle(child)
+
+    Helpers.expect.equality(Helpers.listBuffers(child), { 1, 2, 3, 4 })
+    Helpers.expect.equality(Helpers.winsInTab(child), { 1000 })
+end
+
+T["fallbackOnBufferDelete"] = MiniTest.new_set()
+
+T["fallbackOnBufferDelete"]["invoking :bd keeps nnp enabled"] = function()
+    child.set_size(500, 500)
+    child.lua([[ require('no-neck-pain').setup({width=50,fallbackOnBufferDelete=true}) ]])
+    Helpers.toggle(child)
+
+    Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1000, left = 1001, right = 1002 })
+
+    child.cmd("badd 1")
+    child.cmd("bd")
+    child.loop.sleep(500)
+
+    Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1003, left = 1004, right = 1005 })
+end
+
+T["fallbackOnBufferDelete"]["still allows nvim to quit"] = function()
+    child.set_size(500, 500)
+    child.lua([[ require('no-neck-pain').setup({width=50,fallbackOnBufferDelete=true}) ]])
+    Helpers.toggle(child)
+
+    Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1000, left = 1001, right = 1002 })
+
+    child.cmd("badd 1")
+    child.cmd("q")
+
+    Helpers.expect.error(function()
+        Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1003, left = 1004, right = 1005 })
+    end)
+end
+
 return T

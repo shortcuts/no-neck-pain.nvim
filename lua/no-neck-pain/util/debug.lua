@@ -41,6 +41,8 @@ function D.warnDeprecation(options)
     local rootDeprecated = {
         enableOnVimEnter = "autocmds.enableOnVimEnter",
         enableOnTabEnter = "autocmds.enableOnTabEnter",
+        fallbackOnBufferDelete = "autocmds.fallbackOnBufferDelete",
+        killAllBuffersOnDisable = "autocmds.killAllWindowsOnDisable",
         toggleMapping = "mappings.toggle",
         widthUpMapping = "mappings.widthUp",
         widthDownMapping = "mappings.widthDown",
