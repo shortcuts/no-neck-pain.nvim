@@ -510,6 +510,11 @@ T["tabnew/tabclose"]["does not pick tab 1 for the first active tab"] = function(
                     fileTypePattern = "outline",
                     open = "Outline",
                 },
+                aerial = {
+                    close = "AerialToggle",
+                    fileTypePattern = "aerial",
+                    open = "AerialToggle",
+                },
             },
             main = {
                 curr = 1000,
