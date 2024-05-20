@@ -24,7 +24,7 @@ function NoNeckPain.toggleScratchPad()
         _G.NoNeckPain.config = C.options
     end
 
-    M.toggleScratchPad()
+    M.toggleScratchPad("publicAPI_toggleScratchPad")
 end
 
 --- Sets the config `width` to the given `width` value and resizes the NoNeckPain windows.

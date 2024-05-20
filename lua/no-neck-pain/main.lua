@@ -12,7 +12,7 @@ local N = {}
 --- @param scope string: internal identifier for logging purposes.
 ---@private
 function N.toggle(scope)
-    if S.hasTabs(S) and S.isActiveTabRegistered(S) then
+    if S.isActiveTabRegistered(S) then
         return N.disable(scope)
     end
 
@@ -20,10 +20,12 @@ function N.toggle(scope)
 end
 
 --- Toggles the scratchPad feature of the plugin.
+--
+--- @param scope string: internal identifier for logging purposes.
 ---@private
-function N.toggleScratchPad()
+function N.toggleScratchPad(scope)
     if not S.isActiveTabRegistered(S) then
-        return
+        D.log(scope, "skipped because the current tab is not registered")
     end
 
     -- store the current win to later restore focus
@@ -121,29 +123,26 @@ function N.enable(scope)
         return
     end
 
-    D.log(scope, "calling enable for tab %d", A.getCurrentTab())
-
     S.setTab(S, A.getCurrentTab())
+    S.setEnabled(S)
+    S.setSideID(S, vim.api.nvim_get_current_win(), "curr")
+
+    D.log(
+        scope,
+        "calling enable for tab %d with curr %d",
+        S.getActiveTab(S),
+        S.getSideID(S, "curr")
+    )
 
     local augroupName = A.getAugroupName(S.getActiveTab(S))
     vim.api.nvim_create_augroup(augroupName, { clear = true })
 
-    S.setSideID(S, vim.api.nvim_get_current_win(), "curr")
-
     N.init(scope)
-
-    S.setEnabled(S)
 
     vim.api.nvim_create_autocmd({ "VimResized" }, {
         callback = function(p)
             vim.schedule(function()
-                if _G.NoNeckPain.state == nil or not _G.NoNeckPain.state.enabled then
-                    return
-                end
-
-                local tab = S.getTab(S)
-
-                if tab ~= nil and A.getCurrentTab() ~= tab.id then
+                if not S.isActiveTabValid(S) then
                     return
                 end
 
@@ -173,25 +172,40 @@ function N.enable(scope)
         desc = "Keeps track of the currently active tab and the tab state",
     })
 
-    vim.api.nvim_create_autocmd({ "WinEnter" }, {
+    vim.api.nvim_create_autocmd({ "WinEnter", "WinClosed" }, {
         callback = function(p)
             vim.schedule(function()
                 if not S.isActiveTabValid(S) or E.skip(S.getTab(S)) then
+                    return
+                end
+
+                if p.event == "WinEnter" and E.skip(S.getTab(S)) then
                     return D.log(p.event, "skipped on window %d", vim.api.nvim_get_current_win())
                 end
 
                 S.refreshIntegrations(S, p.event)
                 S.refreshVSplits(S, p.event)
 
-                -- TODO(next): find more skip condition to prevent unwanted UI refresh
+                if
+                    p.event == "WinClosed"
+                    and (
+                        (S.wantsSides(S) and not S.checkSides(S, "and", true))
+                        or not S.checkSides(S, "or", true)
+                    )
+                then
+                    D.log(p.event, "one of the side window has been closed")
+
+                    return N.disable(p.event)
+                end
+
                 N.init(p.event)
             end)
         end,
         group = augroupName,
-        desc = "Updates the state (vsplits, integrations, ui refresh) when entering a window",
+        desc = "Updates the state (vsplits, integrations, ui refresh) when entering or leaving a window",
     })
 
-    vim.api.nvim_create_autocmd({ "WinClosed", "QuitPre", "BufDelete" }, {
+    vim.api.nvim_create_autocmd({ "BufDelete", "QuitPre" }, {
         callback = function(p)
             vim.schedule(function()
                 if not S.isActiveTabValid(S) then
@@ -204,49 +218,42 @@ function N.enable(scope)
                 -- if `curr` has been closed, we will re-route focus to an other window
                 -- if possible, otherwise we disable the plugin and/or quit nvim
                 if not vim.api.nvim_win_is_valid(S.getSideID(S, "curr")) then
+                    if
+                        p.event == "BufDelete"
+                        and _G.NoNeckPain.config.autocmds.fallbackOnBufferDelete
+                    then
+                        D.log(p.event, "`curr` has been deleted and user asked for a fallback")
+
+                        vim.cmd("new")
+
+                        N.disable(string.format("%s:reset", p.event))
+                        N.enable(string.format("%s:reset", p.event))
+
+                        return
+                    end
+
+                    D.log(p.event, "`curr` has been closed")
+
                     local wins = S.getUnregisteredWins(S)
                     if #wins == 0 then
-                        if _G.NoNeckPain.config.autocmds.fallbackOnBufferDelete then
-                            D.log(p.event, "`curr` has been deleted and user asked for a fallback")
-
-                            vim.cmd("new")
-
-                            N.disable(string.format("%s:reset", p.event))
-                            N.enable(string.format("%s:reset", p.event))
-
-                            return
-                        end
-
-                        D.log(
-                            p.event,
-                            "curr has been closed and no active windows found, disabling"
-                        )
+                        D.log(p.event, "no active windows found")
 
                         return N.disable(p.event)
                     end
 
                     S.setSideID(S, wins[1], "curr")
 
-                    D.log(p.event, "curr has been closed, re-routing to %d", S.getSideID(S, "curr"))
-                end
-
-                -- if the user wants both side and one is closed, or if they only want one and none is opened
-                if
-                    (S.wantsSides(S) and not S.checkSides(S, "and", true))
-                    or not S.checkSides(S, "or", true)
-                then
-                    D.log(p.event, "one of the side window has been closed, disabling")
-
-                    return N.disable(p.event)
+                    D.log(p.event, "re-routing to %d", S.getSideID(S, "curr"))
                 end
 
                 N.init(p.event)
             end)
         end,
         group = augroupName,
-        desc = "Updates the state (vsplits, integrations, ui refresh) when leaving a window, also handles disabling the plugin and/or quitting nvim",
+        desc = "Updates the state (vsplits, integrations, ui refresh) when deleting a buffer or attempting to quit nvim",
     })
 
+    -- TODO: make this work with top windows, maybe use BufLeave instead
     if _G.NoNeckPain.config.autocmds.skipEnteringNoNeckPainBuffer then
         vim.api.nvim_create_autocmd({ "WinLeave" }, {
             callback = function(p)
@@ -324,7 +331,7 @@ function N.disable(scope)
             end, vim.api.nvim_tabpage_list_wins(activeTab))
 
             if #wins == 0 then
-                -- return vim.cmd("quit")
+                return vim.cmd("quit")
             end
 
             S.removeNamespace(S, vim.api.nvim_win_get_buf(id), side)

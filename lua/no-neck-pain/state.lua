@@ -562,6 +562,7 @@ end
 function State:refreshVSplits(scope)
     self.initVSplits(self)
 
+    -- TODO: there might be a cleaner way to handle the open state
     local layout = vim.fn.winlayout(self.activeTab)
     if #layout == 2 and type(layout[1]) == "string" and type(layout[2]) == "number" then
         self.increaseVSplits(self, 1)
