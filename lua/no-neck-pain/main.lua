@@ -172,31 +172,19 @@ function N.enable(scope)
         desc = "Keeps track of the currently active tab and the tab state",
     })
 
-    vim.api.nvim_create_autocmd({ "WinEnter", "WinClosed" }, {
+    vim.api.nvim_create_autocmd({ "WinEnter" }, {
         callback = function(p)
             vim.schedule(function()
                 if not S.isActiveTabValid(S) or E.skip(S.getTab(S)) then
                     return
                 end
 
-                if p.event == "WinEnter" and E.skip(S.getTab(S)) then
+                if E.skip(S.getTab(S)) then
                     return D.log(p.event, "skipped on window %d", vim.api.nvim_get_current_win())
                 end
 
                 S.refreshIntegrations(S, p.event)
                 S.refreshVSplits(S, p.event)
-
-                if
-                    p.event == "WinClosed"
-                    and (
-                        (S.wantsSides(S) and not S.checkSides(S, "and", true))
-                        or not S.checkSides(S, "or", true)
-                    )
-                then
-                    D.log(p.event, "one of the side window has been closed")
-
-                    return N.disable(p.event)
-                end
 
                 N.init(p.event)
             end)
@@ -244,6 +232,19 @@ function N.enable(scope)
                     S.setSideID(S, wins[1], "curr")
 
                     D.log(p.event, "re-routing to %d", S.getSideID(S, "curr"))
+                end
+
+                if
+                    (
+                        S.wantsSides(S)
+                        and not (S.isSideWinValid(S, "left") and S.isSideWinValid(S, "right"))
+                    )
+                    or not S.isSideWinValid(S, "left")
+                    or not S.isSideWinValid(S, "right")
+                then
+                    D.log(p.event, "one of the side window has been closed")
+
+                    return N.disable(p.event)
                 end
 
                 N.init(p.event)

@@ -226,87 +226,73 @@ end
 
 T["left/right"] = MiniTest.new_set()
 
-T["left/right"]["setNames doesn't throw when re-creating side buffers"] = function()
-    child.lua([[require('no-neck-pain').setup({width=50, buffers={setNames=true}})]])
+for _, side in ipairs(Co.SIDES) do
+    local otherSide = side == "left" and "right" or "left"
 
-    -- enable
-    Helpers.toggle(child)
+    T["left/right"]["setNames doesn't throw when re-creating side buffers"] = function()
+        child.lua([[require('no-neck-pain').setup({width=50, buffers={setNames=true}})]])
 
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 15)
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.right", 15)
+        -- enable
+        Helpers.toggle(child)
 
-    -- toggle
-    Helpers.toggle(child)
-    Helpers.toggle(child)
+        Helpers.expect.buf_width(child, string.format("tabs[1].wins.main.%s", side), 15)
+        Helpers.expect.buf_width(child, string.format("tabs[1].wins.main.%s", otherSide), 15)
 
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 15)
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.right", 15)
-end
+        -- toggle
+        Helpers.toggle(child)
+        Helpers.toggle(child)
 
-T["left/right"]["have the same width"] = function()
-    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
-    Helpers.toggle(child)
+        Helpers.expect.buf_width(child, string.format("tabs[1].wins.main.%s", side), 15)
+        Helpers.expect.buf_width(child, string.format("tabs[1].wins.main.%s", otherSide), 15)
+    end
 
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 15)
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.right", 15)
-end
+    T["left/right"]["have the same width"] = function()
+        child.lua([[ require('no-neck-pain').setup({width=50}) ]])
+        Helpers.toggle(child)
 
-T["left/right"]["only creates a `left` buffer when `right.enabled` is `false`"] = function()
-    child.lua([[ require('no-neck-pain').setup({width=50,buffers={right={enabled=false}}}) ]])
-    Helpers.toggle(child)
+        Helpers.expect.buf_width(child, string.format("tabs[1].wins.main.%s", side), 15)
+        Helpers.expect.buf_width(child, string.format("tabs[1].wins.main.%s", otherSide), 15)
+    end
 
-    Helpers.expect.state(child, "tabs[1].wins.main", {
-        curr = 1000,
-        left = 1001,
-    })
+    T["left/right"][string.format(
+        "only creates a `%s` buffer when `%s.enabled` is `false`",
+        side,
+        otherSide
+    )] = function()
+        child.lua(
+            string.format(
+                "require('no-neck-pain').setup({width=50,buffers={%s={enabled=false}}})",
+                otherSide
+            )
+        )
+        Helpers.toggle(child)
 
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 15)
-end
+        Helpers.expect.state(child, "tabs[1].wins.main", {
+            curr = 1000,
+            [side] = 1001,
+        })
 
-T["left/right"]["only creates a `right` buffer when `left.enabled` is `false`"] = function()
-    child.lua([[ require('no-neck-pain').setup({width=50,buffers={left={enabled=false}}}) ]])
-    Helpers.toggle(child)
+        Helpers.expect.buf_width(child, string.format("tabs[1].wins.main.%s", side), 15)
+    end
 
-    Helpers.expect.state(child, "tabs[1].wins.main", {
-        curr = 1000,
-        right = 1001,
-    })
+    T["left/right"][string.format("closing the `%s` buffer disables NNP", side)] = function()
+        child.lua([[ require('no-neck-pain').setup({width=50}) ]])
+        Helpers.toggle(child)
 
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.right", 15)
-end
+        Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+        Helpers.expect.state(child, "tabs[1].wins.main", {
+            curr = 1000,
+            left = 1001,
+            right = 1002,
+        })
 
-T["left/right"]["closing the `left` buffer disables NNP"] = function()
-    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
-    Helpers.toggle(child)
+        child.lua(
+            string.format("vim.fn.win_gotoid(_G.NoNeckPain.state.tabs[1].wins.main.%s)", side)
+        )
+        child.cmd("q")
 
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
-    Helpers.expect.state(child, "tabs[1].wins.main", {
-        curr = 1000,
-        left = 1001,
-        right = 1002,
-    })
-
-    child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.tabs[1].wins.main.left)")
-    child.cmd("q")
-
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1000 })
-end
-
-T["left/right"]["closing the `right` buffer disables NNP"] = function()
-    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
-    Helpers.toggle(child)
-
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
-    Helpers.expect.state(child, "tabs[1].wins.main", {
-        curr = 1000,
-        left = 1001,
-        right = 1002,
-    })
-
-    child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.tabs[1].wins.main.right)")
-    child.cmd("q")
-
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1000 })
+        Helpers.expect.equality(Helpers.winsInTab(child), { 1000 })
+    end
 end
 
 return T
