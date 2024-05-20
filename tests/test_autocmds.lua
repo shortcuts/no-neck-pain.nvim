@@ -29,7 +29,7 @@ end
 T["auto command"]["disabling clears VimEnter autocmd"] = function()
     child.restart({ "-u", "scripts/init_auto_open.lua" })
     Helpers.toggle(child)
-    Helpers.wait(child)
+    Helpers.wait(child, 299)
 
     -- errors because it doesn't exist
     Helpers.expect.error(function()
@@ -184,6 +184,25 @@ T["skipEnteringNoNeckPainBuffer"]["does not register if scratchPad feature is en
     Helpers.expect.equality(child.api.nvim_get_current_win(), 1001)
 end
 
+T["skipEnteringNoNeckPainBuffer"]["do not come back to initial position if top or bottom window"] = function()
+    child.set_size(5, 200)
+    child.lua(
+        [[ require('no-neck-pain').setup({width=50, autocmds = { skipEnteringNoNeckPainBuffer = true }}) ]]
+    )
+    Helpers.toggle(child)
+
+    Helpers.expect.config(child, "autocmds.skipEnteringNoNeckPainBuffer", true)
+
+    child.cmd("topleft new")
+
+    Helpers.expect.equality(Helpers.winsInTab(child), { 1003, 1001, 1000, 1002 })
+    Helpers.expect.equality(child.api.nvim_get_current_win(), 1003)
+
+    child.fn.win_gotoid(1001)
+    Helpers.wait(child)
+    Helpers.expect.equality(child.api.nvim_get_current_win(), 1000)
+end
+
 T["killAllWindowsOnDisable"] = MiniTest.new_set()
 
 T["killAllWindowsOnDisable"]["closes every windows when disabling the plugin"] = function()
@@ -199,7 +218,7 @@ T["killAllWindowsOnDisable"]["closes every windows when disabling the plugin"] =
     child.cmd("badd 1")
     child.cmd("vsplit")
     child.cmd("split")
-    child.loop.sleep(500)
+    Helpers.wait(child, 500)
     Helpers.expect.equality(Helpers.listBuffers(child), { 1, 2, 3, 4 })
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1004, 1003, 1000, 1002 })
 
@@ -220,7 +239,7 @@ T["fallbackOnBufferDelete"]["invoking :bd keeps nnp enabled"] = function()
 
     child.cmd("badd 1")
     child.cmd("bd")
-    child.loop.sleep(500)
+    Helpers.wait(child, 500)
 
     Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1003, left = 1004, right = 1005 })
 end

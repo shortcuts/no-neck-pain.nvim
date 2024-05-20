@@ -255,16 +255,11 @@ function N.enable(scope)
 
     -- TODO: make this work with top windows, maybe use BufLeave instead
     if _G.NoNeckPain.config.autocmds.skipEnteringNoNeckPainBuffer then
-        vim.api.nvim_create_autocmd({ "WinLeave" }, {
+        vim.api.nvim_create_autocmd({ "BufLeave" }, {
             callback = function(p)
                 vim.schedule(function()
                     p.event = string.format("%s:skipEnteringNoNeckPainBuffer", p.event)
-                    if
-                        not S.hasTabs(S)
-                        or not S.isActiveTabRegistered(S)
-                        or E.skip()
-                        or S.getScratchPad(S)
-                    then
+                    if not S.isActiveTabRegistered(S) or E.skip() or S.getScratchPad(S) then
                         return D.log(p.event, "skip")
                     end
 
@@ -276,24 +271,47 @@ function N.enable(scope)
                         return
                     end
 
+                    -- always from left to right, we first try to find
+                    -- the index of the window we just left in order to avoid jumping
+                    -- in between windows
                     local wins = vim.api.nvim_list_wins()
+                    -- actual idx of the current window
+                    local idx = 1
+                    -- the position to start from in the list
+                    local pos = 1
 
                     for i = 1, #wins do
-                        local id = i == #wins and 1 or i + 1
+                        if wins[i] == currentWin then
+                            idx = i
+                            pos = i == #wins and 1 or i + 1
+                            break
+                        end
+                    end
+
+                    -- now we can pos from the window position, if we overflow #wins
+                    -- we go to the beginning until pos is reached
+                    -- this avoids re-ordering the wins table
+                    while pos ~= idx do
+                        if pos > #wins then
+                            pos = 1
+                        end
+
                         if
-                            wins[id] ~= currentWin
-                            and wins[id] ~= leftID
-                            and wins[id] ~= rightID
+                            wins[pos] ~= currentWin
+                            and wins[pos] ~= leftID
+                            and wins[pos] ~= rightID
                         then
-                            vim.fn.win_gotoid(wins[id])
+                            vim.fn.win_gotoid(wins[pos])
 
                             return D.log(
                                 p.event,
                                 "rerouted focus of %d to %d",
                                 currentWin,
-                                wins[id]
+                                wins[pos]
                             )
                         end
+
+                        pos = pos + 1
                     end
                 end)
             end,

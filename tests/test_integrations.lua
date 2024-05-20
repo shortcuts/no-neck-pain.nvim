@@ -223,7 +223,7 @@ T["NvimTree"]["keeps sides open"] = function()
     })
 
     child.cmd([[NvimTreeOpen]])
-    child.loop.sleep(50)
+    Helpers.wait(child, 50)
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1004, 1001, 1000, 1002 })
 
@@ -260,7 +260,7 @@ T["neo-tree"]["keeps sides open"] = function()
     })
 
     child.cmd([[Neotree reveal]])
-    child.loop.sleep(50)
+    Helpers.wait(child, 50)
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1004, 1001, 1000, 1002 })
 

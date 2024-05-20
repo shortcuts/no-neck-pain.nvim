@@ -9,8 +9,8 @@ function Helpers.toggle(child)
     Helpers.wait(child)
 end
 
-function Helpers.wait(child)
-    child.loop.sleep(10)
+function Helpers.wait(child, ms)
+    child.loop.sleep(ms or 10)
 end
 
 function Helpers.currentWin(child)
