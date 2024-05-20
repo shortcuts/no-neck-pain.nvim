@@ -98,8 +98,7 @@ T["skipEnteringNoNeckPainBuffer"]["goes to new valid buffer when entering side"]
     Helpers.expect.equality(child.api.nvim_get_current_win(), 1000)
 
     child.fn.win_gotoid(1001)
-    Helpers.wait(child)
-    Helpers.expect.equality(child.api.nvim_get_current_win(), 1000)
+    Helpers.expect.equalityUntil(child, child.api.nvim_get_current_win(), 1000)
 
     child.fn.win_gotoid(1002)
     Helpers.wait(child)

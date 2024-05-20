@@ -4,16 +4,8 @@ local S = require("no-neck-pain.state")
 
 local E = {}
 
----skips the event if:
---- - the plugin is not enabled
---- - we have splits open (when `skipSplit` is `true`)
---- - we are focusing a floating window
---- - we are focusing one of the side buffer
----
----@param tab table?: the table where the tab information are stored.
----@private
-function E.skip(tab)
-    if _G.NoNeckPain.state == nil or not _G.NoNeckPain.state.enabled then
+function E.skip()
+    if not S.isActiveTabValid(S) then
         return true
     end
 
@@ -21,21 +13,9 @@ function E.skip(tab)
         return true
     end
 
-    if tab ~= nil then
-        if A.getCurrentTab() ~= tab.id then
-            return true
-        end
-
-        if
-            S.isSideTheActiveWin(S, "curr")
-            or S.isSideTheActiveWin(S, "left")
-            or S.isSideTheActiveWin(S, "right")
-        then
-            return true
-        end
+    if A.getCurrentTab() ~= S.getActiveTab(S) then
+        return true
     end
-
-    return false
 end
 
 --- determines if we should skip the enabling of the plugin:

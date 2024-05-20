@@ -87,10 +87,16 @@ function N.toggleSide(scope, side)
 end
 
 --- Creates side buffers and set the tab state, focuses the `curr` window if required.
+--
 --- @param scope string: internal identifier for logging purposes.
+--- @param force boolean?: forcing bypasses the refresh integration/vsplit checks
 ---@private
-function N.init(scope)
+function N.init(scope, force)
     assert(S.isActiveTabRegistered(S) == true, "called the internal `init` method on a `nil` tab.")
+
+    if not S.refreshIntegrations(S, scope) and not S.refreshVSplits(S, scope) and not force then
+        return D.log(scope, "skipping init, nothing has changed")
+    end
 
     D.log(
         scope,
@@ -141,12 +147,12 @@ function N.enable(scope)
 
     vim.api.nvim_create_autocmd({ "VimResized" }, {
         callback = function(p)
-            vim.schedule(function()
-                if not S.isActiveTabValid(S) then
+            A.debounce(p.event, function()
+                if E.skip() then
                     return
                 end
 
-                N.init(p.event)
+                N.init(p.event, true)
             end)
         end,
         group = augroupName,
@@ -155,7 +161,7 @@ function N.enable(scope)
 
     vim.api.nvim_create_autocmd({ "TabLeave", "TabEnter" }, {
         callback = function(p)
-            vim.schedule(function()
+            A.debounce(p.event, function()
                 if p.event == "TabLeave" then
                     S.refreshTabs(S)
                     D.log(p.event, "tab %d left", S.getActiveTab(S))
@@ -172,36 +178,12 @@ function N.enable(scope)
         desc = "Keeps track of the currently active tab and the tab state",
     })
 
-    vim.api.nvim_create_autocmd({ "WinEnter" }, {
+    vim.api.nvim_create_autocmd({ "WinEnter", "BufDelete", "QuitPre" }, {
         callback = function(p)
-            vim.schedule(function()
-                if not S.isActiveTabValid(S) or E.skip(S.getTab(S)) then
+            A.debounce(p.event, function()
+                if E.skip() then
                     return
                 end
-
-                if E.skip(S.getTab(S)) then
-                    return D.log(p.event, "skipped on window %d", vim.api.nvim_get_current_win())
-                end
-
-                S.refreshIntegrations(S, p.event)
-                S.refreshVSplits(S, p.event)
-
-                N.init(p.event)
-            end)
-        end,
-        group = augroupName,
-        desc = "Updates the state (vsplits, integrations, ui refresh) when entering or leaving a window",
-    })
-
-    vim.api.nvim_create_autocmd({ "BufDelete", "QuitPre" }, {
-        callback = function(p)
-            vim.schedule(function()
-                if not S.isActiveTabValid(S) then
-                    return
-                end
-
-                S.refreshIntegrations(S, p.event)
-                S.refreshVSplits(S, p.event)
 
                 -- if `curr` has been closed, we will re-route focus to an other window
                 -- if possible, otherwise we disable the plugin and/or quit nvim
@@ -237,7 +219,8 @@ function N.enable(scope)
                 if
                     (
                         S.wantsSides(S)
-                        and not (S.isSideWinValid(S, "left") and S.isSideWinValid(S, "right"))
+                        and not S.isSideWinValid(S, "left")
+                        and not S.isSideWinValid(S, "right")
                     )
                     or not S.isSideWinValid(S, "left")
                     or not S.isSideWinValid(S, "right")
@@ -251,16 +234,16 @@ function N.enable(scope)
             end)
         end,
         group = augroupName,
-        desc = "Updates the state (vsplits, integrations, ui refresh) when deleting a buffer or attempting to quit nvim",
+        desc = "Updates the state (vsplits, integrations, ui refresh) when entering a window, deleting a buffer or attempting to quit nvim",
     })
 
     -- TODO: make this work with top windows, maybe use BufLeave instead
     if _G.NoNeckPain.config.autocmds.skipEnteringNoNeckPainBuffer then
         vim.api.nvim_create_autocmd({ "BufLeave" }, {
             callback = function(p)
-                vim.schedule(function()
+                A.debounce(p.event, function()
                     p.event = string.format("%s:skipEnteringNoNeckPainBuffer", p.event)
-                    if not S.isActiveTabRegistered(S) or E.skip() or S.getScratchPad(S) then
+                    if E.skip() or S.getScratchPad(S) then
                         return D.log(p.event, "skip")
                     end
 

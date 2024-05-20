@@ -31,6 +31,8 @@ local function errorMessage(str, pattern)
     return string.format("Pattern: %s\nObserved string: %s", vim.inspect(pattern), str)
 end
 
+Helpers.sleep = function(child, ms) child.loop.sleep(ms or 10) end
+
 Helpers.expect.buf_width = MiniTest.new_expectation(
     "variable in child process matches",
     function(child, field, value)
@@ -46,6 +48,20 @@ Helpers.expect.global = MiniTest.new_expectation(
     "variable in child process matches",
     function(child, field, value)
         return Helpers.expect.equality(child.lua_get(field), value)
+    end,
+    errorMessage
+)
+
+Helpers.expect.equalityUntil = MiniTest.new_expectation(
+    "waits until a and b are equal",
+    function(child, a, b)
+        while true do
+            if a == b then
+                return Helpers.expect.equality(a, b)
+            end
+
+            Helpers.sleep(child)
+        end
     end,
     errorMessage
 )

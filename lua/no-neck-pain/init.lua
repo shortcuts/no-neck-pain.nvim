@@ -45,7 +45,7 @@ function NoNeckPain.resize(width)
         _G.NoNeckPain.config = vim.tbl_deep_extend("keep", { width = width }, _G.NoNeckPain.config)
     end
 
-    M.init("publicAPI_resize")
+    M.init("publicAPI_resize", true)
 end
 
 --- Toggles the config `${side}.enabled` and re-inits the plugin.
@@ -98,7 +98,7 @@ function NoNeckPain.setup(opts)
                     end
 
                     _G.NoNeckPain.config = C.defaults(opts)
-                    M.init("ColorScheme")
+                    M.init("ColorScheme", true)
                 end)
             end,
             group = "NoNeckPainAutocmd",

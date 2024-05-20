@@ -236,11 +236,13 @@ end
 ---Scans the current tab wins to update registered side integrations.
 ---
 ---@param scope string: the caller of the method.
----@return table: the update state integrations table.
+---
+---@return boolean: indicates whether the registered integrations changed or not
 ---@private
 function State:refreshIntegrations(scope)
     local wins = self.getUnregisteredWins(self)
     local unregisteredIntegrations = vim.deepcopy(Co.INTEGRATIONS)
+    local count = 0
 
     for _, win in pairs(wins) do
         local supported, name, integration = self.isSupportedIntegration(self, scope, win)
@@ -249,10 +251,15 @@ function State:refreshIntegrations(scope)
             integration.id = win
 
             unregisteredIntegrations[name] = integration
+            count = count + 1
         end
     end
 
-    return unregisteredIntegrations
+    D.log(scope, "computed %d integrations", count)
+
+    self.save(self)
+
+    return count > 0
 end
 
 ---Whether the `activeTab` is valid or not.
@@ -560,6 +567,8 @@ end
 ---@param scope string: the caller of the method.
 ---@private
 function State:refreshVSplits(scope)
+    local currentVSplits = self.getVSplits(self)
+
     self.initVSplits(self)
 
     -- TODO: there might be a cleaner way to handle the open state
@@ -570,7 +579,11 @@ function State:refreshVSplits(scope)
         self.iterateOverLayout(self, 0, false, layout)
     end
 
-    D.log(scope, "computed %d vsplits", self.tabs[self.activeTab].wins.vsplits)
+    D.log(scope, "computed %d vsplits", self.getVSplits(self))
+
+    self.save(self)
+
+    return currentVSplits ~= self.getVSplits(self)
 end
 
 return State
