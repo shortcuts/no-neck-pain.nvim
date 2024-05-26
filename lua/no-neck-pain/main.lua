@@ -255,7 +255,7 @@ function N.enable(scope)
                 then
                     D.log(s, "one of the NNP side has been closed")
 
-                    return N.disable(p.event)
+                    return N.disable(s)
                 end
 
                 if S.isSideWinValid(S, "curr") then
@@ -269,7 +269,7 @@ function N.enable(scope)
                 if p.event == "QuitPre" then
                     D.log(s, "curr has been closed")
 
-                    return N.disable(p.event)
+                    return N.disable(s)
                 end
 
                 D.log(s, "`curr` has been deleted, resetting state")
@@ -425,11 +425,45 @@ end
 function N.disable(scope)
     D.log(scope, "calling disable for tab %d", S.activeTab)
 
+    local activeTab = S.activeTab
+
+    local wins = vim.tbl_filter(function(win)
+        return win ~= S.getSideID(S, "left")
+            and win ~= S.getSideID(S, "right")
+            and not A.isRelativeWindow(win)
+    end, vim.api.nvim_tabpage_list_wins(activeTab))
+
+    if #wins == 0 then
+        for name, modified in pairs(A.getOpenedBuffers()) do
+            if modified then
+                local bufname = name
+                if vim.startswith(name, "NoNamePain") then
+                    bufname = string.sub(name, 11)
+                end
+
+                vim.schedule(function()
+                    vim.notify(
+                        "[no-neck-pain.nvim] unable to quit nvim because one or more buffer has modified files, please save or discard changes",
+                        vim.log.levels.ERROR
+                    )
+                    vim.cmd("rightbelow vertical split")
+                    vim.cmd("buffer " .. bufname)
+                    N.init(scope)
+                end)
+                return
+            end
+        end
+
+        pcall(vim.api.nvim_del_augroup_by_name, A.getAugroupName(S.activeTab))
+        pcall(vim.api.nvim_del_augroup_by_name, "NoNeckPainVimEnterAutocmd")
+
+        return vim.cmd("quitall!")
+    end
+
     pcall(vim.api.nvim_del_augroup_by_name, A.getAugroupName(S.activeTab))
 
     local sides = { left = S.getSideID(S, "left"), right = S.getSideID(S, "right") }
     local currID = S.getSideID(S, "curr")
-    local activeTab = S.activeTab
 
     if S.refreshTabs(S) == 0 then
         pcall(vim.api.nvim_del_augroup_by_name, "NoNeckPainVimEnterAutocmd")
@@ -441,15 +475,6 @@ function N.disable(scope)
 
     for side, id in pairs(sides) do
         if vim.api.nvim_win_is_valid(id) then
-            local wins = vim.tbl_filter(function(win)
-                return win ~= id and not A.isRelativeWindow(win)
-                -- return win ~= id
-            end, vim.api.nvim_tabpage_list_wins(activeTab))
-
-            if #wins == 0 then
-                return vim.cmd("quit")
-            end
-
             S.removeNamespace(S, vim.api.nvim_win_get_buf(id), side)
             W.close(scope, id, side)
         end

@@ -362,7 +362,7 @@ T["disable"]["(multiple tab) resets state"] = function()
     Helpers.expect.state(child, "tabs", vim.NIL)
 end
 
-T["disable"]["does not close the window if unsaved buffer"] = function()
+T["disable"]["(no file) does not close the window if unsaved buffer"] = function()
     child.set_size(500, 500)
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     Helpers.toggle(child)
@@ -376,13 +376,39 @@ T["disable"]["does not close the window if unsaved buffer"] = function()
     Helpers.expect.equality(Helpers.listBuffers(child), { 1, 2, 3 })
 
     child.api.nvim_buf_set_lines(1, 0, 1, false, { "foo" })
-
     Helpers.expect.equality(child.lua_get("vim.api.nvim_buf_get_option(1, 'modified')"), true)
+
+    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_get_current_win()"), 1000)
 
     child.cmd("quit")
 
-    -- error because e37 requires confirmation
-    Helpers.expect.equality(child.is_blocked(), true)
+    Helpers.expect.equality(child.is_running(), true)
+end
+
+T["disable"]["(on file) does not close the window if unsaved buffer"] = function()
+    child.set_size(500, 500)
+    child.restart({ "-u", "scripts/minimal_init.lua", "lua/no-neck-pain/main.lua" })
+    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
+    Helpers.toggle(child)
+
+    Helpers.expect.state(child, "enabled", true)
+    Helpers.expect.state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
+    Helpers.expect.equality(Helpers.listBuffers(child), { 1, 2, 3 })
+
+    child.api.nvim_buf_set_lines(1, 0, 1, false, { "foo" })
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_buf_get_option(1, 'modified')"), true)
+
+    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_get_current_win()"), 1000)
+
+    child.cmd("quit")
+
+    Helpers.expect.equality(child.is_running(), true)
 end
 
 T["disable"]["relative window doesn't prevent quitting nvim"] = function()

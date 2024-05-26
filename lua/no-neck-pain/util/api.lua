@@ -151,4 +151,26 @@ function A.debounce(context, callback, timeout)
     end)
 end
 
+---Returns a map of opened buffer name with a boolean indicating if they are modified or not.
+---
+---@return table
+---@private
+function A.getOpenedBuffers()
+    local opened = {}
+
+    for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+        if vim.fn.buflisted(buf) ~= 0 then
+            local name = vim.api.nvim_buf_get_name(buf)
+
+            if name == nil or name == "" then
+                name = string.format("NoNamePain%s", buf)
+            end
+
+            opened[name] = vim.api.nvim_buf_get_option(buf, "modified")
+        end
+    end
+
+    return opened
+end
+
 return A
