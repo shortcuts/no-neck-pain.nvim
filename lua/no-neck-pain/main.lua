@@ -438,17 +438,18 @@ function N.disable(scope)
             if modified then
                 local bufname = name
                 if vim.startswith(name, "NoNamePain") then
-                    bufname = string.sub(name, 10)
+                    bufname = string.sub(name, 11)
                 end
 
-                vim.notify(
-                    "[no-neck-pain.nvim] unable to quit nvim because one or more buffer has modified files, please save or discard changes",
-                    vim.log.levels.ERROR
-                )
-                vim.cmd("rightbelow vertical split")
-                vim.cmd("buffer " .. bufname)
-                N.init(scope)
-
+                vim.schedule(function()
+                    vim.notify(
+                        "[no-neck-pain.nvim] unable to quit nvim because one or more buffer has modified files, please save or discard changes",
+                        vim.log.levels.ERROR
+                    )
+                    vim.cmd("rightbelow vertical split")
+                    vim.cmd("buffer " .. bufname)
+                    N.init(scope)
+                end)
                 return
             end
         end
