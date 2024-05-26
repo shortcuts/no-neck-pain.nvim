@@ -16,6 +16,7 @@ require("neo-tree").setup({
     window = {
         width = 1,
     },
+    close_if_last_window = true,
 })
 require("mini.test").setup()
 require("no-neck-pain").setup({

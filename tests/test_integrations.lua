@@ -301,6 +301,54 @@ T["neo-tree"]["keeps sides open"] = function()
     })
 end
 
+T["neo-tree"]["close_if_last_window"] = function()
+    child.restart({ "-u", "scripts/init_with_neotree.lua", "foo" })
+    child.set_size(5, 300)
+
+    Helpers.toggle(child)
+
+    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+
+    Helpers.expect.state(child, "enabled", true)
+    Helpers.expect.state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
+
+    child.cmd("Neotree reveal")
+    child.loop.sleep(50)
+
+    Helpers.expect.equality(Helpers.winsInTab(child), { 1004, 1001, 1000, 1002 })
+
+    Helpers.expect.state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
+
+    Helpers.expect.state(child, "tabs[1].wins.splits", vim.NIL)
+
+    Helpers.expect.state(child, "tabs[1].wins.integrations.NeoTree", {
+        close = "Neotree close",
+        fileTypePattern = "neo-tree",
+        id = 1004,
+        open = "Neotree reveal",
+        width = 2,
+    })
+
+    child.fn.win_gotoid(1000)
+
+    Helpers.expect.equality(Helpers.winsInTab(child), { 1004, 1001, 1000, 1002 })
+
+    child.cmd("q")
+
+    -- invalid channel
+    Helpers.expect.error(function()
+        Helpers.expect.equality(Helpers.winsInTab(child), { 1004, 1001, 1000, 1002 })
+    end)
+end
+
 T["TSPlayground"] = MiniTest.new_set()
 
 T["TSPlayground"]["keeps sides open"] = function()
