@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [1.14.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.13.0...v1.14.0) (2024-05-26)
+
+
+### Features
+
+* **disable:** warns with better ux when trying to leave ([#364](https://github.com/shortcuts/no-neck-pain.nvim/issues/364)) ([0c19c54](https://github.com/shortcuts/no-neck-pain.nvim/commit/0c19c5460f77770687817e7f935e8f510ab877f1))
+
 ## [1.13.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.12.3...v1.13.0) (2024-05-19)
 
 
