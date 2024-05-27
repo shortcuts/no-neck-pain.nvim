@@ -31,7 +31,9 @@ local function errorMessage(str, pattern)
     return string.format("Pattern: %s\nObserved string: %s", vim.inspect(pattern), str)
 end
 
-Helpers.sleep = function(child, ms) child.loop.sleep(ms or 10) end
+Helpers.sleep = function(child, ms)
+    child.loop.sleep(ms or 10)
+end
 
 Helpers.expect.buf_width = MiniTest.new_expectation(
     "variable in child process matches",

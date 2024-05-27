@@ -38,9 +38,9 @@ T["setup"]["sets exposed methods and default options value"] = function()
     Helpers.expect.global_type(child, "_G.NoNeckPain.config", "table")
     Helpers.expect.config_type(child, "buffers", "table")
 
-    Helpers.expect.config(child, "width", 100)
-    Helpers.expect.config(child, "minSideBufferWidth", 10)
     Helpers.expect.config(child, "debug", false)
+    Helpers.expect.config(child, "minSideBufferWidth", 10)
+    Helpers.expect.config(child, "width", 100)
 
     Helpers.expect.config(child, "autocmds", {
         enableOnTabEnter = false,
@@ -150,6 +150,10 @@ T["setup"]["sets exposed methods and default options value"] = function()
             position = "right",
             reopen = true,
         },
+        aerial = {
+            position = "right",
+            reopen = true,
+        },
     })
 end
 
@@ -166,13 +170,11 @@ T["setup"]["overrides default values"] = function()
             skipEnteringNoNeckPainBuffer = true,
         },
         debug = true,
-        killAllWindowsOnDisable = true,
     })]])
 
     Helpers.expect.config(child, "width", 42)
     Helpers.expect.config(child, "minSideBufferWidth", 0)
     Helpers.expect.config(child, "debug", true)
-    Helpers.expect.config(child, "killAllWindowsOnDisable", true)
     Helpers.expect.config(child, "autocmds", {
         enableOnTabEnter = true,
         enableOnVimEnter = true,
@@ -209,10 +211,12 @@ end
 
 T["setup"]["starts the plugin on VimEnter"] = function()
     child.restart({ "-u", "scripts/init_auto_open.lua" })
+    Helpers.wait(child)
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
-    Helpers.expect.state_type(child, "", "table")
-    Helpers.expect.state(child, "enabled", "foo")
+    Helpers.expect.state(child, "enabled", true)
+
+    child.stop()
 end
 
 T["enable"] = MiniTest.new_set()
@@ -352,25 +356,82 @@ T["disable"]["(multiple tab) resets state"] = function()
     Helpers.expect.state(child, "tabs", vim.NIL)
 end
 
-T["minSideBufferWidth"] = MiniTest.new_set()
-
-T["minSideBufferWidth"]["closes side buffer respecting the given value"] = function()
+T["disable"]["(no file) does not close the window if unsaved buffer"] = function()
     child.set_size(500, 500)
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     Helpers.toggle(child)
 
-    Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1000, left = 1001, right = 1002 })
+    Helpers.expect.state(child, "enabled", true)
+    Helpers.expect.state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
+    Helpers.expect.equality(Helpers.listBuffers(child), { 1, 2, 3 })
 
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 15)
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.right", 15)
+    child.api.nvim_buf_set_lines(1, 0, 1, false, { "foo" })
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_buf_get_option(1, 'modified')"), true)
 
-    child.lua([[
-        require('no-neck-pain').disable()
-        require('no-neck-pain').setup({width=50, minSideBufferWidth=20})
-    ]])
+    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_get_current_win()"), 1000)
+
+    child.cmd("quit")
+
+    Helpers.expect.equality(child.is_running(), true)
+end
+
+T["disable"]["(on file) does not close the window if unsaved buffer"] = function()
+    child.set_size(500, 500)
+    child.restart({ "-u", "scripts/minimal_init.lua", "lua/no-neck-pain/main.lua" })
+    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     Helpers.toggle(child)
 
-    Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1000 })
+    Helpers.expect.state(child, "enabled", true)
+    Helpers.expect.state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
+    Helpers.expect.equality(Helpers.listBuffers(child), { 1, 2, 3 })
+
+    child.api.nvim_buf_set_lines(1, 0, 1, false, { "foo" })
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_buf_get_option(1, 'modified')"), true)
+
+    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_get_current_win()"), 1000)
+
+    child.cmd("quit")
+
+    Helpers.expect.equality(child.is_running(), true)
+end
+
+T["disable"]["relative window doesn't prevent quitting nvim"] = function()
+    if child.fn.has("nvim-0.8") == 0 then
+        MiniTest.skip("incline doesn't support version below 8")
+
+        return
+    end
+
+    child.set_size(500, 500)
+    child.restart({ "-u", "scripts/init_with_incline.lua" })
+    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
+    Helpers.toggle(child)
+
+    Helpers.expect.state(child, "enabled", true)
+    Helpers.expect.state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1003,
+        right = 1004,
+    })
+    Helpers.expect.equality(Helpers.winsInTab(child), { 1003, 1000, 1004, 1002 })
+    vim.fn.win_gotoid(1000)
+
+    child.cmd("quit")
+
+    Helpers.expect.error(function()
+        -- error because instance is closed
+        Helpers.expect.equality(Helpers.winsInTab(child), { 1003, 1000, 1004, 1002 })
+    end)
 end
 
 return T

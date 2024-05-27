@@ -303,6 +303,14 @@ NoNeckPain.options = {
             -- When `true`, if the tree was opened before enabling the plugin, we will reopen it.
             reopen = true,
         },
+        -- @link https://github.com/stevearc/aerial.nvim
+        aerial = {
+            -- The position of the tree.
+            --- @type "left"|"right"
+            position = "right",
+            -- When `true`, if the tree was opened before enabling the plugin, we will reopen it.
+            reopen = true,
+        },
     },
 }
 
