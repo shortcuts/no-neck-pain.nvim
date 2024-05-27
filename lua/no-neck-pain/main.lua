@@ -230,7 +230,7 @@ function N.enable(scope)
                     return N.disable(p.event)
                 end
 
-                N.init(p.event)
+                -- N.init(p.event)
             end)
         end,
         group = augroupName,

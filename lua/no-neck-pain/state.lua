@@ -482,10 +482,10 @@ end
 
 ---Sets the given `bool` value to the active tab scratchPad.
 ---
----@param bool boolean: the value of the scratchPad.
+---@param value boolean: the value of the scratchPad.
 ---@private
-function State:setScratchPad(bool)
-    self.tabs[self.activeTab].scratchPadEnabled = bool
+function State:setScratchPad(value)
+    self.tabs[self.activeTab].scratchPadEnabled = value
 end
 
 ---Gets the scratchPad value for the active tab.
@@ -493,6 +493,7 @@ end
 ---@return boolean: the value of the scratchPad.
 ---@private
 function State:getScratchPad()
+    vim.print("not scratchpad enabled")
     return self.tabs[self.activeTab].scratchPadEnabled
 end
 
