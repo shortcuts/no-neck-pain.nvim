@@ -237,7 +237,6 @@ function N.enable(scope)
         desc = "Updates the state (vsplits, integrations, ui refresh) when entering a window, deleting a buffer or attempting to quit nvim",
     })
 
-    -- TODO: make this work with top windows, maybe use BufLeave instead
     if _G.NoNeckPain.config.autocmds.skipEnteringNoNeckPainBuffer then
         vim.api.nvim_create_autocmd({ "BufLeave" }, {
             callback = function(p)
