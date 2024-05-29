@@ -149,37 +149,25 @@ end
 
 ---Gets all wins that are not already registered in the given `tab`.
 ---
+---@param withCurr boolean?: whether we should filter curr or not
 ---@return table: the wins that are not in `tab`.
 ---@private
-function State:getUnregisteredWins()
-    local wins = vim.api.nvim_tabpage_list_wins(self.activeTab)
-    local stateWins = self.getRegisteredWins(self)
-
-    local validWins = {}
-
-    for _, win in pairs(wins) do
-        if not vim.tbl_contains(stateWins, win) and not A.isRelativeWindow(win) then
-            table.insert(validWins, win)
+function State:getUnregisteredWins(withCurr)
+    return vim.tbl_filter(function(win)
+        if A.isRelativeWindow(win) then
+            return false
         end
-    end
 
-    return validWins
-end
-
----Gets all wins IDs that are registered in the state for the active tab.
----
----@return table: the wins that are not in `tab`.
----@private
-function State:getRegisteredWins()
-    local wins = {}
-
-    if self.tabs[self.activeTab].wins.main ~= nil then
-        for _, side in pairs(self.tabs[self.activeTab].wins.main) do
-            table.insert(wins, side)
+        if not withCurr and win == self.getSideID(self, "curr") then
+            return false
         end
-    end
 
-    return wins
+        if win == self.getSideID(self, "left") or win == self.getSideID(self, "right") then
+            return false
+        end
+
+        return true
+    end, vim.api.nvim_tabpage_list_wins(self.activeTab))
 end
 
 ---Whether the given `fileType` matches a supported integration or not.
@@ -493,7 +481,6 @@ end
 ---@return boolean: the value of the scratchPad.
 ---@private
 function State:getScratchPad()
-    vim.print("not scratchpad enabled")
     return self.tabs[self.activeTab].scratchPadEnabled
 end
 

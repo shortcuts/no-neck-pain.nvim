@@ -232,7 +232,7 @@ T["fallbackOnBufferDelete"] = MiniTest.new_set()
 
 T["fallbackOnBufferDelete"]["invoking :bd keeps nnp enabled"] = function()
     child.set_size(500, 500)
-    child.lua([[ require('no-neck-pain').setup({width=50,fallbackOnBufferDelete=true}) ]])
+    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     Helpers.toggle(child)
 
     Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1000, left = 1001, right = 1002 })
@@ -246,7 +246,7 @@ end
 
 T["fallbackOnBufferDelete"]["still allows nvim to quit"] = function()
     child.set_size(500, 500)
-    child.lua([[ require('no-neck-pain').setup({width=50,fallbackOnBufferDelete=true}) ]])
+    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     Helpers.toggle(child)
 
     Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1000, left = 1001, right = 1002 })

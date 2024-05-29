@@ -185,14 +185,21 @@ function N.enable(scope)
                     return
                 end
 
-                -- if `curr` has been closed, we will re-route focus to an other window
-                -- if possible, otherwise we disable the plugin and/or quit nvim
-                if not vim.api.nvim_win_is_valid(S.getSideID(S, "curr")) then
+                local wins = S.getUnregisteredWins(S)
+                if p.event == "WinEnter" and #wins > 0 then
+                    -- return N.init(p.event)
+                    return
+                end
+
+                if not S.isSideWinValid(S, "curr") then
+                    S.setSideID(S, nil, "curr")
+                    D.log(p.event, "`curr` has been closed")
+
                     if
                         p.event == "BufDelete"
                         and _G.NoNeckPain.config.autocmds.fallbackOnBufferDelete
                     then
-                        D.log(p.event, "`curr` has been deleted and user asked for a fallback")
+                        D.log(p.event, "user asked for a fallback")
 
                         vim.cmd("new")
 
@@ -202,9 +209,6 @@ function N.enable(scope)
                         return
                     end
 
-                    D.log(p.event, "`curr` has been closed")
-
-                    local wins = S.getUnregisteredWins(S)
                     if #wins == 0 then
                         D.log(p.event, "no active windows found")
 
@@ -214,6 +218,8 @@ function N.enable(scope)
                     S.setSideID(S, wins[1], "curr")
 
                     D.log(p.event, "re-routing to %d", S.getSideID(S, "curr"))
+
+                    return N.init(p.event)
                 end
 
                 if
@@ -229,8 +235,6 @@ function N.enable(scope)
 
                     return N.disable(p.event)
                 end
-
-                -- N.init(p.event)
             end)
         end,
         group = augroupName,
@@ -238,12 +242,16 @@ function N.enable(scope)
     })
 
     if _G.NoNeckPain.config.autocmds.skipEnteringNoNeckPainBuffer then
-        vim.api.nvim_create_autocmd({ "BufLeave" }, {
+        vim.api.nvim_create_autocmd({ "WinEnter" }, {
             callback = function(p)
                 A.debounce(p.event, function()
                     p.event = string.format("%s:skipEnteringNoNeckPainBuffer", p.event)
                     if E.skip() or S.getScratchPad(S) then
                         return D.log(p.event, "skip")
+                    end
+
+                    if not S.isSideWinValid(S, "curr") then
+                        return D.log(p.event, "skip no curr found")
                     end
 
                     local currentWin = vim.api.nvim_get_current_win()
@@ -257,7 +265,7 @@ function N.enable(scope)
                     -- always from left to right, we first try to find
                     -- the index of the window we just left in order to avoid jumping
                     -- in between windows
-                    local wins = vim.api.nvim_list_wins()
+                    local wins = vim.api.nvim_tabpage_list_wins(S.getActiveTab(S))
                     -- actual idx of the current window
                     local idx = 1
                     -- the position to start from in the list
@@ -311,14 +319,7 @@ end
 function N.disable(scope)
     D.log(scope, "calling disable for tab %d", S.activeTab)
 
-    local activeTab = S.activeTab
-    local wins = vim.tbl_filter(function(win)
-        return win ~= S.getSideID(S, "left")
-            and win ~= S.getSideID(S, "right")
-            and not A.isRelativeWindow(win)
-    end, vim.api.nvim_tabpage_list_wins(activeTab))
-
-    if #wins == 0 then
+    if #S.getUnregisteredWins(S, true) == 0 then
         for name, modified in pairs(A.getOpenedBuffers()) do
             if modified then
                 local bufname = name
@@ -342,7 +343,8 @@ function N.disable(scope)
         pcall(vim.api.nvim_del_augroup_by_name, A.getAugroupName(S.activeTab))
         pcall(vim.api.nvim_del_augroup_by_name, "NoNeckPainVimEnterAutocmd")
 
-        return vim.cmd("quitall!")
+        -- return vim.cmd("quitall!")
+        return
     end
 
     pcall(vim.api.nvim_del_augroup_by_name, A.getAugroupName(S.activeTab))
