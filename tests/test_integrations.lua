@@ -316,7 +316,7 @@ T["neo-tree"]["close_if_last_window"] = function()
         right = 1002,
     })
 
-    child.cmd("Neotree reveal")
+    child.cmd("Neotree")
     child.loop.sleep(50)
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1004, 1001, 1000, 1002 })
@@ -330,10 +330,10 @@ T["neo-tree"]["close_if_last_window"] = function()
     Helpers.expect.state(child, "tabs[1].wins.splits", vim.NIL)
 
     Helpers.expect.state(child, "tabs[1].wins.integrations.NeoTree", {
-        close = "Neotree close",
+        close = "Neotree",
         fileTypePattern = "neo-tree",
         id = 1004,
-        open = "Neotree reveal",
+        open = "Neotree",
         width = 2,
     })
 
