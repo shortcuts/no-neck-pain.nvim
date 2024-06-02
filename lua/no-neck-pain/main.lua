@@ -105,14 +105,14 @@ function N.init(scope, force)
         S.getSideID(S, "curr")
     )
 
-    -- if we do not have side buffers, we must ensure we only trigger a focus if we re-create them
-    local hadSideBuffers = not S.checkSides(S, "and", false)
+    local hadSideBuffers = S.checkSides(S, "and", true)
 
     W.createSideBuffers()
 
     if
         (not hadSideBuffers and S.checkSides(S, "or", true))
-        or (S.isSideTheActiveWin(S, "left") or S.isSideTheActiveWin(S, "right"))
+        or vim.api.nvim_get_current_win() == S.getSideID(S, "left")
+        or vim.api.nvim_get_current_win() == S.getSideID(S, "right")
     then
         vim.fn.win_gotoid(S.getSideID(S, "curr"))
     end
@@ -185,56 +185,71 @@ function N.enable(scope)
                     return
                 end
 
-                local wins = S.getUnregisteredWins(S)
-                if p.event == "WinEnter" and #wins > 0 then
-                    -- return N.init(p.event)
-                    return
-                end
-
-                if not S.isSideWinValid(S, "curr") then
-                    S.setSideID(S, nil, "curr")
-                    D.log(p.event, "`curr` has been closed")
-
-                    if
-                        p.event == "BufDelete"
-                        and _G.NoNeckPain.config.autocmds.fallbackOnBufferDelete
-                    then
-                        D.log(p.event, "user asked for a fallback")
-
-                        vim.cmd("new")
-
-                        N.disable(string.format("%s:reset", p.event))
-                        N.enable(string.format("%s:reset", p.event))
-
-                        return
-                    end
-
-                    if #wins == 0 then
-                        D.log(p.event, "no active windows found")
-
-                        return N.disable(p.event)
-                    end
-
-                    S.setSideID(S, wins[1], "curr")
-
-                    D.log(p.event, "re-routing to %d", S.getSideID(S, "curr"))
-
-                    return N.init(p.event)
-                end
+                local curr = vim.api.nvim_get_current_win()
 
                 if
-                    (
-                        S.wantsSides(S)
-                        and not S.isSideWinValid(S, "left")
-                        and not S.isSideWinValid(S, "right")
+                    p.event == "WinEnter"
+                    and (
+                        S.getSideID(S, "left") == curr
+                        or S.getSideID(S, "right") == curr
+                        or S.getSideID(S, "curr") == curr
                     )
-                    or not S.isSideWinValid(S, "left")
-                    or not S.isSideWinValid(S, "right")
                 then
-                    D.log(p.event, "one of the side window has been closed")
-
-                    return N.disable(p.event)
+                    return D.log(
+                        p.event,
+                        "skipped, %d is a main window",
+                        vim.api.nvim_get_current_win()
+                    )
                 end
+
+                if p.event ~= "WinEnter" then
+                    if not S.isSideWinValid(S, "curr") then
+                        S.setSideID(S, nil, "curr")
+                        D.log(p.event, "`curr` has been closed")
+
+                        if
+                            p.event == "BufDelete"
+                            and _G.NoNeckPain.config.autocmds.fallbackOnBufferDelete
+                        then
+                            D.log(p.event, "user asked for a fallback")
+
+                            vim.cmd("new")
+
+                            N.disable(string.format("%s:reset", p.event))
+                            N.enable(string.format("%s:reset", p.event))
+
+                            return
+                        end
+
+                        local wins = S.getUnregisteredWins(S)
+                        if #wins == 0 then
+                            D.log(p.event, "no active windows found")
+
+                            return N.disable(p.event)
+                        end
+
+                        S.setSideID(S, wins[1], "curr")
+
+                        D.log(p.event, "re-routing to %d", S.getSideID(S, "curr"))
+
+                        return N.init(p.event)
+                    end
+
+                    for _, side in ipairs(Co.SIDES) do
+                        local id = S.getSideID(S, side)
+                        if
+                            S.isSideEnabled(S, side)
+                            and id ~= nil
+                            and not vim.api.nvim_win_is_valid(id)
+                        then
+                            D.log(p.event, "%s was opened but has been closed", side)
+
+                            return N.disable(p.event)
+                        end
+                    end
+                end
+
+                return N.init(p.event)
             end)
         end,
         group = augroupName,
@@ -244,8 +259,8 @@ function N.enable(scope)
     if _G.NoNeckPain.config.autocmds.skipEnteringNoNeckPainBuffer then
         vim.api.nvim_create_autocmd({ "WinEnter" }, {
             callback = function(p)
+                p.event = string.format("%s:skipEnteringNoNeckPainBuffer", p.event)
                 A.debounce(p.event, function()
-                    p.event = string.format("%s:skipEnteringNoNeckPainBuffer", p.event)
                     if E.skip() or S.getScratchPad(S) then
                         return D.log(p.event, "skip")
                     end
@@ -343,8 +358,7 @@ function N.disable(scope)
         pcall(vim.api.nvim_del_augroup_by_name, A.getAugroupName(S.activeTab))
         pcall(vim.api.nvim_del_augroup_by_name, "NoNeckPainVimEnterAutocmd")
 
-        -- return vim.cmd("quitall!")
-        return
+        return vim.cmd("quitall!")
     end
 
     pcall(vim.api.nvim_del_augroup_by_name, A.getAugroupName(S.activeTab))

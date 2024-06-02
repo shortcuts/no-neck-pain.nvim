@@ -162,7 +162,7 @@ function W.createSideBuffers(skipIntegrations)
     end
 
     for _, side in pairs(Co.SIDES) do
-        if S.isSideRegistered(S, side) then
+        if S.isSideWinValid(S, side) then
             local padding = wins[side].padding or W.getPadding(side)
 
             if padding > _G.NoNeckPain.config.minSideBufferWidth then
@@ -209,12 +209,10 @@ function W.getPadding(side)
 
     local columns = S.getVSplits(S)
 
-    if _G.NoNeckPain.config.buffers.left.enabled then
-        columns = columns - 1
-    end
-
-    if _G.NoNeckPain.config.buffers.right.enabled then
-        columns = columns - 1
+    for _, s in ipairs(Co.SIDES) do
+        if S.isSideEnabled(S, s) then
+            columns = columns - 1
+        end
     end
 
     if columns < 1 then
@@ -241,7 +239,10 @@ function W.getPadding(side)
     for name, tree in pairs(S.getIntegrations(S)) do
         if
             tree.id ~= nil
-            and (not S.wantsSides(S) or side == _G.NoNeckPain.config.integrations[name].position)
+            and (
+                not S.isSideWinValid(S, side)
+                or side == _G.NoNeckPain.config.integrations[name].position
+            )
         then
             D.log(scope, "%s opened with width %d", name, tree.width)
 

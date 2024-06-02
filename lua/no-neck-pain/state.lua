@@ -266,23 +266,6 @@ function State:isActiveTabRegistered()
     return self.hasTabs(self) and self.tabs[self.activeTab] ~= nil
 end
 
----Whether the side window is registered and enabled in the config or not.
----
----@param side "left"|"right"|"curr": the side of the window.
----@return boolean
----@private
-function State:isSideRegistered(side)
-    if not self.isActiveTabRegistered(self) then
-        return false
-    end
-
-    if self.getSideID(self, side) == nil then
-        return false
-    end
-
-    return _G.NoNeckPain.config.buffers[side].enabled
-end
-
 ---Whether the sides window are registered and enabled in the config or not.
 ---
 ---@param condition "or"|"and"
@@ -291,12 +274,12 @@ end
 ---@private
 function State:checkSides(condition, expected)
     if condition == "or" then
-        return self.isSideRegistered(self, "left") == expected
-            or self.isSideRegistered(self, "right") == expected
+        return self.isSideWinValid(self, "left") == expected
+            or self.isSideWinValid(self, "right") == expected
     end
 
-    return self.isSideRegistered(self, "left") == expected
-        and self.isSideRegistered(self, "right") == expected
+    return self.isSideWinValid(self, "left") == expected
+        and self.isSideWinValid(self, "right") == expected
 end
 
 ---Whether the side window is registered and a valid window.
@@ -305,18 +288,13 @@ end
 ---@return boolean
 ---@private
 function State:isSideWinValid(side)
+    if side ~= "curr" and not self.isSideEnabled(self, side) then
+        return false
+    end
+
     local id = self.getSideID(self, side)
 
     return id ~= nil and vim.api.nvim_win_is_valid(id)
-end
-
----Whether the side window is the currently active one or not.
----
----@param side "left"|"right"|"curr": the side of the window.
----@return boolean
----@private
-function State:isSideTheActiveWin(side)
-    return vim.api.nvim_get_current_win() == self.getSideID(self, side)
 end
 
 ---Whether there is tabs registered or not.
@@ -325,6 +303,15 @@ end
 ---@private
 function State:hasTabs()
     return self.tabs ~= nil
+end
+
+---Whether the side is enabled in the config or not.
+---
+---@param side "left"|"right": the side of the window.
+---@return boolean
+---@private
+function State:isSideEnabled(side)
+    return _G.NoNeckPain.config.buffers[side].enabled
 end
 
 ---Whether there is integrations registered in the active tab or not.
@@ -343,14 +330,6 @@ function State:hasIntegrations()
     end
 
     return false
-end
-
----Whether the user wants both sides to be opened or not.
----
----@return boolean
----@private
-function State:wantsSides()
-    return _G.NoNeckPain.config.buffers.left.enabled and _G.NoNeckPain.config.buffers.right.enabled
 end
 
 ---Returns the ID of the given `side`.
@@ -517,7 +496,7 @@ function State:increaseVSplits(nb)
     self.tabs[self.activeTab].wins.vsplits = self.tabs[self.activeTab].wins.vsplits + nb
 end
 
----Recursively iterates over the `winlayout` until it has computed every column present in the UI.
+---Recursively walks in the `winlayout` until it has computed every column present in the UI.
 ---
 ---When we find a `row`, we set `vsplit` to true, the next element will always be a `table` so once on it -we can increase the `vsplits` counter.
 ---
@@ -525,7 +504,7 @@ end
 ---that depth from the number of elements in the current `row` in order to avoid counting all parents many times.
 ---
 ---@private
-function State:iterateOverLayout(depth, vsplit, curr)
+function State:walkLayout(depth, vsplit, curr)
     for _, group in ipairs(curr) do
         -- a row indicates a `vsplit` window container
         if type(group) == "string" and group == "row" then
@@ -545,7 +524,10 @@ function State:iterateOverLayout(depth, vsplit, curr)
                 depth = depth + 1
                 vsplit = false
             end
-            self.iterateOverLayout(self, depth, vsplit, group)
+            self.walkLayout(self, depth, vsplit, group)
+        -- depth 0 on a leaf is only possible after enabling nnp as there's nothing in the layout other than the main window
+        elseif depth == 0 and group == "leaf" then
+            self.increaseVSplits(self, 1)
         end
     end
 end
@@ -559,13 +541,7 @@ function State:refreshVSplits(scope)
 
     self.initVSplits(self)
 
-    -- TODO: there might be a cleaner way to handle the open state
-    local layout = vim.fn.winlayout(self.activeTab)
-    if #layout == 2 and type(layout[1]) == "string" and type(layout[2]) == "number" then
-        self.increaseVSplits(self, 1)
-    else
-        self.iterateOverLayout(self, 0, false, layout)
-    end
+    self.walkLayout(self, 0, false, vim.fn.winlayout(self.activeTab))
 
     D.log(scope, "computed %d vsplits", self.getVSplits(self))
 
