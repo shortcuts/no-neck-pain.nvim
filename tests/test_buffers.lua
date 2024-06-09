@@ -217,6 +217,7 @@ T["curr"]["closing `curr` window without any other window quits Neovim"] = funct
     Helpers.expect.state(child, "tabs[1].wins.main.curr", 1000)
 
     child.cmd("q")
+    Helpers.wait(child)
 
     -- neovim is closed, so it errors
     Helpers.expect.error(function()
@@ -290,6 +291,7 @@ for _, side in ipairs(Co.SIDES) do
             string.format("vim.fn.win_gotoid(_G.NoNeckPain.state.tabs[1].wins.main.%s)", side)
         )
         child.cmd("q")
+        Helpers.wait(child)
 
         Helpers.expect.equality(Helpers.winsInTab(child), { 1000 })
     end
