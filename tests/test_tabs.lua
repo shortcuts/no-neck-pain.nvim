@@ -611,4 +611,73 @@ T["tabnew/tabclose"]["keep state synchronized on second tab"] = function()
     Helpers.expect.state(child, "tabs", vim.NIL)
 end
 
+T["tabnew/tabclose"]["does not close nvim when quitting tab if some are left"] = function()
+    child.lua([[require('no-neck-pain').setup({width=50})]])
+
+    Helpers.expect.equality(child.api.nvim_get_current_tabpage(), 1)
+    Helpers.toggle(child)
+    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+
+    child.cmd("tabnew")
+    Helpers.expect.equality(child.api.nvim_get_current_tabpage(), 2)
+    Helpers.toggle(child)
+    Helpers.expect.equality(Helpers.winsInTab(child), { 1004, 1003, 1005 })
+
+    Helpers.expect.state(child, "enabled", true)
+    Helpers.expect.state(child, "tabs[1]", {
+        id = 1,
+        layers = {
+            split = 1,
+            vsplit = 1,
+        },
+        scratchPadEnabled = false,
+        wins = {
+            integrations = Co.INTEGRATIONS,
+            main = {
+                curr = 1000,
+                left = 1001,
+                right = 1002,
+            },
+        },
+    })
+    Helpers.expect.state(child, "activeTab", 2)
+    Helpers.expect.state(child, "tabs[2]", {
+        id = 2,
+        layers = {
+            split = 1,
+            vsplit = 1,
+        },
+        scratchPadEnabled = false,
+        wins = {
+            integrations = Co.INTEGRATIONS,
+            main = {
+                curr = 1003,
+                left = 1004,
+                right = 1005,
+            },
+        },
+    })
+
+    child.cmd("q")
+    Helpers.expect.equality(child.api.nvim_get_current_tabpage(), 1)
+    Helpers.expect.state(child, "activeTab", 1)
+    Helpers.expect.state(child, "tabs[1]", {
+        id = 1,
+        layers = {
+            split = 1,
+            vsplit = 1,
+        },
+        scratchPadEnabled = false,
+        wins = {
+            integrations = Co.INTEGRATIONS,
+            main = {
+                curr = 1000,
+                left = 1001,
+                right = 1002,
+            },
+        },
+    })
+    Helpers.expect.state(child, "tabs[2]", vim.NIL)
+end
+
 return T

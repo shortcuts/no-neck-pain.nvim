@@ -193,7 +193,7 @@ function N.enable(scope)
         callback = function(p)
             vim.schedule(function()
                 p.event = string.format("%s:split", p.event)
-                if not S.hasTabs(S) or E.skip(S.getTab(S)) then
+                if not S.isActiveTabRegistered(S) or E.skip(S.getTab(S)) then
                     return D.log(p.event, "skip")
                 end
 
@@ -235,7 +235,11 @@ function N.enable(scope)
         callback = function(p)
             vim.schedule(function()
                 local s = string.format("%s:quit", p.event)
-                if E.skip(nil) or not S.isActiveTabRegistered(S) then
+                if
+                    not S.isActiveTabRegistered(S)
+                    or E.skip(nil)
+                    or not S.isActiveTabRegistered(S)
+                then
                     return
                 end
 
@@ -249,7 +253,8 @@ function N.enable(scope)
                         or (S.isSideRegistered(S, "right") and not S.isSideWinValid(S, "right"))
                     )
                     or (
-                        not _G.NoNeckPain.config.fallbackOnBufferDelete
+                        p.event == "BufDelete"
+                        and not _G.NoNeckPain.config.fallbackOnBufferDelete
                         and not S.isSideWinValid(S, "curr")
                     )
                 then
@@ -287,7 +292,12 @@ function N.enable(scope)
     vim.api.nvim_create_autocmd({ "WinClosed", "BufDelete" }, {
         callback = function(p)
             vim.schedule(function()
-                if E.skip(nil) or not S.hasSplits(S) or W.stateWinsActive(true) then
+                if
+                    not S.isActiveTabRegistered(S)
+                    or E.skip(nil)
+                    or not S.hasSplits(S)
+                    or W.stateWinsActive(true)
+                then
                     return
                 end
 
@@ -337,7 +347,11 @@ function N.enable(scope)
         callback = function(p)
             vim.schedule(function()
                 local s = string.format("%s:integration", p.event)
-                if not S.hasTabs(S) or not S.isActiveTabRegistered(S) or E.skip(S.getTab(S)) then
+                if
+                    not S.isActiveTabRegistered(S)
+                    or not S.isActiveTabRegistered(S)
+                    or E.skip(S.getTab(S))
+                then
                     return D.log(s, "skip")
                 end
 
@@ -375,7 +389,7 @@ function N.enable(scope)
                 vim.schedule(function()
                     p.event = string.format("%s:skipEnteringNoNeckPainBuffer", p.event)
                     if
-                        not S.hasTabs(S)
+                        not S.isActiveTabRegistered(S)
                         or not S.isActiveTabRegistered(S)
                         or E.skip()
                         or S.getScratchPad(S)
@@ -433,7 +447,7 @@ function N.disable(scope)
             and not A.isRelativeWindow(win)
     end, vim.api.nvim_tabpage_list_wins(activeTab))
 
-    if #wins == 0 then
+    if #vim.api.nvim_list_tabpages() == 1 and #wins == 0 then
         for name, modified in pairs(A.getOpenedBuffers()) do
             if modified then
                 local bufname = name
