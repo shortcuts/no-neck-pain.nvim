@@ -23,22 +23,13 @@ $(addprefix test-, $(TESTFILES)): test-%:
 	nvim --headless --noplugin -u ./scripts/minimal_init.lua \
 		-c "lua MiniTest.run_file('tests/test_$*.lua', { execute = { reporter = MiniTest.gen_reporter.stdout({ group_depth = 2 }) } })"
 deps:
-	git clone --depth 1 https://github.com/nvim-lua/plenary.nvim deps/plenary
-	git clone --depth 1 https://github.com/nvim-neotest/nvim-nio deps/nvim-nio
-	git clone --depth 1 https://github.com/echasnovski/mini.nvim deps/mini.nvim --branch stable
-	git clone --depth 1 https://github.com/nvim-treesitter/nvim-treesitter deps/nvim-treesitter
-	git clone --depth 1 https://github.com/nvim-treesitter/playground deps/playground
-	git clone --depth 1 https://github.com/nvim-neotest/neotest deps/neotest
-	git clone --depth 1 https://github.com/nvim-tree/nvim-tree.lua deps/nvimtree
-	git clone --depth 1 https://github.com/nvim-neo-tree/neo-tree.nvim deps/neo-tree
-	git clone --depth 1 https://github.com/nvim-tree/nvim-web-devicons deps/nvim-web-devicons
-	git clone --depth 1 https://github.com/MunifTanjim/nui.nvim deps/nui
-	git clone --depth 1 https://github.com/antoinemadec/FixCursorHold.nvim deps/fixcursorhold
-	git clone --depth 1 https://github.com/mfussenegger/nvim-dap deps/nvimdap
-	git clone --depth 1 https://github.com/rcarriga/nvim-dap-ui deps/nvimdapui
-	git clone --depth 1 https://github.com/hedyhli/outline.nvim deps/outline
-	git clone --depth 1 https://github.com/b0o/incline.nvim deps/incline
-	git clone --depth 1 https://github.com/stevearc/aerial.nvim deps/aerial
+	./scripts/clone_deps.sh 1 || true
+	# bc for mini.nvim before this date
+	./scripts/reset_deps_at_date.sh ./deps/mini.nvim
+
+deps-at-date:
+	./scripts/clone_deps.sh || true
+	find deps -type d -mindepth 1 -maxdepth 1 | xargs -I{} bash -c './scripts/reset_deps_at_date.sh {}'
 
 test-ci: deps test
 
