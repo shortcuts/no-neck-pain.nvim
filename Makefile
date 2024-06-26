@@ -27,9 +27,8 @@ deps:
 	# bc for mini.nvim before this date
 	./scripts/reset_deps_at_date.sh ./deps/mini.nvim
 
-deps-at-date:
-	./scripts/clone_deps.sh || true
-	find deps -type d -mindepth 1 -maxdepth 1 | xargs -I{} bash -c './scripts/reset_deps_at_date.sh {}'
+deps-latest:
+	./scripts/clone_deps.sh 1 || true
 
 test-ci: deps test
 
