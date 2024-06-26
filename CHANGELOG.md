@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [1.14.1](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.14.0...v1.14.1) (2024-06-26)
+
+
+### Bug Fixes
+
+* **tabs:** do not close if tabs are left ([#371](https://github.com/shortcuts/no-neck-pain.nvim/issues/371)) ([22ba867](https://github.com/shortcuts/no-neck-pain.nvim/commit/22ba86731a85334d99e2a81e5ecb0966a7ff08d2))
+
 ## [1.14.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.13.0...v1.14.0) (2024-05-26)
 
 
