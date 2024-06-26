@@ -18,8 +18,9 @@ local T = MiniTest.new_set({
 T["install"] = MiniTest.new_set()
 
 T["install"]["sets global loaded variable"] = function()
-    Helpers.expect.global_type(child, "_G.NoNeckPainLoaded", "boolean")
+    Helpers.wait(child)
     Helpers.expect.global(child, "_G.NoNeckPain", vim.NIL)
+    Helpers.expect.global_type(child, "_G.NoNeckPainLoaded", "boolean")
 end
 
 T["setup"] = MiniTest.new_set()
