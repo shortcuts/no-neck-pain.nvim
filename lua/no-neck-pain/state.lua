@@ -586,10 +586,10 @@ function State:computeSplits(focusedWin)
         end
 
         sWidth, sHeight = A.getWidthAndHeight(side)
-        sWidth = vim.api.nvim_list_uis()[1].width - sWidth * nbSide
+        sWidth = vim.o.columns - sWidth * nbSide
     else
-        sWidth = vim.api.nvim_list_uis()[1].width
-        sHeight = vim.api.nvim_list_uis()[1].height
+        sWidth = vim.o.columns
+        sHeight = vim.o.lines
     end
 
     local fWidth, fHeight = A.getWidthAndHeight(focusedWin)

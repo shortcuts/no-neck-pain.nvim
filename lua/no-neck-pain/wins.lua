@@ -191,7 +191,7 @@ function W.createSideBuffers(skipIntegrations)
         local tab = S.getTab(S)
 
         -- get the available usable width (screen size without side paddings)
-        sWidth = vim.api.nvim_list_uis()[1].width - sWidth * nbSide
+        sWidth = vim.o.columns - sWidth * nbSide
         sWidth = math.floor(sWidth / tab.layers.vsplit)
 
         for _, split in pairs(tab.wins.splits) do
@@ -213,20 +213,15 @@ end
 ---@return number: the width of the side window.
 ---@private
 function W.getPadding(side)
-    local uis = vim.api.nvim_list_uis()
-
-    if uis[1] == nil then
-        error("W.getPadding - attempted to get the padding of a non-existing UI.")
-
-        return 0
-    end
-
-    local width = uis[1].width
-
     -- if the available screen size is lower than the config width,
     -- we don't have to create side buffers.
-    if _G.NoNeckPain.config.width >= width then
-        D.log("W.getPadding", "[%s] - ui %s - no space left to create side buffers", side, width)
+    if _G.NoNeckPain.config.width >= vim.o.columns then
+        D.log(
+            "W.getPadding",
+            "[%s] - ui %s - no space left to create side buffers",
+            side,
+            vim.o.columns
+        )
 
         return 0
     end
@@ -238,7 +233,7 @@ function W.getPadding(side)
 
     -- if there's no space left according to the config width,
     -- then we don't have to create side buffers.
-    if occupied >= width then
+    if occupied >= vim.o.columns then
         D.log(side, "%d vsplits - no space left to create side buffers", tab.layers.vsplit)
 
         return 0
@@ -273,7 +268,7 @@ function W.getPadding(side)
     end
 
     return math.floor(
-        (width - paddingToSubstract - (_G.NoNeckPain.config.width * tab.layers.vsplit)) / 2
+        (vim.o.columns - paddingToSubstract - (_G.NoNeckPain.config.width * tab.layers.vsplit)) / 2
     )
 end
 
