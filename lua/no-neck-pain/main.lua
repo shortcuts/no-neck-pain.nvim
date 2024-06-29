@@ -238,7 +238,7 @@ function N.enable(scope)
                     return
                 end
 
-                if S.hasSplits(S) then
+                if S.getVSplits(S) > 0 then
                     return D.log(s, "splits still active")
                 end
 
@@ -287,51 +287,26 @@ function N.enable(scope)
     vim.api.nvim_create_autocmd({ "WinClosed", "BufDelete" }, {
         callback = function(p)
             vim.schedule(function()
-                if
-                    not S.isActiveTabRegistered(S)
-                    or E.skip(nil)
-                    or not S.hasSplits(S)
-                    or W.stateWinsActive(true)
-                then
+                if not S.isActiveTabRegistered(S) or E.skip(nil) or S.getVSplits(S) == 0 then
                     return
                 end
 
-                S.tabs[S.activeTab].wins.splits = vim.tbl_filter(function(split)
-                    if vim.api.nvim_win_is_valid(split.id) then
-                        return true
-                    end
+                S.refreshVSplits(S, p.event)
 
-                    S.decreaseLayers(S, split.vertical)
-
-                    return false
-                end, S.tabs[S.activeTab].wins.splits)
-
-                if #S.tabs[S.activeTab].wins.splits == 0 then
-                    S.initSplits(S)
-                end
-
-                -- we keep track if curr have been closed because if it's the case,
-                -- the focus will be on a side buffer which is wrong
-                local haveCloseCurr = false
-
-                -- if curr is not valid anymore, we focus the first valid split and remove it from the state
                 if not vim.api.nvim_win_is_valid(S.getSideID(S, "curr")) then
-                    -- if neither curr and splits are remaining valids, we just disable
-                    if not S.hasSplits(S) then
+                    local wins = S.getUnregisteredWins(S)
+                    if #wins == 0 then
+                        D.log(p.event, "no active windows found")
+
                         return N.disable(p.event)
                     end
 
-                    haveCloseCurr = true
+                    S.setSideID(S, wins[1], "curr")
 
-                    local split = S.tabs[S.activeTab].wins.splits[1]
+                    D.log(p.event, "re-routing to %d", S.getSideID(S, "curr"))
 
-                    S.decreaseLayers(S, split.vertical)
-                    S.setSideID(S, split.id, "curr")
-                    S.removeSplit(S, split.id)
+                    return N.init(p.event, true)
                 end
-
-                -- we only restore focus on curr if there's no split left
-                N.init(p.event, haveCloseCurr or not S.hasSplits(S))
             end)
         end,
         group = augroupName,

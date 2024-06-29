@@ -258,39 +258,4 @@ function W.getPadding(side)
     return final
 end
 
----Determine if the tab wins are still active and valid.
----
----@param checkSplits boolean: whether splits state should be considered or not.
----@return boolean: whether all windows are active and valid or not.
----@private
-function W.stateWinsActive(checkSplits)
-    if not S.isActiveTabValid(S) then
-        return false
-    end
-
-    local tab = S.getTabSafe(S)
-
-    if tab == nil then
-        return false
-    end
-
-    if tab.wins.main ~= nil then
-        for _, side in pairs(tab.wins.main) do
-            if not vim.api.nvim_win_is_valid(side) then
-                return false
-            end
-        end
-    end
-
-    if checkSplits and tab.wins.splits ~= nil then
-        for _, split in pairs(tab.wins.splits) do
-            if not vim.api.nvim_win_is_valid(split.id) then
-                return false
-            end
-        end
-    end
-
-    return true
-end
-
 return W

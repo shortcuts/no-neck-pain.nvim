@@ -178,43 +178,25 @@ end
 
 ---Gets all wins that are not already registered in the given `tab`.
 ---
+---@param withCurr boolean?: whether we should filter curr or not
 ---@return table: the wins that are not in `tab`.
 ---@private
-function State:getUnregisteredWins()
-    local wins = vim.api.nvim_tabpage_list_wins(self.activeTab)
-    local stateWins = self.getRegisteredWins(self)
-
-    local validWins = {}
-
-    for _, win in pairs(wins) do
-        if not vim.tbl_contains(stateWins, win) and not A.isRelativeWindow(win) then
-            table.insert(validWins, win)
+function State:getUnregisteredWins(withCurr)
+    return vim.tbl_filter(function(win)
+        if A.isRelativeWindow(win) then
+            return false
         end
-    end
 
-    return validWins
-end
-
----Gets all wins IDs that are registered in the state for the active tab.
----
----@return table: the wins that are not in `tab`.
----@private
-function State:getRegisteredWins()
-    local wins = {}
-
-    if self.tabs[self.activeTab].wins.main ~= nil then
-        for _, side in pairs(self.tabs[self.activeTab].wins.main) do
-            table.insert(wins, side)
+        if not withCurr and win == self.getSideID(self, "curr") then
+            return false
         end
-    end
 
-    if self.tabs[self.activeTab].wins.splits ~= nil then
-        for _, split in pairs(self.tabs[self.activeTab].wins.splits) do
-            table.insert(wins, split.id)
+        if win == self.getSideID(self, "left") or win == self.getSideID(self, "right") then
+            return false
         end
-    end
 
-    return wins
+        return true
+    end, vim.api.nvim_tabpage_list_wins(self.activeTab))
 end
 
 ---Whether the given `fileType` matches a supported integration or not.
@@ -367,20 +349,6 @@ function State:hasTabs()
     return self.tabs ~= nil
 end
 
----Whether there is splits registered in the active tab or not.
----
----@return boolean
----@private
-function State:hasSplits()
-    if not self.hasTabs(self) then
-        return false
-    end
-
-    return self.tabs[self.activeTab] ~= nil
-        and self.tabs[self.activeTab].wins ~= nil
-        and self.tabs[self.activeTab].wins.splits ~= nil
-end
-
 ---Whether there is integrations registered in the active tab or not.
 ---
 ---@return boolean
@@ -474,19 +442,6 @@ end
 ---@private
 function State:setActiveTab(id)
     self.activeTab = id
-end
-
----Set a split in the state at the given id.
----
----@param split table: the id of the split.
----
----@private
-function State:setSplit(split)
-    if self.tabs[self.activeTab].wins.splits == nil then
-        self.tabs[self.activeTab].wins.splits = {}
-    end
-
-    self.tabs[self.activeTab].wins.splits[split.id] = split
 end
 
 ---Gets the tab with the given `id` from the state.
