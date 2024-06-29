@@ -163,9 +163,7 @@ function N.enable(scope)
     vim.api.nvim_create_autocmd({ "TabLeave" }, {
         callback = function(p)
             vim.schedule(function()
-                if
-                    S.isActiveTabRegistered(S) and not vim.api.nvim_tabpage_is_valid(S.activeTab)
-                then
+                if not vim.api.nvim_tabpage_is_valid(S.activeTab) then
                     S.refreshTabs(S, S.activeTab)
                     D.log(p.event, "tab %d is now inactive", S.activeTab)
                 else
