@@ -238,9 +238,7 @@ function N.enable(scope)
                     return
                 end
 
-                if S.getVSplits(S) > 0 then
-                    return D.log(s, "splits still active")
-                end
+                S.refreshVSplits(S, s)
 
                 if
                     (
