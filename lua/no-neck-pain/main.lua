@@ -132,7 +132,7 @@ function N.enable(scope)
     vim.api.nvim_create_augroup(augroupName, { clear = true })
 
     S.setSideID(S, vim.api.nvim_get_current_win(), "curr")
-    S.computeSplits(S, S.getSideID(S, "curr"))
+    S.refreshVSplits(S, scope)
 
     N.init(scope, true)
 
@@ -217,12 +217,7 @@ function N.enable(scope)
                     return D.log(p.event, "no new or too many unregistered windows")
                 end
 
-                local focusedWin = wins[1]
-
-                local isVSplit = S.computeSplits(S, focusedWin)
-                S.setSplit(S, { id = focusedWin, vertical = isVSplit })
-
-                if isVSplit then
+                if S.refreshVSplits(S, scope) then
                     N.init(p.event)
                 end
             end)

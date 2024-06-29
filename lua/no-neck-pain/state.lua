@@ -20,11 +20,36 @@ function State:save()
     _G.NoNeckPain.state = self
 end
 
----Sets the state splits to its original value.
+---Sets the vsplits counter to 1.
 ---
 ---@private
-function State:initSplits()
-    self.tabs[self.activeTab].wins.splits = nil
+function State:initVSplits()
+    self.tabs[self.activeTab].wins.vsplits = 0
+end
+
+---Gets the tab vsplits counter.
+---
+---@return number: the number of active vsplits.
+---@private
+function State:getVSplits()
+    return self.tabs[self.activeTab].wins.vsplits
+end
+
+---Whether the side is enabled in the config or not.
+---
+---@param side "left"|"right": the side of the window.
+---@return boolean
+---@private
+function State:isSideEnabled(side)
+    return _G.NoNeckPain.config.buffers[side].enabled
+end
+
+---Gets all integrations.
+---
+---@return table: the integration infos.
+---@private
+function State:getIntegrations()
+    return self.tabs[self.activeTab].wins.integrations
 end
 
 ---Iterates over the tabs in the state to remove invalid tabs.
@@ -514,117 +539,80 @@ function State:setTab(id)
     self.tabs[id] = {
         id = id,
         scratchPadEnabled = false,
-        layers = {
-            vsplit = 1,
-            split = 1,
-        },
         wins = {
+            vsplits = 0,
             main = {
                 curr = nil,
                 left = nil,
                 right = nil,
             },
-            splits = nil,
             integrations = vim.deepcopy(Co.INTEGRATIONS),
         },
     }
     self.activeTab = id
 end
 
----Sets the `layers` of the currently active tab.
+---Increases the vsplits counter.
 ---
----@param vsplit number?: the number of opened vsplits.
----@param split number?: the number of opened splits.
+---@param nb number: the number of columns in the given row.
 ---@private
-function State:setLayers(vsplit, split)
-    if vsplit ~= nil then
-        self.tabs[self.activeTab].layers.vsplit = vsplit
-    end
-
-    if vsplit ~= nil then
-        self.tabs[self.activeTab].layers.split = split
-    end
+function State:increaseVSplits(nb)
+    self.tabs[self.activeTab].wins.vsplits = self.tabs[self.activeTab].wins.vsplits + nb
 end
 
----Removes the split with the given `id` from the state.
+---Recursively walks in the `winlayout` until it has computed every column present in the UI.
 ---
----@param id number: the id of the split to remove.
----@private
-function State:removeSplit(id)
-    self.tabs[self.activeTab].wins.splits[id] = nil
-end
-
----Decreases the layers of splits state values.
+---When we find a `row`, we set `vsplit` to true, the next element will always be a `table` so once on it -we can increase the `vsplits` counter.
 ---
----@param isVSplit boolean: whether the window is a vsplit or not.
----@private
-function State:decreaseLayers(isVSplit)
-    local scope = isVSplit and "vsplit" or "split"
-
-    self.tabs[self.activeTab].layers[scope] = self.tabs[self.activeTab].layers[scope] - 1
-
-    if self.tabs[self.activeTab].layers[scope] < 1 then
-        self.tabs[self.activeTab].layers[scope] = 1
-    end
-end
-
----Determines current state of the split/vsplit windows by comparing widths and heights.
+---In order to also compute nested vsplits, we need to keep track how deep we are in the layout, we remove
+---that depth from the number of elements in the current `row` in order to avoid counting all parents many times.
 ---
----@param focusedWin number: the id of the current window.
----@return boolean: whether the current window is a vsplit or not.
 ---@private
-function State:computeSplits(focusedWin)
-    local side = self.getSideID(self, "left") or self.getSideID(self, "right")
-    local sWidth, sHeight = 0, 0
+function State:walkLayout(depth, vsplit, curr)
+    for _, group in ipairs(curr) do
+        -- a row indicates a `vsplit` window container
+        if type(group) == "string" and group == "row" then
+            vsplit = true
+        elseif type(group) == "table" then
+            local len = #group
+            if vsplit then
+                -- even if we are super deep in the field, len minimal value is always 1.
+                if len <= depth then
+                    len = depth + 1
+                end
 
-    -- when side buffer exists we rely on them, otherwise we fallback to the UI
-    if side ~= nil then
-        local nbSide = 1
+                -- we remove the depth from the len in order to avoid counting parents multiple times.
+                self.increaseVSplits(self, len - depth)
 
-        if self.checkSides(self, "and", true) then
-            nbSide = 2
+                -- reset vsplit as this layer as been computed already, increase depth as we will dug again.
+                depth = depth + 1
+                vsplit = false
+            end
+            self.walkLayout(self, depth, vsplit, group)
+        -- depth 0 on a leaf is only possible after enabling nnp as there's nothing in the layout other than the main window
+        elseif depth == 0 and group == "leaf" then
+            self.increaseVSplits(self, 1)
         end
-
-        sWidth, sHeight = A.getWidthAndHeight(side)
-        sWidth = vim.api.nvim_list_uis()[1].width - sWidth * nbSide
-    else
-        sWidth = vim.api.nvim_list_uis()[1].width
-        sHeight = vim.api.nvim_list_uis()[1].height
     end
+end
 
-    local fWidth, fHeight = A.getWidthAndHeight(focusedWin)
-    local isVSplit = true
+---Refresh vsplits counter based on the `winlayout`.
+---
+---@param scope string: the caller of the method.
+---@return boolean: whether the number of vsplits changed or not.
+---@private
+function State:refreshVSplits(scope)
+    local currentVSplits = self.getVSplits(self)
 
-    local splitInF = math.floor(sHeight / fHeight)
-    if splitInF < 1 then
-        splitInF = 1
-    end
+    self.initVSplits(self)
 
-    if splitInF > self.tabs[self.activeTab].layers.split then
-        isVSplit = false
-    end
+    self.walkLayout(self, 0, false, vim.fn.winlayout(self.activeTab))
 
-    local vsplitInF = math.floor(sWidth / fWidth)
-    if vsplitInF < 1 then
-        vsplitInF = 1
-    end
+    D.log(scope, "computed %d vsplits", self.getVSplits(self))
 
-    if vsplitInF > self.tabs[self.activeTab].layers.vsplit then
-        isVSplit = true
-    end
+    self.save(self)
 
-    -- update anyway because we want state consistency
-    self.setLayers(self, vsplitInF, splitInF)
-
-    D.log(
-        "Sp.compute",
-        "[split %d | vsplit %d] new split, vertical: %s",
-        self.tabs[self.activeTab].layers.split,
-        self.tabs[self.activeTab].layers.vsplit,
-        isVSplit
-    )
-
-    return isVSplit
+    return currentVSplits ~= self.getVSplits(self)
 end
 
 return State
