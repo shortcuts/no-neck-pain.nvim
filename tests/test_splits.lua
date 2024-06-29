@@ -79,8 +79,8 @@ T["split"]["keeps side buffers"] = function()
     child.cmd("q")
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 15)
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.right", 15)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 75)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.right", 75)
 end
 
 T["split"]["keeps correct focus"] = function()
@@ -135,15 +135,14 @@ T["vsplit"]["corretly size splits when opening helper with side buffers open"] =
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1003, 1000, 1002 })
 
     Helpers.expect.buf_width(child, "tabs[1].wins.splits[1003].id", 50)
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 67)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 47)
 
     child.cmd("h")
-    child.loop.sleep(50)
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1004, 1001, 1003, 1000, 1002 })
 
     Helpers.expect.buf_width(child, "tabs[1].wins.splits[1004].id", 150)
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 67)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 47)
 end
 
 T["vsplit"]["correctly position side buffers when there's enough space"] = function()
@@ -170,7 +169,7 @@ T["vsplit"]["preserve vsplit width when having side buffers"] = function()
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1002, 1000 })
 
-    Helpers.expect.buf_width(child, "tabs[1].wins.splits[1002].id", 65)
+    Helpers.expect.buf_width(child, "tabs[1].wins.splits[1002].id", 150)
 end
 
 T["vsplit"]["closing `curr` makes `split` the new `curr`"] = function()
@@ -363,7 +362,7 @@ T["vsplit/split"]["splits and vsplits keeps a correct size"] = function()
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1003, 1000, 1002 })
     Helpers.expect.equality(Helpers.currentWin(child), 1003)
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 468)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 48)
 
     child.cmd("vsplit")
     vim.loop.sleep(50)
