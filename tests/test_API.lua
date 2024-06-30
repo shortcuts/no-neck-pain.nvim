@@ -216,8 +216,6 @@ T["setup"]["starts the plugin on VimEnter"] = function()
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
     Helpers.expect.state(child, "enabled", true)
-
-    child.stop()
 end
 
 T["enable"] = MiniTest.new_set()
@@ -364,7 +362,6 @@ T["disable"]["(multiple tab) resets state"] = function()
 end
 
 T["disable"]["(no file) does not close the window if unsaved buffer"] = function()
-    child.set_size(500, 500)
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     Helpers.toggle(child)
 
@@ -388,7 +385,6 @@ T["disable"]["(no file) does not close the window if unsaved buffer"] = function
 end
 
 T["disable"]["(on file) does not close the window if unsaved buffer"] = function()
-    child.set_size(500, 500)
     child.restart({ "-u", "scripts/minimal_init.lua", "lua/no-neck-pain/main.lua" })
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     Helpers.toggle(child)
@@ -419,7 +415,6 @@ T["disable"]["relative window doesn't prevent quitting nvim"] = function()
         return
     end
 
-    child.set_size(500, 500)
     child.restart({ "-u", "scripts/init_with_incline.lua" })
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     Helpers.toggle(child)
