@@ -44,8 +44,8 @@ Co.INTEGRATIONS = {
     },
     NeoTree = {
         fileTypePattern = "neo-tree",
-        close = "Neotree close",
-        open = "Neotree reveal",
+        close = "Neotree",
+        open = "Neotree",
     },
     neotest = {
         fileTypePattern = "neotest",
