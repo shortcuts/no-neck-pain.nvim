@@ -111,6 +111,8 @@ function N.init(scope, goToCurr, skipIntegrations)
         or (not hadSideBuffers and S.checkSides(S, "or", true))
         or (S.isSideTheActiveWin(S, "left") or S.isSideTheActiveWin(S, "right"))
     then
+        D.log(scope, "re-routing focus to curr")
+
         vim.fn.win_gotoid(S.getSideID(S, "curr"))
     end
 
@@ -188,109 +190,27 @@ function N.enable(scope)
         desc = "Keeps track of the currently active tab",
     })
 
-    vim.api.nvim_create_autocmd({ "WinEnter" }, {
-        callback = function(p)
-            vim.schedule(function()
-                p.event = string.format("%s:split", p.event)
-                if not S.isActiveTabRegistered(S) or E.skip(S.getTab(S)) then
-                    return D.log(p.event, "skip")
-                end
-
-                if S.checkSides(S, "and", false) then
-                    return D.log(p.event, "no side buffer")
-                end
-
-                if S.isSideTheActiveWin(S, "curr") then
-                    return D.log(p.event, "current win")
-                end
-
-                -- an integration isn't considered as a split
-                local isSupportedIntegration = S.isSupportedIntegration(S, p.event, nil)
-                if isSupportedIntegration then
-                    return D.log(p.event, "on an integration")
-                end
-
-                local wins = S.getUnregisteredWins(S)
-
-                if #wins ~= 1 then
-                    return D.log(p.event, "no new or too many unregistered windows")
-                end
-
-                if S.refreshVSplits(S, scope) then
-                    N.init(p.event)
-                end
-            end)
-        end,
-        group = augroupName,
-        desc = "WinEnter covers the split/vsplit management",
-    })
-
     vim.api.nvim_create_autocmd({ "QuitPre", "BufDelete" }, {
         callback = function(p)
             vim.schedule(function()
-                local s = string.format("%s:quit", p.event)
-                if
-                    not S.isActiveTabRegistered(S)
-                    or E.skip(nil)
-                    or not S.isActiveTabRegistered(S)
-                then
-                    return
-                end
-
-                S.refreshVSplits(S, s)
-
-                if
-                    (
-                        (S.isSideRegistered(S, "left") and not S.isSideWinValid(S, "left"))
-                        or (S.isSideRegistered(S, "right") and not S.isSideWinValid(S, "right"))
-                    )
-                    or (
-                        p.event == "BufDelete"
-                        and not _G.NoNeckPain.config.fallbackOnBufferDelete
-                        and not S.isSideWinValid(S, "curr")
-                    )
-                then
-                    D.log(s, "one of the NNP side has been closed")
-
-                    return N.disable(s)
-                end
-
-                if S.isSideWinValid(S, "curr") then
-                    D.log(s, "curr is still valid, skipping")
-
-                    return
-                end
-
-                -- if we still have a side valid but curr has been deleted (mostly because of a :bd),
-                -- we will fallback to the first valid side
-                if p.event == "QuitPre" then
-                    D.log(s, "curr has been closed")
-
-                    return N.disable(s)
-                end
-
-                D.log(s, "`curr` has been deleted, resetting state")
-
-                vim.cmd("new")
-
-                N.disable(string.format("%s:reset", s))
-                N.enable(string.format("%s:reset", s))
-            end)
-        end,
-        group = augroupName,
-        desc = "Handles the closure of main NNP windows",
-    })
-
-    vim.api.nvim_create_autocmd({ "WinClosed", "BufDelete" }, {
-        callback = function(p)
-            vim.schedule(function()
-                if not S.isActiveTabRegistered(S) or E.skip(nil) or S.getVSplits(S) == 0 then
+                if not S.isActiveTabRegistered(S) or E.skip(nil) then
                     return
                 end
 
                 S.refreshVSplits(S, p.event)
 
                 if not vim.api.nvim_win_is_valid(S.getSideID(S, "curr")) then
+                    if p.event == "BufDelete" and _G.NoNeckPain.config.fallbackOnBufferDelete then
+                        D.log(p.event, "`curr` has been deleted, resetting state")
+
+                        vim.cmd("new")
+
+                        N.disable(string.format("%s:reset", p.event))
+                        N.enable(string.format("%s:reset", p.event))
+
+                        return
+                    end
+
                     local wins = S.getUnregisteredWins(S)
                     if #wins == 0 then
                         D.log(p.event, "no active windows found")
@@ -304,10 +224,21 @@ function N.enable(scope)
 
                     return N.init(p.event, true)
                 end
+
+                if
+                    (S.isSideRegistered(S, "left") and not S.isSideWinValid(S, "left"))
+                    or (S.isSideRegistered(S, "right") and not S.isSideWinValid(S, "right"))
+                then
+                    D.log(p.event, "one of the NNP side has been closed")
+
+                    return N.disable(p.event)
+                end
+
+                return N.init(p.event)
             end)
         end,
         group = augroupName,
-        desc = "Aims at restoring NNP enable state after closing a split/vsplit buffer or a main buffer",
+        desc = "keeps track of the state after closing windows and deleting buffers",
     })
 
     vim.api.nvim_create_autocmd({ "WinEnter", "WinClosed" }, {
@@ -321,6 +252,8 @@ function N.enable(scope)
                 then
                     return D.log(s, "skip")
                 end
+
+                S.refreshVSplits(S, scope)
 
                 if S.wantsSides(S) and S.checkSides(S, "and", false) then
                     return D.log(s, "no side buffer")
