@@ -185,10 +185,6 @@ T["tabnew/tabclose"]["doesn't keep closed tabs in state"] = function()
     Helpers.expect.state(child, "tabs", {
         {
             id = 1,
-            layers = {
-                split = 1,
-                vsplit = 1,
-            },
             scratchPadEnabled = false,
             wins = {
                 integrations = Co.INTEGRATIONS,
@@ -197,6 +193,7 @@ T["tabnew/tabclose"]["doesn't keep closed tabs in state"] = function()
                     left = 1001,
                     right = 1002,
                 },
+                vsplits = 1,
             },
         },
     })
@@ -206,10 +203,6 @@ T["tabnew/tabclose"]["doesn't keep closed tabs in state"] = function()
     Helpers.expect.state(child, "tabs", {
         {
             id = 1,
-            layers = {
-                split = 1,
-                vsplit = 1,
-            },
             scratchPadEnabled = false,
             wins = {
                 integrations = Co.INTEGRATIONS,
@@ -218,14 +211,11 @@ T["tabnew/tabclose"]["doesn't keep closed tabs in state"] = function()
                     left = 1001,
                     right = 1002,
                 },
+                vsplits = 1,
             },
         },
         {
             id = 2,
-            layers = {
-                split = 1,
-                vsplit = 1,
-            },
             scratchPadEnabled = false,
             wins = {
                 integrations = Co.INTEGRATIONS,
@@ -234,6 +224,7 @@ T["tabnew/tabclose"]["doesn't keep closed tabs in state"] = function()
                     left = 1004,
                     right = 1005,
                 },
+                vsplits = 1,
             },
         },
     })
@@ -242,10 +233,6 @@ T["tabnew/tabclose"]["doesn't keep closed tabs in state"] = function()
     Helpers.expect.state(child, "tabs", {
         {
             id = 1,
-            layers = {
-                split = 1,
-                vsplit = 1,
-            },
             scratchPadEnabled = false,
             wins = {
                 integrations = Co.INTEGRATIONS,
@@ -254,6 +241,7 @@ T["tabnew/tabclose"]["doesn't keep closed tabs in state"] = function()
                     left = 1001,
                     right = 1002,
                 },
+                vsplits = 1,
             },
         },
     })
@@ -269,10 +257,6 @@ T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
     Helpers.expect.state(child, "tabs", {
         {
             id = 1,
-            layers = {
-                split = 1,
-                vsplit = 1,
-            },
             scratchPadEnabled = false,
             wins = {
                 integrations = Co.INTEGRATIONS,
@@ -281,6 +265,7 @@ T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
                     left = 1001,
                     right = 1002,
                 },
+                vsplits = 1,
             },
         },
     })
@@ -293,10 +278,6 @@ T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
     Helpers.expect.state(child, "tabs", {
         {
             id = 1,
-            layers = {
-                split = 1,
-                vsplit = 1,
-            },
             scratchPadEnabled = false,
             wins = {
                 integrations = Co.INTEGRATIONS,
@@ -305,14 +286,11 @@ T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
                     left = 1001,
                     right = 1002,
                 },
+                vsplits = 1,
             },
         },
         {
             id = 2,
-            layers = {
-                split = 1,
-                vsplit = 1,
-            },
             scratchPadEnabled = false,
             wins = {
                 integrations = Co.INTEGRATIONS,
@@ -321,6 +299,7 @@ T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
                     left = 1004,
                     right = 1005,
                 },
+                vsplits = 3,
             },
         },
     })
@@ -329,10 +308,6 @@ T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
     Helpers.expect.state(child, "tabs", {
         {
             id = 1,
-            layers = {
-                split = 1,
-                vsplit = 1,
-            },
             scratchPadEnabled = false,
             wins = {
                 integrations = Co.INTEGRATIONS,
@@ -341,6 +316,7 @@ T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
                     left = 1001,
                     right = 1002,
                 },
+                vsplits = 1,
             },
         },
     })
@@ -349,10 +325,6 @@ T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
     Helpers.expect.state(child, "tabs", {
         {
             id = 1,
-            layers = {
-                split = 1,
-                vsplit = 1,
-            },
             scratchPadEnabled = false,
             wins = {
                 integrations = Co.INTEGRATIONS,
@@ -361,14 +333,11 @@ T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
                     left = 1001,
                     right = 1002,
                 },
+                vsplits = 1,
             },
         },
         {
             id = 2,
-            layers = {
-                split = 1,
-                vsplit = 1,
-            },
             scratchPadEnabled = false,
             wins = {
                 integrations = Co.INTEGRATIONS,
@@ -377,6 +346,7 @@ T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
                     left = 1006,
                     right = 1007,
                 },
+                vsplits = 3,
             },
         },
     })
@@ -386,10 +356,6 @@ T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
     Helpers.expect.state(child, "tabs", {
         {
             id = 1,
-            layers = {
-                split = 1,
-                vsplit = 1,
-            },
             scratchPadEnabled = false,
             wins = {
                 integrations = Co.INTEGRATIONS,
@@ -398,14 +364,11 @@ T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
                     left = 1001,
                     right = 1002,
                 },
+                vsplits = 1,
             },
         },
         {
             id = 2,
-            layers = {
-                split = 1,
-                vsplit = 1,
-            },
             scratchPadEnabled = false,
             wins = {
                 integrations = Co.INTEGRATIONS,
@@ -414,6 +377,7 @@ T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
                     left = 1006,
                     right = 1007,
                 },
+                vsplits = 3,
             },
         },
     })
@@ -443,10 +407,6 @@ T["tabnew/tabclose"]["does not pick tab 1 for the first active tab"] = function(
     Helpers.expect.state(child, "activeTab", 2)
     Helpers.expect.state(child, "tabs[2]", {
         id = 2,
-        layers = {
-            split = 1,
-            vsplit = 1,
-        },
         scratchPadEnabled = false,
         wins = {
             integrations = Co.INTEGRATIONS,
@@ -455,6 +415,7 @@ T["tabnew/tabclose"]["does not pick tab 1 for the first active tab"] = function(
                 left = 1002,
                 right = 1003,
             },
+            vsplits = 1,
         },
     })
 
@@ -468,10 +429,6 @@ T["tabnew/tabclose"]["does not pick tab 1 for the first active tab"] = function(
     Helpers.toggle(child)
     Helpers.expect.state(child, "tabs[1]", {
         id = 1,
-        layers = {
-            split = 1,
-            vsplit = 1,
-        },
         scratchPadEnabled = false,
         wins = {
             integrations = {
@@ -521,14 +478,11 @@ T["tabnew/tabclose"]["does not pick tab 1 for the first active tab"] = function(
                 left = 1004,
                 right = 1005,
             },
+            vsplits = 3,
         },
     })
     Helpers.expect.state(child, "tabs[2]", {
         id = 2,
-        layers = {
-            split = 1,
-            vsplit = 1,
-        },
         scratchPadEnabled = false,
         wins = {
             integrations = Co.INTEGRATIONS,
@@ -537,6 +491,7 @@ T["tabnew/tabclose"]["does not pick tab 1 for the first active tab"] = function(
                 left = 1002,
                 right = 1003,
             },
+            vsplits = 1,
         },
     })
 end
@@ -562,10 +517,6 @@ T["tabnew/tabclose"]["keep state synchronized on second tab"] = function()
     Helpers.expect.state(child, "activeTab", 2)
     Helpers.expect.state(child, "tabs[2]", {
         id = 2,
-        layers = {
-            split = 1,
-            vsplit = 1,
-        },
         scratchPadEnabled = false,
         wins = {
             integrations = Co.INTEGRATIONS,
@@ -592,10 +543,6 @@ T["tabnew/tabclose"]["keep state synchronized on second tab"] = function()
     Helpers.expect.state(child, "tabs[1]", vim.NIL)
     Helpers.expect.state(child, "tabs[2]", {
         id = 2,
-        layers = {
-            split = 1,
-            vsplit = 1,
-        },
         scratchPadEnabled = false,
         wins = {
             integrations = Co.INTEGRATIONS,
@@ -626,10 +573,6 @@ T["tabnew/tabclose"]["does not close nvim when quitting tab if some are left"] =
     Helpers.expect.state(child, "enabled", true)
     Helpers.expect.state(child, "tabs[1]", {
         id = 1,
-        layers = {
-            split = 1,
-            vsplit = 1,
-        },
         scratchPadEnabled = false,
         wins = {
             integrations = Co.INTEGRATIONS,
@@ -643,10 +586,6 @@ T["tabnew/tabclose"]["does not close nvim when quitting tab if some are left"] =
     Helpers.expect.state(child, "activeTab", 2)
     Helpers.expect.state(child, "tabs[2]", {
         id = 2,
-        layers = {
-            split = 1,
-            vsplit = 1,
-        },
         scratchPadEnabled = false,
         wins = {
             integrations = Co.INTEGRATIONS,
@@ -663,10 +602,6 @@ T["tabnew/tabclose"]["does not close nvim when quitting tab if some are left"] =
     Helpers.expect.state(child, "activeTab", 1)
     Helpers.expect.state(child, "tabs[1]", {
         id = 1,
-        layers = {
-            split = 1,
-            vsplit = 1,
-        },
         scratchPadEnabled = false,
         wins = {
             integrations = Co.INTEGRATIONS,

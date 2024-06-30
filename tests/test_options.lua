@@ -39,7 +39,7 @@ T["killAllBuffersOnDisable"] = MiniTest.new_set()
 
 T["killAllBuffersOnDisable"]["closes every windows when disabling the plugin"] = function()
     child.set_size(500, 500)
-    child.lua([[ require('no-neck-pain').setup({width=50,killAllBuffersOnDisable=true}) ]])
+    child.lua([[ require('no-neck-pain').setup({width=20,killAllBuffersOnDisable=true}) ]])
     Helpers.toggle(child)
 
     Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1000, left = 1001, right = 1002 })
@@ -62,6 +62,8 @@ T["fallbackOnBufferDelete"] = MiniTest.new_set()
 T["fallbackOnBufferDelete"]["invoking :bd keeps nnp enabled"] = function()
     child.set_size(500, 500)
     child.lua([[ require('no-neck-pain').setup({width=50,fallbackOnBufferDelete=true}) ]])
+
+    Helpers.expect.config(child, "fallbackOnBufferDelete", true)
     Helpers.toggle(child)
 
     Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1000, left = 1001, right = 1002 })
