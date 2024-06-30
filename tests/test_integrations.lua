@@ -207,7 +207,7 @@ T["outline"]["keeps sides open"] = function()
     child.cmd("Outline")
     vim.loop.sleep(50)
 
-    Helpers.expect.state(child, "tabs[1].wins.vsplits", 1)
+    Helpers.expect.state(child, "tabs[1].wins.vsplits", 4)
 
     Helpers.expect.state(child, "tabs[1].wins.integrations.outline", {
         close = "Outline",
@@ -251,7 +251,7 @@ T["NvimTree"]["keeps sides open"] = function()
         right = 1002,
     })
 
-    Helpers.expect.state(child, "tabs[1].wins.vsplits", 1)
+    Helpers.expect.state(child, "tabs[1].wins.vsplits", 4)
 
     Helpers.expect.state(child, "tabs[1].wins.integrations.NvimTree", {
         close = "NvimTreeClose",
@@ -290,7 +290,7 @@ T["neo-tree"]["keeps sides open"] = function()
         right = 1002,
     })
 
-    Helpers.expect.state(child, "tabs[1].wins.vsplits", 1)
+    Helpers.expect.state(child, "tabs[1].wins.vsplits", 4)
 
     Helpers.expect.state(child, "tabs[1].wins.integrations.NeoTree", {
         close = "Neotree close",
@@ -358,7 +358,7 @@ T["TSPlayground"]["reduces `left` side if only active when integration is on `ri
 
     child.lua([[
         require('no-neck-pain').setup({
-            width = 50,
+            width = 20,
             buffers = {
                 right = {
                     enabled = false,
@@ -376,21 +376,21 @@ T["TSPlayground"]["reduces `left` side if only active when integration is on `ri
         left = 1001,
         right = nil,
     })
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 15)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 30)
 
     child.cmd("TSPlaygroundToggle")
     vim.loop.sleep(50)
 
-    Helpers.expect.state(child, "tabs[1].wins.vsplits", 1)
+    Helpers.expect.state(child, "tabs[1].wins.vsplits", 3)
 
-    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1003)"), 142)
-    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1001)"), 15)
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1003)"), 144)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 20)
     Helpers.expect.state(child, "tabs[1].wins.integrations.TSPlayground", {
         close = "TSPlaygroundToggle",
         fileTypePattern = "tsplayground",
         id = 1003,
         open = "TSPlaygroundToggle",
-        width = 284,
+        width = 288,
     })
     Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,
@@ -413,7 +413,7 @@ T["TSPlayground"]["reduces `left` side if only active when integration is on `ri
         left = 1001,
         right = nil,
     })
-    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1001)"), 15)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 30)
 end
 
 T["aerial"] = MiniTest.new_set()
@@ -441,7 +441,7 @@ T["aerial"]["keeps sides open"] = function()
 
     child.cmd("AerialToggle")
 
-    Helpers.expect.state(child, "tabs[1].wins.vsplits", 1)
+    Helpers.expect.state(child, "tabs[1].wins.vsplits", 4)
 
     Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1004)"), 25)
     Helpers.expect.state(child, "tabs[1].wins.integrations.aerial.id", 1004)
