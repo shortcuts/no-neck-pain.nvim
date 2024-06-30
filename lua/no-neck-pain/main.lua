@@ -244,39 +244,21 @@ function N.enable(scope)
     vim.api.nvim_create_autocmd({ "WinEnter", "WinClosed" }, {
         callback = function(p)
             vim.schedule(function()
-                local s = string.format("%s:integration", p.event)
-                if
-                    not S.isActiveTabRegistered(S)
-                    or not S.isActiveTabRegistered(S)
-                    or E.skip(S.getTab(S))
-                then
-                    return D.log(s, "skip")
+                if not S.isActiveTabRegistered(S) or E.skip(S.getTab(S)) then
+                    return D.log(p.event, "skip")
                 end
 
                 S.refreshVSplits(S, scope)
 
                 if S.wantsSides(S) and S.checkSides(S, "and", false) then
-                    return D.log(s, "no side buffer")
+                    return D.log(p.event, "no side buffer")
                 end
 
                 if p.event == "WinClosed" and not S.hasIntegrations(S) then
-                    return D.log(s, "no registered integration")
+                    return D.log(p.event, "no registered integration")
                 end
 
-                local unregistered = S.getUnregisteredWins(S)
-                if p.event == "WinEnter" and #unregistered == 0 then
-                    return D.log(s, "no new windows")
-                end
-
-                if
-                    p.event == "WinEnter"
-                    and #unregistered == 1
-                    and not S.isSupportedIntegration(S, s, unregistered[1])
-                then
-                    return D.log(s, "encountered a new window, not an integration")
-                end
-
-                N.init(s, false, true)
+                N.init(p.event, false, true)
             end)
         end,
         group = augroupName,
