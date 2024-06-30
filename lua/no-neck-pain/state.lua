@@ -182,8 +182,6 @@ end
 ---@return table: the wins that are not in `tab`.
 ---@private
 function State:getUnregisteredWins(withCurr)
-
-
     return vim.tbl_filter(function(win)
         if A.isRelativeWindow(win) then
             return false
@@ -279,7 +277,9 @@ end
 ---@return boolean
 ---@private
 function State:isActiveTabRegistered()
-    return self.hasTabs(self) and self.tabs[self.activeTab] ~= nil and vim.api.nvim_tabpage_is_valid(self.activeTab)
+    return self.hasTabs(self)
+        and self.tabs[self.activeTab] ~= nil
+        and vim.api.nvim_tabpage_is_valid(self.activeTab)
 end
 
 ---Whether the side window is registered and enabled in the config or not.
