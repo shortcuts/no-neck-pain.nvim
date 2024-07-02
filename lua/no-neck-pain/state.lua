@@ -20,19 +20,20 @@ function State:save()
     _G.NoNeckPain.state = self
 end
 
----Sets the vsplits counter to 1.
+---Initializes the vsplits to an empty table.
 ---
 ---@private
 function State:initVSplits()
-    self.tabs[self.activeTab].wins.vsplits = 0
+    self.tabs[self.activeTab].wins.vsplits = {}
 end
 
 ---Gets the tab vsplits counter.
 ---
----@return number: the number of active vsplits.
+---@return table: the vsplits window IDs.
+---@return number: the number of vsplits.
 ---@private
 function State:getVSplits()
-    return self.tabs[self.activeTab].wins.vsplits
+    return self.tabs[self.activeTab].wins.vsplits, A.length(self.tabs[self.activeTab].wins.vsplits)
 end
 
 ---Whether the side is enabled in the config or not.
@@ -489,7 +490,7 @@ function State:setTab(id)
         id = id,
         scratchPadEnabled = false,
         wins = {
-            vsplits = 0,
+            vsplits = {},
             main = {
                 curr = nil,
                 left = nil,
@@ -501,12 +502,17 @@ function State:setTab(id)
     self.activeTab = id
 end
 
----Increases the vsplits counter.
+---Insert the given ids window ids in the state.
 ---
----@param nb number: the number of columns in the given row.
+---@param vsplits table: the vsplits leafs to add to the state.
 ---@private
-function State:increaseVSplits(nb)
-    self.tabs[self.activeTab].wins.vsplits = self.tabs[self.activeTab].wins.vsplits + nb
+function State:insertVSplits(vsplits)
+    for _, vsplit in ipairs(vsplits) do
+        -- only add the leaf because we can receive something like { "col" {...}}, which will then be walked in and inserted later
+        if vsplit[1] == "leaf" then
+            self.tabs[self.activeTab].wins.vsplits[vsplit[2]] = true
+        end
+    end
 end
 
 ---Recursively walks in the `winlayout` until it has computed every column present in the UI.
@@ -517,51 +523,45 @@ end
 ---that depth from the number of elements in the current `row` in order to avoid counting all parents many times.
 ---
 ---@private
-function State:walkLayout(depth, vsplit, curr)
+function State:walkLayout(parent, curr)
     for _, group in ipairs(curr) do
-        -- a row indicates a `vsplit` window container
-        if type(group) == "string" and group == "row" then
-            vsplit = true
-        elseif type(group) == "table" then
-            local len = #group
-            if vsplit then
-                -- even if we are super deep in the field, len minimal value is always 1.
-                if len <= depth then
-                    len = depth + 1
-                end
-
+        if type(group) == "table" then
+            -- a row indicates a `vsplit` window container
+            if parent == "row" then
                 -- we remove the depth from the len in order to avoid counting parents multiple times.
-                self.increaseVSplits(self, len - depth)
-
-                -- reset vsplit as this layer as been computed already, increase depth as we will dug again.
-                depth = depth + 1
-                vsplit = false
+                self.insertVSplits(self, group)
+                parent = nil
             end
-            self.walkLayout(self, depth, vsplit, group)
+            self.walkLayout(self, parent, group)
         -- depth 0 on a leaf is only possible after enabling nnp as there's nothing in the layout other than the main window
-        elseif depth == 0 and group == "leaf" then
-            self.increaseVSplits(self, 1)
+        elseif group == "leaf" and parent == nil then
+            self.insertVSplits(self, { curr })
+        elseif type(group) == "string" then
+            parent = group
         end
     end
 end
 
----Refresh vsplits counter based on the `winlayout`.
+---Refresh vsplits state based on the `winlayout`.
 ---
 ---@param scope string: the caller of the method.
 ---@return boolean: whether the number of vsplits changed or not.
 ---@private
 function State:refreshVSplits(scope)
-    local currentVSplits = self.getVSplits(self)
+    local _, nbVSplits = self.getVSplits(self)
 
     self.initVSplits(self)
 
-    self.walkLayout(self, 0, false, vim.fn.winlayout(self.activeTab))
+    self.walkLayout(self, nil, vim.fn.winlayout(self.activeTab))
 
-    D.log(scope, "computed %d vsplits", self.getVSplits(self))
+    D.log(scope, "computed %d vsplits", nbVSplits)
 
     self.save(self)
 
-    return currentVSplits ~= self.getVSplits(self)
+    local _, nbNBVsplits = self.getVSplits(self)
+
+    -- TODO: real table diff
+    return nbVSplits ~= nbNBVsplits
 end
 
 return State

@@ -10,7 +10,7 @@ local W = {}
 ---
 ---@param id number: the id of the window.
 ---@param width number: the width to apply to the window.
----@param side "left"|"right"|"curr": the side of the window being resized, used for logging only.
+---@param side "left"|"right"|"curr"|"vsplit": the side of the window being resized, used for logging only.
 ---@private
 local function resize(id, width, side)
     D.log(side, "resizing %d with padding %d", id, width)
@@ -177,6 +177,27 @@ function W.createSideBuffers(skipIntegrations)
         end
     end
 
+    local vsplits, nbVSplits = S.getVSplits(S)
+    local leftID = S.getSideID(S, "left")
+    local rightID = S.getSideID(S, "right")
+
+    -- if we still have side buffers open at this point, and we have vsplit opened,
+    -- there might be width issues so we the resize opened vsplits.
+    if (leftID or rightID) and nbVSplits > 0 then
+        local sWidth = wins.left.padding or wins.right.padding
+        local nbSide = leftID and rightID and 2 or 1
+
+        -- get the available usable width (screen size without side paddings)
+        sWidth = vim.api.nvim_list_uis()[1].width - sWidth * nbSide
+        sWidth = math.floor(sWidth / (nbVSplits - nbSide))
+
+        for vsplit, _ in pairs(vsplits) do
+            if vsplit ~= leftID and vsplit ~= rightID and vsplit ~= S.getSideID(S, "curr") then
+                resize(vsplit, sWidth, "vsplit")
+            end
+        end
+    end
+
     -- closing integrations and reopening them means new window IDs
     if closedIntegrations then
         S.refreshIntegrations(S, "createSideBuffers")
@@ -208,16 +229,12 @@ function W.getPadding(side)
         return 0
     end
 
-    local columns = S.getVSplits(S)
+    local _, columns = S.getVSplits(S)
 
     for _, s in ipairs(Co.SIDES) do
-        if S.isSideEnabled(S, s) then
+        if S.isSideEnabled(S, s) and columns > 1 then
             columns = columns - 1
         end
-    end
-
-    if columns < 1 then
-        columns = 1
     end
 
     -- we need to see if there's enough space left to have side buffers

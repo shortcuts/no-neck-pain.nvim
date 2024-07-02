@@ -248,7 +248,7 @@ function N.enable(scope)
                     return D.log(p.event, "skip")
                 end
 
-                S.refreshVSplits(S, scope)
+                S.refreshVSplits(S, p.event)
 
                 if S.wantsSides(S) and S.checkSides(S, "and", false) then
                     return D.log(p.event, "no side buffer")
