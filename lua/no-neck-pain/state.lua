@@ -515,25 +515,22 @@ function State:insertVSplits(vsplits)
     end
 end
 
----Recursively walks in the `winlayout` until it has computed every column present in the UI.
+---Recursively walks in the `winlayout` until it has computed every column present.
 ---
----When we find a `row`, we set `vsplit` to true, the next element will always be a `table` so once on it -we can increase the `vsplits` counter.
----
----In order to also compute nested vsplits, we need to keep track how deep we are in the layout, we remove
----that depth from the number of elements in the current `row` in order to avoid counting all parents many times.
+---Finding a parentless leaf means we are at the basic nvim just opened level
+---Finding any other string than a leaf result on a parent (row or col)
+---Finding a group of type table means we have a set of childrens windows
+---  When we are on a children of a row, we insert all of them in our vsplit states and reset the parent
 ---
 ---@private
 function State:walkLayout(parent, curr)
     for _, group in ipairs(curr) do
         if type(group) == "table" then
-            -- a row indicates a `vsplit` window container
             if parent == "row" then
-                -- we remove the depth from the len in order to avoid counting parents multiple times.
                 self.insertVSplits(self, group)
                 parent = nil
             end
             self.walkLayout(self, parent, group)
-        -- depth 0 on a leaf is only possible after enabling nnp as there's nothing in the layout other than the main window
         elseif group == "leaf" and parent == nil then
             self.insertVSplits(self, { curr })
         elseif type(group) == "string" then
@@ -542,7 +539,7 @@ function State:walkLayout(parent, curr)
     end
 end
 
----Refresh vsplits state based on the `winlayout`.
+---Refreshes the vsplit states by analyzing the winlayout.
 ---
 ---@param scope string: the caller of the method.
 ---@return boolean: whether the number of vsplits changed or not.
