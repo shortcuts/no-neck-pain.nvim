@@ -96,8 +96,6 @@ function N.init(scope, goToCurr, skipIntegrations)
 
     D.log(scope, "init called on tab %d for current window %d", S.activeTab, S.getSideID(S, "curr"))
 
-    S.scanLayout(S, scope)
-
     -- if we do not have side buffers, we must ensure we only trigger a focus if we re-create them
     local hadSideBuffers = true
     if S.checkSides(S, "and", false) then
@@ -130,16 +128,15 @@ function N.enable(scope)
 
     D.log(scope, "calling enable for tab %d", A.getCurrentTab())
 
+    S.setEnabled(S)
     S.setTab(S, A.getCurrentTab())
 
     local augroupName = A.getAugroupName(S.activeTab)
     vim.api.nvim_create_augroup(augroupName, { clear = true })
 
     S.setSideID(S, vim.api.nvim_get_current_win(), "curr")
-
+    S.scanLayout(S, scope)
     N.init(scope, true)
-
-    S.setEnabled(S)
 
     vim.api.nvim_create_autocmd({ "VimResized" }, {
         callback = function(p)

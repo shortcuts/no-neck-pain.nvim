@@ -107,9 +107,6 @@ end
 ---@param skipIntegrations boolean?: skip integrations action when true.
 ---@private
 function W.createSideBuffers(skipIntegrations)
-    -- before creating side buffers, we determine if we should consider externals
-    S.scanLayout(S, "createSideBuffers")
-
     local wins = {
         left = { cmd = "topleft vnew", padding = 0 },
         right = { cmd = "botright vnew", padding = 0 },
@@ -164,6 +161,19 @@ function W.createSideBuffers(skipIntegrations)
         S.reopenIntegration(S)
     end
 
+    for _, side in pairs(Co.SIDES) do
+        if S.isSideRegistered(S, side) then
+            local padding = wins[side].padding or W.getPadding(side)
+
+            if padding > _G.NoNeckPain.config.minSideBufferWidth then
+                resize(S.getSideID(S, side), padding, side)
+            else
+                W.close("W.createSideBuffers", S.getSideID(S, side), side)
+                S.setSideID(S, nil, side)
+            end
+        end
+    end
+
     local vsplits, nbVSplits = S.getVSplits(S)
     local leftID = S.getSideID(S, "left")
     local rightID = S.getSideID(S, "right")
@@ -187,18 +197,6 @@ function W.createSideBuffers(skipIntegrations)
         resize(S.getSideID(S, "curr"), _G.NoNeckPain.config.width, "curr")
     end
 
-    for _, side in pairs(Co.SIDES) do
-        if S.isSideRegistered(S, side) then
-            local padding = wins[side].padding or W.getPadding(side)
-
-            if padding > _G.NoNeckPain.config.minSideBufferWidth then
-                resize(S.getSideID(S, side), padding, side)
-            else
-                W.close("W.createSideBuffers", S.getSideID(S, side), side)
-                S.setSideID(S, nil, side)
-            end
-        end
-    end
 
     -- closing integrations and reopening them means new window IDs
     if closedIntegrations then

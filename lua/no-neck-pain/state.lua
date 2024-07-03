@@ -220,19 +220,6 @@ function State:isSupportedIntegration(scope, win)
         return true, integrationName, integrationInfo
     end
 
-    if fileType == "" and tab ~= nil then
-        local wins = self.getUnregisteredWins(self)
-
-        D.log(scope, "computing recursively")
-        if #wins ~= 1 or wins[1] == win then
-            D.log(scope, "too many windows to determine")
-
-            return false, nil, nil
-        end
-
-        return self.isSupportedIntegration(self, scope, wins[1])
-    end
-
     local registeredIntegrations = tab ~= nil and tab.wins.integrations or Co.INTEGRATIONS
 
     for name, integration in pairs(registeredIntegrations) do
