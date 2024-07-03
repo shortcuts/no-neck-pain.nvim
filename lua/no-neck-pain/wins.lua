@@ -197,7 +197,6 @@ function W.createSideBuffers(skipIntegrations)
         resize(S.getSideID(S, "curr"), _G.NoNeckPain.config.width, "curr")
     end
 
-
     -- closing integrations and reopening them means new window IDs
     if closedIntegrations then
         S.scanLayout(S, "createSideBuffers")

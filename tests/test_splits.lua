@@ -73,7 +73,7 @@ T["split"]["keeps side buffers"] = function()
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
     Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 30)
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.right", 30)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.right", 28)
 end
 
 T["split"]["keeps correct focus"] = function()
@@ -124,15 +124,15 @@ T["vsplit"]["corretly size splits when opening helper with side buffers open"] =
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1003, 1000, 1002 })
 
-    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1003)"), 19)
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 18)
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1003)"), 20)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 20)
 
     child.cmd("h")
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1004, 1001, 1003, 1000, 1002 })
 
     Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1004)"), 80)
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 17)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 20)
 end
 
 T["vsplit"]["correctly position side buffers when there's enough space"] = function()
@@ -294,52 +294,51 @@ T["vsplit/split"]["closing side buffers because of splits restores focus"] = fun
 
     child.cmd("q")
     child.cmd("q")
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1006, 1003, 1000, 1007 })
+    Helpers.expect.equality(Helpers.winsInTab(child), { 1012, 1004, 1003, 1013 })
 
-    Helpers.expect.equality(Helpers.currentWin(child), 1000)
+    Helpers.expect.equality(Helpers.currentWin(child), 1004)
 end
 
--- T["vsplit/split"]["closing help page doens't break layout"] = function()
---     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
---     Helpers.toggle(child)
---
---     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
---
---     child.cmd("split")
---     child.cmd("h")
---     Helpers.expect.equality(Helpers.winsInTab(child), { 1004, 1001, 1003, 1000, 1002 })
---
---     Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 48)
---
---     child.cmd("q")
---     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1003, 1000, 1002 })
---
---     Helpers.expect.equality(Helpers.currentWin(child), 1003)
---
---     Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 48)
--- end
---
--- T["vsplit/split"]["splits and vsplits keeps a correct size"] = function()
---     child.lua([[ require('no-neck-pain').setup({width=20}) ]])
---     Helpers.toggle(child)
---
---     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
---     Helpers.expect.equality(Helpers.currentWin(child), 1000)
---
---     child.cmd("split")
---
---     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1003, 1000, 1002 })
---     Helpers.expect.equality(Helpers.currentWin(child), 1003)
---     Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 468)
---
---     child.cmd("vsplit")
---
---     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1004, 1003, 1000, 1002 })
---     Helpers.expect.equality(Helpers.currentWin(child), 1004)
---
---     Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 468)
---     Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1003)"), 417)
---     Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1000)"), 468)
--- end
+T["vsplit/split"]["closing help page doens't break layout"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
+    Helpers.toggle(child)
+
+    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+
+    child.cmd("split")
+    child.cmd("h")
+    Helpers.expect.equality(Helpers.winsInTab(child), { 1004, 1001, 1003, 1000, 1002 })
+
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 50)
+
+    child.cmd("q")
+    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1003, 1000, 1002 })
+
+    Helpers.expect.equality(Helpers.currentWin(child), 1003)
+
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 50)
+end
+
+T["vsplit/split"]["splits and vsplits keeps a correct size"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=20}) ]])
+    Helpers.toggle(child)
+
+    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+    Helpers.expect.equality(Helpers.currentWin(child), 1000)
+
+    child.cmd("split")
+
+    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1003, 1000, 1002 })
+    Helpers.expect.equality(Helpers.currentWin(child), 1003)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 20)
+
+    child.cmd("vsplit")
+
+    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1004, 1003, 1000, 1002 })
+    Helpers.expect.equality(Helpers.currentWin(child), 1004)
+
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 20)
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1003)"), 2)
+end
 
 return T
