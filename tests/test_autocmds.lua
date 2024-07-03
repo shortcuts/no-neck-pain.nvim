@@ -38,7 +38,6 @@ T["auto command"]["disabling clears VimEnter autocmd"] = function()
 end
 
 T["auto command"]["does not shift when opening/closing float window"] = function()
-    child.set_size(5, 200)
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     Helpers.toggle(child)
 
@@ -86,7 +85,6 @@ end
 T["skipEnteringNoNeckPainBuffer"] = MiniTest.new_set()
 
 T["skipEnteringNoNeckPainBuffer"]["goes to new valid buffer when entering side"] = function()
-    child.set_size(5, 200)
     child.lua(
         [[ require('no-neck-pain').setup({width=50, autocmds = { skipEnteringNoNeckPainBuffer = true }}) ]]
     )
@@ -128,7 +126,6 @@ T["skipEnteringNoNeckPainBuffer"]["goes to new valid buffer when entering side"]
 end
 
 T["skipEnteringNoNeckPainBuffer"]["does not register if scratchPad feature is enabled (global)"] = function()
-    child.set_size(5, 200)
     child.lua(
         [[ require('no-neck-pain').setup({width=50, buffers = { scratchPad = { enabled = true } }, autocmds = { skipEnteringNoNeckPainBuffer = true }}) ]]
     )
@@ -147,7 +144,6 @@ T["skipEnteringNoNeckPainBuffer"]["does not register if scratchPad feature is en
 end
 
 T["skipEnteringNoNeckPainBuffer"]["does not register if scratchPad feature is enabled (left)"] = function()
-    child.set_size(5, 200)
     child.lua(
         [[ require('no-neck-pain').setup({width=50, buffers = { left = { scratchPad = { enabled = true } } }, autocmds = { skipEnteringNoNeckPainBuffer = true }}) ]]
     )
@@ -166,7 +162,6 @@ T["skipEnteringNoNeckPainBuffer"]["does not register if scratchPad feature is en
 end
 
 T["skipEnteringNoNeckPainBuffer"]["does not register if scratchPad feature is enabled (right)"] = function()
-    child.set_size(5, 200)
     child.lua(
         [[ require('no-neck-pain').setup({width=50, buffers = { right = { scratchPad = { enabled = true } } }, autocmds = { skipEnteringNoNeckPainBuffer = true }}) ]]
     )

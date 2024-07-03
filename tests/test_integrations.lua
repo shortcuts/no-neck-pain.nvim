@@ -124,7 +124,6 @@ T["nvimdapui"]["keeps sides open"] = function()
     end
 
     child.restart({ "-u", "scripts/init_with_nvimdapui.lua" })
-    child.set_size(20, 100)
 
     Helpers.toggle(child)
 
@@ -164,7 +163,6 @@ T["neotest"] = MiniTest.new_set()
 
 T["neotest"]["keeps sides open"] = function()
     child.restart({ "-u", "scripts/init_with_neotest.lua", "lua/no-neck-pain/main.lua" })
-    child.set_size(20, 100)
 
     Helpers.toggle(child)
 
@@ -193,7 +191,6 @@ T["outline"] = MiniTest.new_set()
 
 T["outline"]["keeps sides open"] = function()
     child.restart({ "-u", "scripts/init_with_outline.lua", "lua/no-neck-pain/main.lua" })
-    child.set_size(20, 100)
 
     Helpers.toggle(child)
 
@@ -266,7 +263,6 @@ T["neo-tree"] = MiniTest.new_set()
 
 T["neo-tree"]["keeps sides open"] = function()
     child.restart({ "-u", "scripts/init_with_neotree.lua", "foo" })
-    child.set_size(5, 300)
 
     Helpers.toggle(child)
 
@@ -305,7 +301,6 @@ T["TSPlayground"] = MiniTest.new_set()
 
 T["TSPlayground"]["keeps sides open"] = function()
     child.restart({ "-u", "scripts/init_with_tsplayground.lua" })
-    child.set_size(5, 300)
 
     Helpers.toggle(child)
 
@@ -354,7 +349,6 @@ end
 
 T["TSPlayground"]["reduces `left` side if only active when integration is on `right`"] = function()
     child.restart({ "-u", "scripts/init_with_tsplayground.lua" })
-    child.set_size(5, 300)
 
     child.lua([[
         require('no-neck-pain').setup({
@@ -426,7 +420,6 @@ T["aerial"]["keeps sides open"] = function()
     end
 
     child.restart({ "-u", "scripts/init_with_aerial.lua" })
-    child.set_size(5, 500)
 
     Helpers.toggle(child)
 

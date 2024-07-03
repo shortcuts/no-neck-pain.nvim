@@ -45,7 +45,7 @@ end
 
 ---Whether the side is enabled in the config or not.
 ---
----@param side "left"|"right": the side of the window.
+---@param side "left"|"right"|"curr": the side of the window.
 ---@return boolean
 ---@private
 function State:isSideEnabled(side)
@@ -247,21 +247,19 @@ function State:isActiveTabRegistered()
         and vim.api.nvim_tabpage_is_valid(self.activeTab)
 end
 
----Whether the side window is registered and enabled in the config or not.
+---Whether the side window is registered and a valid window.
 ---
 ---@param side "left"|"right"|"curr": the side of the window.
 ---@return boolean
 ---@private
-function State:isSideRegistered(side)
-    if not self.isActiveTabRegistered(self) then
+function State:isSideWinValid(side)
+    if side ~= "curr" and not self.isSideEnabled(self, side) then
         return false
     end
 
-    if self.getSideID(self, side) == nil then
-        return false
-    end
+    local id = self.getSideID(self, side)
 
-    return _G.NoNeckPain.config.buffers[side].enabled
+    return id ~= nil and vim.api.nvim_win_is_valid(id)
 end
 
 ---Whether the sides window are registered and enabled in the config or not.
@@ -272,23 +270,12 @@ end
 ---@private
 function State:checkSides(condition, expected)
     if condition == "or" then
-        return self.isSideRegistered(self, "left") == expected
-            or self.isSideRegistered(self, "right") == expected
+        return self.isSideWinValid(self, "left") == expected
+            or self.isSideWinValid(self, "right") == expected
     end
 
-    return self.isSideRegistered(self, "left") == expected
-        and self.isSideRegistered(self, "right") == expected
-end
-
----Whether the side window is registered and a valid window.
----
----@param side "left"|"right"|"curr": the side of the window.
----@return boolean
----@private
-function State:isSideWinValid(side)
-    local id = self.getSideID(self, side)
-
-    return id ~= nil and vim.api.nvim_win_is_valid(id)
+    return self.isSideWinValid(self, "left") == expected
+        and self.isSideWinValid(self, "right") == expected
 end
 
 ---Whether the side window is the currently active one or not.
@@ -474,15 +461,16 @@ end
 ---@private
 function State:setLayoutWindows(scope, wins)
     for _, win in ipairs(wins) do
-        if win[1] == "leaf" then
-            local supported, name, integration = self.isSupportedIntegration(self, scope, win[2])
+        local id = win[2]
+        if win[1] == "leaf" and not A.isRelativeWindow(id) then
+            local supported, name, integration = self.isSupportedIntegration(self, scope, id)
             if supported and name and integration then
-                integration.width = vim.api.nvim_win_get_width(win[2]) * 2
-                integration.id = win[2]
+                integration.width = vim.api.nvim_win_get_width(id) * 2
+                integration.id = id
 
                 self.tabs[self.activeTab].wins.integrations[name] = integration
             else
-                self.tabs[self.activeTab].wins.vsplits[win[2]] = true
+                self.tabs[self.activeTab].wins.vsplits[id] = true
             end
         end
     end
@@ -499,10 +487,11 @@ end
 ---@private
 function State:walkLayout(scope, parent, curr)
     for _, group in ipairs(curr) do
-        if type(group) == "table" then
+        if type(group) == "table" and group[1] ~= "leaf" then
             if parent == "row" then
-                self.setLayoutWindows(self, scope, group)
-                parent = nil
+                -- if we are on a `col`, we don't care about how many windows are in it,
+                -- because their width is grouped, so one is enough to keep track of
+                self.setLayoutWindows(self, scope, group[1] == "col" and { group[2][1] } or group)
             end
             self.walkLayout(self, scope, parent, group)
         elseif group == "leaf" and parent == nil then
@@ -526,9 +515,9 @@ function State:scanLayout(scope)
     self.walkLayout(self, scope, nil, vim.fn.winlayout(self.activeTab))
     self.save(self)
 
-    local _, nbNBVsplits = self.getVSplits(self)
+    local vsplits, nbNBVsplits = self.getVSplits(self)
 
-    D.log(scope, "computed %d vsplits", nbVSplits)
+    D.log(scope, "computed vsplits: %s", vim.inspect(vsplits))
 
     -- TODO: real table diff
     return nbVSplits ~= nbNBVsplits

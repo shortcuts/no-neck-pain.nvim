@@ -81,6 +81,8 @@ function N.toggleSide(scope, side)
         return N.disable(scope)
     end
 
+    S.scanLayout(S, scope)
+
     N.init(scope)
 end
 
@@ -223,15 +225,15 @@ function N.enable(scope)
                 end
 
                 if
-                    (S.isSideRegistered(S, "left") and not S.isSideWinValid(S, "left"))
-                    or (S.isSideRegistered(S, "right") and not S.isSideWinValid(S, "right"))
+                    (S.isSideWinValid(S, "left") and not S.isSideWinValid(S, "left"))
+                    or (S.isSideWinValid(S, "right") and not S.isSideWinValid(S, "right"))
                 then
                     D.log(p.event, "one of the NNP side has been closed")
 
                     return N.disable(p.event)
                 end
 
-                return N.init(p.event)
+                -- return N.init(p.event)
             end)
         end,
         group = augroupName,
