@@ -13,18 +13,25 @@ function State:init()
     self.tabs = nil
 end
 
+---Sets the integrations state of the current tab to its original value.
+---
+---@private
+function State:initIntegrations()
+    self.tabs[self.activeTab].wins.integrations = vim.deepcopy(Co.INTEGRATIONS)
+end
+
+---Sets the vsplits state of the current tab to its original value.
+---
+---@private
+function State:initVSplits()
+    self.tabs[self.activeTab].wins.vsplits = {}
+end
+
 ---Saves the state in the global _G.NoNeckPain.state object.
 ---
 ---@private
 function State:save()
     _G.NoNeckPain.state = self
-end
-
----Initializes the vsplits to an empty table.
----
----@private
-function State:initVSplits()
-    self.tabs[self.activeTab].wins.vsplits = {}
 end
 
 ---Gets the tab vsplits counter.
@@ -78,14 +85,6 @@ function State:refreshTabs(id)
     self.tabs = refreshedTabs
 
     return #self.tabs
-end
-
----Refresh the integrations of the active state tab.
----
----@param scope string: the caller of the method.
----@private
-function State:refreshIntegrations(scope)
-    self.tabs[self.activeTab].wins.integrations = self.scanIntegrations(self, scope)
 end
 
 ---Closes side integrations if opened.
@@ -249,28 +248,6 @@ function State:isSupportedIntegration(scope, win)
     end
 
     return false, nil
-end
-
----Scans the current tab wins to update registered side integrations.
----
----@param scope string: the caller of the method.
----@return table: the update state integrations table.
----@private
-function State:scanIntegrations(scope)
-    local wins = self.getUnregisteredWins(self)
-    local unregisteredIntegrations = vim.deepcopy(Co.INTEGRATIONS)
-
-    for _, win in pairs(wins) do
-        local supported, name, integration = self.isSupportedIntegration(self, scope, win)
-        if supported and name and integration then
-            integration.width = vim.api.nvim_win_get_width(win) * 2
-            integration.id = win
-
-            unregisteredIntegrations[name] = integration
-        end
-    end
-
-    return unregisteredIntegrations
 end
 
 ---Whether the `activeTab` is registered in the state and valid.
@@ -502,15 +479,24 @@ function State:setTab(id)
     self.activeTab = id
 end
 
----Insert the given ids window ids in the state.
+---Set the given layout windows in their corresponding entity (vsplits or integrations).
+---We only consider `leaf` because we can receive something like `{ "col" {...}}`, which will then be walked in and considered later
 ---
----@param vsplits table: the vsplits leafs to add to the state.
+---@param scope string: the caller of the method.
+---@param wins table: the layout windows.
 ---@private
-function State:insertVSplits(vsplits)
-    for _, vsplit in ipairs(vsplits) do
-        -- only add the leaf because we can receive something like { "col" {...}}, which will then be walked in and inserted later
-        if vsplit[1] == "leaf" then
-            self.tabs[self.activeTab].wins.vsplits[vsplit[2]] = true
+function State:setLayoutWindows(scope, wins)
+    for _, win in ipairs(wins) do
+        if win[1] == "leaf" then
+            local supported, name, integration = self.isSupportedIntegration(self, scope, win[2])
+            if supported and name and integration then
+                integration.width = vim.api.nvim_win_get_width(win[2]) * 2
+                integration.id = win[2]
+
+                self.tabs[self.activeTab].wins.integrations[name] = integration
+            else
+                self.tabs[self.activeTab].wins.vsplits[win[2]] = true
+            end
         end
     end
 end
@@ -520,42 +506,42 @@ end
 ---Finding a parentless leaf means we are at the basic nvim just opened level
 ---Finding any other string than a leaf result on a parent (row or col)
 ---Finding a group of type table means we have a set of childrens windows
----  When we are on a children of a row, we insert all of them in our vsplit states and reset the parent
+---  When we are on a children of a row, we will set the layout wins in state in order to determine if they are integrations or not
 ---
+---@param scope string: the caller of the method.
 ---@private
-function State:walkLayout(parent, curr)
+function State:walkLayout(scope, parent, curr)
     for _, group in ipairs(curr) do
         if type(group) == "table" then
             if parent == "row" then
-                self.insertVSplits(self, group)
+                self.setLayoutWindows(self, scope, group)
                 parent = nil
             end
-            self.walkLayout(self, parent, group)
+            self.walkLayout(self, scope, parent, group)
         elseif group == "leaf" and parent == nil then
-            self.insertVSplits(self, { curr })
+            self.setLayoutWindows(self, scope, { curr })
         elseif type(group) == "string" then
             parent = group
         end
     end
 end
 
----Refreshes the vsplit states by analyzing the winlayout.
+---Scans the winlayout in order to identify window position and type.
 ---
 ---@param scope string: the caller of the method.
 ---@return boolean: whether the number of vsplits changed or not.
 ---@private
-function State:refreshVSplits(scope)
+function State:scanLayout(scope)
     local _, nbVSplits = self.getVSplits(self)
 
     self.initVSplits(self)
-
-    self.walkLayout(self, nil, vim.fn.winlayout(self.activeTab))
-
-    D.log(scope, "computed %d vsplits", nbVSplits)
-
+    self.initIntegrations(self)
+    self.walkLayout(self, scope, nil, vim.fn.winlayout(self.activeTab))
     self.save(self)
 
     local _, nbNBVsplits = self.getVSplits(self)
+
+    D.log(scope, "computed %d vsplits", nbVSplits)
 
     -- TODO: real table diff
     return nbVSplits ~= nbNBVsplits

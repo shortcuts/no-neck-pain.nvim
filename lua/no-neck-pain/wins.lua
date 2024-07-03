@@ -108,7 +108,7 @@ end
 ---@private
 function W.createSideBuffers(skipIntegrations)
     -- before creating side buffers, we determine if we should consider externals
-    S.refreshIntegrations(S, "createSideBuffers")
+    S.scanLayout(S, "createSideBuffers")
 
     local wins = {
         left = { cmd = "topleft vnew", padding = 0 },
@@ -164,6 +164,29 @@ function W.createSideBuffers(skipIntegrations)
         S.reopenIntegration(S)
     end
 
+    local vsplits, nbVSplits = S.getVSplits(S)
+    local leftID = S.getSideID(S, "left")
+    local rightID = S.getSideID(S, "right")
+
+    -- if we still have side buffers open at this point, and we have vsplit opened,
+    -- there might be width issues so we the resize opened vsplits.
+    if (leftID or rightID) and nbVSplits > 0 then
+        -- local sWidth = wins.left.padding or wins.right.padding
+        -- local nbSide = leftID and rightID and 2 or 1
+        --
+        -- -- get the available usable width (screen size without side paddings)
+        -- sWidth = vim.api.nvim_list_uis()[1].width - sWidth * nbSide
+        -- sWidth = math.floor(sWidth / (nbVSplits - nbSide))
+
+        for vsplit, _ in pairs(vsplits) do
+            if vsplit ~= leftID and vsplit ~= rightID and vsplit ~= S.getSideID(S, "curr") then
+                resize(vsplit, _G.NoNeckPain.config.width, "vsplit")
+            end
+        end
+
+        resize(S.getSideID(S, "curr"), _G.NoNeckPain.config.width, "curr")
+    end
+
     for _, side in pairs(Co.SIDES) do
         if S.isSideRegistered(S, side) then
             local padding = wins[side].padding or W.getPadding(side)
@@ -177,30 +200,9 @@ function W.createSideBuffers(skipIntegrations)
         end
     end
 
-    local vsplits, nbVSplits = S.getVSplits(S)
-    local leftID = S.getSideID(S, "left")
-    local rightID = S.getSideID(S, "right")
-
-    -- if we still have side buffers open at this point, and we have vsplit opened,
-    -- there might be width issues so we the resize opened vsplits.
-    if (leftID or rightID) and nbVSplits > 0 then
-        local sWidth = wins.left.padding or wins.right.padding
-        local nbSide = leftID and rightID and 2 or 1
-
-        -- get the available usable width (screen size without side paddings)
-        sWidth = vim.api.nvim_list_uis()[1].width - sWidth * nbSide
-        sWidth = math.floor(sWidth / (nbVSplits - nbSide))
-
-        for vsplit, _ in pairs(vsplits) do
-            if vsplit ~= leftID and vsplit ~= rightID and vsplit ~= S.getSideID(S, "curr") then
-                resize(vsplit, sWidth, "vsplit")
-            end
-        end
-    end
-
     -- closing integrations and reopening them means new window IDs
     if closedIntegrations then
-        S.refreshIntegrations(S, "createSideBuffers")
+        S.scanLayout(S, "createSideBuffers")
     end
 end
 

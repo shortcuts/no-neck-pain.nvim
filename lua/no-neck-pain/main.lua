@@ -96,7 +96,7 @@ function N.init(scope, goToCurr, skipIntegrations)
 
     D.log(scope, "init called on tab %d for current window %d", S.activeTab, S.getSideID(S, "curr"))
 
-    S.refreshVSplits(S, scope)
+    S.scanLayout(S, scope)
 
     -- if we do not have side buffers, we must ensure we only trigger a focus if we re-create them
     local hadSideBuffers = true
@@ -197,7 +197,7 @@ function N.enable(scope)
                     return
                 end
 
-                S.refreshVSplits(S, p.event)
+                S.scanLayout(S, p.event)
 
                 if not vim.api.nvim_win_is_valid(S.getSideID(S, "curr")) then
                     if p.event == "BufDelete" and _G.NoNeckPain.config.fallbackOnBufferDelete then
@@ -248,7 +248,7 @@ function N.enable(scope)
                     return D.log(p.event, "skip")
                 end
 
-                S.refreshVSplits(S, p.event)
+                S.scanLayout(S, p.event)
 
                 if S.wantsSides(S) and S.checkSides(S, "and", false) then
                     return D.log(p.event, "no side buffer")
