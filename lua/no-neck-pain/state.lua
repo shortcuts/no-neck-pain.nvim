@@ -36,11 +36,23 @@ end
 
 ---Gets the tab vsplits counter.
 ---
+---@param filterMain boolean?: whether we should remove main windows or not.
 ---@return table: the vsplits window IDs.
 ---@return number: the number of vsplits.
 ---@private
-function State:getVSplits()
-    return self.tabs[self.activeTab].wins.vsplits, A.length(self.tabs[self.activeTab].wins.vsplits)
+function State:getVSplits(filterMain)
+    if not filterMain then
+        return self.tabs[self.activeTab].wins.vsplits,
+            A.length(self.tabs[self.activeTab].wins.vsplits)
+    end
+
+    local filtered = vim.tbl_filter(function(vsplit)
+        return vsplit == self.getSideID(self, "left")
+            or vsplit == self.getSideID(self, "right")
+            or vsplit == self.getSideID(self, "curr")
+    end, self.tabs[self.activeTab].wins.vsplits)
+
+    return filtered, A.length(filtered)
 end
 
 ---Whether the side is enabled in the config or not.
@@ -62,19 +74,12 @@ end
 
 ---Iterates over the tabs in the state to remove invalid tabs.
 ---
----@param id number?: the `id` of the tab to remove from the state, defaults to the current tabpage.
 ---@return number: the total `tabs` in the state.
 ---@private
-function State:refreshTabs(id)
-    id = id or A.getCurrentTab()
-
-    local refreshedTabs = {}
-
-    for _, tab in pairs(self.tabs) do
-        if tab.id ~= id and vim.api.nvim_tabpage_is_valid(tab.id) then
-            refreshedTabs[tab.id] = tab
-        end
-    end
+function State:refreshTabs()
+    local refreshedTabs = vim.tbl_filter(function(tab)
+        return vim.api.nvim_tabpage_is_valid(tab.id)
+    end, self.tabs)
 
     if #refreshedTabs == 0 then
         self.tabs = nil

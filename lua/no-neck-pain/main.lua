@@ -162,41 +162,33 @@ function N.enable(scope)
         desc = "Resizes side windows after terminal has been resized, closes them if not enough space left.",
     })
 
-    vim.api.nvim_create_autocmd({ "TabLeave" }, {
+    vim.api.nvim_create_autocmd({ "TabLeave", "TabEnter" }, {
         callback = function(p)
-            vim.schedule(function()
-                if not vim.api.nvim_tabpage_is_valid(S.activeTab) then
-                    S.refreshTabs(S, S.activeTab)
-                    D.log(p.event, "tab %d is now inactive", S.activeTab)
-                else
+            A.debounce(p.event, function()
+                if p.event == "TabLeave" then
+                    S.refreshTabs(S)
                     D.log(p.event, "tab %d left", S.activeTab)
-                end
-            end)
-        end,
-        group = augroupName,
-        desc = "Removes potentially inactive tabs from the state",
-    })
 
-    vim.api.nvim_create_autocmd({ "TabEnter" }, {
-        callback = function(p)
-            vim.schedule(function()
+                    return
+                end
+
                 S.setActiveTab(S, A.getCurrentTab())
 
                 D.log(p.event, "tab %d entered", S.activeTab)
             end)
         end,
         group = augroupName,
-        desc = "Keeps track of the currently active tab",
+        desc = "Keeps track of the currently active tab and the tab state",
     })
 
-    vim.api.nvim_create_autocmd({ "QuitPre", "BufDelete" }, {
+    vim.api.nvim_create_autocmd({ "QuitPre", "BufDelete", "WinEnter", "WinClosed" }, {
         callback = function(p)
             vim.schedule(function()
-                if not S.isActiveTabRegistered(S) or E.skip(nil) then
+                if not S.isActiveTabRegistered(S) or E.skip(S.getTab(S)) then
                     return
                 end
 
-                S.scanLayout(S, p.event)
+                local refresh = S.scanLayout(S, p.event)
 
                 if not vim.api.nvim_win_is_valid(S.getSideID(S, "curr")) then
                     if p.event == "BufDelete" and _G.NoNeckPain.config.fallbackOnBufferDelete then
@@ -210,14 +202,14 @@ function N.enable(scope)
                         return
                     end
 
-                    local wins = S.getUnregisteredWins(S)
-                    if #wins == 0 then
+                    local vsplits, nbVSplits = S.getVSplits(S, true)
+                    if nbVSplits == 0 then
                         D.log(p.event, "no active windows found")
 
                         return N.disable(p.event)
                     end
 
-                    S.setSideID(S, wins[1], "curr")
+                    S.setSideID(S, vsplits[1], "curr")
 
                     D.log(p.event, "re-routing to %d", S.getSideID(S, "curr"))
 
@@ -225,43 +217,21 @@ function N.enable(scope)
                 end
 
                 if
-                    (S.isSideWinValid(S, "left") and not S.isSideWinValid(S, "left"))
-                    or (S.isSideWinValid(S, "right") and not S.isSideWinValid(S, "right"))
+                    (S.isSideEnabled(S, "left") and not S.isSideWinValid(S, "left"))
+                    or (S.isSideEnabled(S, "right") and not S.isSideWinValid(S, "right"))
                 then
                     D.log(p.event, "one of the NNP side has been closed")
 
                     return N.disable(p.event)
                 end
 
-                -- return N.init(p.event)
+                if refresh then
+                    return N.init(p.event)
+                end
             end)
         end,
         group = augroupName,
         desc = "keeps track of the state after closing windows and deleting buffers",
-    })
-
-    vim.api.nvim_create_autocmd({ "WinEnter", "WinClosed" }, {
-        callback = function(p)
-            vim.schedule(function()
-                if not S.isActiveTabRegistered(S) or E.skip(S.getTab(S)) then
-                    return D.log(p.event, "skip")
-                end
-
-                S.scanLayout(S, p.event)
-
-                if S.wantsSides(S) and S.checkSides(S, "and", false) then
-                    return D.log(p.event, "no side buffer")
-                end
-
-                if p.event == "WinClosed" and not S.hasIntegrations(S) then
-                    return D.log(p.event, "no registered integration")
-                end
-
-                N.init(p.event, false, true)
-            end)
-        end,
-        group = augroupName,
-        desc = "Resize to apply on WinEnter/Closed of an integration",
     })
 
     if _G.NoNeckPain.config.autocmds.skipEnteringNoNeckPainBuffer then
@@ -318,9 +288,9 @@ end
 --- Disables the plugin for the given tab, clear highlight groups and autocmds, closes side buffers and resets the internal state.
 ---@private
 function N.disable(scope)
-    D.log(scope, "calling disable for tab %d", S.activeTab)
-
     local activeTab = S.activeTab
+
+    D.log(scope, "calling disable for tab %d", activeTab)
 
     local wins = vim.tbl_filter(function(win)
         return win ~= S.getSideID(S, "left")
@@ -349,13 +319,13 @@ function N.disable(scope)
             end
         end
 
-        pcall(vim.api.nvim_del_augroup_by_name, A.getAugroupName(S.activeTab))
+        pcall(vim.api.nvim_del_augroup_by_name, A.getAugroupName(activeTab))
         pcall(vim.api.nvim_del_augroup_by_name, "NoNeckPainVimEnterAutocmd")
 
         return vim.cmd("quitall!")
     end
 
-    pcall(vim.api.nvim_del_augroup_by_name, A.getAugroupName(S.activeTab))
+    pcall(vim.api.nvim_del_augroup_by_name, A.getAugroupName(activeTab))
 
     local sides = { left = S.getSideID(S, "left"), right = S.getSideID(S, "right") }
     local currID = S.getSideID(S, "curr")
