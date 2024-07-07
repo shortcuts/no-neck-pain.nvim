@@ -28,11 +28,9 @@ function W.initSideOptions(side, id)
     local bufid = vim.api.nvim_win_get_buf(id)
 
     for opt, val in pairs(_G.NoNeckPain.config.buffers[side].bo) do
-        if S.getScratchPad(S) and opt == "filetype" then
-            goto continue
+        if not S.getScratchPad(S) and opt == "filetype" then
+            A.setBufferOption(bufid, opt, val)
         end
-        A.setBufferOption(bufid, opt, val)
-        ::continue::
     end
 
     for opt, val in pairs(_G.NoNeckPain.config.buffers[side].wo) do

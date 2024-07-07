@@ -74,10 +74,15 @@ end
 
 ---Iterates over the tabs in the state to remove invalid tabs.
 ---
+---@param skipID number: the ID to skip from potentially valid tabs.
 ---@return number: the total `tabs` in the state.
 ---@private
-function State:refreshTabs()
+function State:refreshTabs(skipID)
     local refreshedTabs = vim.tbl_filter(function(tab)
+        if skipID ~= nil and tab.id == skipID then
+            return false
+        end
+
         return vim.api.nvim_tabpage_is_valid(tab.id)
     end, self.tabs)
 

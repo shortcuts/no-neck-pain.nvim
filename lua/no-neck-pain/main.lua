@@ -330,7 +330,7 @@ function N.disable(scope)
     local sides = { left = S.getSideID(S, "left"), right = S.getSideID(S, "right") }
     local currID = S.getSideID(S, "curr")
 
-    if S.refreshTabs(S) == 0 then
+    if S.refreshTabs(S, activeTab) == 0 then
         pcall(vim.api.nvim_del_augroup_by_name, "NoNeckPainVimEnterAutocmd")
 
         D.log(scope, "no more active tabs left, reinitializing state")

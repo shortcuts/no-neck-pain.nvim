@@ -21,17 +21,7 @@ function E.skip(tab)
         return true
     end
 
-    if tab ~= nil then
-        if A.getCurrentTab() ~= tab.id then
-            return true
-        end
-
-        if S.isSideTheActiveWin(S, "left") or S.isSideTheActiveWin(S, "right") then
-            return true
-        end
-    end
-
-    return false
+    return tab ~= nil and A.getCurrentTab() ~= tab.id
 end
 
 --- determines if we should skip the enabling of the plugin:
