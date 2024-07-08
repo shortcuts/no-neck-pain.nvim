@@ -188,6 +188,13 @@ function N.enable(scope)
                     return
                 end
 
+                if
+                    p.event == "WinEnter"
+                    and (S.isSideTheActiveWin(S, "left") or S.isSideTheActiveWin(S, "right"))
+                then
+                    return D.log(p.event, "skip enter on side")
+                end
+
                 local refresh = S.scanLayout(S, p.event)
 
                 if not vim.api.nvim_win_is_valid(S.getSideID(S, "curr")) then
@@ -241,8 +248,7 @@ function N.enable(scope)
                     p.event = string.format("%s:skipEnteringNoNeckPainBuffer", p.event)
                     if
                         not S.isActiveTabRegistered(S)
-                        or not S.isActiveTabRegistered(S)
-                        or E.skip()
+                        or E.skip(S.getTab(S))
                         or S.getScratchPad(S)
                     then
                         return D.log(p.event, "skip")

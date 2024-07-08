@@ -74,7 +74,7 @@ end
 
 ---Iterates over the tabs in the state to remove invalid tabs.
 ---
----@param skipID number: the ID to skip from potentially valid tabs.
+---@param skipID number?: the ID to skip from potentially valid tabs.
 ---@return number: the total `tabs` in the state.
 ---@private
 function State:refreshTabs(skipID)
