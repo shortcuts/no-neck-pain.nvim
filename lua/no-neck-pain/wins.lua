@@ -183,7 +183,7 @@ function W.createSideBuffers(skipIntegrations)
         local nbSide = leftID and rightID and 2 or 1
 
         -- get the available usable width (screen size without side paddings)
-        sWidth = vim.api.nvim_list_uis()[1].width - sWidth * nbSide
+        sWidth = vim.o.columns - sWidth * nbSide
         sWidth = math.floor(sWidth / (nbVSplits - nbSide))
 
         for vsplit, _ in pairs(vsplits) do
