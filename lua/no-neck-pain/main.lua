@@ -181,7 +181,7 @@ function N.enable(scope)
         desc = "Keeps track of the currently active tab and the tab state",
     })
 
-    vim.api.nvim_create_autocmd({ "QuitPre", "BufDelete", "WinEnter", "WinClosed" }, {
+    vim.api.nvim_create_autocmd({ "QuitPre", "BufDelete", "WinEnter" }, {
         callback = function(p)
             vim.schedule(function()
                 if not S.isActiveTabRegistered(S) or E.skip(S.getTab(S)) then
