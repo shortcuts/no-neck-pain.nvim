@@ -209,16 +209,16 @@ function N.enable(scope)
                         return
                     end
 
-                    local vsplits, nbVSplits = S.getVSplits(S, true)
-                    if nbVSplits == 0 then
+                    local vsplit = S.getFirstValidVSplit(S)
+                    if vsplit == nil then
                         D.log(p.event, "no active windows found")
 
                         return N.disable(p.event)
                     end
 
-                    S.setSideID(S, vsplits[1], "curr")
+                    S.setSideID(S, vsplit, "curr")
 
-                    D.log(p.event, "re-routing to %d", S.getSideID(S, "curr"))
+                    D.log(p.event, "re-routing to %d", vsplit)
 
                     return N.init(p.event, true)
                 end

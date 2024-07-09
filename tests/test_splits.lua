@@ -156,7 +156,7 @@ T["vsplit"]["preserve vsplit width when having side buffers"] = function()
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1002, 1000 })
 
-    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1002)"), 38)
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1002)"), 28)
 end
 
 T["vsplit"]["closing `curr` makes `split` the new `curr`"] = function()

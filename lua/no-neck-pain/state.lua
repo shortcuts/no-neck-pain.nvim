@@ -34,25 +34,32 @@ function State:save()
     _G.NoNeckPain.state = self
 end
 
+---Gets the first valid window in the current tab.
+---
+---@return number?: the number of vsplits.
+---@private
+function State:getFirstValidVSplit()
+    for win, _ in pairs(self.tabs[self.activeTab].wins.vsplits) do
+        if
+            win ~= self.getSideID(self, "left")
+            and win ~= self.getSideID(self, "right")
+            and win ~= self.getSideID(self, "curr")
+            and vim.api.nvim_win_is_valid(win)
+        then
+            return win
+        end
+    end
+
+    return nil
+end
+
 ---Gets the tab vsplits counter.
 ---
----@param filterMain boolean?: whether we should remove main windows or not.
 ---@return table: the vsplits window IDs.
 ---@return number: the number of vsplits.
 ---@private
-function State:getVSplits(filterMain)
-    if not filterMain then
-        return self.tabs[self.activeTab].wins.vsplits,
-            A.length(self.tabs[self.activeTab].wins.vsplits)
-    end
-
-    local filtered = vim.tbl_filter(function(vsplit)
-        return vsplit == self.getSideID(self, "left")
-            or vsplit == self.getSideID(self, "right")
-            or vsplit == self.getSideID(self, "curr")
-    end, self.tabs[self.activeTab].wins.vsplits)
-
-    return filtered, A.length(filtered)
+function State:getVSplits()
+    return self.tabs[self.activeTab].wins.vsplits, A.length(self.tabs[self.activeTab].wins.vsplits)
 end
 
 ---Whether the side is enabled in the config or not.

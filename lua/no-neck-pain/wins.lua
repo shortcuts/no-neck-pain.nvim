@@ -28,7 +28,7 @@ function W.initSideOptions(side, id)
     local bufid = vim.api.nvim_win_get_buf(id)
 
     for opt, val in pairs(_G.NoNeckPain.config.buffers[side].bo) do
-        if not S.getScratchPad(S) and opt == "filetype" then
+        if not S.getScratchPad(S) and opt ~= "filetype" then
             A.setBufferOption(bufid, opt, val)
         end
     end
@@ -187,7 +187,7 @@ function W.createSideBuffers(skipIntegrations)
         sWidth = math.floor(sWidth / (nbVSplits - nbSide))
 
         for vsplit, _ in pairs(vsplits) do
-            if vsplit ~= leftID and vsplit ~= rightID and vsplit ~= S.getSideID(S, "curr") then
+            if vsplit ~= leftID and vsplit ~= rightID then
                 resize(vsplit, sWidth, string.format("vsplit:%s", vsplit))
             end
         end
