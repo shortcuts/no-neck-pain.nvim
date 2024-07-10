@@ -224,8 +224,21 @@ function N.enable(scope)
                 end
 
                 if
-                    (S.isSideEnabled(S, "left") and not S.isSideWinValid(S, "left"))
-                    or (S.isSideEnabled(S, "right") and not S.isSideWinValid(S, "right"))
+                    p.event == "QuitPre"
+                    and not S.isSideWinValid(S, "left")
+                    and not S.isSideWinValid(S, "right")
+                then
+                    D.log(p.event, "closed a vsplit when no side buffers were present")
+
+                    return N.init(p.event)
+                end
+
+                if
+                    p.event ~= "WinEnter"
+                    and (
+                        (S.isSideEnabled(S, "left") and not S.isSideWinValid(S, "left"))
+                        or (S.isSideEnabled(S, "right") and not S.isSideWinValid(S, "right"))
+                    )
                 then
                     D.log(p.event, "one of the NNP side has been closed")
 

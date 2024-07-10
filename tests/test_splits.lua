@@ -294,9 +294,9 @@ T["vsplit/split"]["closing side buffers because of splits restores focus"] = fun
 
     child.cmd("q")
     child.cmd("q")
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1012, 1004, 1003, 1013 })
+    Helpers.expect.equality(Helpers.winsInTab(child), { 1006, 1003, 1000, 1007 })
 
-    Helpers.expect.equality(Helpers.currentWin(child), 1004)
+    Helpers.expect.equality(Helpers.currentWin(child), 1000)
 end
 
 T["vsplit/split"]["closing help page doens't break layout"] = function()

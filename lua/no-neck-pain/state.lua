@@ -56,10 +56,9 @@ end
 ---Gets the tab vsplits counter.
 ---
 ---@return table: the vsplits window IDs.
----@return number: the number of vsplits.
 ---@private
 function State:getVSplits()
-    return self.tabs[self.activeTab].wins.vsplits, A.length(self.tabs[self.activeTab].wins.vsplits)
+    return self.tabs[self.activeTab].wins.vsplits
 end
 
 ---Whether the side is enabled in the config or not.
@@ -525,19 +524,18 @@ end
 ---@return boolean: whether the number of vsplits changed or not.
 ---@private
 function State:scanLayout(scope)
-    local _, nbVSplits = self.getVSplits(self)
+    local vsplits = self.getVSplits(self)
 
     self.initVSplits(self)
     self.initIntegrations(self)
     self.walkLayout(self, scope, nil, vim.fn.winlayout(self.activeTab))
     self.save(self)
 
-    local vsplits, nbNBVsplits = self.getVSplits(self)
+    local newVSplits = self.getVSplits(self)
 
-    D.log(scope, "computed vsplits: %s", vim.inspect(vsplits))
+    D.log(scope, "computed vsplits: %s - %s", vim.inspect(vsplits), vim.inspect(newVSplits))
 
-    -- TODO: real table diff
-    return nbVSplits ~= nbNBVsplits
+    return not vim.deep_equal(vsplits, newVSplits)
 end
 
 return State

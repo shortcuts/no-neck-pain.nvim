@@ -125,7 +125,7 @@ function W.createSideBuffers(skipIntegrations)
             then
                 vim.cmd(wins[side].cmd)
 
-                local id = vim.api.nvim_get_current_win()
+                S.setSideID(S, vim.api.nvim_get_current_win(), side)
 
                 if _G.NoNeckPain.config.buffers.setNames then
                     local exist = vim.fn.bufnr("no-neck-pain-" .. side)
@@ -137,21 +137,15 @@ function W.createSideBuffers(skipIntegrations)
                     vim.api.nvim_buf_set_name(0, "no-neck-pain-" .. side)
                 end
 
-                S.setSideID(S, id, side)
-
                 if _G.NoNeckPain.config.buffers[side].scratchPad.enabled then
                     S.setScratchPad(S, true)
-                    W.initScratchPad(side, id)
+                    W.initScratchPad(side, S.getSideID(S, side))
                 else
-                    W.initSideOptions(side, id)
+                    W.initSideOptions(side, S.getSideID(S, side))
                 end
             end
 
-            local sideID = S.getSideID(S, side)
-
-            if sideID ~= nil then
-                C.init(sideID, side)
-            end
+            C.init(S.getSideID(S, side), side)
         end
     end
 
@@ -172,7 +166,8 @@ function W.createSideBuffers(skipIntegrations)
         end
     end
 
-    local vsplits, nbVSplits = S.getVSplits(S)
+    local vsplits = S.getVSplits(S)
+    local nbVSplits = vim.tbl_count(vsplits)
     local leftID = S.getSideID(S, "left")
     local rightID = S.getSideID(S, "right")
 
@@ -184,7 +179,22 @@ function W.createSideBuffers(skipIntegrations)
 
         -- get the available usable width (screen size without side paddings)
         sWidth = vim.o.columns - sWidth * nbSide
-        sWidth = math.floor(sWidth / (nbVSplits - nbSide))
+        local remainingVSplits = nbVSplits - nbSide
+
+        if remainingVSplits < 1 then
+            remainingVSplits = 1
+        end
+
+        sWidth = math.floor(sWidth / remainingVSplits)
+
+        D.log(
+            "splitResize",
+            "%d/%d screen width remaining, %d vsplits including %d sides",
+            sWidth,
+            vim.o.columns,
+            nbVSplits,
+            nbSide
+        )
 
         for vsplit, _ in pairs(vsplits) do
             if vsplit ~= leftID and vsplit ~= rightID then
@@ -214,7 +224,7 @@ function W.getPadding(side)
         return 0
     end
 
-    local _, columns = S.getVSplits(S)
+    local columns = vim.tbl_count(S.getVSplits(S))
 
     for _, s in ipairs(Co.SIDES) do
         if S.isSideWinValid(S, s) and columns > 1 then
