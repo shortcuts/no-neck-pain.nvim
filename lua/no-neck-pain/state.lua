@@ -493,13 +493,9 @@ end
 ---@param hasColParent boolean: whether or not the previous walked tree was a column.
 ---@private
 function State:walkLayout(scope, tree, hasColParent)
-    -- if col -- represents a vertical association of window, e.g. { { "leaf", int }, { "col", { ... } }, { "row", { ...} } }
-    --  - count every top level leaf only members
-    --  - any other entities are skipped because they will be walked in later
-    -- if row -- represents an horizontal association of window, e.g  { { "leaf", int }, { "col", { ... } }, { "row", { ...} } }
-    --  - count every top level leaf only members
-    --  - any other entities are skipped because they will be walked in later
-    -- if leaf -- represents a window, e.g. { "leaf", int }
+    -- col -- represents a vertical association of window, e.g. { { "leaf", int }, { "col", { ... } }, { "row", { ...} } }
+    -- row -- represents an horizontal association of window, e.g  { { "leaf", int }, { "col", { ... } }, { "row", { ...} } }
+    -- leaf -- represents a window, e.g. { "leaf", int }
 
     if tree == nil then
         return
