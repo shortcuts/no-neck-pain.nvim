@@ -20,11 +20,11 @@ function State:initIntegrations()
     self.tabs[self.activeTab].wins.integrations = vim.deepcopy(Co.INTEGRATIONS)
 end
 
----Sets the vsplits state of the current tab to its original value.
+---Sets the columns state of the current tab to its original value.
 ---
 ---@private
-function State:initVSplits()
-    self.tabs[self.activeTab].wins.vsplits = {}
+function State:initColumns()
+    self.tabs[self.activeTab].wins.columns = 0
 end
 
 ---Saves the state in the global _G.NoNeckPain.state object.
@@ -34,31 +34,12 @@ function State:save()
     _G.NoNeckPain.state = self
 end
 
----Gets the first valid window in the current tab.
+---Gets the columns count in the current layout.
 ---
----@return number?: the number of vsplits.
+---@return table: the columns window IDs.
 ---@private
-function State:getFirstValidVSplit()
-    for win, _ in pairs(self.tabs[self.activeTab].wins.vsplits) do
-        if
-            win ~= self.getSideID(self, "left")
-            and win ~= self.getSideID(self, "right")
-            and win ~= self.getSideID(self, "curr")
-            and vim.api.nvim_win_is_valid(win)
-        then
-            return win
-        end
-    end
-
-    return nil
-end
-
----Gets the tab vsplits counter.
----
----@return table: the vsplits window IDs.
----@private
-function State:getVSplits()
-    return self.tabs[self.activeTab].wins.vsplits
+function State:getColumns()
+    return self.tabs[self.activeTab].wins.columns
 end
 
 ---Whether the side is enabled in the config or not.
@@ -457,7 +438,7 @@ function State:setTab(id)
         id = id,
         scratchPadEnabled = false,
         wins = {
-            vsplits = {},
+            columns = 0,
             main = {
                 curr = nil,
                 left = nil,
@@ -469,8 +450,8 @@ function State:setTab(id)
     self.activeTab = id
 end
 
----Set the given layout windows in their corresponding entity (vsplits or integrations).
----We only consider `leaf` because we can receive something like `{ "col" {...}}`, which will then be walked in and considered later
+---Increases the columns if the encountered window of the given table is not an integration, otherwise sets the integration.
+---When a column in encountered, it counts for a column but we don't consider its child windows, it will be walked in at a later time.
 ---
 ---@param scope string: the caller of the method.
 ---@param wins table: the layout windows.
@@ -486,34 +467,58 @@ function State:setLayoutWindows(scope, wins)
 
                 self.tabs[self.activeTab].wins.integrations[name] = integration
             else
-                self.tabs[self.activeTab].wins.vsplits[id] = true
+                self.tabs[self.activeTab].wins.columns = self.tabs[self.activeTab].wins.columns + 1
             end
+        elseif win[1] == "col" then
+            self.tabs[self.activeTab].wins.columns = self.tabs[self.activeTab].wins.columns + 1
         end
     end
+
+    D.log(
+        scope,
+        "increased to %d after %s",
+        self.tabs[self.activeTab].wins.columns,
+        vim.inspect(wins)
+    )
 end
 
 ---Recursively walks in the `winlayout` until it has computed every column present.
 ---
----Finding a parentless leaf means we are at the basic nvim just opened level
----Finding any other string than a leaf result on a parent (row or col)
----Finding a group of type table means we have a set of childrens windows
----  When we are on a children of a row, we will set the layout wins in state in order to determine if they are integrations or not
+---When a leaf is 'col', we walk in the next element (its windows), and keep track of the previous 'col' origin in order to deduce it from the potential 'row'.
+---When a leaf is 'row', if we had a column previously, we remove 1 element from the next element (its windows), because at least 1 window is also part of this column. If there was no column, we consider every leafs in the row.
+---When a leaf is a table that contains a 'col' or 'row', we directly walk in it.
 ---
 ---@param scope string: the caller of the method.
+---@param tree table: the tree to walk in.
+---@param hasColParent boolean: whether or not the previous walked tree was a column.
 ---@private
-function State:walkLayout(scope, parent, curr)
-    for _, group in ipairs(curr) do
-        if type(group) == "table" and group[1] ~= "leaf" then
-            if parent == "row" then
-                -- if we are on a `col`, we don't care about how many windows are in it,
-                -- because their width is grouped, so one is enough to keep track of
-                self.setLayoutWindows(self, scope, group[1] == "col" and { group[2][1] } or group)
+function State:walkLayout(scope, tree, hasColParent)
+    -- if col -- represents a vertical association of window, e.g. { { "leaf", int }, { "col", { ... } }, { "row", { ...} } }
+    --  - count every top level leaf only members
+    --  - any other entities are skipped because they will be walked in later
+    -- if row -- represents an horizontal association of window, e.g  { { "leaf", int }, { "col", { ... } }, { "row", { ...} } }
+    --  - count every top level leaf only members
+    --  - any other entities are skipped because they will be walked in later
+    -- if leaf -- represents a window, e.g. { "leaf", int }
+
+    if tree == nil then
+        return
+    end
+
+    D.log(scope, "new layer entered%s: %s", hasColParent and " from col" or "", vim.inspect(tree))
+    for idx, leaf in ipairs(tree) do
+        if leaf == "row" then
+            local leafs = tree[idx + 1]
+            -- if on a row we were on a col, then it means one iteam of the row must be of the same width as a col one
+            if hasColParent and vim.tbl_count(leafs) > 1 then
+                table.remove(leafs, 1)
             end
-            self.walkLayout(self, scope, parent, group)
-        elseif group == "leaf" and parent == nil then
-            self.setLayoutWindows(self, scope, { curr })
-        elseif type(group) == "string" then
-            parent = group
+            self.setLayoutWindows(self, scope, leafs)
+            self.walkLayout(self, scope, tree[idx + 1], false)
+        elseif leaf == "col" then
+            self.walkLayout(self, scope, tree[idx + 1], true)
+        elseif type(leaf) == "table" and type(leaf[1]) == "string" then
+            self.walkLayout(self, scope, leaf, hasColParent)
         end
     end
 end
@@ -521,21 +526,27 @@ end
 ---Scans the winlayout in order to identify window position and type.
 ---
 ---@param scope string: the caller of the method.
----@return boolean: whether the number of vsplits changed or not.
+---@return boolean: whether the number of columns changed or not.
 ---@private
 function State:scanLayout(scope)
-    local vsplits = self.getVSplits(self)
+    local columns = self.getColumns(self)
 
-    self.initVSplits(self)
+    self.initColumns(self)
     self.initIntegrations(self)
-    self.walkLayout(self, scope, nil, vim.fn.winlayout(self.activeTab))
+
+    local layout = vim.fn.winlayout(self.activeTab)
+
+    -- basically when opening vim with nnp autocmds, nothing else than a curr window
+    if layout[1] == "leaf" then
+        self.setLayoutWindows(self, scope, { layout })
+    else
+        self.walkLayout(self, scope, vim.fn.winlayout(self.activeTab), false)
+    end
     self.save(self)
 
-    local newVSplits = self.getVSplits(self)
+    D.log(scope, "computed columns: %d - %d", columns, self.getColumns(self))
 
-    D.log(scope, "computed vsplits: %s - %s", vim.inspect(vsplits), vim.inspect(newVSplits))
-
-    return not vim.deep_equal(vsplits, newVSplits)
+    return true
 end
 
 return State

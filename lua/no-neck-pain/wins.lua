@@ -166,20 +166,19 @@ function W.createSideBuffers(skipIntegrations)
         end
     end
 
-    local vsplits = S.getVSplits(S)
-    local nbVSplits = vim.tbl_count(vsplits)
+    local columns = S.getColumns(S)
     local leftID = S.getSideID(S, "left")
     local rightID = S.getSideID(S, "right")
 
     -- if we still have side buffers open at this point, and we have vsplit opened,
     -- there might be width issues so we the resize opened vsplits.
-    if (leftID or rightID) and nbVSplits > 1 then
+    if (leftID or rightID) and columns > 1 then
         local sWidth = wins.left.padding or wins.right.padding
         local nbSide = leftID and rightID and 2 or 1
 
         -- get the available usable width (screen size without side paddings)
         sWidth = vim.o.columns - sWidth * nbSide
-        local remainingVSplits = nbVSplits - nbSide
+        local remainingVSplits = columns - nbSide
 
         if remainingVSplits < 1 then
             remainingVSplits = 1
@@ -189,18 +188,18 @@ function W.createSideBuffers(skipIntegrations)
 
         D.log(
             "splitResize",
-            "%d/%d screen width remaining, %d vsplits including %d sides",
+            "%d/%d screen width remaining, %d columns including %d sides",
             sWidth,
             vim.o.columns,
-            nbVSplits,
+            columns,
             nbSide
         )
 
-        for vsplit, _ in pairs(vsplits) do
-            if vsplit ~= leftID and vsplit ~= rightID then
-                resize(vsplit, sWidth, string.format("vsplit:%s", vsplit))
-            end
-        end
+        -- for vsplit, _ in pairs(vsplits) do
+        -- if vsplit ~= leftID and vsplit ~= rightID then
+        --     -- resize(vsplit, sWidth, string.format("vsplit:%s", vsplit))
+        -- end
+        -- end
     end
 
     -- closing integrations and reopening them means new window IDs
@@ -224,7 +223,7 @@ function W.getPadding(side)
         return 0
     end
 
-    local columns = vim.tbl_count(S.getVSplits(S))
+    local columns = S.getColumns(S)
 
     for _, s in ipairs(Co.SIDES) do
         if S.isSideWinValid(S, s) and columns > 1 then
@@ -235,7 +234,7 @@ function W.getPadding(side)
     -- we need to see if there's enough space left to have side buffers
     local occupied = _G.NoNeckPain.config.width * columns
 
-    D.log(scope, "have %d vsplits", columns)
+    D.log(scope, "have %d columns", columns)
 
     -- if there's no space left according to the config width,
     -- then we don't have to create side buffers.
@@ -245,7 +244,7 @@ function W.getPadding(side)
         return 0
     end
 
-    D.log(scope, "%d/%d with vsplits, computing integrations", occupied, vim.o.columns)
+    D.log(scope, "%d/%d with columns, computing integrations", occupied, vim.o.columns)
 
     -- now we need to determine how much we should substract from the remaining padding
     -- if there's side integrations open.
