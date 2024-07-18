@@ -42,6 +42,18 @@ function State:getColumns()
     return self.tabs[self.activeTab].wins.columns
 end
 
+---Consumes the redraw value in the state, in order to know if we should redraw sides or not.
+---
+---@return boolean
+---@private
+function State:consumeRedraw()
+    local redraw = self.tabs[self.activeTab].redraw
+
+    self.tabs[self.activeTab].redraw = false
+
+    return redraw
+end
+
 ---Whether the side is enabled in the config or not.
 ---
 ---@param side "left"|"right"|"curr": the side of the window.
@@ -173,26 +185,16 @@ function State:getIntegration(id)
     return nil, nil
 end
 
----Gets all wins that are not already registered in the given `tab`.
+---Gets every unregistered wins (non main, non integrations).
 ---
----@param withCurr boolean?: whether we should filter curr or not
----@return table: the wins that are not in `tab`.
+---@return table: the list of windows.
 ---@private
-function State:getUnregisteredWins(withCurr)
+function State:getUnregisteredWins()
     return vim.tbl_filter(function(win)
-        if A.isRelativeWindow(win) then
-            return false
-        end
-
-        if not withCurr and win == self.getSideID(self, "curr") then
-            return false
-        end
-
-        if win == self.getSideID(self, "left") or win == self.getSideID(self, "right") then
-            return false
-        end
-
-        return true
+        return not A.isRelativeWindow(win)
+            and win ~= self.getSideID(self, "curr")
+            and win ~= self.getSideID(self, "left")
+            and win ~= self.getSideID(self, "right")
     end, vim.api.nvim_tabpage_list_wins(self.activeTab))
 end
 
@@ -466,6 +468,7 @@ function State:setLayoutWindows(scope, wins)
                 integration.id = id
 
                 self.tabs[self.activeTab].wins.integrations[name] = integration
+                self.tabs[self.activeTab].redraw = true
             else
                 self.tabs[self.activeTab].wins.columns = self.tabs[self.activeTab].wins.columns + 1
             end

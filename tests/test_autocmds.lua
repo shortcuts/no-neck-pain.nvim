@@ -79,7 +79,7 @@ T["auto command"]["does not shift when opening/closing float window"] = function
     })
 
     Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 15)
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.right", 13)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.right", 15)
 end
 
 T["skipEnteringNoNeckPainBuffer"] = MiniTest.new_set()

@@ -242,7 +242,7 @@ T["enable"]["(single tab) sets state"] = function()
         right = 1002,
     })
 
-    Helpers.expect.state(child, "tabs[1].wins.vsplits[1000]", true)
+    Helpers.expect.state(child, "tabs[1].wins.columns", 1)
 
     Helpers.expect.state_type(child, "tabs[1].wins.integrations", "table")
 
@@ -270,7 +270,7 @@ T["enable"]["(multiple tab) sets state"] = function()
         left = 1001,
         right = 1002,
     })
-    Helpers.expect.state(child, "tabs[1].wins.vsplits[1000]", true)
+    Helpers.expect.state(child, "tabs[1].wins.columns", 1)
 
     Helpers.expect.state_type(child, "tabs[1].wins.integrations", "table")
 
@@ -294,9 +294,7 @@ T["enable"]["(multiple tab) sets state"] = function()
         left = 1004,
         right = 1005,
     })
-    Helpers.expect.state(child, "tabs[2].wins.vsplits[1003]", true)
-    Helpers.expect.state(child, "tabs[2].wins.vsplits[1004]", true)
-    Helpers.expect.state(child, "tabs[2].wins.vsplits[1005]", true)
+    Helpers.expect.state(child, "tabs[2].wins.columns", 3)
 
     Helpers.expect.state_type(child, "tabs[2].wins.integrations", "table")
 

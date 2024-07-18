@@ -89,9 +89,8 @@ end
 --- Creates side buffers and set the tab state, focuses the `curr` window if required.
 --- @param scope string: internal identifier for logging purposes.
 --- @param goToCurr boolean?: whether we should re-focus the `curr` window.
---- @param skipIntegrations boolean?: whether we should skip the integrations logic.
 ---@private
-function N.init(scope, goToCurr, skipIntegrations)
+function N.init(scope, goToCurr)
     if not S.isActiveTabRegistered(S) then
         error("called the internal `init` method on a `nil` tab.")
     end
@@ -104,7 +103,12 @@ function N.init(scope, goToCurr, skipIntegrations)
         hadSideBuffers = false
     end
 
-    W.createSideBuffers(skipIntegrations)
+    if S.consumeRedraw(S) then
+        W.move(string.format("%s:consumeRedraw", scope), "left")
+        W.move(string.format("%s:consumeRedraw", scope), "right")
+    end
+
+    W.createSideBuffers()
 
     if
         goToCurr
@@ -209,16 +213,16 @@ function N.enable(scope)
                         return
                     end
 
-                    local vsplit = S.getFirstValidVSplit(S)
-                    if vsplit == nil then
+                    local wins = S.getUnregisteredWins(S)
+                    if #wins == 0 then
                         D.log(p.event, "no active windows found")
 
                         return N.disable(p.event)
                     end
 
-                    S.setSideID(S, vsplit, "curr")
+                    S.setSideID(S, wins[1], "curr")
 
-                    D.log(p.event, "re-routing to %d", vsplit)
+                    D.log(p.event, "re-routing to %d", wins[1])
 
                     return N.init(p.event, true)
                 end

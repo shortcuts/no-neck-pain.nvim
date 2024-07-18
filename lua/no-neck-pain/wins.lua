@@ -10,7 +10,7 @@ local W = {}
 ---
 ---@param id number: the id of the window.
 ---@param width number: the width to apply to the window.
----@param side "left"|"right"|"curr"|"vsplit": the side of the window being resized, used for logging only.
+---@param side "left"|"right"|"curr"|"unregistered": the side of the window being resized, used for logging only.
 ---@private
 local function resize(id, width, side)
     D.log(side, "resizing %d with padding %d", id, width)
@@ -38,6 +38,36 @@ function W.initSideOptions(side, id)
     end
 end
 
+---Moves a side window to its original position
+---
+---@param scope string: the scope from where this function is called.
+---@param side "left"|"right": the side of the window being closed, used for logging only.
+---@private
+function W.move(scope, side)
+    local id = S.getSideID(S, side)
+    if id == nil then
+        return
+    end
+
+    if vim.api.nvim_win_is_valid(id) then
+        local wins = vim.api.nvim_tabpage_list_wins(S.activeTab)
+
+        if side == "left" then
+            if wins[1] == id then
+                return
+            end
+            vim.fn.win_splitmove(id, wins[1], { vertical = true })
+        else
+            if wins[#wins] == id then
+                return
+            end
+            vim.fn.win_splitmove(id, wins[#wins], { vertical = true })
+        end
+
+        D.log(scope, "moving %s window", side)
+    end
+end
+
 ---Closes a window if it's valid.
 ---
 ---@param scope string: the scope from where this function is called.
@@ -45,9 +75,9 @@ end
 ---@param side "left"|"right": the side of the window being closed, used for logging only.
 ---@private
 function W.close(scope, id, side)
-    D.log(scope, "closing %s window", side)
-
     if vim.api.nvim_win_is_valid(id) then
+        D.log(scope, "closing %s window", side)
+
         vim.api.nvim_win_close(id, false)
     end
 end
@@ -102,18 +132,12 @@ end
 --- - A side buffer is not created if there's not enough space.
 --- - If it already exists, we resize it.
 ---
----@param skipIntegrations boolean?: skip integrations action when true.
 ---@private
-function W.createSideBuffers(skipIntegrations)
+function W.createSideBuffers()
     local wins = {
         left = { cmd = "topleft vnew", padding = 0 },
         right = { cmd = "botright vnew", padding = 0 },
     }
-
-    local closedIntegrations = false
-    if not skipIntegrations then
-        closedIntegrations = S.closeIntegration(S)
-    end
 
     for _, side in pairs(Co.SIDES) do
         if _G.NoNeckPain.config.buffers[side].enabled then
@@ -147,10 +171,6 @@ function W.createSideBuffers(skipIntegrations)
 
             C.init(S.getSideID(S, side), side)
         end
-    end
-
-    if closedIntegrations and not skipIntegrations then
-        S.reopenIntegration(S)
     end
 
     for _, side in pairs(Co.SIDES) do
@@ -195,16 +215,9 @@ function W.createSideBuffers(skipIntegrations)
             nbSide
         )
 
-        -- for vsplit, _ in pairs(vsplits) do
-        -- if vsplit ~= leftID and vsplit ~= rightID then
-        --     -- resize(vsplit, sWidth, string.format("vsplit:%s", vsplit))
-        -- end
-        -- end
-    end
-
-    -- closing integrations and reopening them means new window IDs
-    if closedIntegrations then
-        S.scanLayout(S, "createSideBuffers")
+        for _, win in pairs(S.getUnregisteredWins(S)) do
+            resize(win, sWidth, string.format("unregistered:%d", win))
+        end
     end
 end
 
