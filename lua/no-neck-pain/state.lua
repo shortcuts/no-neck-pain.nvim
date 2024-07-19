@@ -543,7 +543,13 @@ function State:scanLayout(scope)
     end
     self.save(self)
 
-    D.log(scope, "computed columns: %d - %d", columns, self.getColumns(self))
+    D.log(
+        scope,
+        "[tab %d] computed columns: %d - %d",
+        self.activeTab,
+        columns,
+        self.getColumns(self)
+    )
 
     return true
 end

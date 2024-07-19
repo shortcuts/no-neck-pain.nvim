@@ -188,43 +188,52 @@ function N.enable(scope)
     vim.api.nvim_create_autocmd({ "QuitPre", "BufDelete", "WinEnter" }, {
         callback = function(p)
             vim.schedule(function()
-                if not S.isActiveTabRegistered(S) or E.skip(S.getTab(S)) then
+                local s = string.format("%s:%d", p.event, vim.api.nvim_get_current_win())
+                if not S.isActiveTabRegistered(S) or E.skip() then
                     return
                 end
 
                 if
                     p.event == "WinEnter"
-                    and (S.isSideTheActiveWin(S, "left") or S.isSideTheActiveWin(S, "right"))
+                    and (
+                        S.isSideTheActiveWin(S, "left")
+                        or S.isSideTheActiveWin(S, "right")
+                        or S.isSideTheActiveWin(S, "curr")
+                    )
                 then
-                    return D.log(p.event, "skip enter on side")
+                    return D.log(s, "skip on side")
                 end
 
-                local refresh = S.scanLayout(S, p.event)
+                if p.event == "BufDelete" and vim.api.nvim_win_is_valid(S.getSideID(S, "curr")) then
+                    return D.log(s, "skip still there")
+                end
+
+                local refresh = S.scanLayout(S, s)
 
                 if not vim.api.nvim_win_is_valid(S.getSideID(S, "curr")) then
                     if p.event == "BufDelete" and _G.NoNeckPain.config.fallbackOnBufferDelete then
-                        D.log(p.event, "`curr` has been deleted, resetting state")
+                        D.log(s, "`curr` has been deleted, resetting state")
 
                         vim.cmd("new")
 
-                        N.disable(string.format("%s:reset", p.event))
-                        N.enable(string.format("%s:reset", p.event))
+                        N.disable(string.format("%s:reset", s))
+                        N.enable(string.format("%s:reset", s))
 
                         return
                     end
 
                     local wins = S.getUnregisteredWins(S)
                     if #wins == 0 then
-                        D.log(p.event, "no active windows found")
+                        D.log(s, "no active windows found")
 
-                        return N.disable(p.event)
+                        return N.disable(s)
                     end
 
                     S.setSideID(S, wins[1], "curr")
 
-                    D.log(p.event, "re-routing to %d", wins[1])
+                    D.log(s, "re-routing to %d", wins[1])
 
-                    return N.init(p.event, true)
+                    return N.init(s, true)
                 end
 
                 if
@@ -232,9 +241,9 @@ function N.enable(scope)
                     and not S.isSideWinValid(S, "left")
                     and not S.isSideWinValid(S, "right")
                 then
-                    D.log(p.event, "closed a vsplit when no side buffers were present")
+                    D.log(s, "closed a vsplit when no side buffers were present")
 
-                    return N.init(p.event)
+                    return N.init(s)
                 end
 
                 if
@@ -244,13 +253,13 @@ function N.enable(scope)
                         or (S.isSideEnabled(S, "right") and not S.isSideWinValid(S, "right"))
                     )
                 then
-                    D.log(p.event, "one of the NNP side has been closed")
+                    D.log(s, "one of the NNP side has been closed")
 
-                    return N.disable(p.event)
+                    return N.disable(s)
                 end
 
                 if refresh then
-                    return N.init(p.event)
+                    return N.init(s)
                 end
             end)
         end,
@@ -263,11 +272,7 @@ function N.enable(scope)
             callback = function(p)
                 vim.schedule(function()
                     p.event = string.format("%s:skipEnteringNoNeckPainBuffer", p.event)
-                    if
-                        not S.isActiveTabRegistered(S)
-                        or E.skip(S.getTab(S))
-                        or S.getScratchPad(S)
-                    then
+                    if not S.isActiveTabRegistered(S) or E.skip() or S.getScratchPad(S) then
                         return D.log(p.event, "skip")
                     end
 

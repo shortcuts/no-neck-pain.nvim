@@ -294,7 +294,7 @@ T["enable"]["(multiple tab) sets state"] = function()
         left = 1004,
         right = 1005,
     })
-    Helpers.expect.state(child, "tabs[2].wins.columns", 3)
+    Helpers.expect.state(child, "tabs[2].wins.columns", 1)
 
     Helpers.expect.state_type(child, "tabs[2].wins.integrations", "table")
 

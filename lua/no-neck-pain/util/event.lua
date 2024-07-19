@@ -6,13 +6,11 @@ local E = {}
 
 ---skips the event if:
 --- - the plugin is not enabled
---- - we have splits open (when `skipSplit` is `true`)
---- - we are focusing a floating window
---- - we are focusing one of the side buffer
+--- - the current window is a relative window
+--- - the event is triggered in a different tab
 ---
----@param tab table?: the table where the tab information are stored.
 ---@private
-function E.skip(tab)
+function E.skip()
     if _G.NoNeckPain.state == nil or not _G.NoNeckPain.state.enabled then
         return true
     end
@@ -21,7 +19,7 @@ function E.skip(tab)
         return true
     end
 
-    return tab ~= nil and A.getCurrentTab() ~= tab.id
+    return A.getCurrentTab() ~= S.activeTab
 end
 
 --- determines if we should skip the enabling of the plugin:
