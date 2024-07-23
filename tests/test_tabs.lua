@@ -588,7 +588,7 @@ T["tabnew/tabclose"]["keep state synchronized on second tab"] = function()
     })
 
     Helpers.toggle(child)
-    Helpers.expect.state(child, "tabs", vim.NIL)
+    Helpers.expect.state(child, "tabs", {})
 end
 
 T["tabnew/tabclose"]["does not close nvim when quitting tab if some are left"] = function()

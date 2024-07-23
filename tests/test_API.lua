@@ -320,7 +320,7 @@ T["disable"]["(single tab) resets state"] = function()
     Helpers.expect.state(child, "enabled", false)
     Helpers.expect.state(child, "activeTab", 1)
 
-    Helpers.expect.state(child, "tabs", vim.NIL)
+    Helpers.expect.state(child, "tabs", {})
 end
 
 T["disable"]["(multiple tab) resets state"] = function()
@@ -358,7 +358,7 @@ T["disable"]["(multiple tab) resets state"] = function()
     Helpers.expect.state(child, "enabled", false)
     Helpers.expect.state(child, "activeTab", 1)
 
-    Helpers.expect.state(child, "tabs", vim.NIL)
+    Helpers.expect.state(child, "tabs", {})
 end
 
 T["disable"]["(no file) does not close the window if unsaved buffer"] = function()

@@ -2,7 +2,7 @@ local A = require("no-neck-pain.util.api")
 local Co = require("no-neck-pain.util.constants")
 local D = require("no-neck-pain.util.debug")
 
-local State = { enabled = false, activeTab = A.getCurrentTab(), tabs = nil }
+local State = { enabled = false, activeTab = A.getCurrentTab(), tabs = {} }
 
 ---Sets the state to its original value.
 ---
@@ -10,7 +10,7 @@ local State = { enabled = false, activeTab = A.getCurrentTab(), tabs = nil }
 function State:init()
     self.enabled = false
     self.activeTab = A.getCurrentTab()
-    self.tabs = nil
+    self.tabs = {}
 end
 
 ---Sets the integrations state of the current tab to its original value.
@@ -73,27 +73,26 @@ end
 
 ---Iterates over the tabs in the state to remove invalid tabs.
 ---
+---@param scope string: caller of the method.
 ---@param skipID number?: the ID to skip from potentially valid tabs.
 ---@return number: the total `tabs` in the state.
 ---@private
-function State:refreshTabs(skipID)
-    local refreshedTabs = vim.tbl_filter(function(tab)
-        if skipID ~= nil and tab.id == skipID then
-            return false
+function State:refreshTabs(scope, skipID)
+    D.log(scope, "refreshing tabs...")
+
+    for _, tab in pairs(self.tabs) do
+        if tab.id == skipID or not vim.api.nvim_tabpage_is_valid(tab.id) then
+            self.tabs[tab.id] = nil
         end
-
-        return vim.api.nvim_tabpage_is_valid(tab.id)
-    end, self.tabs)
-
-    if #refreshedTabs == 0 then
-        self.tabs = nil
-
-        return 0
     end
 
-    self.tabs = refreshedTabs
+    local len = vim.tbl_count(self.tabs)
 
-    return #self.tabs
+    if len == 0 then
+        self.init(self)
+    end
+
+    return len
 end
 
 ---Closes side integrations if opened.
@@ -432,8 +431,6 @@ end
 ---@param id number: the id of the tab.
 ---@private
 function State:setTab(id)
-    self.tabs = self.tabs or {}
-
     D.log("setTab", "registered new tab %d", id)
 
     self.tabs[id] = {

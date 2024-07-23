@@ -166,19 +166,14 @@ function N.enable(scope)
         desc = "Resizes side windows after terminal has been resized, closes them if not enough space left.",
     })
 
-    vim.api.nvim_create_autocmd({ "TabLeave", "TabEnter" }, {
+    vim.api.nvim_create_autocmd({ "TabEnter" }, {
         callback = function(p)
             A.debounce(p.event, function()
-                if p.event == "TabLeave" then
-                    S.refreshTabs(S)
-                    D.log(p.event, "tab %d left", S.activeTab)
+                D.log(p.event, "tab %d entered", S.activeTab)
 
-                    return
-                end
+                S.refreshTabs(S, p.event)
 
                 S.setActiveTab(S, A.getCurrentTab())
-
-                D.log(p.event, "tab %d entered", S.activeTab)
             end)
         end,
         group = augroupName,
@@ -358,7 +353,7 @@ function N.disable(scope)
     local sides = { left = S.getSideID(S, "left"), right = S.getSideID(S, "right") }
     local currID = S.getSideID(S, "curr")
 
-    if S.refreshTabs(S, activeTab) == 0 then
+    if S.refreshTabs(S, scope, activeTab) == 0 then
         pcall(vim.api.nvim_del_augroup_by_name, "NoNeckPainVimEnterAutocmd")
 
         D.log(scope, "no more active tabs left, reinitializing state")
