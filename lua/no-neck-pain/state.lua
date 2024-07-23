@@ -538,8 +538,10 @@ function State:scanLayout(scope)
     -- basically when opening vim with nnp autocmds, nothing else than a curr window
     if layout[1] == "leaf" then
         self.setLayoutWindows(self, scope, { layout })
+    elseif layout[1] == "col" and vim.tbl_count(layout) == 2 then
+        self.walkLayout(self, scope, layout[2], false)
     else
-        self.walkLayout(self, scope, vim.fn.winlayout(self.activeTab), false)
+        self.walkLayout(self, scope, layout, false)
     end
     self.save(self)
 

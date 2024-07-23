@@ -124,15 +124,15 @@ T["vsplit"]["correctly size splits when opening helper with side buffers open"] 
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1003, 1000, 1002 })
 
-    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1003)"), 19)
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 18)
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1003)"), 20)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 17)
 
     child.cmd("h")
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1004, 1001, 1003, 1000, 1002 })
 
     Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1004)"), 80)
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 8)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 17)
 end
 
 T["vsplit"]["correctly position side buffers when there's enough space"] = function()
@@ -156,7 +156,7 @@ T["vsplit"]["preserve vsplit width when having side buffers"] = function()
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1002, 1000 })
 
-    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1002)"), 32)
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1002)"), 30)
 end
 
 T["vsplit"]["closing `curr` makes `split` the new `curr`"] = function()
@@ -309,14 +309,14 @@ T["vsplit/split"]["closing help page doens't break layout"] = function()
     child.cmd("h")
     Helpers.expect.equality(Helpers.winsInTab(child), { 1004, 1001, 1003, 1000, 1002 })
 
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 48)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 50)
 
     child.cmd("q")
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1003, 1000, 1002 })
 
     Helpers.expect.equality(Helpers.currentWin(child), 1003)
 
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 48)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 50)
 end
 
 T["vsplit/split"]["splits and vsplits keeps a correct size"] = function()
@@ -330,7 +330,7 @@ T["vsplit/split"]["splits and vsplits keeps a correct size"] = function()
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1003, 1000, 1002 })
     Helpers.expect.equality(Helpers.currentWin(child), 1003)
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 18)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 20)
 
     child.cmd("vsplit")
 
@@ -338,7 +338,7 @@ T["vsplit/split"]["splits and vsplits keeps a correct size"] = function()
     Helpers.expect.equality(Helpers.currentWin(child), 1004)
 
     Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 38)
-    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1003)"), 2)
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1003)"), 20)
 end
 
 return T
