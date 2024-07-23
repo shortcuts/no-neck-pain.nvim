@@ -143,6 +143,7 @@ function N.enable(scope)
     S.setSideID(S, vim.api.nvim_get_current_win(), "curr")
     S.scanLayout(S, scope)
     N.init(scope, true)
+    S.scanLayout(S, scope)
 
     vim.api.nvim_create_autocmd({ "VimResized" }, {
         callback = function(p)
@@ -180,7 +181,7 @@ function N.enable(scope)
         desc = "Keeps track of the currently active tab and the tab state",
     })
 
-    vim.api.nvim_create_autocmd({ "QuitPre", "BufDelete", "WinEnter" }, {
+    vim.api.nvim_create_autocmd({ "WinEnter" }, {
         callback = function(p)
             vim.schedule(function()
                 local s = string.format("%s:%d", p.event, vim.api.nvim_get_current_win())
@@ -188,15 +189,21 @@ function N.enable(scope)
                     return
                 end
 
-                if
-                    p.event == "WinEnter"
-                    and (
-                        S.isSideTheActiveWin(S, "left")
-                        or S.isSideTheActiveWin(S, "right")
-                        or S.isSideTheActiveWin(S, "curr")
-                    )
-                then
-                    return D.log(s, "skip on side")
+                if S.scanLayout(S, s) then
+                    return N.init(s)
+                end
+            end)
+        end,
+        group = augroupName,
+        desc = "Keeps track of the state after entering new windows",
+    })
+
+    vim.api.nvim_create_autocmd({ "QuitPre", "BufDelete" }, {
+        callback = function(p)
+            vim.schedule(function()
+                local s = string.format("%s:%d", p.event, vim.api.nvim_get_current_win())
+                if not S.isActiveTabRegistered(S) or E.skip() then
+                    return
                 end
 
                 if p.event == "BufDelete" and vim.api.nvim_win_is_valid(S.getSideID(S, "curr")) then
@@ -242,11 +249,8 @@ function N.enable(scope)
                 end
 
                 if
-                    p.event ~= "WinEnter"
-                    and (
-                        (S.isSideEnabled(S, "left") and not S.isSideWinValid(S, "left"))
-                        or (S.isSideEnabled(S, "right") and not S.isSideWinValid(S, "right"))
-                    )
+                    (S.isSideEnabled(S, "left") and not S.isSideWinValid(S, "left"))
+                    or (S.isSideEnabled(S, "right") and not S.isSideWinValid(S, "right"))
                 then
                     D.log(s, "one of the NNP side has been closed")
 

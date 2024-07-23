@@ -550,7 +550,7 @@ function State:scanLayout(scope)
         self.getColumns(self)
     )
 
-    return true
+    return columns ~= self.getColumns(self)
 end
 
 return State

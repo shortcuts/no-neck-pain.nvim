@@ -114,77 +114,77 @@ T["integrations"]["NeoTree throws with wrong values"] = function()
     end)
 end
 
--- T["nvimdapui"] = MiniTest.new_set()
---
--- T["nvimdapui"]["keeps sides open"] = function()
---     if child.fn.has("nvim-0.8") == 0 then
---         MiniTest.skip("NvimDAPUI doesn't support version below 8")
---
---         return
---     end
---
---     child.restart({ "-u", "scripts/init_with_nvimdapui.lua" })
---
---     Helpers.toggle(child)
---
---     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
---     Helpers.expect.state(child, "tabs[1].wins.main", {
---         curr = 1000,
---         left = 1001,
---         right = 1002,
---     })
---
---     child.lua([[require('dapui').open()]])
---
---     Helpers.expect.equality(
---         Helpers.winsInTab(child),
---         { 1010, 1009, 1008, 1007, 1001, 1000, 1002, 1006, 1003 }
---     )
---
---     Helpers.expect.state(child, "tabs[1].wins.main", {
---         curr = 1000,
---         left = 1001,
---         right = 1002,
---     })
---
---     Helpers.expect.state(child, "tabs[1].wins.columns", 5)
---
---     Helpers.expect.state(child, "tabs[1].wins.integrations.NvimDAPUI", {
---         close = "lua require('dapui').close()",
---         fileTypePattern = "dap",
---         id = 1003,
---         open = "lua require('dapui').open()",
---         width = 58,
---     })
--- end
---
--- T["neotest"] = MiniTest.new_set()
---
--- T["neotest"]["keeps sides open"] = function()
---     child.restart({ "-u", "scripts/init_with_neotest.lua", "lua/no-neck-pain/main.lua" })
---
---     Helpers.toggle(child)
---
---     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
---     Helpers.expect.state(child, "tabs[1].wins.main", {
---         curr = 1000,
---         left = 1001,
---         right = 1002,
---     })
---
---     child.lua([[require('neotest').summary.open()]])
---
---     Helpers.expect.state(child, "tabs[1].wins.columns", 3)
---
---     Helpers.expect.state(child, "tabs[1].wins.integrations.neotest", {
---         close = "lua require('neotest').summary.close()",
---         fileTypePattern = "neotest",
---         id = 1003,
---         open = "lua require('neotest').summary.open()",
---         width = 100,
---     })
--- end
---
+T["nvimdapui"] = MiniTest.new_set()
+
+T["nvimdapui"]["keeps sides open"] = function()
+    if child.fn.has("nvim-0.8") == 0 then
+        MiniTest.skip("NvimDAPUI doesn't support version below 8")
+
+        return
+    end
+
+    child.restart({ "-u", "scripts/init_with_nvimdapui.lua" })
+
+    Helpers.toggle(child)
+
+    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+    Helpers.expect.state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
+
+    child.lua([[require('dapui').open()]])
+
+    Helpers.expect.equality(
+        Helpers.winsInTab(child),
+        { 1010, 1009, 1008, 1007, 1001, 1000, 1002, 1006, 1003 }
+    )
+
+    Helpers.expect.state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
+
+    Helpers.expect.state(child, "tabs[1].wins.columns", 1)
+
+    Helpers.expect.state(child, "tabs[1].wins.integrations.NvimDAPUI", {
+        close = "lua require('dapui').close()",
+        fileTypePattern = "dap",
+        id = 1003,
+        open = "lua require('dapui').open()",
+        width = 58,
+    })
+end
+
+T["neotest"] = MiniTest.new_set()
+
+T["neotest"]["keeps sides open"] = function()
+    child.restart({ "-u", "scripts/init_with_neotest.lua", "lua/no-neck-pain/main.lua" })
+
+    Helpers.toggle(child)
+
+    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+    Helpers.expect.state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
+
+    child.lua([[require('neotest').summary.open()]])
+
+    Helpers.expect.state(child, "tabs[1].wins.columns", 3)
+
+    Helpers.expect.state(child, "tabs[1].wins.integrations.neotest", {
+        close = "lua require('neotest').summary.close()",
+        fileTypePattern = "neotest",
+        id = 1003,
+        open = "lua require('neotest').summary.open()",
+        width = 100,
+    })
+end
+
 -- T["outline"] = MiniTest.new_set()
 --
 -- T["outline"]["keeps sides open"] = function()
@@ -211,7 +211,7 @@ end
 --         width = 40,
 --     })
 -- end
---
+
 -- T["NvimTree"] = MiniTest.new_set()
 --
 -- T["NvimTree"]["keeps sides open"] = function()
