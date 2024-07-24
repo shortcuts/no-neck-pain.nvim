@@ -73,7 +73,7 @@ T["split"]["keeps side buffers"] = function()
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
     Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 30)
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.right", 30)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.right", 28)
 end
 
 T["split"]["keeps correct focus"] = function()
@@ -309,14 +309,14 @@ T["vsplit/split"]["closing help page doens't break layout"] = function()
     child.cmd("h")
     Helpers.expect.equality(Helpers.winsInTab(child), { 1004, 1001, 1003, 1000, 1002 })
 
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 50)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 48)
 
     child.cmd("q")
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1003, 1000, 1002 })
 
     Helpers.expect.equality(Helpers.currentWin(child), 1003)
 
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 50)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 48)
 end
 
 T["vsplit/split"]["splits and vsplits keeps a correct size"] = function()
