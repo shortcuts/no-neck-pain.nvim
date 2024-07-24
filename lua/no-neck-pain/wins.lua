@@ -44,28 +44,13 @@ end
 ---@param side "left"|"right": the side of the window being closed, used for logging only.
 ---@private
 function W.move(scope, side)
-    local id = S.getSideID(S, side)
-    if id == nil then
-        return
+    if side == "left" then
+        vim.api.nvim_input("<C-W>H")
+    else
+        vim.api.nvim_input("<C-W>l")
     end
 
-    if vim.api.nvim_win_is_valid(id) then
-        local wins = vim.api.nvim_tabpage_list_wins(S.activeTab)
-
-        if side == "left" then
-            if wins[1] == id then
-                return
-            end
-            vim.fn.win_splitmove(id, wins[1], { vertical = true })
-        else
-            if wins[#wins] == id then
-                return
-            end
-            vim.fn.win_splitmove(id, wins[#wins], { vertical = true })
-        end
-
-        D.log(scope, "moving %s window", side)
-    end
+    D.log(scope, "moving %s window", side)
 end
 
 ---Closes a window if it's valid.
@@ -215,9 +200,9 @@ function W.createSideBuffers()
             nbSide
         )
 
-        for _, win in pairs(S.getUnregisteredWins(S)) do
-            resize(win, sWidth, string.format("unregistered:%d", win))
-        end
+        -- for _, win in pairs(S.getUnregisteredWins(S)) do
+        --     resize(win, sWidth, string.format("unregistered:%d", win))
+        -- end
     end
 end
 
