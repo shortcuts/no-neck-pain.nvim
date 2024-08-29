@@ -18,9 +18,9 @@ T["auto command"] = MiniTest.new_set()
 
 T["auto command"]["does not create side buffers window's width < options.width"] = function()
     child.lua([[ require('no-neck-pain').setup({width=1000}) ]])
-    Helpers.toggle(child)
+    child.nnp()
 
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1000 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1000 })
     Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,
     })
@@ -28,7 +28,7 @@ end
 
 T["auto command"]["disabling clears VimEnter autocmd"] = function()
     child.restart({ "-u", "scripts/init_auto_open.lua" })
-    Helpers.toggle(child)
+    child.nnp()
     child.wait()
 
     -- errors because it doesn't exist
@@ -39,9 +39,9 @@ end
 
 T["auto command"]["does not shift when opening/closing float window"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
-    Helpers.toggle(child)
+    child.nnp()
 
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
     Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,
         left = 1001,
@@ -57,7 +57,7 @@ T["auto command"]["does not shift when opening/closing float window"] = function
         { width = 100, height = 100, relative = "cursor", row = 0, col = 0 }
     )
 
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002, 1003 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002, 1003 })
     Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,
         left = 1001,
@@ -71,7 +71,7 @@ T["auto command"]["does not shift when opening/closing float window"] = function
     child.fn.win_gotoid(1003)
     child.cmd("q")
 
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
     Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,
         left = 1001,
@@ -88,11 +88,11 @@ T["skipEnteringNoNeckPainBuffer"]["goes to new valid buffer when entering side"]
     child.lua(
         [[ require('no-neck-pain').setup({width=50, autocmds = { skipEnteringNoNeckPainBuffer = true }}) ]]
     )
-    Helpers.toggle(child)
+    child.nnp()
 
     Helpers.expect.config(child, "autocmds.skipEnteringNoNeckPainBuffer", true)
 
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
     Helpers.expect.equality(child.api.nvim_get_current_win(), 1000)
 
     child.fn.win_gotoid(1001)
@@ -105,7 +105,7 @@ T["skipEnteringNoNeckPainBuffer"]["goes to new valid buffer when entering side"]
 
     child.cmd("split")
 
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1003, 1000, 1002 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1003, 1000, 1002 })
     Helpers.expect.equality(child.api.nvim_get_current_win(), 1003)
 
     child.fn.win_gotoid(1000)
@@ -129,13 +129,13 @@ T["skipEnteringNoNeckPainBuffer"]["does not register if scratchPad feature is en
     child.lua(
         [[ require('no-neck-pain').setup({width=50, buffers = { scratchPad = { enabled = true } }, autocmds = { skipEnteringNoNeckPainBuffer = true }}) ]]
     )
-    Helpers.toggle(child)
+    child.nnp()
 
     Helpers.expect.config(child, "buffers.left.scratchPad.enabled", true)
     Helpers.expect.config(child, "buffers.right.scratchPad.enabled", true)
     Helpers.expect.config(child, "autocmds.skipEnteringNoNeckPainBuffer", true)
 
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
     Helpers.expect.equality(child.api.nvim_get_current_win(), 1000)
 
     child.fn.win_gotoid(1001)
@@ -147,13 +147,13 @@ T["skipEnteringNoNeckPainBuffer"]["does not register if scratchPad feature is en
     child.lua(
         [[ require('no-neck-pain').setup({width=50, buffers = { left = { scratchPad = { enabled = true } } }, autocmds = { skipEnteringNoNeckPainBuffer = true }}) ]]
     )
-    Helpers.toggle(child)
+    child.nnp()
 
     Helpers.expect.config(child, "buffers.left.scratchPad.enabled", true)
     Helpers.expect.config(child, "buffers.right.scratchPad.enabled", false)
     Helpers.expect.config(child, "autocmds.skipEnteringNoNeckPainBuffer", true)
 
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
     Helpers.expect.equality(child.api.nvim_get_current_win(), 1000)
 
     child.fn.win_gotoid(1001)
@@ -165,13 +165,13 @@ T["skipEnteringNoNeckPainBuffer"]["does not register if scratchPad feature is en
     child.lua(
         [[ require('no-neck-pain').setup({width=50, buffers = { right = { scratchPad = { enabled = true } } }, autocmds = { skipEnteringNoNeckPainBuffer = true }}) ]]
     )
-    Helpers.toggle(child)
+    child.nnp()
 
     Helpers.expect.config(child, "buffers.left.scratchPad.enabled", false)
     Helpers.expect.config(child, "buffers.right.scratchPad.enabled", true)
     Helpers.expect.config(child, "autocmds.skipEnteringNoNeckPainBuffer", true)
 
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
     Helpers.expect.equality(child.api.nvim_get_current_win(), 1000)
 
     child.fn.win_gotoid(1001)

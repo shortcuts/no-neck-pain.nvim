@@ -125,10 +125,10 @@ T["nvimdapui"]["keeps sides open"] = function()
 
     child.restart({ "-u", "scripts/init_with_nvimdapui.lua" })
 
-    Helpers.toggle(child)
+    child.nnp()
     child.wait()
 
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
     Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,
         left = 1001,
@@ -139,7 +139,7 @@ T["nvimdapui"]["keeps sides open"] = function()
     child.wait()
 
     Helpers.expect.equality(
-        Helpers.winsInTab(child),
+        child.get_wins_in_tab(),
         { 1001, 1010, 1009, 1008, 1007, 1000, 1006, 1003, 1002 }
     )
 
@@ -163,9 +163,9 @@ T["neotest"]["keeps sides open"] = function()
 
     child.restart({ "-u", "scripts/init_with_neotest.lua", "lua/no-neck-pain/main.lua" })
 
-    Helpers.toggle(child)
+    child.nnp()
 
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
     Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,
         left = 1001,
@@ -190,9 +190,9 @@ T["outline"] = MiniTest.new_set()
 T["outline"]["keeps sides open"] = function()
     child.restart({ "-u", "scripts/init_with_outline.lua", "lua/no-neck-pain/main.lua" })
 
-    Helpers.toggle(child)
+    child.nnp()
 
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
     Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,
         left = 1001,
@@ -224,9 +224,9 @@ T["NvimTree"]["keeps sides open"] = function()
 
     child.restart({ "-u", "scripts/init_with_nvimtree.lua", "foo" })
 
-    Helpers.toggle(child)
+    child.nnp()
 
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
 
     Helpers.expect.state(child, "enabled", true)
     Helpers.expect.state(child, "tabs[1].wins.main", {
@@ -237,7 +237,7 @@ T["NvimTree"]["keeps sides open"] = function()
 
     child.cmd([[NvimTreeOpen]])
 
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1004, 1001, 1000, 1002 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1004, 1001, 1000, 1002 })
 
     Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,
@@ -261,9 +261,9 @@ T["neo-tree"] = MiniTest.new_set()
 T["neo-tree"]["keeps sides open"] = function()
     child.restart({ "-u", "scripts/init_with_neotree.lua", "foo" })
 
-    Helpers.toggle(child)
+    child.nnp()
 
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
 
     Helpers.expect.state(child, "enabled", true)
     Helpers.expect.state(child, "tabs[1].wins.main", {
@@ -275,7 +275,7 @@ T["neo-tree"]["keeps sides open"] = function()
     child.cmd([[Neotree reveal]])
     child.wait()
 
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1004, 1000, 1002 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1004, 1000, 1002 })
 
     Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,
@@ -305,9 +305,9 @@ T["TSPlayground"]["keeps sides open"] = function()
 
     child.restart({ "-u", "scripts/init_with_tsplayground.lua" })
 
-    Helpers.toggle(child)
+    child.nnp()
 
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
 
     Helpers.expect.state(child, "enabled", true)
     Helpers.expect.state(child, "tabs[1].wins.main", {
@@ -369,10 +369,10 @@ T["TSPlayground"]["reduces `left` side if only active when integration is on `ri
             },
         })
     ]])
-    Helpers.toggle(child)
+    child.nnp()
     child.wait()
 
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000 })
 
     Helpers.expect.state(child, "enabled", true)
     Helpers.expect.state(child, "tabs[1].wins.main", {
@@ -432,9 +432,9 @@ T["aerial"]["keeps sides open"] = function()
 
     child.restart({ "-u", "scripts/init_with_aerial.lua" })
 
-    Helpers.toggle(child)
+    child.nnp()
 
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
 
     Helpers.expect.state(child, "enabled", true)
     Helpers.expect.state(child, "tabs[1].wins.main", {

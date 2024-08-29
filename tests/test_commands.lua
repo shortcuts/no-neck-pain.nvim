@@ -17,15 +17,15 @@ local T = MiniTest.new_set({
 T["commands"] = MiniTest.new_set()
 
 T["commands"]["NoNeckPain toggles the plugin state"] = function()
-    Helpers.toggle(child)
+    child.nnp()
     Helpers.expect.state(child, "enabled", true)
 
-    Helpers.toggle(child)
+    child.nnp()
     Helpers.expect.state(child, "enabled", false)
 end
 
 T["commands"]["NoNeckPainResize sets the config width and resizes windows"] = function()
-    Helpers.toggle(child)
+    child.nnp()
 
     Helpers.expect.global(child, "_G.NoNeckPain.config.width", 100)
 
@@ -47,7 +47,7 @@ T["commands"]["NoNeckPainResize throws with the plugin disabled"] = function()
 end
 
 T["commands"]["NoNeckPainResize does nothing with the same width"] = function()
-    Helpers.toggle(child)
+    child.nnp()
 
     Helpers.expect.global(child, "_G.NoNeckPain.config.width", 100)
 
@@ -63,7 +63,7 @@ T["commands"]["NoNeckPainResize does nothing with the same width"] = function()
 end
 
 T["commands"]["NoNeckPainWidthUp increases the width by 5"] = function()
-    Helpers.toggle(child)
+    child.nnp()
 
     Helpers.expect.global(child, "_G.NoNeckPain.config.width", 100)
 
@@ -88,7 +88,7 @@ T["commands"]["NoNeckPainWidthUp increases the width by N when mappings.widthUp 
         }
     })]])
 
-    Helpers.toggle(child)
+    child.nnp()
 
     Helpers.expect.global(child, "_G.NoNeckPain.config.width", 100)
 
@@ -107,7 +107,7 @@ T["commands"]["NoNeckPainWidthUp increases the width by N when mappings.widthUp 
 end
 
 T["commands"]["NoNeckPainWidthUp decreases the width by 5"] = function()
-    Helpers.toggle(child)
+    child.nnp()
 
     Helpers.expect.global(child, "_G.NoNeckPain.config.width", 100)
 
@@ -132,7 +132,7 @@ T["commands"]["NoNeckPainWidthUp decreases the width by N when mappings.widthDow
         }
     })]])
 
-    Helpers.toggle(child)
+    child.nnp()
 
     Helpers.expect.global(child, "_G.NoNeckPain.config.width", 100)
 

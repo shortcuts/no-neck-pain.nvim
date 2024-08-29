@@ -10,4 +10,4 @@ require("nvim-treesitter.configs").setup({
     },
 })
 require("mini.test").setup()
-require("no-neck-pain").setup({ debug=true, width = 1 })
+require("no-neck-pain").setup({ debug = true, width = 1 })
