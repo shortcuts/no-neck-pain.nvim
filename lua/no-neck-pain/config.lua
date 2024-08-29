@@ -331,7 +331,7 @@ local defaults = vim.deepcopy(NoNeckPain.options)
 ---@private
 local function parseDeprecatedScratchPad(side, options, fileType)
     -- set the defaults if the user rely on them
-    if A.length(options) == 0 or options.pathToFile == nil then
+    if vim.tbl_count(options) == 0 or options.pathToFile == nil then
         options = A.tde(options, defaults.buffers.scratchPad)
     end
 

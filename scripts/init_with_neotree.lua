@@ -14,12 +14,12 @@ require("neo-tree").setup({
         },
     },
     window = {
-        width = 1,
+        width = 30,
     },
 })
 require("mini.test").setup()
 require("no-neck-pain").setup({
-    width = 1,
+    width = 5,
     minSideBufferWidth = 0,
     integrations = { NeoTree = { reopen = true } },
 })

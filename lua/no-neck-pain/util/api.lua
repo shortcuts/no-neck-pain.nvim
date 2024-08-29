@@ -10,19 +10,6 @@ function A.getCurrentTab()
     return vim.api.nvim_get_current_tabpage() or 1
 end
 
----Returns the number of keys in the given table
----
----@param tbl table: the table to count the keys.
----@return number: the number of keys in the table.
----@private
-function A.length(tbl)
-    local count = 0
-    for _ in pairs(tbl) do
-        count = count + 1
-    end
-    return count
-end
-
 function A.tde(t1, t2)
     return vim.deepcopy(vim.tbl_deep_extend("keep", t1 or {}, t2 or {}))
 end
@@ -34,22 +21,6 @@ end
 ---@private
 function A.getAugroupName(id)
     return string.format("NoNeckPain-%d", id)
-end
-
----returns the width and height of a given window
----
----@param win number?: the win number, defaults to 0 if nil
----@return number: the width of the window
----@return number: the height of the window
----@private
-function A.getWidthAndHeight(win)
-    win = win or 0
-
-    if win ~= 0 and not vim.api.nvim_win_is_valid(win) then
-        win = 0
-    end
-
-    return vim.api.nvim_win_get_width(win), vim.api.nvim_win_get_height(win)
 end
 
 ---Determines if the given `win` or the current window is relative.
@@ -140,6 +111,7 @@ function A.debounce(context, callback, timeout)
 
         debouncer.executing = true
         vim.schedule(function()
+            D.log(context, ">> debouncer triggered")
             callback(context)
             debouncer.executing = false
 

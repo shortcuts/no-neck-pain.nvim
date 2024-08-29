@@ -29,7 +29,7 @@ end
 T["auto command"]["disabling clears VimEnter autocmd"] = function()
     child.restart({ "-u", "scripts/init_auto_open.lua" })
     Helpers.toggle(child)
-    Helpers.wait(child)
+    child.wait()
 
     -- errors because it doesn't exist
     Helpers.expect.error(function()
@@ -38,7 +38,6 @@ T["auto command"]["disabling clears VimEnter autocmd"] = function()
 end
 
 T["auto command"]["does not shift when opening/closing float window"] = function()
-    child.set_size(5, 200)
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     Helpers.toggle(child)
 
@@ -86,7 +85,6 @@ end
 T["skipEnteringNoNeckPainBuffer"] = MiniTest.new_set()
 
 T["skipEnteringNoNeckPainBuffer"]["goes to new valid buffer when entering side"] = function()
-    child.set_size(5, 200)
     child.lua(
         [[ require('no-neck-pain').setup({width=50, autocmds = { skipEnteringNoNeckPainBuffer = true }}) ]]
     )
@@ -98,11 +96,11 @@ T["skipEnteringNoNeckPainBuffer"]["goes to new valid buffer when entering side"]
     Helpers.expect.equality(child.api.nvim_get_current_win(), 1000)
 
     child.fn.win_gotoid(1001)
-    Helpers.wait(child)
+    child.wait()
     Helpers.expect.equality(child.api.nvim_get_current_win(), 1000)
 
     child.fn.win_gotoid(1002)
-    Helpers.wait(child)
+    child.wait()
     Helpers.expect.equality(child.api.nvim_get_current_win(), 1000)
 
     child.cmd("split")
@@ -111,24 +109,23 @@ T["skipEnteringNoNeckPainBuffer"]["goes to new valid buffer when entering side"]
     Helpers.expect.equality(child.api.nvim_get_current_win(), 1003)
 
     child.fn.win_gotoid(1000)
-    Helpers.wait(child)
+    child.wait()
     Helpers.expect.equality(child.api.nvim_get_current_win(), 1000)
 
     child.fn.win_gotoid(1003)
-    Helpers.wait(child)
+    child.wait()
     Helpers.expect.equality(child.api.nvim_get_current_win(), 1003)
 
     child.fn.win_gotoid(1001)
-    Helpers.wait(child)
+    child.wait()
     Helpers.expect.equality(child.api.nvim_get_current_win(), 1003)
 
     child.fn.win_gotoid(1002)
-    Helpers.wait(child)
+    child.wait()
     Helpers.expect.equality(child.api.nvim_get_current_win(), 1003)
 end
 
 T["skipEnteringNoNeckPainBuffer"]["does not register if scratchPad feature is enabled (global)"] = function()
-    child.set_size(5, 200)
     child.lua(
         [[ require('no-neck-pain').setup({width=50, buffers = { scratchPad = { enabled = true } }, autocmds = { skipEnteringNoNeckPainBuffer = true }}) ]]
     )
@@ -142,12 +139,11 @@ T["skipEnteringNoNeckPainBuffer"]["does not register if scratchPad feature is en
     Helpers.expect.equality(child.api.nvim_get_current_win(), 1000)
 
     child.fn.win_gotoid(1001)
-    Helpers.wait(child)
+    child.wait()
     Helpers.expect.equality(child.api.nvim_get_current_win(), 1001)
 end
 
 T["skipEnteringNoNeckPainBuffer"]["does not register if scratchPad feature is enabled (left)"] = function()
-    child.set_size(5, 200)
     child.lua(
         [[ require('no-neck-pain').setup({width=50, buffers = { left = { scratchPad = { enabled = true } } }, autocmds = { skipEnteringNoNeckPainBuffer = true }}) ]]
     )
@@ -161,12 +157,11 @@ T["skipEnteringNoNeckPainBuffer"]["does not register if scratchPad feature is en
     Helpers.expect.equality(child.api.nvim_get_current_win(), 1000)
 
     child.fn.win_gotoid(1001)
-    Helpers.wait(child)
+    child.wait()
     Helpers.expect.equality(child.api.nvim_get_current_win(), 1001)
 end
 
 T["skipEnteringNoNeckPainBuffer"]["does not register if scratchPad feature is enabled (right)"] = function()
-    child.set_size(5, 200)
     child.lua(
         [[ require('no-neck-pain').setup({width=50, buffers = { right = { scratchPad = { enabled = true } } }, autocmds = { skipEnteringNoNeckPainBuffer = true }}) ]]
     )
@@ -180,7 +175,7 @@ T["skipEnteringNoNeckPainBuffer"]["does not register if scratchPad feature is en
     Helpers.expect.equality(child.api.nvim_get_current_win(), 1000)
 
     child.fn.win_gotoid(1001)
-    Helpers.wait(child)
+    child.wait()
     Helpers.expect.equality(child.api.nvim_get_current_win(), 1001)
 end
 
