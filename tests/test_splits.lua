@@ -125,14 +125,14 @@ T["vsplit"]["correctly size splits when opening helper with side buffers open"] 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1003, 1000, 1002 })
 
     Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1003)"), 20)
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 17)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 19)
 
     child.cmd("h")
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1004, 1001, 1003, 1000, 1002 })
 
     Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1004)"), 80)
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 17)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 18)
 end
 
 T["vsplit"]["correctly position side buffers when there's enough space"] = function()
@@ -156,7 +156,7 @@ T["vsplit"]["preserve vsplit width when having side buffers"] = function()
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1002, 1000 })
 
-    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1002)"), 30)
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1002)"), 26)
 end
 
 T["vsplit"]["closing `curr` makes `split` the new `curr`"] = function()
@@ -185,15 +185,20 @@ T["vsplit"]["closing `curr` makes `split` the new `curr`"] = function()
 end
 
 T["vsplit"]["hides side buffers"] = function()
-    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
+    child.lua([[ require('no-neck-pain').setup({width=58}) ]])
     Helpers.toggle(child)
+
+    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+    Helpers.expect.state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
 
     child.cmd("vsplit")
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1003, 1000 })
-    Helpers.expect.state(child, "tabs[1].wins.main", {
-        curr = 1000,
-    })
+    Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1000 })
 
     child.lua("vim.fn.win_gotoid(1003)")
     child.cmd("q")

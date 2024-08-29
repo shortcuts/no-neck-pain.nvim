@@ -37,13 +37,13 @@ function N.toggleScratchPad()
     for _, side in pairs(Co.SIDES) do
         local id = S.getSideID(S, side)
         if id ~= nil then
-            vim.fn.win_gotoid(id)
+            vim.api.nvim_set_current_win(id)
             W.initScratchPad(side, id, currentState)
         end
     end
 
     -- restore focus
-    vim.fn.win_gotoid(currWin)
+    vim.api.nvim_set_current_win(currWin)
 
     S.save(S)
 end
@@ -103,12 +103,11 @@ function N.init(scope, goToCurr)
         hadSideBuffers = false
     end
 
-    if S.consumeRedraw(S) then
-        W.move(string.format("%s:consumeRedraw", scope), "left")
-        W.move(string.format("%s:consumeRedraw", scope), "right")
-    end
-
     W.createSideBuffers()
+
+    if S.consumeRedraw(S) then
+        W.reposition(string.format("%s:consumeRedraw", scope))
+    end
 
     if
         goToCurr
@@ -117,7 +116,7 @@ function N.init(scope, goToCurr)
     then
         D.log(scope, "re-routing focus to curr")
 
-        vim.fn.win_gotoid(S.getSideID(S, "curr"))
+        vim.api.nvim_set_current_win(S.getSideID(S, "curr"))
     end
 
     S.save(S)
@@ -183,14 +182,29 @@ function N.enable(scope)
 
     vim.api.nvim_create_autocmd({ "WinEnter" }, {
         callback = function(p)
+            local s = string.format("%s:%d", p.event, vim.api.nvim_get_current_win())
             vim.schedule(function()
-                local s = string.format("%s:%d", p.event, vim.api.nvim_get_current_win())
                 if not S.isActiveTabRegistered(S) or E.skip() then
                     return
                 end
 
-                if S.scanLayout(S, s) then
-                    return N.init(s)
+                local init = S.scanLayout(S, s)
+
+                if
+                    not S.tabs[S.activeTab].redraw
+                    and (
+                        S.isSideTheActiveWin(S, "left")
+                        or S.isSideTheActiveWin(S, "right")
+                        or S.isSideTheActiveWin(S, "curr")
+                    )
+                then
+                    return
+                end
+
+                if init then
+                    A.debounce(s, function()
+                        return N.init(s)
+                    end)
                 end
             end)
         end,
@@ -207,7 +221,7 @@ function N.enable(scope)
                 end
 
                 if p.event == "BufDelete" and vim.api.nvim_win_is_valid(S.getSideID(S, "curr")) then
-                    return D.log(s, "skip still there")
+                    return
                 end
 
                 local refresh = S.scanLayout(S, s)
@@ -292,7 +306,7 @@ function N.enable(scope)
                             and wins[id] ~= leftID
                             and wins[id] ~= rightID
                         then
-                            vim.fn.win_gotoid(wins[id])
+                            vim.api.nvim_set_current_win(wins[id])
 
                             return D.log(
                                 p.event,
@@ -374,7 +388,7 @@ function N.disable(scope)
 
     -- shutdowns gracefully by focusing the stored `curr` buffer
     if currID ~= nil and vim.api.nvim_win_is_valid(currID) then
-        vim.fn.win_gotoid(currID)
+        vim.api.nvim_set_current_win(currID)
 
         if _G.NoNeckPain.config.killAllBuffersOnDisable then
             vim.cmd("only")

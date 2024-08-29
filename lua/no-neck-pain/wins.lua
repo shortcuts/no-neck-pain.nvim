@@ -38,19 +38,53 @@ function W.initSideOptions(side, id)
     end
 end
 
----Moves a side window to its original position
+---Reposition the side buffers to their initial place
 ---
 ---@param scope string: the scope from where this function is called.
----@param side "left"|"right": the side of the window being closed, used for logging only.
 ---@private
-function W.move(scope, side)
-    if side == "left" then
-        vim.api.nvim_input("<C-W>H")
-    else
-        vim.api.nvim_input("<C-W>l")
+function W.reposition(scope)
+    local sides = {
+        left = vim.api.nvim_replace_termcodes("normal <C-W>H", true, false, true),
+        right = vim.api.nvim_replace_termcodes("normal <C-W>L", true, false, true),
+    }
+
+    local restoreFocus = false
+
+    for side, keys in pairs(sides) do
+        local sscope = string.format("%s:%s", scope, side)
+
+        local id = S.getSideID(S, side)
+        if id ~= nil then
+            local wins = vim.api.nvim_tabpage_list_wins(S.activeTab)
+            local curr = vim.api.nvim_get_current_win()
+
+            if curr ~= id then
+                D.log(sscope, "wrong win focused %d re-routing to %d", curr, id)
+
+                vim.api.nvim_set_current_win(id)
+            end
+
+            vim.cmd(keys)
+
+            wins = vim.api.nvim_tabpage_list_wins(S.activeTab)
+
+            if (side == "left" and wins[1] ~= id) or (side == "right" and wins[#wins] ~= id) then
+                D.log(
+                    sscope,
+                    "wrong position after window move, focusing %s, should be %d, wins order %s",
+                    vim.api.nvim_get_current_win(),
+                    id,
+                    vim.inspect(wins)
+                )
+            end
+
+            restoreFocus = true
+        end
     end
 
-    D.log(scope, "moving %s window", side)
+    if restoreFocus and S.getSideID(S, "curr") ~= nil then
+        vim.api.nvim_set_current_win(S.getSideID(S, "curr"))
+    end
 end
 
 ---Closes a window if it's valid.
@@ -200,9 +234,9 @@ function W.createSideBuffers()
             nbSide
         )
 
-        -- for _, win in pairs(S.getUnregisteredWins(S)) do
-        --     resize(win, sWidth, string.format("unregistered:%d", win))
-        -- end
+        for _, win in pairs(S.getUnregisteredWins(S)) do
+            -- resize(win, sWidth, string.format("unregistered:%d", win))
+        end
     end
 end
 

@@ -23,22 +23,6 @@ function A.getAugroupName(id)
     return string.format("NoNeckPain-%d", id)
 end
 
----returns the width and height of a given window
----
----@param win number?: the win number, defaults to 0 if nil
----@return number: the width of the window
----@return number: the height of the window
----@private
-function A.getWidthAndHeight(win)
-    win = win or 0
-
-    if win ~= 0 and not vim.api.nvim_win_is_valid(win) then
-        win = 0
-    end
-
-    return vim.api.nvim_win_get_width(win), vim.api.nvim_win_get_height(win)
-end
-
 ---Determines if the given `win` or the current window is relative.
 ---
 ---@param win number?: the id of the window.
@@ -127,6 +111,7 @@ function A.debounce(context, callback, timeout)
 
         debouncer.executing = true
         vim.schedule(function()
+            D.log(context, ">> debouncer triggered")
             callback(context)
             debouncer.executing = false
 

@@ -464,8 +464,8 @@ function State:setLayoutWindows(scope, wins)
                 integration.width = vim.api.nvim_win_get_width(id) * 2
                 integration.id = id
 
-                self.tabs[self.activeTab].wins.integrations[name] = integration
                 self.tabs[self.activeTab].redraw = true
+                self.tabs[self.activeTab].wins.integrations[name] = integration
             else
                 self.tabs[self.activeTab].wins.columns = self.tabs[self.activeTab].wins.columns + 1
             end
@@ -473,13 +473,6 @@ function State:setLayoutWindows(scope, wins)
             self.tabs[self.activeTab].wins.columns = self.tabs[self.activeTab].wins.columns + 1
         end
     end
-
-    D.log(
-        scope,
-        "increased to %d after %s",
-        self.tabs[self.activeTab].wins.columns,
-        vim.inspect(wins)
-    )
 end
 
 ---Recursively walks in the `winlayout` until it has computed every column present.
@@ -501,7 +494,7 @@ function State:walkLayout(scope, tree, hasColParent)
         return
     end
 
-    D.log(scope, "new layer entered%s: %s", hasColParent and " from col" or "", vim.inspect(tree))
+    -- D.log(scope, "new layer entered%s: %s", hasColParent and " from col" or "", vim.inspect(tree))
     for idx, leaf in ipairs(tree) do
         if leaf == "row" then
             local leafs = tree[idx + 1]
