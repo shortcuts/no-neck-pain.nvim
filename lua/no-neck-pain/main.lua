@@ -19,9 +19,9 @@ function N.toggle(scope)
     N.enable(scope)
 end
 
---- Toggles the scratchpad feature of the plugin.
+--- Toggles the scratchPad feature of the plugin.
 ---@private
-function N.toggle_scratchpad()
+function N.toggle_scratchPad()
     if not S.is_active_tab_registered(S) then
         return
     end
@@ -30,15 +30,15 @@ function N.toggle_scratchpad()
     local curr_win = vim.api.nvim_get_current_win()
     local current_state = S.tabs[S.active_tab].scratchpad_enabled
 
-    -- save new state of the scratchpad and update tabs
-    S.set_scratchpad(S, not current_state)
+    -- save new state of the scratchPad and update tabs
+    S.set_scratchPad(S, not current_state)
 
     -- map over both sides and let the init method either setup or cleanup the side buffers
     for _, side in pairs(Co.SIDES) do
         local id = S.get_side_id(S, side)
         if id ~= nil then
             vim.api.nvim_set_current_win(id)
-            W.init_scratchpad(side, id, current_state)
+            W.init_scratchPad(side, id, current_state)
         end
     end
 
@@ -310,7 +310,7 @@ function N.enable(scope)
             callback = function(p)
                 vim.schedule(function()
                     p.event = string.format("%s:skip_entering_NoNeckPain_buffer", p.event)
-                    if not S.is_active_tab_registered(S) or E.skip() or S.get_scratchpad(S) then
+                    if not S.is_active_tab_registered(S) or E.skip() or S.get_scratchPad(S) then
                         return D.log(p.event, "skip")
                     end
 

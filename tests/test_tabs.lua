@@ -191,7 +191,7 @@ T["tabnew/tabclose"]["doesn't keep closed tabs in state"] = function()
         {
             id = 1,
             redraw = false,
-            scratchPadEnabled = false,
+            scratchpad_enabled = false,
             wins = {
                 integrations = Co.INTEGRATIONS,
                 main = {
@@ -210,7 +210,7 @@ T["tabnew/tabclose"]["doesn't keep closed tabs in state"] = function()
         {
             id = 1,
             redraw = false,
-            scratchPadEnabled = false,
+            scratchpad_enabled = false,
             wins = {
                 integrations = Co.INTEGRATIONS,
                 main = {
@@ -224,7 +224,7 @@ T["tabnew/tabclose"]["doesn't keep closed tabs in state"] = function()
         {
             id = 2,
             redraw = false,
-            scratchPadEnabled = false,
+            scratchpad_enabled = false,
             wins = {
                 integrations = Co.INTEGRATIONS,
                 main = {
@@ -243,7 +243,7 @@ T["tabnew/tabclose"]["doesn't keep closed tabs in state"] = function()
         {
             id = 1,
             redraw = false,
-            scratchPadEnabled = false,
+            scratchpad_enabled = false,
             wins = {
                 integrations = Co.INTEGRATIONS,
                 main = {
@@ -268,7 +268,7 @@ T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
         {
             id = 1,
             redraw = false,
-            scratchPadEnabled = false,
+            scratchpad_enabled = false,
             wins = {
                 integrations = Co.INTEGRATIONS,
                 main = {
@@ -291,7 +291,7 @@ T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
         {
             id = 1,
             redraw = false,
-            scratchPadEnabled = false,
+            scratchpad_enabled = false,
             wins = {
                 integrations = Co.INTEGRATIONS,
                 main = {
@@ -305,7 +305,7 @@ T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
         {
             id = 2,
             redraw = false,
-            scratchPadEnabled = false,
+            scratchpad_enabled = false,
             wins = {
                 integrations = Co.INTEGRATIONS,
                 main = {
@@ -323,7 +323,7 @@ T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
         {
             id = 1,
             redraw = false,
-            scratchPadEnabled = false,
+            scratchpad_enabled = false,
             wins = {
                 integrations = Co.INTEGRATIONS,
                 main = {
@@ -341,7 +341,7 @@ T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
         {
             id = 1,
             redraw = false,
-            scratchPadEnabled = false,
+            scratchpad_enabled = false,
             wins = {
                 integrations = Co.INTEGRATIONS,
                 main = {
@@ -355,7 +355,7 @@ T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
         {
             id = 2,
             redraw = false,
-            scratchPadEnabled = false,
+            scratchpad_enabled = false,
             wins = {
                 integrations = Co.INTEGRATIONS,
                 main = {
@@ -375,7 +375,7 @@ T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
         {
             id = 1,
             redraw = false,
-            scratchPadEnabled = false,
+            scratchpad_enabled = false,
             wins = {
                 integrations = Co.INTEGRATIONS,
                 main = {
@@ -389,7 +389,7 @@ T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
         {
             id = 2,
             redraw = false,
-            scratchPadEnabled = false,
+            scratchpad_enabled = false,
             wins = {
                 integrations = Co.INTEGRATIONS,
                 main = {
@@ -430,7 +430,7 @@ T["tabnew/tabclose"]["does not pick tab 1 for the first active tab"] = function(
     Helpers.expect.state(child, "tabs[2]", {
         id = 2,
         redraw = false,
-        scratchPadEnabled = false,
+        scratchpad_enabled = false,
         wins = {
             integrations = Co.INTEGRATIONS,
             main = {
@@ -454,7 +454,7 @@ T["tabnew/tabclose"]["does not pick tab 1 for the first active tab"] = function(
     Helpers.expect.state(child, "tabs[1]", {
         id = 1,
         redraw = false,
-        scratchPadEnabled = false,
+        scratchpad_enabled = false,
         wins = {
             integrations = {
                 NeoTree = {
@@ -509,7 +509,7 @@ T["tabnew/tabclose"]["does not pick tab 1 for the first active tab"] = function(
     Helpers.expect.state(child, "tabs[2]", {
         id = 2,
         redraw = false,
-        scratchPadEnabled = false,
+        scratchpad_enabled = false,
         wins = {
             integrations = Co.INTEGRATIONS,
             main = {
@@ -545,7 +545,7 @@ T["tabnew/tabclose"]["keep state synchronized on second tab"] = function()
     Helpers.expect.state(child, "tabs[2]", {
         id = 2,
         redraw = false,
-        scratchPadEnabled = false,
+        scratchpad_enabled = false,
         wins = {
             integrations = Co.INTEGRATIONS,
             main = {
@@ -575,7 +575,7 @@ T["tabnew/tabclose"]["keep state synchronized on second tab"] = function()
     Helpers.expect.state(child, "tabs[2]", {
         id = 2,
         redraw = false,
-        scratchPadEnabled = false,
+        scratchpad_enabled = false,
         wins = {
             integrations = Co.INTEGRATIONS,
             main = {
@@ -608,7 +608,7 @@ T["tabnew/tabclose"]["does not close nvim when quitting tab if some are left"] =
     Helpers.expect.state(child, "tabs[1]", {
         id = 1,
         redraw = false,
-        scratchPadEnabled = false,
+        scratchpad_enabled = false,
         wins = {
             integrations = Co.INTEGRATIONS,
             main = {
@@ -623,7 +623,7 @@ T["tabnew/tabclose"]["does not close nvim when quitting tab if some are left"] =
     Helpers.expect.state(child, "tabs[2]", {
         id = 2,
         redraw = false,
-        scratchPadEnabled = false,
+        scratchpad_enabled = false,
         wins = {
             integrations = Co.INTEGRATIONS,
             main = {
@@ -642,7 +642,7 @@ T["tabnew/tabclose"]["does not close nvim when quitting tab if some are left"] =
     Helpers.expect.state(child, "tabs[1]", {
         id = 1,
         redraw = false,
-        scratchPadEnabled = false,
+        scratchpad_enabled = false,
         wins = {
             integrations = Co.INTEGRATIONS,
             main = {

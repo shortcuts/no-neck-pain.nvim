@@ -28,7 +28,7 @@ function W.init_side_options(side, id)
     local bufid = vim.api.nvim_win_get_buf(id)
 
     for opt, val in pairs(_G.NoNeckPain.config.buffers[side].bo) do
-        if not S.get_scratchpad(S) and opt ~= "filetype" then
+        if not S.get_scratchPad(S) and opt ~= "filetype" then
             A.set_buffer_option(bufid, opt, val)
         end
     end
@@ -101,32 +101,32 @@ function W.close(scope, id, side)
     end
 end
 
----Sets options to the side buffers to toggle the scratchpad.
+---Sets options to the side buffers to toggle the scratchPad.
 ---
 ---@param side "left"|"right": the side of the window being resized, used for logging only.
 ---@param id number: the side window ID.
 ---@param cleanup boolean?: cleanup the given buffer
 ---@private
-function W.init_scratchpad(side, id, cleanup)
+function W.init_scratchPad(side, id, cleanup)
     if not _G.NoNeckPain.config.buffers[side].enabled then
         return
     end
 
-    -- cleanup is used when the `toggle` method disables the scratchpad, we then reinitialize it with the user-given configuration.
+    -- cleanup is used when the `toggle` method disables the scratchPad, we then reinitialize it with the user-given configuration.
     if cleanup then
         vim.cmd("enew")
         return W.init_side_options(side, id)
     end
 
     D.log(
-        string.format("W.init_scratchpad:%s", side),
+        string.format("W.init_scratchPad:%s", side),
         "enabled with location %s",
-        _G.NoNeckPain.config.buffers[side].scratchpad.pathToFile
+        _G.NoNeckPain.config.buffers[side].scratchPad.pathToFile
     )
 
     W.init_side_options(side, id)
 
-    vim.cmd(string.format("edit %s", _G.NoNeckPain.config.buffers[side].scratchpad.pathToFile))
+    vim.cmd(string.format("edit %s", _G.NoNeckPain.config.buffers[side].scratchPad.pathToFile))
 
     A.set_buffer_option(0, "bufhidden", "")
     A.set_buffer_option(0, "buftype", "")
@@ -180,9 +180,9 @@ function W.create_side_buffers()
                     vim.api.nvim_buf_set_name(0, "no-neck-pain-" .. side)
                 end
 
-                if _G.NoNeckPain.config.buffers[side].scratchpad.enabled then
-                    S.set_scratchpad(S, true)
-                    W.init_scratchpad(side, S.get_side_id(S, side))
+                if _G.NoNeckPain.config.buffers[side].scratchPad.enabled then
+                    S.set_scratchPad(S, true)
+                    W.init_scratchPad(side, S.get_side_id(S, side))
                 else
                     W.init_side_options(side, S.get_side_id(S, side))
                 end

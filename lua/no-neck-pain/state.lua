@@ -426,19 +426,19 @@ function State:get_tab_safe()
     return self.get_tab(self)
 end
 
----Sets the given `bool` value to the active tab scratchpad.
+---Sets the given `bool` value to the active tab scratchPad.
 ---
----@param bool boolean: the value of the scratchpad.
+---@param bool boolean: the value of the scratchPad.
 ---@private
-function State:set_scratchpad(bool)
+function State:set_scratchPad(bool)
     self.tabs[self.active_tab].scratchpad_enabled = bool
 end
 
----Gets the scratchpad value for the active tab.
+---Gets the scratchPad value for the active tab.
 ---
----@return boolean: the value of the scratchpad.
+---@return boolean: the value of the scratchPad.
 ---@private
-function State:get_scratchpad()
+function State:get_scratchPad()
     return self.tabs[self.active_tab].scratchpad_enabled
 end
 
