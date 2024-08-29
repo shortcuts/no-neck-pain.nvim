@@ -12,7 +12,7 @@ local N = {}
 --- @param scope string: internal identifier for logging purposes.
 ---@private
 function N.toggle(scope)
-    if S.hasTabs(S) and S.isActiveTabRegistered(S) then
+    if S.has_tabs(S) and S.is_active_tab_registered(S) then
         return N.disable(scope)
     end
 
@@ -21,29 +21,29 @@ end
 
 --- Toggles the scratchPad feature of the plugin.
 ---@private
-function N.toggleScratchPad()
-    if not S.isActiveTabRegistered(S) then
+function N.toggle_scratchPad()
+    if not S.is_active_tab_registered(S) then
         return
     end
 
     -- store the current win to later restore focus
-    local currWin = vim.api.nvim_get_current_win()
-    local currentState = S.tabs[S.activeTab].scratchPadEnabled
+    local curr_win = vim.api.nvim_get_current_win()
+    local current_state = S.tabs[S.active_tab].scratchpad_enabled
 
     -- save new state of the scratchPad and update tabs
-    S.setScratchPad(S, not currentState)
+    S.set_scratchPad(S, not current_state)
 
     -- map over both sides and let the init method either setup or cleanup the side buffers
     for _, side in pairs(Co.SIDES) do
-        local id = S.getSideID(S, side)
+        local id = S.get_side_id(S, side)
         if id ~= nil then
             vim.api.nvim_set_current_win(id)
-            W.initScratchPad(side, id, currentState)
+            W.init_scratchPad(side, id, current_state)
         end
     end
 
     -- restore focus
-    vim.api.nvim_set_current_win(currWin)
+    vim.api.nvim_set_current_win(curr_win)
 
     S.save(S)
 end
@@ -53,8 +53,8 @@ end
 --- @param scope string: internal identifier for logging purposes.
 --- @param side "left" | "right": the side to toggle.
 ---@private
-function N.toggleSide(scope, side)
-    if not S.isActiveTabRegistered(S) then
+function N.toggle_side(scope, side)
+    if not S.is_active_tab_registered(S) then
         D.log(scope, "skipped because the current tab is not registered")
 
         return S.save(S)
@@ -67,11 +67,11 @@ function N.toggleSide(scope, side)
     )
 
     if not _G.NoNeckPain.config.buffers[side].enabled then
-        W.close(scope, S.getSideID(S, side), side)
-        S.setSideID(S, nil, side)
+        W.close(scope, S.get_side_id(S, side), side)
+        S.set_side_id(S, nil, side)
     end
 
-    if not S.checkSides(S, "or", true) then
+    if not S.check_sides(S, "or", true) then
         _G.NoNeckPain.config = vim.tbl_deep_extend(
             "keep",
             { buffers = { left = { enabled = true }, right = { enabled = true } } },
@@ -81,58 +81,63 @@ function N.toggleSide(scope, side)
         return N.disable(scope)
     end
 
-    S.scanLayout(S, scope)
+    S.scan_layout(S, scope)
 
     N.init(scope)
 end
 
 --- Creates side buffers and set the tab state, focuses the `curr` window if required.
 --- @param scope string: internal identifier for logging purposes.
---- @param goToCurr boolean?: whether we should re-focus the `curr` window.
+--- @param go_to_curr boolean?: whether we should re-focus the `curr` window.
 ---@private
-function N.init(scope, goToCurr)
-    if not S.isActiveTabRegistered(S) then
+function N.init(scope, go_to_curr)
+    if not S.is_active_tab_registered(S) then
         error("called the internal `init` method on a `nil` tab.")
     end
 
-    D.log(scope, "init called on tab %d for current window %d", S.activeTab, S.getSideID(S, "curr"))
+    D.log(
+        scope,
+        "init called on tab %d for current window %d",
+        S.active_tab,
+        S.get_side_id(S, "curr")
+    )
 
     -- if we do not have side buffers, we must ensure we only trigger a focus if we re-create them
-    local hadSideBuffers = true
-    if not S.is_side_win_valid(S, "left") or not S.is_side_win_valid(S, "right") then
-        hadSideBuffers = false
+    local had_side_buffers = true
+    if not S.is_side_win_enabled_and_valid(S, "left") or not S.is_side_win_enabled_and_valid(S, "right") then
+        had_side_buffers = false
     end
 
     W.create_side_buffers()
 
     if S.consume_redraw(S) then
-        W.reposition(string.format("%s:consumeRedraw", scope))
+        W.reposition(string.format("%s:consume_redraw", scope))
     end
 
     if
-        goToCurr
-        or (not hadSideBuffers and S.checkSides(S, "or", true))
-        or (S.isSideTheActiveWin(S, "left") or S.isSideTheActiveWin(S, "right"))
+        go_to_curr
+        or (not had_side_buffers and S.check_sides(S, "or", true))
+        or (S.is_side_the_active_win(S, "left") or S.is_side_the_active_win(S, "right"))
     then
         D.log(scope, "re-routing focus to curr")
 
-        vim.api.nvim_set_current_win(S.getSideID(S, "curr"))
+        vim.api.nvim_set_current_win(S.get_side_id(S, "curr"))
     end
 
     -- if we still have side buffers open at this point, and we have vsplit opened,
     -- there might be width issues so we the resize opened vsplits.
-    if S.checkSides(S, "or", true) and S.getColumns(S) > 1 then
-        D.log("wins_resize", "have %d columns", S.getColumns(S))
+    if S.check_sides(S, "or", true) and S.get_columns(S) > 1 then
+        D.log("wins_resize", "have %d columns", S.get_columns(S))
 
-        for _, win in pairs(S.getUnregisteredWins(S)) do
+        for _, win in pairs(S.get_unregistered_wins(S)) do
             W.resize(win, _G.NoNeckPain.config.width, string.format("win:%d", win))
         end
 
-        if not hadSideBuffers then
+        if not had_side_buffers then
             W.resize(
-                S.getSideID(S, "curr"),
+                S.get_side_id(S, "curr"),
                 _G.NoNeckPain.config.width,
-                string.format("win:%d", S.getSideID(S, "curr"))
+                string.format("win:%d", S.get_side_id(S, "curr"))
             )
         end
     end
@@ -145,22 +150,22 @@ end
 --- @param scope string: internal identifier for logging purposes.
 ---@private
 function N.enable(scope)
-    if E.skipEnable() then
+    if E.skip_enable() then
         return
     end
 
-    D.log(scope, "calling enable for tab %d", A.getCurrentTab())
+    D.log(scope, "calling enable for tab %d", A.get_current_tab())
 
-    S.setEnabled(S)
-    S.setTab(S, A.getCurrentTab())
+    S.set_enabled(S)
+    S.set_tab(S, A.get_current_tab())
 
-    local augroupName = A.getAugroupName(S.activeTab)
-    vim.api.nvim_create_augroup(augroupName, { clear = true })
+    local augroup_name = A.get_augroup_name(S.active_tab)
+    vim.api.nvim_create_augroup(augroup_name, { clear = true })
 
-    S.setSideID(S, vim.api.nvim_get_current_win(), "curr")
-    S.scanLayout(S, scope)
+    S.set_side_id(S, vim.api.nvim_get_current_win(), "curr")
+    S.scan_layout(S, scope)
     N.init(scope, true)
-    S.scanLayout(S, scope)
+    S.scan_layout(S, scope)
 
     vim.api.nvim_create_autocmd({ "VimResized" }, {
         callback = function(p)
@@ -169,10 +174,10 @@ function N.enable(scope)
                     return
                 end
 
-                local tab = S.getTab(S)
+                local tab = S.get_tab(S)
 
                 if tab ~= nil then
-                    if A.getCurrentTab() ~= tab.id then
+                    if A.get_current_tab() ~= tab.id then
                         return
                     end
                 end
@@ -180,21 +185,21 @@ function N.enable(scope)
                 N.init(p.event)
             end)
         end,
-        group = augroupName,
+        group = augroup_name,
         desc = "Resizes side windows after terminal has been resized, closes them if not enough space left.",
     })
 
     vim.api.nvim_create_autocmd({ "TabEnter" }, {
         callback = function(p)
             A.debounce(p.event, function()
-                D.log(p.event, "tab %d entered", S.activeTab)
+                D.log(p.event, "tab %d entered", S.active_tab)
 
-                S.refreshTabs(S, p.event)
+                S.refresh_tabs(S, p.event)
 
-                S.setActiveTab(S, A.getCurrentTab())
+                S.set_active_tab(S, A.get_current_tab())
             end)
         end,
-        group = augroupName,
+        group = augroup_name,
         desc = "Keeps track of the currently active tab and the tab state",
     })
 
@@ -202,18 +207,18 @@ function N.enable(scope)
         callback = function(p)
             local s = string.format("%s:%d", p.event, vim.api.nvim_get_current_win())
             vim.schedule(function()
-                if not S.isActiveTabRegistered(S) or E.skip() then
+                if not S.is_active_tab_registered(S) or E.skip() then
                     return
                 end
 
-                local init = S.scanLayout(S, s)
+                local init = S.scan_layout(S, s)
 
                 if
-                    not S.tabs[S.activeTab].redraw
+                    not S.tabs[S.active_tab].redraw
                     and (
-                        S.isSideTheActiveWin(S, "left")
-                        or S.isSideTheActiveWin(S, "right")
-                        or S.isSideTheActiveWin(S, "curr")
+                        S.is_side_the_active_win(S, "left")
+                        or S.is_side_the_active_win(S, "right")
+                        or S.is_side_the_active_win(S, "curr")
                     )
                 then
                     return
@@ -226,7 +231,7 @@ function N.enable(scope)
                 end
             end)
         end,
-        group = augroupName,
+        group = augroup_name,
         desc = "Keeps track of the state after entering new windows",
     })
 
@@ -234,17 +239,19 @@ function N.enable(scope)
         callback = function(p)
             vim.schedule(function()
                 local s = string.format("%s:%d", p.event, vim.api.nvim_get_current_win())
-                if not S.isActiveTabRegistered(S) or E.skip() then
+                if not S.is_active_tab_registered(S) or E.skip() then
                     return
                 end
 
-                if p.event == "BufDelete" and vim.api.nvim_win_is_valid(S.getSideID(S, "curr")) then
+                if
+                    p.event == "BufDelete" and vim.api.nvim_win_is_valid(S.get_side_id(S, "curr"))
+                then
                     return
                 end
 
-                local refresh = S.scanLayout(S, s)
+                local refresh = S.scan_layout(S, s)
 
-                if not vim.api.nvim_win_is_valid(S.getSideID(S, "curr")) then
+                if not vim.api.nvim_win_is_valid(S.get_side_id(S, "curr")) then
                     if p.event == "BufDelete" and _G.NoNeckPain.config.fallbackOnBufferDelete then
                         D.log(s, "`curr` has been deleted, resetting state")
 
@@ -256,14 +263,14 @@ function N.enable(scope)
                         return
                     end
 
-                    local wins = S.getUnregisteredWins(S)
+                    local wins = S.get_unregistered_wins(S)
                     if #wins == 0 then
                         D.log(s, "no active windows found")
 
                         return N.disable(s)
                     end
 
-                    S.setSideID(S, wins[1], "curr")
+                    S.set_side_id(S, wins[1], "curr")
 
                     D.log(s, "re-routing to %d", wins[1])
 
@@ -272,8 +279,8 @@ function N.enable(scope)
 
                 if
                     p.event == "QuitPre"
-                    and not S.isSideWinValid(S, "left")
-                    and not S.isSideWinValid(S, "right")
+                    and not S.is_side_win_valid(S, "left")
+                    and not S.is_side_win_valid(S, "right")
                 then
                     D.log(s, "closed a vsplit when no side buffers were present")
 
@@ -281,8 +288,8 @@ function N.enable(scope)
                 end
 
                 if
-                    (S.isSideEnabled(S, "left") and not S.isSideWinValid(S, "left"))
-                    or (S.isSideEnabled(S, "right") and not S.isSideWinValid(S, "right"))
+                    (S.is_side_enabled(S, "left") and not S.is_side_win_valid(S, "left"))
+                    or (S.is_side_enabled(S, "right") and not S.is_side_win_valid(S, "right"))
                 then
                     D.log(s, "one of the NNP side has been closed")
 
@@ -294,7 +301,7 @@ function N.enable(scope)
                 end
             end)
         end,
-        group = augroupName,
+        group = augroup_name,
         desc = "keeps track of the state after closing windows and deleting buffers",
     })
 
@@ -302,16 +309,16 @@ function N.enable(scope)
         vim.api.nvim_create_autocmd({ "WinLeave" }, {
             callback = function(p)
                 vim.schedule(function()
-                    p.event = string.format("%s:skipEnteringNoNeckPainBuffer", p.event)
-                    if not S.isActiveTabRegistered(S) or E.skip() or S.getScratchPad(S) then
+                    p.event = string.format("%s:skip_entering_NoNeckPain_buffer", p.event)
+                    if not S.is_active_tab_registered(S) or E.skip() or S.get_scratchPad(S) then
                         return D.log(p.event, "skip")
                     end
 
-                    local currentWin = vim.api.nvim_get_current_win()
-                    local leftID = S.getSideID(S, "left")
-                    local rightID = S.getSideID(S, "right")
+                    local current_win = vim.api.nvim_get_current_win()
+                    local left_id = S.get_side_id(S, "left")
+                    local right_id = S.get_side_id(S, "right")
 
-                    if currentWin ~= leftID and currentWin ~= rightID then
+                    if current_win ~= left_id and current_win ~= right_id then
                         return
                     end
 
@@ -320,23 +327,23 @@ function N.enable(scope)
                     for i = 1, #wins do
                         local id = i == #wins and 1 or i + 1
                         if
-                            wins[id] ~= currentWin
-                            and wins[id] ~= leftID
-                            and wins[id] ~= rightID
+                            wins[id] ~= current_win
+                            and wins[id] ~= left_id
+                            and wins[id] ~= right_id
                         then
                             vim.api.nvim_set_current_win(wins[id])
 
                             return D.log(
                                 p.event,
                                 "rerouted focus of %d to %d",
-                                currentWin,
+                                current_win,
                                 wins[id]
                             )
                         end
                     end
                 end)
             end,
-            group = augroupName,
+            group = augroup_name,
             desc = "Entering a no-neck-pain side buffer skips to the next available buffer",
         })
     end
@@ -347,18 +354,18 @@ end
 --- Disables the plugin for the given tab, clear highlight groups and autocmds, closes side buffers and resets the internal state.
 ---@private
 function N.disable(scope)
-    local activeTab = S.activeTab
+    local active_tab = S.active_tab
 
-    D.log(scope, "calling disable for tab %d", activeTab)
+    D.log(scope, "calling disable for tab %d", active_tab)
 
     local wins = vim.tbl_filter(function(win)
-        return win ~= S.getSideID(S, "left")
-            and win ~= S.getSideID(S, "right")
-            and not A.isRelativeWindow(win)
-    end, vim.api.nvim_tabpage_list_wins(activeTab))
+        return win ~= S.get_side_id(S, "left")
+            and win ~= S.get_side_id(S, "right")
+            and not A.is_relative_window(win)
+    end, vim.api.nvim_tabpage_list_wins(active_tab))
 
     if #vim.api.nvim_list_tabpages() == 1 and #wins == 0 then
-        for name, modified in pairs(A.getOpenedBuffers()) do
+        for name, modified in pairs(A.get_opened_buffers()) do
             if modified then
                 local bufname = name
                 if vim.startswith(name, "NoNamePain") then
@@ -378,18 +385,18 @@ function N.disable(scope)
             end
         end
 
-        pcall(vim.api.nvim_del_augroup_by_name, A.getAugroupName(activeTab))
+        pcall(vim.api.nvim_del_augroup_by_name, A.get_augroup_name(active_tab))
         pcall(vim.api.nvim_del_augroup_by_name, "NoNeckPainVimEnterAutocmd")
 
         return vim.cmd("quitall!")
     end
 
-    pcall(vim.api.nvim_del_augroup_by_name, A.getAugroupName(activeTab))
+    pcall(vim.api.nvim_del_augroup_by_name, A.get_augroup_name(active_tab))
 
-    local sides = { left = S.getSideID(S, "left"), right = S.getSideID(S, "right") }
-    local currID = S.getSideID(S, "curr")
+    local sides = { left = S.get_side_id(S, "left"), right = S.get_side_id(S, "right") }
+    local curr_id = S.get_side_id(S, "curr")
 
-    if S.refreshTabs(S, scope, activeTab) == 0 then
+    if S.refresh_tabs(S, scope, active_tab) == 0 then
         pcall(vim.api.nvim_del_augroup_by_name, "NoNeckPainVimEnterAutocmd")
 
         D.log(scope, "no more active tabs left, reinitializing state")
@@ -399,14 +406,14 @@ function N.disable(scope)
 
     for side, id in pairs(sides) do
         if vim.api.nvim_win_is_valid(id) then
-            S.removeNamespace(S, vim.api.nvim_win_get_buf(id), side)
+            S.remove_namespace(S, vim.api.nvim_win_get_buf(id), side)
             W.close(scope, id, side)
         end
     end
 
     -- shutdowns gracefully by focusing the stored `curr` buffer
-    if currID ~= nil and vim.api.nvim_win_is_valid(currID) then
-        vim.api.nvim_set_current_win(currID)
+    if curr_id ~= nil and vim.api.nvim_win_is_valid(curr_id) then
+        vim.api.nvim_set_current_win(curr_id)
 
         if _G.NoNeckPain.config.killAllBuffersOnDisable then
             vim.cmd("only")

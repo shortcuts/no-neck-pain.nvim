@@ -24,17 +24,17 @@ end
 ---@param side "left"|"right"|"curr": the side of the window to initialize.
 ---@param id number: the id of the window.
 ---@private
-function W.initSideOptions(side, id)
+function W.init_side_options(side, id)
     local bufid = vim.api.nvim_win_get_buf(id)
 
     for opt, val in pairs(_G.NoNeckPain.config.buffers[side].bo) do
-        if not S.getScratchPad(S) and opt ~= "filetype" then
-            A.setBufferOption(bufid, opt, val)
+        if not S.get_scratchPad(S) and opt ~= "filetype" then
+            A.set_buffer_option(bufid, opt, val)
         end
     end
 
     for opt, val in pairs(_G.NoNeckPain.config.buffers[side].wo) do
-        A.setWindowOption(id, opt, val)
+        A.set_window_option(id, opt, val)
     end
 end
 
@@ -48,14 +48,14 @@ function W.reposition(scope)
         right = vim.api.nvim_replace_termcodes("normal <C-W>L", true, false, true),
     }
 
-    local restoreFocus = false
+    local restore_focus = false
 
     for side, keys in pairs(sides) do
         local sscope = string.format("%s:%s", scope, side)
 
-        local id = S.getSideID(S, side)
+        local id = S.get_side_id(S, side)
         if id ~= nil then
-            local wins = vim.api.nvim_tabpage_list_wins(S.activeTab)
+            local wins = vim.api.nvim_tabpage_list_wins(S.active_tab)
             local curr = vim.api.nvim_get_current_win()
 
             if curr ~= id then
@@ -66,7 +66,7 @@ function W.reposition(scope)
 
             vim.cmd(keys)
 
-            wins = vim.api.nvim_tabpage_list_wins(S.activeTab)
+            wins = vim.api.nvim_tabpage_list_wins(S.active_tab)
 
             if (side == "left" and wins[1] ~= id) or (side == "right" and wins[#wins] ~= id) then
                 D.log(
@@ -78,12 +78,12 @@ function W.reposition(scope)
                 )
             end
 
-            restoreFocus = true
+            restore_focus = true
         end
     end
 
-    if restoreFocus and S.getSideID(S, "curr") ~= nil then
-        vim.api.nvim_set_current_win(S.getSideID(S, "curr"))
+    if restore_focus and S.get_side_id(S, "curr") ~= nil then
+        vim.api.nvim_set_current_win(S.get_side_id(S, "curr"))
     end
 end
 
@@ -107,7 +107,7 @@ end
 ---@param id number: the side window ID.
 ---@param cleanup boolean?: cleanup the given buffer
 ---@private
-function W.initScratchPad(side, id, cleanup)
+function W.init_scratchPad(side, id, cleanup)
     if not _G.NoNeckPain.config.buffers[side].enabled then
         return
     end
@@ -115,24 +115,24 @@ function W.initScratchPad(side, id, cleanup)
     -- cleanup is used when the `toggle` method disables the scratchPad, we then reinitialize it with the user-given configuration.
     if cleanup then
         vim.cmd("enew")
-        return W.initSideOptions(side, id)
+        return W.init_side_options(side, id)
     end
 
     D.log(
-        string.format("W.initScratchPad:%s", side),
+        string.format("W.init_scratchPad:%s", side),
         "enabled with location %s",
         _G.NoNeckPain.config.buffers[side].scratchPad.pathToFile
     )
 
-    W.initSideOptions(side, id)
+    W.init_side_options(side, id)
 
     vim.cmd(string.format("edit %s", _G.NoNeckPain.config.buffers[side].scratchPad.pathToFile))
 
-    A.setBufferOption(0, "bufhidden", "")
-    A.setBufferOption(0, "buftype", "")
-    A.setBufferOption(0, "buflisted", false)
-    A.setBufferOption(0, "autoread", true)
-    A.setWindowOption(id, "conceallevel", 2)
+    A.set_buffer_option(0, "bufhidden", "")
+    A.set_buffer_option(0, "buftype", "")
+    A.set_buffer_option(0, "buflisted", false)
+    A.set_buffer_option(0, "autoread", true)
+    A.set_window_option(id, "conceallevel", 2)
 
     -- users might want to use a filetype that isn't supported by neovim, we should let them
     -- if they've defined it on the configuration side.
@@ -141,7 +141,7 @@ function W.initScratchPad(side, id, cleanup)
         if filetype == "" or filetype == "no-neck-pain" then
             filetype = "norg"
         end
-        A.setBufferOption(0, "filetype", filetype)
+        A.set_buffer_option(0, "filetype", filetype)
     end
 
     vim.o.autowriteall = true
@@ -160,17 +160,17 @@ function W.create_side_buffers()
 
     for _, side in pairs(Co.SIDES) do
         if _G.NoNeckPain.config.buffers[side].enabled then
-            wins[side].padding = W.getPadding(side)
+            wins[side].padding = W.get_padding(side)
 
             if
                 wins[side].padding > _G.NoNeckPain.config.minSideBufferWidth
-                and not S.isSideWinValid(S, side)
+                and not S.is_side_win_valid(S, side)
             then
                 vim.cmd(wins[side].cmd)
 
-                S.setSideID(S, vim.api.nvim_get_current_win(), side)
+                S.set_side_id(S, vim.api.nvim_get_current_win(), side)
 
-                if _G.NoNeckPain.config.buffers.setNames then
+                if _G.NoNeckPain.config.buffers.set_names then
                     local exist = vim.fn.bufnr("no-neck-pain-" .. side)
 
                     if exist ~= -1 then
@@ -181,26 +181,26 @@ function W.create_side_buffers()
                 end
 
                 if _G.NoNeckPain.config.buffers[side].scratchPad.enabled then
-                    S.setScratchPad(S, true)
-                    W.initScratchPad(side, S.getSideID(S, side))
+                    S.set_scratchPad(S, true)
+                    W.init_scratchPad(side, S.get_side_id(S, side))
                 else
-                    W.initSideOptions(side, S.getSideID(S, side))
+                    W.init_side_options(side, S.get_side_id(S, side))
                 end
             end
 
-            C.init(S.getSideID(S, side), side)
+            C.init(S.get_side_id(S, side), side)
         end
     end
 
     for _, side in pairs(Co.SIDES) do
-        if S.isSideWinValid(S, side) then
-            local padding = wins[side].padding or W.getPadding(side)
+        if S.is_side_win_valid(S, side) then
+            local padding = wins[side].padding or W.get_padding(side)
 
             if padding > _G.NoNeckPain.config.minSideBufferWidth then
-                W.resize(S.getSideID(S, side), padding, side)
+                W.resize(S.get_side_id(S, side), padding, side)
             else
-                W.close("W.createSideBuffers", S.getSideID(S, side), side)
-                S.setSideID(S, nil, side)
+                W.close("W.create_side_buffers", S.get_side_id(S, side), side)
+                S.set_side_id(S, nil, side)
             end
         end
     end
@@ -211,8 +211,8 @@ end
 ---@param side "left"|"right": the side of the window.
 ---@return number: the width of the side window.
 ---@private
-function W.getPadding(side)
-    local scope = string.format("W.getPadding:%s", side)
+function W.get_padding(side)
+    local scope = string.format("W.get_padding:%s", side)
     -- if the available screen size is lower than the config width,
     -- we don't have to create side buffers.
     if _G.NoNeckPain.config.width >= vim.o.columns then
@@ -221,10 +221,10 @@ function W.getPadding(side)
         return 0
     end
 
-    local columns = S.getColumns(S)
+    local columns = S.get_columns(S)
 
     for _, s in ipairs(Co.SIDES) do
-        if S.isSideWinValid(S, s) and columns > 1 then
+        if S.is_side_win_valid(S, s) and columns > 1 then
             columns = columns - 1
         end
     end
@@ -246,11 +246,11 @@ function W.getPadding(side)
 
     -- now we need to determine how much we should substract from the remaining padding
     -- if there's side integrations open.
-    for name, tree in pairs(S.getIntegrations(S)) do
+    for name, tree in pairs(S.get_integrations(S)) do
         if
             tree.id ~= nil
             and (
-                not S.isSideWinValid(S, side)
+                not S.is_side_win_valid(S, side)
                 or side == _G.NoNeckPain.config.integrations[name].position
             )
         then

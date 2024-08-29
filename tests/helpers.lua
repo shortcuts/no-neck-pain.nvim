@@ -4,7 +4,7 @@ local Helpers = {}
 -- Add extra expectations
 Helpers.expect = vim.deepcopy(MiniTest.expect)
 
-local function errorMessage(str, pattern)
+local function error_message(str, pattern)
     return string.format("Pattern: %s\nObserved string: %s", vim.inspect(pattern), str)
 end
 
@@ -16,7 +16,7 @@ Helpers.expect.buf_width = MiniTest.new_expectation(
             value
         )
     end,
-    errorMessage
+    error_message
 )
 
 Helpers.expect.global = MiniTest.new_expectation(
@@ -24,7 +24,7 @@ Helpers.expect.global = MiniTest.new_expectation(
     function(child, field, value)
         return Helpers.expect.equality(child.lua_get(field), value)
     end,
-    errorMessage
+    error_message
 )
 
 Helpers.expect.global_type = MiniTest.new_expectation(
@@ -32,7 +32,7 @@ Helpers.expect.global_type = MiniTest.new_expectation(
     function(child, field, value)
         return Helpers.expect.global(child, "type(" .. field .. ")", value)
     end,
-    errorMessage
+    error_message
 )
 
 Helpers.expect.config = MiniTest.new_expectation(
@@ -40,7 +40,7 @@ Helpers.expect.config = MiniTest.new_expectation(
     function(child, field, value)
         return Helpers.expect.global(child, "_G.NoNeckPain.config." .. field, value)
     end,
-    errorMessage
+    error_message
 )
 
 Helpers.expect.config_type = MiniTest.new_expectation(
@@ -48,28 +48,28 @@ Helpers.expect.config_type = MiniTest.new_expectation(
     function(child, field, value)
         return Helpers.expect.global(child, "type(_G.NoNeckPain.config." .. field .. ")", value)
     end,
-    errorMessage
+    error_message
 )
 
 Helpers.expect.state = MiniTest.new_expectation("state matches", function(child, field, value)
     return Helpers.expect.global(child, "_G.NoNeckPain.state." .. field, value)
-end, errorMessage)
+end, error_message)
 
 Helpers.expect.state_type = MiniTest.new_expectation(
     "state type matches",
     function(child, field, value)
         return Helpers.expect.global(child, "type(_G.NoNeckPain.state." .. field .. ")", value)
     end,
-    errorMessage
+    error_message
 )
 
 Helpers.expect.match = MiniTest.new_expectation("string matching", function(str, pattern)
     return str:find(pattern) ~= nil
-end, errorMessage)
+end, error_message)
 
 Helpers.expect.no_match = MiniTest.new_expectation("no string matching", function(str, pattern)
     return str:find(pattern) == nil
-end, errorMessage)
+end, error_message)
 
 -- Monkey-patch `MiniTest.new_child_neovim` with helpful wrappers
 Helpers.new_child_neovim = function()
@@ -95,7 +95,7 @@ Helpers.new_child_neovim = function()
     end
 
     child.get_wins_in_tab = function(tab)
-        tab = tab or "_G.NoNeckPain.state.activeTab"
+        tab = tab or "_G.NoNeckPain.state.active_tab"
 
         return child.lua_get("vim.api.nvim_tabpage_list_wins(" .. tab .. ")")
     end
