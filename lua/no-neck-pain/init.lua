@@ -119,7 +119,7 @@ function NoNeckPain.setup(opts)
 
                     A.debounce("enable_on_vim_enter", function()
                         if _G.NoNeckPain.state ~= nil then
-                            pcall(vim.api.nvim_del_augroup_by_name, "NoNeckPain_vim_enter_autocmd")
+                            pcall(vim.api.nvim_del_augroup_by_name, "NoNeckPainVimEnterAutocmd")
                         end
                     end, 20)
                 end)
