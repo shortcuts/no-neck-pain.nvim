@@ -12,7 +12,7 @@ local W = {}
 ---@param width number: the width to apply to the window.
 ---@param side "left"|"right"|"curr"|"unregistered": the side of the window being resized, used for logging only.
 ---@private
-local function resize(id, width, side)
+function W.resize(id, width, side)
     D.log(side, "resizing %d with padding %d", id, width)
 
     if vim.api.nvim_win_is_valid(id) then
@@ -152,7 +152,7 @@ end
 --- - If it already exists, we resize it.
 ---
 ---@private
-function W.createSideBuffers()
+function W.create_side_buffers()
     local wins = {
         left = { cmd = "topleft vnew", padding = 0 },
         right = { cmd = "botright vnew", padding = 0 },
@@ -197,45 +197,11 @@ function W.createSideBuffers()
             local padding = wins[side].padding or W.getPadding(side)
 
             if padding > _G.NoNeckPain.config.minSideBufferWidth then
-                resize(S.getSideID(S, side), padding, side)
+                W.resize(S.getSideID(S, side), padding, side)
             else
                 W.close("W.createSideBuffers", S.getSideID(S, side), side)
                 S.setSideID(S, nil, side)
             end
-        end
-    end
-
-    local columns = S.getColumns(S)
-    local leftID = S.getSideID(S, "left")
-    local rightID = S.getSideID(S, "right")
-
-    -- if we still have side buffers open at this point, and we have vsplit opened,
-    -- there might be width issues so we the resize opened vsplits.
-    if (leftID or rightID) and columns > 1 then
-        local sWidth = wins.left.padding or wins.right.padding
-        local nbSide = leftID and rightID and 2 or 1
-
-        -- get the available usable width (screen size without side paddings)
-        sWidth = vim.o.columns - sWidth * nbSide
-        local remainingVSplits = columns - nbSide
-
-        if remainingVSplits < 1 then
-            remainingVSplits = 1
-        end
-
-        sWidth = math.floor(sWidth / remainingVSplits)
-
-        D.log(
-            "splitResize",
-            "%d/%d screen width remaining, %d columns including %d sides",
-            sWidth,
-            vim.o.columns,
-            columns,
-            nbSide
-        )
-
-        for _, win in pairs(S.getUnregisteredWins(S)) do
-            -- resize(win, sWidth, string.format("unregistered:%d", win))
         end
     end
 end

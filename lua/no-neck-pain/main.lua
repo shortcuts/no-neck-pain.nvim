@@ -99,13 +99,13 @@ function N.init(scope, goToCurr)
 
     -- if we do not have side buffers, we must ensure we only trigger a focus if we re-create them
     local hadSideBuffers = true
-    if S.checkSides(S, "and", false) then
+    if not S.is_side_win_valid(S, "left") or not S.is_side_win_valid(S, "right") then
         hadSideBuffers = false
     end
 
-    W.createSideBuffers()
+    W.create_side_buffers()
 
-    if S.consumeRedraw(S) then
+    if S.consume_redraw(S) then
         W.reposition(string.format("%s:consumeRedraw", scope))
     end
 
@@ -117,6 +117,24 @@ function N.init(scope, goToCurr)
         D.log(scope, "re-routing focus to curr")
 
         vim.api.nvim_set_current_win(S.getSideID(S, "curr"))
+    end
+
+    -- if we still have side buffers open at this point, and we have vsplit opened,
+    -- there might be width issues so we the resize opened vsplits.
+    if S.checkSides(S, "or", true) and S.getColumns(S) > 1 then
+        D.log("wins_resize", "have %d columns", S.getColumns(S))
+
+        for _, win in pairs(S.getUnregisteredWins(S)) do
+            W.resize(win, _G.NoNeckPain.config.width, string.format("win:%d", win))
+        end
+
+        if not hadSideBuffers then
+            W.resize(
+                S.getSideID(S, "curr"),
+                _G.NoNeckPain.config.width,
+                string.format("win:%d", S.getSideID(S, "curr"))
+            )
+        end
     end
 
     S.save(S)
