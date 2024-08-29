@@ -135,7 +135,7 @@ function A.get_opened_buffers()
             local name = vim.api.nvim_buf_get_name(buf)
 
             if name == nil or name == "" then
-                name = string.format("NoNeckPain%s", buf)
+                name = string.format("NoNamePain%s", buf)
             end
 
             opened[name] = vim.api.nvim_buf_get_option(buf, "modified")

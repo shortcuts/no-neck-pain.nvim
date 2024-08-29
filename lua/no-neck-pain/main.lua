@@ -368,7 +368,7 @@ function N.disable(scope)
         for name, modified in pairs(A.get_opened_buffers()) do
             if modified then
                 local bufname = name
-                if vim.startswith(name, "NoNeckPain") then
+                if vim.startswith(name, "NoNamePain") then
                     bufname = string.sub(name, 11)
                 end
 
