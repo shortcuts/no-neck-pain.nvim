@@ -51,10 +51,10 @@ NoNeckPain.bufferOptionsBo = {
     swapfile = false,
 }
 
---- NoNeckPain's scratchPad buffer options.
+--- NoNeckPain's scratchpad buffer options.
 ---
 --- Leverages the side buffers as notepads, which work like any Neovim buffer and automatically saves its content at the given `location`.
---- note: quitting an unsaved scratchPad buffer is non-blocking, and the content is still saved.
+--- note: quitting an unsaved scratchpad buffer is non-blocking, and the content is still saved.
 ---
 ---@type table
 ---Default values:
@@ -78,7 +78,7 @@ NoNeckPain.bufferOptionsScratchPad = {
     --- @example: `no-neck-pain-left.norg`
     --- @deprecated: use `pathToFile` instead.
     location = nil,
-    -- The path to the file to save the scratchPad content to and load it in the buffer.
+    -- The path to the file to save the scratchpad content to and load it in the buffer.
     --- @type string?
     --- @example: `~/notes.norg`
     pathToFile = "",
@@ -137,7 +137,7 @@ NoNeckPain.bufferOptions = {
     --- @see NoNeckPain.bufferOptionsWo `:h NoNeckPain.bufferOptionsWo`
     wo = NoNeckPain.bufferOptionsWo,
     --- @see NoNeckPain.bufferOptionsScratchPad `:h NoNeckPain.bufferOptionsScratchPad`
-    scratchPad = NoNeckPain.bufferOptionsScratchPad,
+    scratchpad = NoNeckPain.bufferOptionsScratchPad,
 }
 
 --- NoNeckPain's plugin config.
@@ -213,10 +213,10 @@ NoNeckPain.options = {
         -- When `false`, the mapping is not created.
         --- @type string | { mapping: string, value: number }
         widthDown = "<Leader>n-",
-        -- Sets a global mapping to Neovim, which allows you to toggle the scratchPad feature.
+        -- Sets a global mapping to Neovim, which allows you to toggle the scratchpad feature.
         -- When `false`, the mapping is not created.
         --- @type string
-        scratchPad = "<Leader>ns",
+        scratchpad = "<Leader>ns",
     },
     --- Common options that are set to both side buffers.
     --- See |NoNeckPain.bufferOptions| for option scoped to the `left` and/or `right` buffer.
@@ -226,9 +226,9 @@ NoNeckPain.options = {
         --- @type boolean
         setNames = false,
         -- Leverages the side buffers as notepads, which work like any Neovim buffer and automatically saves its content at the given `location`.
-        -- note: quitting an unsaved scratchPad buffer is non-blocking, and the content is still saved.
+        -- note: quitting an unsaved scratchpad buffer is non-blocking, and the content is still saved.
         --- see |NoNeckPain.bufferOptionsScratchPad|
-        scratchPad = NoNeckPain.bufferOptionsScratchPad,
+        scratchpad = NoNeckPain.bufferOptionsScratchPad,
         -- colors to apply to both side buffers, for buffer scopped options @see |NoNeckPain.bufferOptions|
         --- see |NoNeckPain.bufferOptionsColors|
         colors = NoNeckPain.bufferOptionsColors,
@@ -322,17 +322,17 @@ NoNeckPain.options = {
 ---@private
 local defaults = vim.deepcopy(NoNeckPain.options)
 
---- Parses the deprecated scratchPad options into the new `pathToFile` option.
+--- Parses the deprecated scratchpad options into the new `pathToFile` option.
 ---
 ---@param side "left"|"right" The side of the buffer.
 ---@param options table Module config table. See |NoNeckPain.bufferOptionsScratchPads|.
 ---@param fileType string The file extension to leverage.
 ---
 ---@private
-local function parseDeprecatedScratchPad(side, options, fileType)
+local function parse_deprecated_scratchpad(side, options, fileType)
     -- set the defaults if the user rely on them
     if vim.tbl_count(options) == 0 or options.pathToFile == nil then
-        options = A.tde(options, defaults.buffers.scratchPad)
+        options = A.tde(options, defaults.buffers.scratchpad)
     end
 
     -- handle the deprecation to `fileName` and `location`
@@ -368,9 +368,9 @@ function NoNeckPain.defaults(options)
         options.buffers[side].bo = A.tde(options.buffers[side].bo, options.buffers.bo)
         options.buffers[side].wo = A.tde(options.buffers[side].wo, options.buffers.wo)
         options.buffers[side].colors = A.tde(options.buffers[side].colors, options.buffers.colors)
-        options.buffers[side].scratchPad = parseDeprecatedScratchPad(
+        options.buffers[side].scratchpad = parse_deprecated_scratchpad(
             side,
-            A.tde(options.buffers[side].scratchPad, options.buffers.scratchPad),
+            A.tde(options.buffers[side].scratchpad, options.buffers.scratchpad),
             options.buffers[side].bo.filetype
         )
     end
@@ -406,11 +406,11 @@ function NoNeckPain.defaults(options)
     end
 
     -- cleanup deprecated options to sanitize the saved config
-    NoNeckPain.options.buffers.left.scratchPad.location = nil
-    NoNeckPain.options.buffers.left.scratchPad.fileName = nil
-    NoNeckPain.options.buffers.right.scratchPad.location = nil
-    NoNeckPain.options.buffers.right.scratchPad.fileName = nil
-    NoNeckPain.options.buffers.scratchPad = nil
+    NoNeckPain.options.buffers.left.scratchpad.location = nil
+    NoNeckPain.options.buffers.left.scratchpad.fileName = nil
+    NoNeckPain.options.buffers.right.scratchpad.location = nil
+    NoNeckPain.options.buffers.right.scratchpad.fileName = nil
+    NoNeckPain.options.buffers.scratchpad = nil
 
     return NoNeckPain.options
 end
@@ -421,7 +421,7 @@ end
 ---@param mappings table A key value map of the mapping name and its command.
 ---
 ---@private
-local function registerMappings(options, mappings)
+local function register_mappings(options, mappings)
     -- all of the mappings are disabled
     if not options.enabled then
         return
@@ -461,15 +461,15 @@ function NoNeckPain.setup(options)
 
     NoNeckPain.options.hasNvim9 = vim.fn.has("nvim-0.9") == 1
 
-    D.warnDeprecation(NoNeckPain.options)
+    D.warn_deprecation(NoNeckPain.options)
 
-    registerMappings(NoNeckPain.options.mappings, {
+    register_mappings(NoNeckPain.options.mappings, {
         toggle = ":NoNeckPain<CR>",
         toggleLeftSide = ":NoNeckPainToggleLeftSide<CR>",
         toggleRightSide = ":NoNeckPainToggleRightSide<CR>",
         widthUp = ":NoNeckPainWidthUp<CR>",
         widthDown = ":NoNeckPainWidthDown<CR>",
-        scratchPad = ":NoNeckPainScratchPad<CR>",
+        scratchpad = ":NoNeckPainScratchPad<CR>",
     })
 
     return NoNeckPain.options

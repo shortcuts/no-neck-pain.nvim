@@ -11,11 +11,11 @@ function NoNeckPain.toggle()
         _G.NoNeckPain.config = C.options
     end
 
-    A.debounce("publicAPI_toggle", M.toggle)
+    A.debounce("public_api_toggle", M.toggle)
 end
 
---- Toggles the scratchPad feature of the plugin.
-function NoNeckPain.toggleScratchPad()
+--- Toggles the scratchpad feature of the plugin.
+function NoNeckPain.toggle_scratchpad()
     if _G.NoNeckPain.state == nil or not _G.NoNeckPain.state.enabled then
         error("no-neck-pain.nvim must be enabled, run `NoNeckPain` first.")
     end
@@ -24,7 +24,7 @@ function NoNeckPain.toggleScratchPad()
         _G.NoNeckPain.config = C.options
     end
 
-    M.toggleScratchPad()
+    M.toggle_scratchpad()
 end
 
 --- Sets the config `width` to the given `width` value and resizes the NoNeckPain windows.
@@ -45,19 +45,19 @@ function NoNeckPain.resize(width)
         _G.NoNeckPain.config = vim.tbl_deep_extend("keep", { width = width }, _G.NoNeckPain.config)
     end
 
-    M.init("publicAPI_resize", false)
+    M.init("public_api_resize", false)
 end
 
 --- Toggles the config `${side}.enabled` and re-inits the plugin.
 ---
 --- @param side "left" | "right": the side to toggle.
-function NoNeckPain.toggleSide(side)
+function NoNeckPain.toggle_side(side)
     if _G.NoNeckPain.state == nil or not _G.NoNeckPain.state.enabled then
         error("no-neck-pain.nvim must be enabled, run `NoNeckPain` first.")
     end
 
-    A.debounce("publicAPI_toggleSide", function(scope)
-        M.toggleSide(scope, side)
+    A.debounce("public_api_toggle_side", function(scope)
+        M.toggle_side(scope, side)
     end)
 end
 
@@ -67,12 +67,12 @@ function NoNeckPain.enable()
         _G.NoNeckPain.config = C.options
     end
 
-    A.debounce("publicAPI_enable", M.enable, 10)
+    A.debounce("public_api_enable", M.enable, 10)
 end
 
 --- Disables the plugin, clear highlight groups and autocmds, closes side buffers and resets the internal state.
 function NoNeckPain.disable()
-    A.debounce("publicAPI_disable", M.disable)
+    A.debounce("public_api_disable", M.disable)
 end
 
 -- setup NoNeckPain options and merge them with user provided ones.
@@ -91,14 +91,14 @@ function NoNeckPain.setup(opts)
     if _G.NoNeckPain.config.autocmds.reloadOnColorSchemeChange then
         vim.api.nvim_create_autocmd({ "ColorScheme" }, {
             pattern = "*",
-            callback = function()
+            callback = function(p)
                 vim.schedule(function()
                     if _G.NoNeckPain.state == nil or not _G.NoNeckPain.state.enabled then
                         return
                     end
 
                     _G.NoNeckPain.config = C.defaults(opts)
-                    M.init("ColorScheme")
+                    M.init(p.event)
                 end)
             end,
             group = "NoNeckPainAutocmd",
@@ -117,9 +117,9 @@ function NoNeckPain.setup(opts)
 
                     NoNeckPain.enable()
 
-                    A.debounce("enableOnVimEnter", function()
+                    A.debounce("enable_on_vim_enter", function()
                         if _G.NoNeckPain.state ~= nil then
-                            pcall(vim.api.nvim_del_augroup_by_name, "NoNeckPainVimEnterAutocmd")
+                            pcall(vim.api.nvim_del_augroup_by_name, "NoNeckPain_vim_enter_autocmd")
                         end
                     end, 20)
                 end)

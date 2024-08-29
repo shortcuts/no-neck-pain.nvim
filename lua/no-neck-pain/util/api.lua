@@ -6,7 +6,7 @@ local A = { debouncers = {} }
 ---
 ---@return number: the tabpage id.
 ---@private
-function A.getCurrentTab()
+function A.get_current_tab()
     return vim.api.nvim_get_current_tabpage() or 1
 end
 
@@ -19,7 +19,7 @@ end
 ---@param id number?: the id of the tab.
 ---@return string: the initialied state
 ---@private
-function A.getAugroupName(id)
+function A.get_augroup_name(id)
     return string.format("NoNeckPain-%d", id)
 end
 
@@ -28,7 +28,7 @@ end
 ---@param win number?: the id of the window.
 ---@return boolean: true if the window is relative.
 ---@private
-function A.isRelativeWindow(win)
+function A.is_relative_window(win)
     win = win or vim.api.nvim_get_current_win()
 
     if
@@ -47,8 +47,8 @@ end
 ---@param opt string: the opt name.
 ---@param val string|number|boolean: the opt value.
 ---@private
-function A.setBufferOption(id, opt, val)
-    if _G.NoNeckPain.config.hasNvim9 then
+function A.set_buffer_option(id, opt, val)
+    if _G.NoNeckPain.config.has_nvim9 then
         vim.api.nvim_set_option_value(opt, val, { buf = id })
     else
         vim.api.nvim_buf_set_option(id, opt, val)
@@ -61,8 +61,8 @@ end
 ---@param opt string: the opt name.
 ---@param val string|number: the opt value.
 ---@private
-function A.setWindowOption(id, opt, val)
-    if _G.NoNeckPain.config.hasNvim9 then
+function A.set_window_option(id, opt, val)
+    if _G.NoNeckPain.config.has_nvim9 then
         vim.api.nvim_set_option_value(opt, val, { win = id, scope = "local" })
     else
         vim.api.nvim_win_set_option(id, opt, val)
@@ -127,7 +127,7 @@ end
 ---
 ---@return table
 ---@private
-function A.getOpenedBuffers()
+function A.get_opened_buffers()
     local opened = {}
 
     for _, buf in ipairs(vim.api.nvim_list_bufs()) do
@@ -135,7 +135,7 @@ function A.getOpenedBuffers()
             local name = vim.api.nvim_buf_get_name(buf)
 
             if name == nil or name == "" then
-                name = string.format("NoNamePain%s", buf)
+                name = string.format("NoNeckPain%s", buf)
             end
 
             opened[name] = vim.api.nvim_buf_get_option(buf, "modified")
