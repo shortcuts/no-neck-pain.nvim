@@ -82,6 +82,6 @@ Co.INTEGRATIONS = {
 ---Dashboards filetypes that delays the plugin enable step until next buffer entered.
 ---
 ---@private
-Co.DASHBOARDS = { "dashboard", "alpha", "ministarter" }
+Co.DASHBOARDS = { "dashboard", "alpha", "starter" }
 
 return Co
