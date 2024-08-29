@@ -6,11 +6,7 @@ Helpers.expect = vim.deepcopy(MiniTest.expect)
 
 function Helpers.toggle(child)
     child.cmd("NoNeckPain")
-    Helpers.wait(child)
-end
-
-function Helpers.wait(child)
-    child.loop.sleep(10)
+    child.wait()
 end
 
 function Helpers.currentWin(child)
@@ -106,6 +102,10 @@ Helpers.new_child_neovim = function()
         local msg =
             string.format("Can not use `child.%s` because child process is blocked.", method)
         error(msg)
+    end
+
+    child.wait = function()
+        child.loop.sleep(10)
     end
 
     child.setup = function()

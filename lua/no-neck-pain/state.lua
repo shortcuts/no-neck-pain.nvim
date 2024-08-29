@@ -466,9 +466,8 @@ function State:setLayoutWindows(scope, wins)
 
                 self.tabs[self.activeTab].redraw = true
                 self.tabs[self.activeTab].wins.integrations[name] = integration
-            else
-                self.tabs[self.activeTab].wins.columns = self.tabs[self.activeTab].wins.columns + 1
             end
+            self.tabs[self.activeTab].wins.columns = self.tabs[self.activeTab].wins.columns + 1
         elseif win[1] == "col" then
             self.tabs[self.activeTab].wins.columns = self.tabs[self.activeTab].wins.columns + 1
         end
@@ -528,6 +527,7 @@ function State:scanLayout(scope)
     -- basically when opening vim with nnp autocmds, nothing else than a curr window
     if layout[1] == "leaf" then
         self.setLayoutWindows(self, scope, { layout })
+    -- when a helper or vsplit takes most of the width
     elseif layout[1] == "col" and vim.tbl_count(layout) == 2 then
         self.walkLayout(self, scope, layout[2], false)
     else

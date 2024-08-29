@@ -19,8 +19,7 @@ require("neo-tree").setup({
 })
 require("mini.test").setup()
 require("no-neck-pain").setup({
-    debug = true,
-    width = 30,
+    width = 5,
     minSideBufferWidth = 0,
     integrations = { NeoTree = { reopen = true } },
 })

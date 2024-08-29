@@ -33,7 +33,7 @@ T["commands"]["NoNeckPainResize sets the config width and resizes windows"] = fu
     Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 80)
 
     child.cmd("NoNeckPainResize 20")
-    Helpers.wait(child)
+    child.wait()
 
     Helpers.expect.global(child, "_G.NoNeckPain.config.width", 20)
 

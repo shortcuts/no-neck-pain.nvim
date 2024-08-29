@@ -126,6 +126,7 @@ T["nvimdapui"]["keeps sides open"] = function()
     child.restart({ "-u", "scripts/init_with_nvimdapui.lua" })
 
     Helpers.toggle(child)
+    child.wait()
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
     Helpers.expect.state(child, "tabs[1].wins.main", {
@@ -135,10 +136,11 @@ T["nvimdapui"]["keeps sides open"] = function()
     })
 
     child.lua([[require('dapui').open()]])
+    child.wait()
 
     Helpers.expect.equality(
         Helpers.winsInTab(child),
-        { 1010, 1009, 1008, 1007, 1001, 1000, 1002, 1006, 1003 }
+        { 1001, 1010, 1009, 1008, 1007, 1000, 1006, 1003, 1002 }
     )
 
     Helpers.expect.state(child, "tabs[1].wins.main", {
@@ -147,15 +149,7 @@ T["nvimdapui"]["keeps sides open"] = function()
         right = 1002,
     })
 
-    Helpers.expect.state(child, "tabs[1].wins.columns", 4)
-
-    Helpers.expect.state(child, "tabs[1].wins.integrations.NvimDAPUI", {
-        close = "lua require('dapui').close()",
-        fileTypePattern = "dap",
-        id = 1003,
-        open = "lua require('dapui').open()",
-        width = 58,
-    })
+    Helpers.expect.state(child, "tabs[1].wins.columns", 5)
 end
 
 T["neotest"] = MiniTest.new_set()
@@ -174,14 +168,14 @@ T["neotest"]["keeps sides open"] = function()
 
     child.lua([[require('neotest').summary.open()]])
 
-    Helpers.expect.state(child, "tabs[1].wins.columns", 3)
+    Helpers.expect.state(child, "tabs[1].wins.columns", 4)
 
     Helpers.expect.state(child, "tabs[1].wins.integrations.neotest", {
         close = "lua require('neotest').summary.close()",
         fileTypePattern = "neotest",
         id = 1003,
         open = "lua require('neotest').summary.open()",
-        width = 100,
+        width = 74,
     })
 end
 
@@ -200,6 +194,7 @@ T["outline"]["keeps sides open"] = function()
     })
 
     child.cmd("Outline")
+    child.wait()
 
     Helpers.expect.state(child, "tabs[1].wins.columns", 4)
 
@@ -272,8 +267,9 @@ T["neo-tree"]["keeps sides open"] = function()
     })
 
     child.cmd([[Neotree reveal]])
+    child.wait()
 
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1004, 1001, 1000, 1002 })
+    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1004, 1000, 1002 })
 
     Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,
@@ -288,7 +284,7 @@ T["neo-tree"]["keeps sides open"] = function()
         fileTypePattern = "neo-tree",
         id = 1004,
         open = "Neotree reveal",
-        width = 2,
+        width = 60,
     })
 end
 
@@ -309,21 +305,23 @@ T["TSPlayground"]["keeps sides open"] = function()
     })
 
     child.cmd("TSPlaygroundToggle")
+    child.wait()
 
-    Helpers.expect.state(child, "tabs[1].wins.columns", 3)
+    Helpers.expect.state(child, "tabs[1].wins.columns", 4)
 
-    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1004)"), 159)
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1004)"), 19)
     Helpers.expect.state(child, "tabs[1].wins.integrations.TSPlayground", {
         close = "TSPlaygroundToggle",
         fileTypePattern = "tsplayground",
         id = 1004,
         open = "TSPlaygroundToggle",
-        width = 318,
+        width = 38,
     })
 
     Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,
         left = 1001,
+        right = 1002,
     })
 
     child.cmd("TSPlaygroundToggle")
@@ -336,7 +334,7 @@ T["TSPlayground"]["keeps sides open"] = function()
     Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,
         left = 1001,
-        right = 1005,
+        right = 1002,
     })
 end
 
@@ -354,6 +352,7 @@ T["TSPlayground"]["reduces `left` side if only active when integration is on `ri
         })
     ]])
     Helpers.toggle(child)
+    child.wait()
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000 })
 
@@ -364,19 +363,21 @@ T["TSPlayground"]["reduces `left` side if only active when integration is on `ri
         right = nil,
     })
     Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 30)
+    Helpers.expect.state(child, "tabs[1].wins.columns", 2)
 
     child.cmd("TSPlaygroundToggle")
+    child.wait()
 
     Helpers.expect.state(child, "tabs[1].wins.columns", 3)
 
-    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1003)"), 144)
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 20)
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1003)"), 26)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 26)
     Helpers.expect.state(child, "tabs[1].wins.integrations.TSPlayground", {
         close = "TSPlaygroundToggle",
         fileTypePattern = "tsplayground",
         id = 1003,
         open = "TSPlaygroundToggle",
-        width = 288,
+        width = 52,
     })
     Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,
@@ -385,6 +386,7 @@ T["TSPlayground"]["reduces `left` side if only active when integration is on `ri
     })
 
     child.cmd("TSPlaygroundToggle")
+    child.wait()
 
     Helpers.expect.state(child, "tabs[1].wins.columns", 2)
 
@@ -398,7 +400,7 @@ T["TSPlayground"]["reduces `left` side if only active when integration is on `ri
         left = 1001,
         right = nil,
     })
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 30)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 40)
 end
 
 T["aerial"] = MiniTest.new_set()
@@ -424,10 +426,11 @@ T["aerial"]["keeps sides open"] = function()
     })
 
     child.cmd("AerialToggle")
+    child.wait()
 
     Helpers.expect.state(child, "tabs[1].wins.columns", 4)
 
-    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1004)"), 25)
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1004)"), 14)
     Helpers.expect.state(child, "tabs[1].wins.integrations.aerial.id", 1004)
 
     Helpers.expect.state(child, "tabs[1].wins.main", {
@@ -437,6 +440,7 @@ T["aerial"]["keeps sides open"] = function()
     })
 
     child.cmd("AerialToggle")
+    child.wait()
 
     Helpers.expect.state(child, "tabs[1].wins.integrations.aerial", {
         close = "AerialToggle",

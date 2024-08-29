@@ -18,7 +18,7 @@ local T = MiniTest.new_set({
 T["install"] = MiniTest.new_set()
 
 T["install"]["sets global loaded variable"] = function()
-    Helpers.wait(child)
+    child.wait()
     Helpers.expect.global(child, "_G.NoNeckPain", vim.NIL)
     Helpers.expect.global_type(child, "_G.NoNeckPainLoaded", "boolean")
 end
@@ -212,7 +212,7 @@ end
 
 T["setup"]["starts the plugin on VimEnter"] = function()
     child.restart({ "-u", "scripts/init_auto_open.lua" })
-    Helpers.wait(child)
+    child.wait()
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
     Helpers.expect.state(child, "enabled", true)
