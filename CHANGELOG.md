@@ -1,4 +1,16 @@
 <a name="0.2.3"></a>
+## [1.15.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.14.1...v1.15.0) (2024-08-29)
+
+
+### Features
+
+* **splits:** leverage winlayout ([#375](https://github.com/shortcuts/no-neck-pain.nvim/issues/375)) ([ba74759](https://github.com/shortcuts/no-neck-pain.nvim/commit/ba7475920e0de811768728589f6c1c7df156c803))
+
+
+### Bug Fixes
+
+* inconsistent resizes on vsplits ([#380](https://github.com/shortcuts/no-neck-pain.nvim/issues/380)) ([af5c9bc](https://github.com/shortcuts/no-neck-pain.nvim/commit/af5c9bca059bf2aec6a3046e7507e5bd8dbeb3c0))
+
 ## [1.14.1](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.14.0...v1.14.1) (2024-06-26)
 
 
