@@ -46,7 +46,7 @@ end
 ---
 ---@return boolean
 ---@private
-function State:consumeRedraw()
+function State:consume_redraw()
     local redraw = self.tabs[self.activeTab].redraw
 
     self.tabs[self.activeTab].redraw = false
@@ -184,9 +184,9 @@ function State:getIntegration(id)
     return nil, nil
 end
 
----Gets every unregistered wins (non main, non integrations).
+---Gets wins that are not relative or main wins.
 ---
----@return table: the list of windows.
+---@return table: the list of windows IDs.
 ---@private
 function State:getUnregisteredWins()
     return vim.tbl_filter(function(win)
@@ -194,6 +194,7 @@ function State:getUnregisteredWins()
             and win ~= self.getSideID(self, "curr")
             and win ~= self.getSideID(self, "left")
             and win ~= self.getSideID(self, "right")
+            and not self.is_supported_integration(self, "_", win)
     end, vim.api.nvim_tabpage_list_wins(self.activeTab))
 end
 
@@ -205,7 +206,7 @@ end
 ---@return string?: the supported integration name.
 ---@return table?: the supported integration infos.
 ---@private
-function State:isSupportedIntegration(scope, win)
+function State:is_supported_integration(scope, win)
     win = win or 0
     local tab = self.getTabSafe(self)
     local buffer = vim.api.nvim_win_get_buf(win)
@@ -243,6 +244,21 @@ function State:isActiveTabRegistered()
     return self.hasTabs(self)
         and self.tabs[self.activeTab] ~= nil
         and vim.api.nvim_tabpage_is_valid(self.activeTab)
+end
+
+---Returns true if the win isn't registered, or if it is and valid, false otherwise.
+---
+---@param side "left"|"right": the side of the window.
+---@return boolean
+---@private
+function State:is_side_win_valid(side)
+    if not self.isSideEnabled(self, side) then
+        return true
+    end
+
+    local id = self.getSideID(self, side)
+
+    return id ~= nil and vim.api.nvim_win_is_valid(id)
 end
 
 ---Whether the side window is registered and a valid window.
@@ -459,7 +475,7 @@ function State:setLayoutWindows(scope, wins)
     for _, win in ipairs(wins) do
         local id = win[2]
         if win[1] == "leaf" and not A.isRelativeWindow(id) then
-            local supported, name, integration = self.isSupportedIntegration(self, scope, id)
+            local supported, name, integration = self.is_supported_integration(self, scope, id)
             if supported and name and integration then
                 integration.width = vim.api.nvim_win_get_width(id) * 2
                 integration.id = id

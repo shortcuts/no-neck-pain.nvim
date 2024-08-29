@@ -46,7 +46,7 @@ function E.skipEnable()
         return true
     end
 
-    return S.isSupportedIntegration(S, "E.skipEnable", nil)
+    return S.is_supported_integration(S, "E.skipEnable", nil)
 end
 
 return E
