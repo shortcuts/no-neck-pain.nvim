@@ -252,7 +252,7 @@ function N.enable(scope)
                 local refresh = S.scan_layout(S, s)
 
                 if not vim.api.nvim_win_is_valid(S.get_side_id(S, "curr")) then
-                    if p.event == "Buf_delete" and _G.NoNeckPain.config.fallbackOnBufferDelete then
+                    if p.event == "BufDelete" and _G.NoNeckPain.config.fallbackOnBufferDelete then
                         D.log(s, "`curr` has been deleted, resetting state")
 
                         vim.cmd("new")
