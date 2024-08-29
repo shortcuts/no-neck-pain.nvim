@@ -222,7 +222,7 @@ function State:is_supported_integration(scope, win)
     local registered_integrations = tab ~= nil and tab.wins.integrations or Co.INTEGRATIONS
 
     for name, integration in pairs(registered_integrations) do
-        if vim.startswith(string.lower(filetype), integration.filetype_pattern) then
+        if vim.startswith(string.lower(filetype), integration.fileTypePattern) then
             D.log(scope, "win '%d' is an integration '%s'", win, filetype)
 
             if tab ~= nil then

@@ -228,7 +228,7 @@ T["enable"]["(single tab) sets state"] = function()
     Helpers.expect.global_type(child, "_G.NoNeckPain.state", "table")
 
     Helpers.expect.state(child, "enabled", true)
-    Helpers.expect.state(child, "activeTab", 1)
+    Helpers.expect.state(child, "active_tab", 1)
 
     Helpers.expect.state_type(child, "tabs", "table")
 
@@ -257,7 +257,7 @@ T["enable"]["(multiple tab) sets state"] = function()
     Helpers.expect.global_type(child, "_G.NoNeckPain.state", "table")
 
     Helpers.expect.state(child, "enabled", true)
-    Helpers.expect.state(child, "activeTab", 1)
+    Helpers.expect.state(child, "active_tab", 1)
 
     Helpers.expect.state_type(child, "tabs", "table")
 
@@ -281,7 +281,7 @@ T["enable"]["(multiple tab) sets state"] = function()
     child.nnp()
 
     Helpers.expect.state(child, "enabled", true)
-    Helpers.expect.state(child, "activeTab", 2)
+    Helpers.expect.state(child, "active_tab", 2)
 
     Helpers.expect.state_type(child, "tabs", "table")
 
@@ -309,7 +309,7 @@ T["disable"]["(single tab) resets state"] = function()
     Helpers.expect.global_type(child, "_G.NoNeckPain.state", "table")
 
     Helpers.expect.state(child, "enabled", true)
-    Helpers.expect.state(child, "activeTab", 1)
+    Helpers.expect.state(child, "active_tab", 1)
 
     Helpers.expect.state_type(child, "tabs", "table")
 
@@ -318,7 +318,7 @@ T["disable"]["(single tab) resets state"] = function()
     Helpers.expect.global_type(child, "_G.NoNeckPain.state", "table")
 
     Helpers.expect.state(child, "enabled", false)
-    Helpers.expect.state(child, "activeTab", 1)
+    Helpers.expect.state(child, "active_tab", 1)
 
     Helpers.expect.state(child, "tabs", {})
 end
@@ -329,7 +329,7 @@ T["disable"]["(multiple tab) resets state"] = function()
     Helpers.expect.global_type(child, "_G.NoNeckPain.state", "table")
 
     Helpers.expect.state(child, "enabled", true)
-    Helpers.expect.state(child, "activeTab", 1)
+    Helpers.expect.state(child, "active_tab", 1)
 
     Helpers.expect.state_type(child, "tabs", "table")
 
@@ -339,7 +339,7 @@ T["disable"]["(multiple tab) resets state"] = function()
     Helpers.expect.global_type(child, "_G.NoNeckPain.state", "table")
 
     Helpers.expect.state(child, "enabled", true)
-    Helpers.expect.state(child, "activeTab", 2)
+    Helpers.expect.state(child, "active_tab", 2)
 
     Helpers.expect.state_type(child, "tabs", "table")
 
@@ -347,7 +347,7 @@ T["disable"]["(multiple tab) resets state"] = function()
     child.nnp()
 
     Helpers.expect.state(child, "enabled", true)
-    Helpers.expect.state(child, "activeTab", 2)
+    Helpers.expect.state(child, "active_tab", 2)
 
     Helpers.expect.state_type(child, "tabs", "table")
 
@@ -356,7 +356,7 @@ T["disable"]["(multiple tab) resets state"] = function()
     child.nnp()
 
     Helpers.expect.state(child, "enabled", false)
-    Helpers.expect.state(child, "activeTab", 1)
+    Helpers.expect.state(child, "active_tab", 1)
 
     Helpers.expect.state(child, "tabs", {})
 end

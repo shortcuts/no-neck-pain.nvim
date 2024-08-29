@@ -121,12 +121,12 @@ function W.init_scratchpad(side, id, cleanup)
     D.log(
         string.format("W.init_scratchpad:%s", side),
         "enabled with location %s",
-        _G.NoNeckPain.config.buffers[side].scratchpad.path_to_file
+        _G.NoNeckPain.config.buffers[side].scratchpad.pathToFile
     )
 
     W.init_side_options(side, id)
 
-    vim.cmd(string.format("edit %s", _G.NoNeckPain.config.buffers[side].scratchpad.path_to_file))
+    vim.cmd(string.format("edit %s", _G.NoNeckPain.config.buffers[side].scratchpad.pathToFile))
 
     A.set_buffer_option(0, "bufhidden", "")
     A.set_buffer_option(0, "buftype", "")
@@ -163,7 +163,7 @@ function W.create_side_buffers()
             wins[side].padding = W.get_padding(side)
 
             if
-                wins[side].padding > _G.NoNeckPain.config.min_side_buffer_width
+                wins[side].padding > _G.NoNeckPain.config.minSideBufferWidth
                 and not S.is_side_win_valid(S, side)
             then
                 vim.cmd(wins[side].cmd)
@@ -196,7 +196,7 @@ function W.create_side_buffers()
         if S.is_side_win_valid(S, side) then
             local padding = wins[side].padding or W.get_padding(side)
 
-            if padding > _G.NoNeckPain.config.min_side_buffer_width then
+            if padding > _G.NoNeckPain.config.minSideBufferWidth then
                 W.resize(S.get_side_id(S, side), padding, side)
             else
                 W.close("W.create_side_buffers", S.get_side_id(S, side), side)

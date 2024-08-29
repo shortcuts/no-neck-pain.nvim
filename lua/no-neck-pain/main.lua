@@ -95,7 +95,12 @@ function N.init(scope, go_to_curr)
         error("called the internal `init` method on a `nil` tab.")
     end
 
-    D.log(scope, "init called on tab %d for current window %d", S.active_tab, S.set_side_id(S, "curr"))
+    D.log(
+        scope,
+        "init called on tab %d for current window %d",
+        S.active_tab,
+        S.get_side_id(S, "curr")
+    )
 
     -- if we do not have side buffers, we must ensure we only trigger a focus if we re-create them
     local had_side_buffers = true
@@ -116,7 +121,7 @@ function N.init(scope, go_to_curr)
     then
         D.log(scope, "re-routing focus to curr")
 
-        vim.api.nvim_set_current_win(S.set_side_id(S, "curr"))
+        vim.api.nvim_set_current_win(S.get_side_id(S, "curr"))
     end
 
     -- if we still have side buffers open at this point, and we have vsplit opened,
@@ -238,14 +243,16 @@ function N.enable(scope)
                     return
                 end
 
-                if p.event == "BufDelete" and vim.api.nvim_win_is_valid(S.get_side_id(S, "curr")) then
+                if
+                    p.event == "BufDelete" and vim.api.nvim_win_is_valid(S.get_side_id(S, "curr"))
+                then
                     return
                 end
 
                 local refresh = S.scan_layout(S, s)
 
                 if not vim.api.nvim_win_is_valid(S.get_side_id(S, "curr")) then
-                    if p.event == "Buf_delete" and _G.NoNeckPain.config.fallback_on_buffer_delete then
+                    if p.event == "Buf_delete" and _G.NoNeckPain.config.fallbackOnBufferDelete then
                         D.log(s, "`curr` has been deleted, resetting state")
 
                         vim.cmd("new")
@@ -408,7 +415,7 @@ function N.disable(scope)
     if curr_id ~= nil and vim.api.nvim_win_is_valid(curr_id) then
         vim.api.nvim_set_current_win(curr_id)
 
-        if _G.NoNeckPain.config.kill_all_buffers_on_disable then
+        if _G.NoNeckPain.config.killAllBuffersOnDisable then
             vim.cmd("only")
         end
     end
