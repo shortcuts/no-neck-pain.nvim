@@ -155,6 +155,12 @@ end
 T["neotest"] = MiniTest.new_set()
 
 T["neotest"]["keeps sides open"] = function()
+    if child.fn.has("nvim-0.8") == 0 then
+        MiniTest.skip("neotest doesn't support version below 8")
+
+        return
+    end
+
     child.restart({ "-u", "scripts/init_with_neotest.lua", "lua/no-neck-pain/main.lua" })
 
     Helpers.toggle(child)
@@ -211,7 +217,7 @@ T["NvimTree"] = MiniTest.new_set()
 
 T["NvimTree"]["keeps sides open"] = function()
     if child.fn.has("nvim-0.9") == 0 then
-        MiniTest.skip("NvimTree doesn't support version below 8")
+        MiniTest.skip("NvimTree doesn't support version below 9")
 
         return
     end
@@ -292,7 +298,7 @@ T["TSPlayground"] = MiniTest.new_set()
 
 T["TSPlayground"]["keeps sides open"] = function()
     if child.fn.has("nvim-0.9") == 0 then
-        MiniTest.skip("tsplayground doesn't support version below 8")
+        MiniTest.skip("tsplayground doesn't support version below 9")
 
         return
     end
@@ -346,7 +352,7 @@ end
 
 T["TSPlayground"]["reduces `left` side if only active when integration is on `right`"] = function()
     if child.fn.has("nvim-0.9") == 0 then
-        MiniTest.skip("tsplayground doesn't support version below 8")
+        MiniTest.skip("tsplayground doesn't support version below 9")
 
         return
     end
