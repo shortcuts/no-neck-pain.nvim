@@ -228,7 +228,7 @@ T["vsplit"]["many vsplit leave side buffers open as long as there's space for it
     child.cmd("q")
 
     Helpers.expect.equality(child.get_wins_in_tab(), { 1005, 1003, 1000, 1006 })
-    Helpers.expect.state(child, "tabs[_G.NoNeckPain.state.activeTab].wins.main", {
+    Helpers.expect.state(child, "tabs[_G.NoNeckPain.state.active_tab].wins.main", {
         curr = 1000,
         left = 1005,
         right = 1006,
@@ -278,7 +278,7 @@ T["vsplit/split"]["state is correctly sync'd even after many changes"] = functio
     child.cmd("q")
 
     Helpers.expect.equality(child.get_wins_in_tab(), { 1006, 1004, 1007 })
-    Helpers.expect.state(child, "tabs[_G.NoNeckPain.state.activeTab].wins.main", {
+    Helpers.expect.state(child, "tabs[_G.NoNeckPain.state.active_tab].wins.main", {
         curr = 1004,
         left = 1006,
         right = 1007,
