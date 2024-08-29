@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [1.16.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.15.0...v1.16.0) (2024-08-29)
+
+
+### Features
+
+* add mini.starter dashboard to constants ([#377](https://github.com/shortcuts/no-neck-pain.nvim/issues/377)) ([d8168ac](https://github.com/shortcuts/no-neck-pain.nvim/commit/d8168ac45f1aed39ca9c9d85146d3408a9163191))
+
 ## [1.15.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.14.1...v1.15.0) (2024-08-29)
 
 
