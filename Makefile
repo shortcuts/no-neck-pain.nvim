@@ -24,11 +24,12 @@ $(addprefix test-, $(TESTFILES)): test-%:
 		-c "lua MiniTest.run_file('tests/test_$*.lua', { execute = { reporter = MiniTest.gen_reporter.stdout({ group_depth = 2 }) } })"
 deps:
 	./scripts/clone_deps.sh 1 || true
-	# bc for mini.nvim before this date
-	./scripts/reset_deps_at_date.sh ./deps/mini.nvim
 
-deps-latest:
-	./scripts/clone_deps.sh 1 || true
+deps-lint:
+	luarocks install argparse --force
+	luarocks install luafilesystem --force
+	luarocks install lanes --force
+	luarocks install luacheck --force
 
 test-ci: deps test
 
@@ -39,6 +40,7 @@ documentation-ci: deps documentation
 
 lint:
 	stylua . -g '*.lua' -g '!deps/' -g '!nightly/'
+	luacheck plugin/ lua/
 
 luals-ci:
 	rm -rf .ci/lua-ls/log

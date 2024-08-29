@@ -116,6 +116,10 @@ end
 ---@param side "left"|"right": the side of the window being resized, used for logging only.
 ---@private
 function C.init(win, side)
+    if win == nil then
+        return
+    end
+
     if
         _G.NoNeckPain.config.buffers[side].colors.background == nil
         and _G.NoNeckPain.config.buffers[side].colors.text == nil
