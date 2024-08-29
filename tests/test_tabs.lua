@@ -19,76 +19,76 @@ T["tabs"] = MiniTest.new_set()
 
 T["tabs"]["keeps the active tab in state"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
-    Helpers.toggle(child)
+    child.nnp()
 
-    Helpers.expect.state(child, "activeTab", 1)
+    Helpers.expect.state(child, "active_tab", 1)
 
     child.cmd("tabnew")
     child.wait()
 
-    Helpers.expect.state(child, "activeTab", 2)
+    Helpers.expect.state(child, "active_tab", 2)
 end
 
 T["tabs"]["new tab doesn't have side buffers"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
-    Helpers.toggle(child)
+    child.nnp()
 
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
-    Helpers.expect.state(child, "activeTab", 1)
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+    Helpers.expect.state(child, "active_tab", 1)
 
     child.cmd("tabnew")
     child.wait()
 
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1003 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1003 })
 end
 
 T["tabs"]["side buffers coexist on many tabs"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
-    Helpers.toggle(child)
+    child.nnp()
 
     -- tab 1
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
-    Helpers.expect.state(child, "activeTab", 1)
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+    Helpers.expect.state(child, "active_tab", 1)
 
     -- tab 2
     child.cmd("tabnew")
-    Helpers.toggle(child)
+    child.nnp()
 
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1004, 1003, 1005 })
-    Helpers.expect.state(child, "activeTab", 2)
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1004, 1003, 1005 })
+    Helpers.expect.state(child, "active_tab", 2)
 
     -- tab 3
     child.cmd("tabnew")
-    Helpers.toggle(child)
+    child.nnp()
 
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1007, 1006, 1008 })
-    Helpers.expect.state(child, "activeTab", 3)
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1007, 1006, 1008 })
+    Helpers.expect.state(child, "active_tab", 3)
 
-    Helpers.expect.equality(Helpers.winsInTab(child, 1), { 1001, 1000, 1002 })
-    Helpers.expect.equality(Helpers.winsInTab(child, 2), { 1004, 1003, 1005 })
-    Helpers.expect.equality(Helpers.winsInTab(child, 3), { 1007, 1006, 1008 })
+    Helpers.expect.equality(child.get_wins_in_tab(1), { 1001, 1000, 1002 })
+    Helpers.expect.equality(child.get_wins_in_tab(2), { 1004, 1003, 1005 })
+    Helpers.expect.equality(child.get_wins_in_tab(3), { 1007, 1006, 1008 })
 end
 
 T["tabs"]["previous tab kept side buffers if enabled"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
-    Helpers.toggle(child)
+    child.nnp()
 
     -- tab 1
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
-    Helpers.expect.state(child, "activeTab", 1)
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+    Helpers.expect.state(child, "active_tab", 1)
 
     -- tab 2
     child.cmd("tabnew")
     child.wait()
 
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1003 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1003 })
 
     -- tab 1
     child.cmd("tabprevious")
     child.wait()
 
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
-    Helpers.expect.state(child, "activeTab", 1)
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+    Helpers.expect.state(child, "active_tab", 1)
 end
 
 T["TabNewEntered"] = MiniTest.new_set()
@@ -100,17 +100,17 @@ T["TabNewEntered"]["starts the plugin on new tab"] = function()
     Helpers.expect.state(child, "enabled", true)
 
     -- tab 1
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
 
-    Helpers.expect.state(child, "activeTab", 1)
+    Helpers.expect.state(child, "active_tab", 1)
 
     -- tab 2
     child.cmd("tabnew")
     child.wait()
 
-    Helpers.expect.state(child, "activeTab", 2)
+    Helpers.expect.state(child, "active_tab", 2)
 
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1004, 1003, 1005 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1004, 1003, 1005 })
 end
 
 T["TabNewEntered"]["does not re-enable if the user disables it"] = function()
@@ -120,33 +120,33 @@ T["TabNewEntered"]["does not re-enable if the user disables it"] = function()
     Helpers.expect.state(child, "enabled", true)
 
     -- tab 1
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
 
-    Helpers.expect.state(child, "activeTab", 1)
+    Helpers.expect.state(child, "active_tab", 1)
 
     -- tab 2
     child.cmd("tabnew")
     child.wait()
-    Helpers.expect.state(child, "activeTab", 2)
+    Helpers.expect.state(child, "active_tab", 2)
 
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1004, 1003, 1005 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1004, 1003, 1005 })
 
-    Helpers.toggle(child)
+    child.nnp()
 
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1003 })
-    Helpers.expect.state(child, "activeTab", 2)
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1003 })
+    Helpers.expect.state(child, "active_tab", 2)
 
     -- tab 1
     child.cmd("tabprevious")
     child.wait()
-    Helpers.expect.state(child, "activeTab", 1)
+    Helpers.expect.state(child, "active_tab", 1)
 
     -- tab 2
     child.cmd("tabnext")
     child.wait()
-    Helpers.expect.state(child, "activeTab", 2)
+    Helpers.expect.state(child, "active_tab", 2)
 
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1003 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1003 })
 end
 
 T["tabnew/tabclose"] = MiniTest.new_set()
@@ -156,29 +156,29 @@ T["tabnew/tabclose"]["opening and closing tabs does not throw any error"] = func
     child.wait()
 
     Helpers.expect.state(child, "enabled", true)
-    Helpers.expect.state(child, "activeTab", 1)
+    Helpers.expect.state(child, "active_tab", 1)
 
     child.cmd("tabnew")
     child.wait()
-    Helpers.expect.state(child, "activeTab", 2)
+    Helpers.expect.state(child, "active_tab", 2)
 
     child.cmd("tabclose")
     child.wait()
-    Helpers.expect.state(child, "activeTab", 1)
+    Helpers.expect.state(child, "active_tab", 1)
 
     child.cmd("tabnew")
     child.wait()
     child.cmd("tabnew")
     child.wait()
-    Helpers.expect.state(child, "activeTab", 4)
+    Helpers.expect.state(child, "active_tab", 4)
 
     child.cmd("tabclose")
     child.wait()
-    Helpers.expect.state(child, "activeTab", 3)
+    Helpers.expect.state(child, "active_tab", 3)
 
     child.cmd("tabclose")
     child.wait()
-    Helpers.expect.state(child, "activeTab", 1)
+    Helpers.expect.state(child, "active_tab", 1)
 end
 
 T["tabnew/tabclose"]["doesn't keep closed tabs in state"] = function()
@@ -186,12 +186,12 @@ T["tabnew/tabclose"]["doesn't keep closed tabs in state"] = function()
     child.wait()
 
     Helpers.expect.state(child, "enabled", true)
-    Helpers.expect.state(child, "activeTab", 1)
+    Helpers.expect.state(child, "active_tab", 1)
     Helpers.expect.state(child, "tabs", {
         {
             id = 1,
             redraw = false,
-            scratchPadEnabled = false,
+            scratchpad_enabled = false,
             wins = {
                 integrations = Co.INTEGRATIONS,
                 main = {
@@ -210,7 +210,7 @@ T["tabnew/tabclose"]["doesn't keep closed tabs in state"] = function()
         {
             id = 1,
             redraw = false,
-            scratchPadEnabled = false,
+            scratchpad_enabled = false,
             wins = {
                 integrations = Co.INTEGRATIONS,
                 main = {
@@ -224,7 +224,7 @@ T["tabnew/tabclose"]["doesn't keep closed tabs in state"] = function()
         {
             id = 2,
             redraw = false,
-            scratchPadEnabled = false,
+            scratchpad_enabled = false,
             wins = {
                 integrations = Co.INTEGRATIONS,
                 main = {
@@ -243,7 +243,7 @@ T["tabnew/tabclose"]["doesn't keep closed tabs in state"] = function()
         {
             id = 1,
             redraw = false,
-            scratchPadEnabled = false,
+            scratchpad_enabled = false,
             wins = {
                 integrations = Co.INTEGRATIONS,
                 main = {
@@ -263,12 +263,12 @@ T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
 
     child.cmd("badd 1")
     Helpers.expect.state(child, "enabled", true)
-    Helpers.expect.state(child, "activeTab", 1)
+    Helpers.expect.state(child, "active_tab", 1)
     Helpers.expect.state(child, "tabs", {
         {
             id = 1,
             redraw = false,
-            scratchPadEnabled = false,
+            scratchpad_enabled = false,
             wins = {
                 integrations = Co.INTEGRATIONS,
                 main = {
@@ -286,12 +286,12 @@ T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
     child.cmd("badd 2")
     child.wait()
     Helpers.expect.state(child, "enabled", true)
-    Helpers.expect.state(child, "activeTab", 2)
+    Helpers.expect.state(child, "active_tab", 2)
     Helpers.expect.state(child, "tabs", {
         {
             id = 1,
             redraw = false,
-            scratchPadEnabled = false,
+            scratchpad_enabled = false,
             wins = {
                 integrations = Co.INTEGRATIONS,
                 main = {
@@ -305,7 +305,7 @@ T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
         {
             id = 2,
             redraw = false,
-            scratchPadEnabled = false,
+            scratchpad_enabled = false,
             wins = {
                 integrations = Co.INTEGRATIONS,
                 main = {
@@ -318,12 +318,12 @@ T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
         },
     })
 
-    Helpers.toggle(child)
+    child.nnp()
     Helpers.expect.state(child, "tabs", {
         {
             id = 1,
             redraw = false,
-            scratchPadEnabled = false,
+            scratchpad_enabled = false,
             wins = {
                 integrations = Co.INTEGRATIONS,
                 main = {
@@ -336,12 +336,12 @@ T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
         },
     })
 
-    Helpers.toggle(child)
+    child.nnp()
     Helpers.expect.state(child, "tabs", {
         {
             id = 1,
             redraw = false,
-            scratchPadEnabled = false,
+            scratchpad_enabled = false,
             wins = {
                 integrations = Co.INTEGRATIONS,
                 main = {
@@ -355,7 +355,7 @@ T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
         {
             id = 2,
             redraw = false,
-            scratchPadEnabled = false,
+            scratchpad_enabled = false,
             wins = {
                 integrations = Co.INTEGRATIONS,
                 main = {
@@ -370,12 +370,12 @@ T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
 
     child.cmd("tabprevious")
     child.wait()
-    Helpers.expect.state(child, "activeTab", 1)
+    Helpers.expect.state(child, "active_tab", 1)
     Helpers.expect.state(child, "tabs", {
         {
             id = 1,
             redraw = false,
-            scratchPadEnabled = false,
+            scratchpad_enabled = false,
             wins = {
                 integrations = Co.INTEGRATIONS,
                 main = {
@@ -389,7 +389,7 @@ T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
         {
             id = 2,
             redraw = false,
-            scratchPadEnabled = false,
+            scratchpad_enabled = false,
             wins = {
                 integrations = Co.INTEGRATIONS,
                 main = {
@@ -404,7 +404,7 @@ T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
 
     child.cmd("tabprevious")
     child.wait()
-    Helpers.expect.state(child, "activeTab", 2)
+    Helpers.expect.state(child, "active_tab", 2)
 end
 
 T["tabnew/tabclose"]["does not pick tab 1 for the first active tab"] = function()
@@ -421,16 +421,16 @@ T["tabnew/tabclose"]["does not pick tab 1 for the first active tab"] = function(
     child.cmd("badd 2")
 
     Helpers.expect.global_type(child, "_G.NoNeckPain.state", "nil")
-    Helpers.toggle(child)
+    child.nnp()
     Helpers.expect.equality(child.api.nvim_get_current_tabpage(), 2)
     Helpers.expect.global_type(child, "_G.NoNeckPain.state", "table")
     Helpers.expect.state(child, "enabled", true)
     Helpers.expect.state(child, "tabs[1]", vim.NIL)
-    Helpers.expect.state(child, "activeTab", 2)
+    Helpers.expect.state(child, "active_tab", 2)
     Helpers.expect.state(child, "tabs[2]", {
         id = 2,
         redraw = false,
-        scratchPadEnabled = false,
+        scratchpad_enabled = false,
         wins = {
             integrations = Co.INTEGRATIONS,
             main = {
@@ -448,13 +448,13 @@ T["tabnew/tabclose"]["does not pick tab 1 for the first active tab"] = function(
     Helpers.expect.global_type(child, "_G.NoNeckPain.state", "table")
     Helpers.expect.state(child, "enabled", true)
     Helpers.expect.state(child, "tabs[1]", vim.NIL)
-    Helpers.expect.state(child, "activeTab", 1)
+    Helpers.expect.state(child, "active_tab", 1)
 
-    Helpers.toggle(child)
+    child.nnp()
     Helpers.expect.state(child, "tabs[1]", {
         id = 1,
         redraw = false,
-        scratchPadEnabled = false,
+        scratchpad_enabled = false,
         wins = {
             integrations = {
                 NeoTree = {
@@ -509,7 +509,7 @@ T["tabnew/tabclose"]["does not pick tab 1 for the first active tab"] = function(
     Helpers.expect.state(child, "tabs[2]", {
         id = 2,
         redraw = false,
-        scratchPadEnabled = false,
+        scratchpad_enabled = false,
         wins = {
             integrations = Co.INTEGRATIONS,
             main = {
@@ -536,16 +536,16 @@ T["tabnew/tabclose"]["keep state synchronized on second tab"] = function()
     child.cmd("badd 2")
 
     Helpers.expect.global_type(child, "_G.NoNeckPain.state", "nil")
-    Helpers.toggle(child)
+    child.nnp()
     Helpers.expect.equality(child.api.nvim_get_current_tabpage(), 2)
     Helpers.expect.global_type(child, "_G.NoNeckPain.state", "table")
     Helpers.expect.state(child, "enabled", true)
     Helpers.expect.state(child, "tabs[1]", vim.NIL)
-    Helpers.expect.state(child, "activeTab", 2)
+    Helpers.expect.state(child, "active_tab", 2)
     Helpers.expect.state(child, "tabs[2]", {
         id = 2,
         redraw = false,
-        scratchPadEnabled = false,
+        scratchpad_enabled = false,
         wins = {
             integrations = Co.INTEGRATIONS,
             main = {
@@ -563,19 +563,19 @@ T["tabnew/tabclose"]["keep state synchronized on second tab"] = function()
     Helpers.expect.global_type(child, "_G.NoNeckPain.state", "table")
     Helpers.expect.state(child, "enabled", true)
     Helpers.expect.state(child, "tabs[1]", vim.NIL)
-    Helpers.expect.state(child, "activeTab", 1)
+    Helpers.expect.state(child, "active_tab", 1)
 
     child.cmd("tabnext")
     child.wait()
     Helpers.expect.global_type(child, "_G.NoNeckPain.state", "table")
     Helpers.expect.equality(child.api.nvim_get_current_tabpage(), 2)
-    Helpers.expect.state(child, "activeTab", 2)
+    Helpers.expect.state(child, "active_tab", 2)
     Helpers.expect.state(child, "enabled", true)
     Helpers.expect.state(child, "tabs[1]", vim.NIL)
     Helpers.expect.state(child, "tabs[2]", {
         id = 2,
         redraw = false,
-        scratchPadEnabled = false,
+        scratchpad_enabled = false,
         wins = {
             integrations = Co.INTEGRATIONS,
             main = {
@@ -587,7 +587,7 @@ T["tabnew/tabclose"]["keep state synchronized on second tab"] = function()
         },
     })
 
-    Helpers.toggle(child)
+    child.nnp()
     Helpers.expect.state(child, "tabs", {})
 end
 
@@ -595,20 +595,20 @@ T["tabnew/tabclose"]["does not close nvim when quitting tab if some are left"] =
     child.lua([[require('no-neck-pain').setup({width=50})]])
 
     Helpers.expect.equality(child.api.nvim_get_current_tabpage(), 1)
-    Helpers.toggle(child)
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+    child.nnp()
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
 
     child.cmd("tabnew")
     child.wait()
     Helpers.expect.equality(child.api.nvim_get_current_tabpage(), 2)
-    Helpers.toggle(child)
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1004, 1003, 1005 })
+    child.nnp()
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1004, 1003, 1005 })
 
     Helpers.expect.state(child, "enabled", true)
     Helpers.expect.state(child, "tabs[1]", {
         id = 1,
         redraw = false,
-        scratchPadEnabled = false,
+        scratchpad_enabled = false,
         wins = {
             integrations = Co.INTEGRATIONS,
             main = {
@@ -619,11 +619,11 @@ T["tabnew/tabclose"]["does not close nvim when quitting tab if some are left"] =
             columns = 3,
         },
     })
-    Helpers.expect.state(child, "activeTab", 2)
+    Helpers.expect.state(child, "active_tab", 2)
     Helpers.expect.state(child, "tabs[2]", {
         id = 2,
         redraw = false,
-        scratchPadEnabled = false,
+        scratchpad_enabled = false,
         wins = {
             integrations = Co.INTEGRATIONS,
             main = {
@@ -638,11 +638,11 @@ T["tabnew/tabclose"]["does not close nvim when quitting tab if some are left"] =
     child.cmd("q")
     child.wait()
     Helpers.expect.equality(child.api.nvim_get_current_tabpage(), 1)
-    Helpers.expect.state(child, "activeTab", 1)
+    Helpers.expect.state(child, "active_tab", 1)
     Helpers.expect.state(child, "tabs[1]", {
         id = 1,
         redraw = false,
-        scratchPadEnabled = false,
+        scratchpad_enabled = false,
         wins = {
             integrations = Co.INTEGRATIONS,
             main = {

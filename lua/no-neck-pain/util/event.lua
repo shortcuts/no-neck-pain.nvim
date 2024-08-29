@@ -15,11 +15,11 @@ function E.skip()
         return true
     end
 
-    if A.isRelativeWindow() then
+    if A.is_relative_window() then
         return true
     end
 
-    return A.getCurrentTab() ~= S.activeTab
+    return A.get_current_tab() ~= S.active_tab
 end
 
 --- determines if we should skip the enabling of the plugin:
@@ -27,17 +27,17 @@ end
 ---  2. if we are focusing a relative window
 ---  3. if we are focusing a side tree or a dashboard
 --- - the plugin is not enabled
---- - we have splits open (when `skipSplit` is `true`)
+--- - we have splits open (when `skip_split` is `true`)
 --- - we are focusing a floating window
 --- - we are focusing one of the side buffer
 ---
 ---@private
-function E.skipEnable()
-    if S.isActiveTabRegistered(S) then
+function E.skip_enable()
+    if S.is_active_tab_registered(S) then
         return true
     end
 
-    if A.isRelativeWindow() then
+    if A.is_relative_window() then
         return true
     end
 
@@ -46,7 +46,7 @@ function E.skipEnable()
         return true
     end
 
-    return S.isSupportedIntegration(S, "E.skipEnable", nil)
+    return S.is_supported_integration(S, "E.skip_enable", nil)
 end
 
 return E

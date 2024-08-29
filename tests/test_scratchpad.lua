@@ -70,8 +70,8 @@ T["scratchPad"]["default to `norg` fileType"] = function()
             }
         },
     })]])
-    Helpers.toggle(child)
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+    child.nnp()
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
 
     local cwd = child.lua_get("vim.fn.getcwd()")
     local left = cwd .. "/no-neck-pain-left.norg"
@@ -115,9 +115,9 @@ T["scratchPad"]["override of filetype is reflected to the buffer"] = function()
             }
         },
     })]])
-    Helpers.toggle(child)
+    child.nnp()
 
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
 
     local cwd = child.lua_get("vim.fn.getcwd()")
     local left = cwd .. "/no-neck-pain-left.md"
@@ -159,9 +159,9 @@ T["scratchPad"]["side buffer can have their own definition"] = function()
             }
         },
     })]])
-    Helpers.toggle(child)
+    child.nnp()
 
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
 
     local cwd = child.lua_get("vim.fn.getcwd()")
     local left = cwd .. "/lua/no-neck-pain-left.norg"
@@ -202,9 +202,9 @@ T["scratchPad"]["side buffer definition overrides global one"] = function()
             },
         },
     })]])
-    Helpers.toggle(child)
+    child.nnp()
 
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
 
     local cwd = child.lua_get("vim.fn.getcwd()")
     local left = cwd .. "/lua/no-neck-pain-left.norg"
@@ -242,9 +242,9 @@ T["scratchPad"]["forwards the given filetype to the scratchPad"] = function()
             },
         },
     })]])
-    Helpers.toggle(child)
+    child.nnp()
 
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
 
     Helpers.expect.config(child, "buffers.left.bo.filetype", "custom")
     Helpers.expect.config(child, "buffers.right.bo.filetype", "custom")
@@ -264,9 +264,9 @@ T["scratchPad"]["toggling the scratchPad sets the buffer/window options"] = func
         buffers = { scratchPad = { enabled = false }, },
         mappings = { scratchPad = "foo" },
     })]])
-    Helpers.toggle(child)
+    child.nnp()
 
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
 
     child.fn.win_gotoid(1001)
     Helpers.expect.equality(child.lua_get("vim.api.nvim_buf_get_option(0, 'buflisted')"), false)

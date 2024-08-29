@@ -329,7 +329,7 @@ local defaults = vim.deepcopy(NoNeckPain.options)
 ---@param fileType string The file extension to leverage.
 ---
 ---@private
-local function parseDeprecatedScratchPad(side, options, fileType)
+local function parse_deprecated_scratchPad(side, options, fileType)
     -- set the defaults if the user rely on them
     if vim.tbl_count(options) == 0 or options.pathToFile == nil then
         options = A.tde(options, defaults.buffers.scratchPad)
@@ -368,7 +368,7 @@ function NoNeckPain.defaults(options)
         options.buffers[side].bo = A.tde(options.buffers[side].bo, options.buffers.bo)
         options.buffers[side].wo = A.tde(options.buffers[side].wo, options.buffers.wo)
         options.buffers[side].colors = A.tde(options.buffers[side].colors, options.buffers.colors)
-        options.buffers[side].scratchPad = parseDeprecatedScratchPad(
+        options.buffers[side].scratchPad = parse_deprecated_scratchPad(
             side,
             A.tde(options.buffers[side].scratchPad, options.buffers.scratchPad),
             options.buffers[side].bo.filetype
@@ -421,7 +421,7 @@ end
 ---@param mappings table A key value map of the mapping name and its command.
 ---
 ---@private
-local function registerMappings(options, mappings)
+local function register_mappings(options, mappings)
     -- all of the mappings are disabled
     if not options.enabled then
         return
@@ -461,9 +461,9 @@ function NoNeckPain.setup(options)
 
     NoNeckPain.options.hasNvim9 = vim.fn.has("nvim-0.9") == 1
 
-    D.warnDeprecation(NoNeckPain.options)
+    D.warn_deprecation(NoNeckPain.options)
 
-    registerMappings(NoNeckPain.options.mappings, {
+    register_mappings(NoNeckPain.options.mappings, {
         toggle = ":NoNeckPain<CR>",
         toggleLeftSide = ":NoNeckPainToggleLeftSide<CR>",
         toggleRightSide = ":NoNeckPainToggleRightSide<CR>",
