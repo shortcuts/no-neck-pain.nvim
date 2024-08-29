@@ -251,7 +251,7 @@ end
 ---@param side "left"|"right": the side of the window.
 ---@return boolean
 ---@private
-function State:is_side_win_valid(side)
+function State:is_side_win_enabled_and_valid(side)
     if not self.is_side_enabled(self, side) then
         return true
     end

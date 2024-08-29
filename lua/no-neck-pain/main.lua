@@ -104,7 +104,7 @@ function N.init(scope, go_to_curr)
 
     -- if we do not have side buffers, we must ensure we only trigger a focus if we re-create them
     local had_side_buffers = true
-    if not S.is_side_win_valid(S, "left") or not S.is_side_win_valid(S, "right") then
+    if not S.is_side_win_enabled_and_valid(S, "left") or not S.is_side_win_enabled_and_valid(S, "right") then
         had_side_buffers = false
     end
 
