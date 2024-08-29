@@ -15,7 +15,7 @@ function NoNeckPain.toggle()
 end
 
 --- Toggles the scratchpad feature of the plugin.
-function NoNeckPain.toggle_scratchpad()
+function NoNeckPain.toggleScratchPad()
     if _G.NoNeckPain.state == nil or not _G.NoNeckPain.state.enabled then
         error("no-neck-pain.nvim must be enabled, run `NoNeckPain` first.")
     end
@@ -51,7 +51,7 @@ end
 --- Toggles the config `${side}.enabled` and re-inits the plugin.
 ---
 --- @param side "left" | "right": the side to toggle.
-function NoNeckPain.toggle_side(side)
+function NoNeckPain.toggleSide(side)
     if _G.NoNeckPain.state == nil or not _G.NoNeckPain.state.enabled then
         error("no-neck-pain.nvim must be enabled, run `NoNeckPain` first.")
     end
