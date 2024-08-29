@@ -4,25 +4,6 @@ local Helpers = {}
 -- Add extra expectations
 Helpers.expect = vim.deepcopy(MiniTest.expect)
 
-function Helpers.toggle(child)
-    child.cmd("NoNeckPain")
-    child.wait()
-end
-
-function Helpers.currentWin(child)
-    return child.lua_get("vim.api.nvim_get_current_win()")
-end
-
-function Helpers.winsInTab(child, tab)
-    tab = tab or "_G.NoNeckPain.state.activeTab"
-
-    return child.lua_get("vim.api.nvim_tabpage_list_wins(" .. tab .. ")")
-end
-
-function Helpers.listBuffers(child)
-    return child.lua_get("vim.api.nvim_list_bufs()")
-end
-
 local function errorMessage(str, pattern)
     return string.format("Pattern: %s\nObserved string: %s", vim.inspect(pattern), str)
 end
@@ -108,12 +89,31 @@ Helpers.new_child_neovim = function()
         child.loop.sleep(10)
     end
 
+    child.nnp = function()
+        child.cmd("NoNeckPain")
+        child.wait()
+    end
+
+    child.get_wins_in_tab = function(tab)
+        tab = tab or "_G.NoNeckPain.state.activeTab"
+
+        return child.lua_get("vim.api.nvim_tabpage_list_wins(" .. tab .. ")")
+    end
+
+    child.list_buffers = function()
+        return child.lua_get("vim.api.nvim_list_bufs()")
+    end
+
     child.setup = function()
         child.restart({ "-u", "scripts/minimal_init.lua" })
 
         -- Change initial buffer to be readonly. This not only increases execution
         -- speed, but more closely resembles manually opened Neovim.
         child.bo.readonly = false
+    end
+
+    child.get_current_win = function()
+        return child.lua_get("vim.api.nvim_get_current_win()")
     end
 
     child.set_lines = function(arr, start, finish)

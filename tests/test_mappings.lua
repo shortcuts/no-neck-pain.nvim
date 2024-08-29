@@ -184,10 +184,10 @@ end
 
 T["setup"]["increase the width with mapping"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50,mappings={enabled=true,widthUp="nn"}}) ]])
-    Helpers.toggle(child)
+    child.nnp()
 
     Helpers.expect.global(child, "_G.NoNeckPain.config.width", 50)
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
 
     child.api.nvim_input("nn")
     child.api.nvim_input("nn")
@@ -201,10 +201,10 @@ T["setup"]["increase the width with custom mapping and value"] = function()
     child.lua(
         [[ require('no-neck-pain').setup({width=50,mappings={enabled=true,widthUp={mapping="nn", value=10}}}) ]]
     )
-    Helpers.toggle(child)
+    child.nnp()
 
     Helpers.expect.global(child, "_G.NoNeckPain.config.width", 50)
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
 
     child.api.nvim_input("nn")
     child.api.nvim_input("nn")
@@ -242,10 +242,10 @@ T["setup"]["decrease the width with mapping"] = function()
     child.lua(
         [[ require('no-neck-pain').setup({width=50,mappings={enabled=true,widthDown="nn"}}) ]]
     )
-    Helpers.toggle(child)
+    child.nnp()
 
     Helpers.expect.global(child, "_G.NoNeckPain.config.width", 50)
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
 
     child.api.nvim_input("nn")
     child.api.nvim_input("nn")
@@ -259,10 +259,10 @@ T["setup"]["decrease the width with custom mapping and value"] = function()
     child.lua(
         [[ require('no-neck-pain').setup({width=50,mappings={enabled=true,widthDown={mapping="nn",value=7}}}) ]]
     )
-    Helpers.toggle(child)
+    child.nnp()
 
     Helpers.expect.global(child, "_G.NoNeckPain.config.width", 50)
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
 
     child.api.nvim_input("nn")
     child.api.nvim_input("nn")
@@ -276,7 +276,7 @@ T["setup"]["toggles scratchPad"] = function()
     child.lua(
         [[ require('no-neck-pain').setup({width=50,mappings={enabled=true,scratchPad="ns"}}) ]]
     )
-    Helpers.toggle(child)
+    child.nnp()
 
     Helpers.expect.global(child, "_G.NoNeckPain.config.buffers.left.scratchPad.enabled", false)
     Helpers.expect.global(child, "_G.NoNeckPain.config.buffers.right.scratchPad.enabled", false)
@@ -294,7 +294,7 @@ T["setup"]["toggle sides and disable if none"] = function()
     child.lua(
         [[ require('no-neck-pain').setup({width=50,mappings={enabled=true,toggleLeftSide="nl",toggleRightSide="nr"}}) ]]
     )
-    Helpers.toggle(child)
+    child.nnp()
 
     Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,

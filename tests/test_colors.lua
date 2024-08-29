@@ -120,7 +120,7 @@ T["setup"]["`common` options spreads it to `left` and `right` buffers"] = functi
             },
         }})
     ]])
-    Helpers.toggle(child)
+    child.nnp()
 
     Helpers.expect.state(child, "enabled", true)
 
@@ -168,7 +168,7 @@ T["setup"]["(transparent) assert side buffers have the same colors as the main b
         highlight NonText ctermbg=none
     ]])
     child.lua([[ require('no-neck-pain').setup() ]])
-    Helpers.toggle(child)
+    child.nnp()
 
     child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.tabs[1].wins.main.curr)")
     local currbg = child.lua_get("vim.api.nvim_get_hl_by_name('Normal', true).background")
@@ -187,7 +187,7 @@ end
 T["setup"]["(normal) assert side buffers have the same colors as the main buffer"] = function()
     child.cmd([[colorscheme blue]])
     child.lua([[ require('no-neck-pain').setup() ]])
-    Helpers.toggle(child)
+    child.nnp()
 
     child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.tabs[1].wins.main.curr)")
     local currbg = child.lua_get("vim.api.nvim_get_hl_by_name('Normal', true).background")
@@ -270,7 +270,7 @@ T["color"]["refreshes the stored color when changing colorscheme"] = function()
     child.lua(
         [[ require('no-neck-pain').setup({ autocmds = { reloadOnColorSchemeChange=true } }) ]]
     )
-    Helpers.toggle(child)
+    child.nnp()
 
     Helpers.expect.config(child, "buffers.colors", { blend = 0 })
 

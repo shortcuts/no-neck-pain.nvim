@@ -195,7 +195,7 @@ T["curr"] = MiniTest.new_set()
 
 T["curr"]["have the default width"] = function()
     child.lua([[ require('no-neck-pain').setup() ]])
-    Helpers.toggle(child)
+    child.nnp()
 
     -- need to know why the child isn't precise enough
     Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 80)
@@ -203,7 +203,7 @@ end
 
 T["curr"]["have the width from the config"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
-    Helpers.toggle(child)
+    child.nnp()
 
     -- need to know why the child isn't precise enough
     Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 48)
@@ -211,16 +211,16 @@ end
 
 T["curr"]["closing `curr` window without any other window quits Neovim"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
-    Helpers.toggle(child)
+    child.nnp()
 
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
     Helpers.expect.state(child, "tabs[1].wins.main.curr", 1000)
 
     child.cmd("q")
 
     -- neovim is closed, so it errors
     Helpers.expect.error(function()
-        Helpers.winsInTab(child)
+        child.get_wins_in_tab()
     end)
 end
 
@@ -230,14 +230,14 @@ T["left/right"]["setNames doesn't throw when re-creating side buffers"] = functi
     child.lua([[require('no-neck-pain').setup({width=50, buffers={setNames=true}})]])
 
     -- enable
-    Helpers.toggle(child)
+    child.nnp()
 
     Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 15)
     Helpers.expect.buf_width(child, "tabs[1].wins.main.right", 15)
 
     -- toggle
-    Helpers.toggle(child)
-    Helpers.toggle(child)
+    child.nnp()
+    child.nnp()
 
     Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 15)
     Helpers.expect.buf_width(child, "tabs[1].wins.main.right", 15)
@@ -245,7 +245,7 @@ end
 
 T["left/right"]["have the same width"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
-    Helpers.toggle(child)
+    child.nnp()
 
     Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 15)
     Helpers.expect.buf_width(child, "tabs[1].wins.main.right", 15)
@@ -253,7 +253,7 @@ end
 
 T["left/right"]["only creates a `left` buffer when `right.enabled` is `false`"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50,buffers={right={enabled=false}}}) ]])
-    Helpers.toggle(child)
+    child.nnp()
 
     Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,
@@ -265,7 +265,7 @@ end
 
 T["left/right"]["only creates a `right` buffer when `left.enabled` is `false`"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50,buffers={left={enabled=false}}}) ]])
-    Helpers.toggle(child)
+    child.nnp()
 
     Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,
@@ -277,9 +277,9 @@ end
 
 T["left/right"]["closing the `left` buffer disables NNP"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
-    Helpers.toggle(child)
+    child.nnp()
 
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
     Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,
         left = 1001,
@@ -289,14 +289,14 @@ T["left/right"]["closing the `left` buffer disables NNP"] = function()
     child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.tabs[1].wins.main.left)")
     child.cmd("q")
 
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1000 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1000 })
 end
 
 T["left/right"]["closing the `right` buffer disables NNP"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
-    Helpers.toggle(child)
+    child.nnp()
 
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
     Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,
         left = 1001,
@@ -306,7 +306,7 @@ T["left/right"]["closing the `right` buffer disables NNP"] = function()
     child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.tabs[1].wins.main.right)")
     child.cmd("q")
 
-    Helpers.expect.equality(Helpers.winsInTab(child), { 1000 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1000 })
 end
 
 return T
