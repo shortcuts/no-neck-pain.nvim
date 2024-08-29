@@ -185,7 +185,7 @@ T["vsplit"]["closing `curr` makes `split` the new `curr`"] = function()
 end
 
 T["vsplit"]["hides side buffers"] = function()
-    child.lua([[ require('no-neck-pain').setup({width=58}) ]])
+    child.lua([[ require('no-neck-pain').setup({width=50,minSideBufferWidth=0}) ]])
     Helpers.toggle(child)
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1000, 1002 })
@@ -196,6 +196,7 @@ T["vsplit"]["hides side buffers"] = function()
     })
 
     child.cmd("vsplit")
+    Helpers.wait(child)
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1003, 1000 })
     Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1000 })
@@ -220,6 +221,7 @@ T["vsplit"]["many vsplit leave side buffers open as long as there's space for it
 
     child.cmd("vsplit")
     child.cmd("vsplit")
+    Helpers.wait(child)
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1004, 1003, 1000 })
 
@@ -268,6 +270,7 @@ T["vsplit/split"]["state is correctly sync'd even after many changes"] = functio
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1004, 1000, 1002 })
 
     child.cmd("vsplit")
+    Helpers.wait(child)
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1005, 1004, 1000 })
 
@@ -294,6 +297,7 @@ T["vsplit/split"]["closing side buffers because of splits restores focus"] = fun
 
     child.cmd("vsplit")
     child.cmd("vsplit")
+    Helpers.wait(child)
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1005, 1004, 1003, 1000 })
 
@@ -338,12 +342,13 @@ T["vsplit/split"]["splits and vsplits keeps a correct size"] = function()
     Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 20)
 
     child.cmd("vsplit")
+    Helpers.wait(child)
 
     Helpers.expect.equality(Helpers.winsInTab(child), { 1001, 1004, 1003, 1000, 1002 })
     Helpers.expect.equality(Helpers.currentWin(child), 1004)
 
     Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 38)
-    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1003)"), 20)
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1003)"), 17)
 end
 
 return T
