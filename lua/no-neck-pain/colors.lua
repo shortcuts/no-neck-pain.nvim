@@ -3,7 +3,7 @@ local constants = require("no-neck-pain.util.constants")
 local debug = require("no-neck-pain.util.debug")
 local state = require("no-neck-pain.state")
 
-local C = {}
+local colors = {}
 
 --- Converts an hex color code to RGB, values are returned independently.
 ---
@@ -51,7 +51,7 @@ end
 ---@param factor number: Brighten (positive) or darken (negative) the side buffers background color. Accepted values are [-1..1].
 ---@return string?: the blended color code.
 ---@private
-function C.match_and_blend(color_code, factor)
+local function match_and_blend(color_code, factor)
     if color_code == nil or string.lower(color_code) == "none" then
         return nil
     end
@@ -90,12 +90,12 @@ end
 ---@param buffers table: the buffers table to parse.
 ---@return table: the parsed buffers.
 ---@private
-function C.parse(buffers)
-    buffers.colors.background = C.match_and_blend(buffers.colors.background, buffers.colors.blend)
+function colors.parse(buffers)
+    buffers.colors.background = match_and_blend(buffers.colors.background, buffers.colors.blend)
 
     for _, side in pairs(constants.SIDES) do
         if buffers[side].enabled then
-            buffers[side].colors.background = C.match_and_blend(
+            buffers[side].colors.background = colors.match_and_blend(
                 buffers[side].colors.background,
                 buffers[side].colors.blend or buffers.colors.blend
             ) or buffers.colors.background
@@ -115,7 +115,7 @@ end
 ---@param win number: the id of the win to init.
 ---@param side "left"|"right": the side of the window being resized, used for logging only.
 ---@private
-function C.init(win, side)
+function colors.init(win, side)
     if win == nil then
         return
     end
@@ -125,7 +125,7 @@ function C.init(win, side)
         and _G.NoNeckPain.config.buffers[side].colors.text == nil
         and _G.NoNeckPain.config.buffers[side].colors.blend == 0
     then
-        return debug.log("C.init", "skipping color initialization for side %s", side)
+        return debug.log("colors.init", "skipping color initialization for side %s", side)
     end
 
     -- init namespace for the current tab
@@ -187,4 +187,4 @@ function C.init(win, side)
     api.set_window_option(win, "winhl", table.concat(string_groups, ","))
 end
 
-return C
+return colors
