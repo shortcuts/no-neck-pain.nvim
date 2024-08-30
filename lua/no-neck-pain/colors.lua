@@ -95,7 +95,7 @@ function colors.parse(buffers)
 
     for _, side in pairs(constants.SIDES) do
         if buffers[side].enabled then
-            buffers[side].colors.background = colors.match_and_blend(
+            buffers[side].colors.background = match_and_blend(
                 buffers[side].colors.background,
                 buffers[side].colors.blend or buffers.colors.blend
             ) or buffers.colors.background
