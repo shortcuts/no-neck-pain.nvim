@@ -150,7 +150,7 @@ end
 --- @param scope string: internal identifier for logging purposes.
 ---@private
 function N.enable(scope)
-    if E.skip_enable() then
+    if E.skip_enable(scope) then
         return
     end
 
@@ -419,6 +419,8 @@ function N.disable(scope)
             vim.cmd("only")
         end
     end
+
+    S.disabled_tabs[active_tab] = true
 
     S.save(S)
 end

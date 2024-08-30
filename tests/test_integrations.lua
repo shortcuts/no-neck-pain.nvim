@@ -114,6 +114,105 @@ T["integrations"]["NeoTree throws with wrong values"] = function()
     end)
 end
 
+T["checkhealth"] = MiniTest.new_set()
+
+T["checkhealth"]["state is in sync"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=20}) ]])
+    child.nnp()
+    child.wait()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+    Helpers.expect.state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
+
+    child.cmd("checkhealth")
+    child.wait()
+
+    if child.fn.has("nvim-0.10") == 0 then
+        Helpers.expect.equality(child.get_wins_in_tab(), { 1004 })
+
+        child.nnp()
+        child.wait()
+
+        Helpers.expect.equality(child.get_wins_in_tab(), { 1005, 1004, 1006 })
+        Helpers.expect.state(child, "tabs[2].wins.main", {
+            curr = 1004,
+            left = 1005,
+            right = 1006,
+        })
+    else
+        Helpers.expect.equality(child.get_wins_in_tab(), { 1003 })
+
+        child.nnp()
+        child.wait()
+
+        Helpers.expect.equality(child.get_wins_in_tab(), { 1004, 1003, 1005 })
+        Helpers.expect.state(child, "tabs[2].wins.main", {
+            curr = 1003,
+            left = 1004,
+            right = 1005,
+        })
+    end
+
+    child.cmd("q")
+    child.wait()
+
+    Helpers.expect.state(child, "tabs[2]", vim.NIL)
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+    Helpers.expect.state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
+end
+
+T["checkhealth"]["auto opens side buffers"] = function()
+    child.restart({ "-u", "scripts/init_auto_open.lua" })
+    child.wait()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+    Helpers.expect.state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
+
+    child.cmd("checkhealth")
+    child.wait()
+
+    if child.fn.has("nvim-0.10") == 0 then
+        Helpers.expect.equality(child.get_wins_in_tab(), { 1005, 1004, 1006 })
+        Helpers.expect.state(child, "tabs[2].wins.main", {
+            curr = 1004,
+            left = 1005,
+            right = 1006,
+        })
+    else
+        Helpers.expect.equality(child.get_wins_in_tab(), { 1004, 1003, 1005 })
+        Helpers.expect.state(child, "tabs[2].wins.main", {
+            curr = 1003,
+            left = 1004,
+            right = 1005,
+        })
+    end
+
+    child.cmd("q")
+    child.wait()
+
+    Helpers.expect.state(child, "tabs[2]", vim.NIL)
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+    Helpers.expect.state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
+end
+
 T["nvimdapui"] = MiniTest.new_set()
 
 T["nvimdapui"]["keeps sides open"] = function()

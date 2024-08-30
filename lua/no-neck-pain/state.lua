@@ -2,7 +2,7 @@ local A = require("no-neck-pain.util.api")
 local Co = require("no-neck-pain.util.constants")
 local D = require("no-neck-pain.util.debug")
 
-local State = { enabled = false, active_tab = A.get_current_tab(), tabs = {} }
+local State = { enabled = false, active_tab = A.get_current_tab(), tabs = {}, disabled_tabs = {} }
 
 ---Sets the state to its original value.
 ---

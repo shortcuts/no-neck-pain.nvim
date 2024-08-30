@@ -31,14 +31,25 @@ end
 --- - we are focusing a floating window
 --- - we are focusing one of the side buffer
 ---
+--- @param scope string: internal identifier for logging purposes.
 ---@private
-function E.skip_enable()
+function E.skip_enable(scope)
     if S.is_active_tab_registered(S) then
         return true
     end
 
     if A.is_relative_window() then
         return true
+    end
+
+    if S.disabled_tabs[S.active_tab] then
+        if scope == "enable_on_tab_enter" then
+            return true
+        end
+
+        S.disabled_tabs[S.active_tab] = nil
+
+        return false
     end
 
     -- dashboards delays the plugin enable step until next buffer entered
