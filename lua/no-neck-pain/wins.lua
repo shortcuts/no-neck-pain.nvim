@@ -1,6 +1,6 @@
-local A = require("no-neck-pain.util.api")
+local api = require("no-neck-pain.util.api")
 local C = require("no-neck-pain.colors")
-local Co = require("no-neck-pain.util.constants")
+local constants = require("no-neck-pain.util.constants")
 local D = require("no-neck-pain.util.debug")
 local S = require("no-neck-pain.state")
 
@@ -29,12 +29,12 @@ function W.init_side_options(side, id)
 
     for opt, val in pairs(_G.NoNeckPain.config.buffers[side].bo) do
         if not S.get_scratchPad(S) and opt ~= "filetype" then
-            A.set_buffer_option(bufid, opt, val)
+            api.set_buffer_option(bufid, opt, val)
         end
     end
 
     for opt, val in pairs(_G.NoNeckPain.config.buffers[side].wo) do
-        A.set_window_option(id, opt, val)
+        api.set_window_option(id, opt, val)
     end
 end
 
@@ -128,11 +128,11 @@ function W.init_scratchPad(side, id, cleanup)
 
     vim.cmd(string.format("edit %s", _G.NoNeckPain.config.buffers[side].scratchPad.pathToFile))
 
-    A.set_buffer_option(0, "bufhidden", "")
-    A.set_buffer_option(0, "buftype", "")
-    A.set_buffer_option(0, "buflisted", false)
-    A.set_buffer_option(0, "autoread", true)
-    A.set_window_option(id, "conceallevel", 2)
+    api.set_buffer_option(0, "bufhidden", "")
+    api.set_buffer_option(0, "buftype", "")
+    api.set_buffer_option(0, "buflisted", false)
+    api.set_buffer_option(0, "autoread", true)
+    api.set_window_option(id, "conceallevel", 2)
 
     -- users might want to use a filetype that isn't supported by neovim, we should let them
     -- if they've defined it on the configuration side.
@@ -141,7 +141,7 @@ function W.init_scratchPad(side, id, cleanup)
         if filetype == "" or filetype == "no-neck-pain" then
             filetype = "norg"
         end
-        A.set_buffer_option(0, "filetype", filetype)
+        api.set_buffer_option(0, "filetype", filetype)
     end
 
     vim.o.autowriteall = true
@@ -158,7 +158,7 @@ function W.create_side_buffers()
         right = { cmd = "botright vnew", padding = 0 },
     }
 
-    for _, side in pairs(Co.SIDES) do
+    for _, side in pairs(constants.SIDES) do
         if _G.NoNeckPain.config.buffers[side].enabled then
             wins[side].padding = W.get_padding(side)
 
@@ -192,7 +192,7 @@ function W.create_side_buffers()
         end
     end
 
-    for _, side in pairs(Co.SIDES) do
+    for _, side in pairs(constants.SIDES) do
         if S.is_side_win_valid(S, side) then
             local padding = wins[side].padding or W.get_padding(side)
 
@@ -223,7 +223,7 @@ function W.get_padding(side)
 
     local columns = S.get_columns(S)
 
-    for _, s in ipairs(Co.SIDES) do
+    for _, s in ipairs(constants.SIDES) do
         if S.is_side_win_valid(S, s) and columns > 1 then
             columns = columns - 1
         end

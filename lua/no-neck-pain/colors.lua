@@ -1,5 +1,5 @@
-local A = require("no-neck-pain.util.api")
-local Co = require("no-neck-pain.util.constants")
+local api = require("no-neck-pain.util.api")
+local constants = require("no-neck-pain.util.constants")
 local D = require("no-neck-pain.util.debug")
 local S = require("no-neck-pain.state")
 
@@ -66,8 +66,8 @@ function C.match_and_blend(color_code, factor)
         )
     end
 
-    if Co.THEMES[color_code] ~= nil then
-        color_code = Co.THEMES[color_code]
+    if constants.THEMES[color_code] ~= nil then
+        color_code = constants.THEMES[color_code]
     end
 
     local hex_pattern = "^#" .. "[abcdef0-9]" .. ("[abcdef0-9]"):rep(5) .. "$"
@@ -93,7 +93,7 @@ end
 function C.parse(buffers)
     buffers.colors.background = C.match_and_blend(buffers.colors.background, buffers.colors.blend)
 
-    for _, side in pairs(Co.SIDES) do
+    for _, side in pairs(constants.SIDES) do
         if buffers[side].enabled then
             buffers[side].colors.background = C.match_and_blend(
                 buffers[side].colors.background,
@@ -184,7 +184,7 @@ function C.init(win, side)
         table.insert(string_groups, string.format("%s:%s", hl, group))
     end
 
-    A.set_window_option(win, "winhl", table.concat(string_groups, ","))
+    api.set_window_option(win, "winhl", table.concat(string_groups, ","))
 end
 
 return C

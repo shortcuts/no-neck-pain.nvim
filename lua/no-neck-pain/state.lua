@@ -1,15 +1,15 @@
-local A = require("no-neck-pain.util.api")
-local Co = require("no-neck-pain.util.constants")
+local api = require("no-neck-pain.util.api")
+local constants = require("no-neck-pain.util.constants")
 local D = require("no-neck-pain.util.debug")
 
-local State = { enabled = false, active_tab = A.get_current_tab(), tabs = {}, disabled_tabs = {} }
+local State = { enabled = false, active_tab = api.get_current_tab(), tabs = {}, disabled_tabs = {} }
 
 --- Sets the state to its original value.
 ---
 ---@private
 function State:init()
     self.enabled = false
-    self.active_tab = A.get_current_tab()
+    self.active_tab = api.get_current_tab()
     self.tabs = {}
 end
 
@@ -17,7 +17,7 @@ end
 ---
 ---@private
 function State:init_integrations()
-    self.tabs[self.active_tab].wins.integrations = vim.deepcopy(Co.INTEGRATIONS)
+    self.tabs[self.active_tab].wins.integrations = vim.deepcopy(constants.INTEGRATIONS)
 end
 
 --- Sets the columns state of the current tab to its original value.
@@ -190,7 +190,7 @@ end
 ---@private
 function State:get_unregistered_wins()
     return vim.tbl_filter(function(win)
-        return not A.is_relative_window(win)
+        return not api.is_relative_window(win)
             and win ~= self.get_side_id(self, "curr")
             and win ~= self.get_side_id(self, "left")
             and win ~= self.get_side_id(self, "right")
@@ -219,7 +219,7 @@ function State:is_supported_integration(scope, win)
         return true, integration_name, integration_info
     end
 
-    local registered_integrations = tab ~= nil and tab.wins.integrations or Co.INTEGRATIONS
+    local registered_integrations = tab ~= nil and tab.wins.integrations or constants.INTEGRATIONS
 
     for name, integration in pairs(registered_integrations) do
         if vim.startswith(string.lower(filetype), integration.fileTypePattern) then
@@ -409,7 +409,7 @@ end
 ---@return table: the `tab` information.
 ---@private
 function State:get_tab()
-    local id = self.active_tab or A.get_current_tab()
+    local id = self.active_tab or api.get_current_tab()
 
     return self.tabs[id]
 end
@@ -459,7 +459,7 @@ function State:set_tab(id)
                 left = nil,
                 right = nil,
             },
-            integrations = vim.deepcopy(Co.INTEGRATIONS),
+            integrations = vim.deepcopy(constants.INTEGRATIONS),
         },
     }
     self.active_tab = id
@@ -474,7 +474,7 @@ end
 function State:set_layout_windows(scope, wins)
     for _, win in ipairs(wins) do
         local id = win[2]
-        if win[1] == "leaf" and not A.is_relative_window(id) then
+        if win[1] == "leaf" and not api.is_relative_window(id) then
             local supported, name, integration = self.is_supported_integration(self, scope, id)
             if supported and name and integration then
                 integration.width = vim.api.nvim_win_get_width(id) * 2

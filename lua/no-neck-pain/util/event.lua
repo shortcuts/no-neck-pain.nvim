@@ -1,5 +1,5 @@
-local A = require("no-neck-pain.util.api")
-local Co = require("no-neck-pain.util.constants")
+local api = require("no-neck-pain.util.api")
+local constants = require("no-neck-pain.util.constants")
 local S = require("no-neck-pain.state")
 
 local E = {}
@@ -15,11 +15,11 @@ function E.skip()
         return true
     end
 
-    if A.is_relative_window() then
+    if api.is_relative_window() then
         return true
     end
 
-    return A.get_current_tab() ~= S.active_tab
+    return api.get_current_tab() ~= S.active_tab
 end
 
 --- determines if we should skip the enabling of the plugin:
@@ -38,7 +38,7 @@ function E.skip_enable(scope)
         return true
     end
 
-    if A.is_relative_window() then
+    if api.is_relative_window() then
         return true
     end
 
@@ -53,7 +53,7 @@ function E.skip_enable(scope)
     end
 
     -- dashboards delays the plugin enable step until next buffer entered
-    if vim.tbl_contains(Co.DASHBOARDS, vim.bo.filetype) then
+    if vim.tbl_contains(constants.DASHBOARDS, vim.bo.filetype) then
         return true
     end
 

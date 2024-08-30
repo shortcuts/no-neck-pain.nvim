@@ -1,6 +1,6 @@
 local M = require("no-neck-pain.main")
 local D = require("no-neck-pain.util.debug")
-local A = require("no-neck-pain.util.api")
+local api = require("no-neck-pain.util.api")
 local C = require("no-neck-pain.config")
 
 local NoNeckPain = {}
@@ -11,7 +11,7 @@ function NoNeckPain.toggle()
         _G.NoNeckPain.config = C.options
     end
 
-    A.debounce("public_api_toggle", M.toggle)
+    api.debounce("public_api_toggle", M.toggle)
 end
 
 --- Toggles the scratchPad feature of the plugin.
@@ -56,7 +56,7 @@ function NoNeckPain.toggleSide(side)
         error("no-neck-pain.nvim must be enabled, run `NoNeckPain` first.")
     end
 
-    A.debounce("public_api_toggle_side", function(scope)
+    api.debounce("public_api_toggle_side", function(scope)
         M.toggle_side(scope, side)
     end)
 end
@@ -67,12 +67,12 @@ function NoNeckPain.enable(scope)
         _G.NoNeckPain.config = C.options
     end
 
-    A.debounce(scope or "public_api_enable", M.enable, 10)
+    api.debounce(scope or "public_api_enable", M.enable, 10)
 end
 
 --- Disables the plugin, clear highlight groups and autocmds, closes side buffers and resets the internal state.
 function NoNeckPain.disable()
-    A.debounce("public_api_disable", M.disable)
+    api.debounce("public_api_disable", M.disable)
 end
 
 -- setup NoNeckPain options and merge them with user provided ones.
@@ -117,7 +117,7 @@ function NoNeckPain.setup(opts)
 
                     NoNeckPain.enable()
 
-                    A.debounce("enable_on_vim_enter", function()
+                    api.debounce("enable_on_vim_enter", function()
                         if _G.NoNeckPain.state ~= nil then
                             pcall(vim.api.nvim_del_augroup_by_name, "NoNeckPainVimEnterAutocmd")
                         end

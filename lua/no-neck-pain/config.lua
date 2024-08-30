@@ -1,7 +1,7 @@
-local A = require("no-neck-pain.util.api")
+local api = require("no-neck-pain.util.api")
 local D = require("no-neck-pain.util.debug")
 local C = require("no-neck-pain.colors")
-local Co = require("no-neck-pain.util.constants")
+local constants = require("no-neck-pain.util.constants")
 
 local NoNeckPain = {}
 
@@ -332,7 +332,7 @@ local defaults = vim.deepcopy(NoNeckPain.options)
 local function parse_deprecated_scratchPad(side, options, fileType)
     -- set the defaults if the user rely on them
     if vim.tbl_count(options) == 0 or options.pathToFile == nil then
-        options = A.tde(options, defaults.buffers.scratchPad)
+        options = api.tde(options, defaults.buffers.scratchPad)
     end
 
     -- handle the deprecation to `fileName` and `location`
@@ -362,20 +362,20 @@ end
 function NoNeckPain.defaults(options)
     options.buffers = options.buffers or {}
 
-    for _, side in pairs(Co.SIDES) do
+    for _, side in pairs(constants.SIDES) do
         options.buffers[side] = options.buffers[side] or {}
 
-        options.buffers[side].bo = A.tde(options.buffers[side].bo, options.buffers.bo)
-        options.buffers[side].wo = A.tde(options.buffers[side].wo, options.buffers.wo)
-        options.buffers[side].colors = A.tde(options.buffers[side].colors, options.buffers.colors)
+        options.buffers[side].bo = api.tde(options.buffers[side].bo, options.buffers.bo)
+        options.buffers[side].wo = api.tde(options.buffers[side].wo, options.buffers.wo)
+        options.buffers[side].colors = api.tde(options.buffers[side].colors, options.buffers.colors)
         options.buffers[side].scratchPad = parse_deprecated_scratchPad(
             side,
-            A.tde(options.buffers[side].scratchPad, options.buffers.scratchPad),
+            api.tde(options.buffers[side].scratchPad, options.buffers.scratchPad),
             options.buffers[side].bo.filetype
         )
     end
 
-    NoNeckPain.options = A.tde(options, defaults)
+    NoNeckPain.options = api.tde(options, defaults)
     NoNeckPain.options.buffers = C.parse(NoNeckPain.options.buffers)
 
     -- assert `width` values through vim options

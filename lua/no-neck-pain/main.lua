@@ -1,5 +1,5 @@
-local A = require("no-neck-pain.util.api")
-local Co = require("no-neck-pain.util.constants")
+local api = require("no-neck-pain.util.api")
+local constants = require("no-neck-pain.util.constants")
 local D = require("no-neck-pain.util.debug")
 local E = require("no-neck-pain.util.event")
 local S = require("no-neck-pain.state")
@@ -34,7 +34,7 @@ function N.toggle_scratchPad()
     S.set_scratchPad(S, not current_state)
 
     -- map over both sides and let the init method either setup or cleanup the side buffers
-    for _, side in pairs(Co.SIDES) do
+    for _, side in pairs(constants.SIDES) do
         local id = S.get_side_id(S, side)
         if id ~= nil then
             vim.api.nvim_set_current_win(id)
@@ -157,12 +157,12 @@ function N.enable(scope)
         return
     end
 
-    D.log(scope, "calling enable for tab %d", A.get_current_tab())
+    D.log(scope, "calling enable for tab %d", api.get_current_tab())
 
     S.set_enabled(S)
-    S.set_tab(S, A.get_current_tab())
+    S.set_tab(S, api.get_current_tab())
 
-    local augroup_name = A.get_augroup_name(S.active_tab)
+    local augroup_name = api.get_augroup_name(S.active_tab)
     vim.api.nvim_create_augroup(augroup_name, { clear = true })
 
     S.set_side_id(S, vim.api.nvim_get_current_win(), "curr")
@@ -180,7 +180,7 @@ function N.enable(scope)
                 local tab = S.get_tab(S)
 
                 if tab ~= nil then
-                    if A.get_current_tab() ~= tab.id then
+                    if api.get_current_tab() ~= tab.id then
                         return
                     end
                 end
@@ -194,12 +194,12 @@ function N.enable(scope)
 
     vim.api.nvim_create_autocmd({ "TabEnter" }, {
         callback = function(p)
-            A.debounce(p.event, function()
+            api.debounce(p.event, function()
                 D.log(p.event, "tab %d entered", S.active_tab)
 
                 S.refresh_tabs(S, p.event)
 
-                S.set_active_tab(S, A.get_current_tab())
+                S.set_active_tab(S, api.get_current_tab())
             end)
         end,
         group = augroup_name,
@@ -228,7 +228,7 @@ function N.enable(scope)
                 end
 
                 if init then
-                    A.debounce(s, function()
+                    api.debounce(s, function()
                         return N.init(s)
                     end)
                 end
@@ -364,11 +364,11 @@ function N.disable(scope)
     local wins = vim.tbl_filter(function(win)
         return win ~= S.get_side_id(S, "left")
             and win ~= S.get_side_id(S, "right")
-            and not A.is_relative_window(win)
+            and not api.is_relative_window(win)
     end, vim.api.nvim_tabpage_list_wins(active_tab))
 
     if #vim.api.nvim_list_tabpages() == 1 and #wins == 0 then
-        for name, modified in pairs(A.get_opened_buffers()) do
+        for name, modified in pairs(api.get_opened_buffers()) do
             if modified then
                 local bufname = name
                 if vim.startswith(name, "NoNamePain") then
@@ -388,13 +388,13 @@ function N.disable(scope)
             end
         end
 
-        pcall(vim.api.nvim_del_augroup_by_name, A.get_augroup_name(active_tab))
+        pcall(vim.api.nvim_del_augroup_by_name, api.get_augroup_name(active_tab))
         pcall(vim.api.nvim_del_augroup_by_name, "NoNeckPainVimEnterAutocmd")
 
         return vim.cmd("quitall!")
     end
 
-    pcall(vim.api.nvim_del_augroup_by_name, A.get_augroup_name(active_tab))
+    pcall(vim.api.nvim_del_augroup_by_name, api.get_augroup_name(active_tab))
 
     local sides = { left = S.get_side_id(S, "left"), right = S.get_side_id(S, "right") }
     local curr_id = S.get_side_id(S, "curr")
