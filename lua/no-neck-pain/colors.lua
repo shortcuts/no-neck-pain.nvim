@@ -1,7 +1,7 @@
 local api = require("no-neck-pain.util.api")
 local constants = require("no-neck-pain.util.constants")
 local D = require("no-neck-pain.util.debug")
-local S = require("no-neck-pain.state")
+local state = require("no-neck-pain.state")
 
 local C = {}
 
@@ -129,13 +129,13 @@ function C.init(win, side)
     end
 
     -- init namespace for the current tab
-    local id, _ = S.set_namespace(S, side)
+    local id, _ = state.set_namespace(state, side)
     local bufnr = vim.api.nvim_win_get_buf(win)
 
     -- create groups to assign them to the namespace
     local background_group =
-        string.format("NoNeckPain_background_tab_%s_side_%s", S.active_tab, side)
-    local text_group = string.format("NoNeckPain_text_tab_%s_side_%s", S.active_tab, side)
+        string.format("NoNeckPain_background_tab_%s_side_%s", state.active_tab, side)
+    local text_group = string.format("NoNeckPain_text_tab_%s_side_%s", state.active_tab, side)
 
     vim.cmd(
         string.format(

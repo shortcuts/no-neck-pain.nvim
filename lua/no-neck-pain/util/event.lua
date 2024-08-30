@@ -1,6 +1,6 @@
 local api = require("no-neck-pain.util.api")
 local constants = require("no-neck-pain.util.constants")
-local S = require("no-neck-pain.state")
+local state = require("no-neck-pain.state")
 
 local E = {}
 
@@ -19,7 +19,7 @@ function E.skip()
         return true
     end
 
-    return api.get_current_tab() ~= S.active_tab
+    return api.get_current_tab() ~= state.active_tab
 end
 
 --- determines if we should skip the enabling of the plugin:
@@ -34,7 +34,7 @@ end
 ---@param scope string: internal identifier for logging purposes.
 ---@private
 function E.skip_enable(scope)
-    if S.is_active_tab_registered(S) then
+    if state.is_active_tab_registered(state) then
         return true
     end
 
@@ -42,12 +42,12 @@ function E.skip_enable(scope)
         return true
     end
 
-    if S.disabled_tabs[S.active_tab] then
+    if state.disabled_tabs[state.active_tab] then
         if scope == "enable_on_tab_enter" then
             return true
         end
 
-        S.disabled_tabs[S.active_tab] = nil
+        state.disabled_tabs[state.active_tab] = nil
 
         return false
     end
@@ -57,7 +57,7 @@ function E.skip_enable(scope)
         return true
     end
 
-    return S.is_supported_integration(S, "E.skip_enable", nil)
+    return state.is_supported_integration(state, "E.skip_enable", nil)
 end
 
 return E

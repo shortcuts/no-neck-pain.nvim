@@ -2,7 +2,7 @@ local api = require("no-neck-pain.util.api")
 local C = require("no-neck-pain.colors")
 local constants = require("no-neck-pain.util.constants")
 local D = require("no-neck-pain.util.debug")
-local S = require("no-neck-pain.state")
+local state = require("no-neck-pain.state")
 
 local W = {}
 
@@ -28,7 +28,7 @@ function W.init_side_options(side, id)
     local bufid = vim.api.nvim_win_get_buf(id)
 
     for opt, val in pairs(_G.NoNeckPain.config.buffers[side].bo) do
-        if not S.get_scratchPad(S) and opt ~= "filetype" then
+        if not state.get_scratchPad(state) and opt ~= "filetype" then
             api.set_buffer_option(bufid, opt, val)
         end
     end
@@ -53,9 +53,9 @@ function W.reposition(scope)
     for side, keys in pairs(sides) do
         local sscope = string.format("%s:%s", scope, side)
 
-        local id = S.get_side_id(S, side)
+        local id = state.get_side_id(state, side)
         if id ~= nil then
-            local wins = vim.api.nvim_tabpage_list_wins(S.active_tab)
+            local wins = vim.api.nvim_tabpage_list_wins(state.active_tab)
             local curr = vim.api.nvim_get_current_win()
 
             if curr ~= id then
@@ -66,7 +66,7 @@ function W.reposition(scope)
 
             vim.cmd(keys)
 
-            wins = vim.api.nvim_tabpage_list_wins(S.active_tab)
+            wins = vim.api.nvim_tabpage_list_wins(state.active_tab)
 
             if (side == "left" and wins[1] ~= id) or (side == "right" and wins[#wins] ~= id) then
                 D.log(
@@ -82,8 +82,8 @@ function W.reposition(scope)
         end
     end
 
-    if restore_focus and S.get_side_id(S, "curr") ~= nil then
-        vim.api.nvim_set_current_win(S.get_side_id(S, "curr"))
+    if restore_focus and state.get_side_id(state, "curr") ~= nil then
+        vim.api.nvim_set_current_win(state.get_side_id(state, "curr"))
     end
 end
 
@@ -164,11 +164,11 @@ function W.create_side_buffers()
 
             if
                 wins[side].padding > _G.NoNeckPain.config.minSideBufferWidth
-                and not S.is_side_win_valid(S, side)
+                and not state.is_side_win_valid(state, side)
             then
                 vim.cmd(wins[side].cmd)
 
-                S.set_side_id(S, vim.api.nvim_get_current_win(), side)
+                state.set_side_id(state, vim.api.nvim_get_current_win(), side)
 
                 if _G.NoNeckPain.config.buffers.set_names then
                     local exist = vim.fn.bufnr("no-neck-pain-" .. side)
@@ -181,26 +181,26 @@ function W.create_side_buffers()
                 end
 
                 if _G.NoNeckPain.config.buffers[side].scratchPad.enabled then
-                    S.set_scratchPad(S, true)
-                    W.init_scratchPad(side, S.get_side_id(S, side))
+                    state.set_scratchPad(state, true)
+                    W.init_scratchPad(side, state.get_side_id(state, side))
                 else
-                    W.init_side_options(side, S.get_side_id(S, side))
+                    W.init_side_options(side, state.get_side_id(state, side))
                 end
             end
 
-            C.init(S.get_side_id(S, side), side)
+            C.init(state.get_side_id(state, side), side)
         end
     end
 
     for _, side in pairs(constants.SIDES) do
-        if S.is_side_win_valid(S, side) then
+        if state.is_side_win_valid(state, side) then
             local padding = wins[side].padding or W.get_padding(side)
 
             if padding > _G.NoNeckPain.config.minSideBufferWidth then
-                W.resize(S.get_side_id(S, side), padding, side)
+                W.resize(state.get_side_id(state, side), padding, side)
             else
-                W.close("W.create_side_buffers", S.get_side_id(S, side), side)
-                S.set_side_id(S, nil, side)
+                W.close("W.create_side_buffers", state.get_side_id(state, side), side)
+                state.set_side_id(state, nil, side)
             end
         end
     end
@@ -221,10 +221,10 @@ function W.get_padding(side)
         return 0
     end
 
-    local columns = S.get_columns(S)
+    local columns = state.get_columns(state)
 
     for _, s in ipairs(constants.SIDES) do
-        if S.is_side_win_valid(S, s) and columns > 1 then
+        if state.is_side_win_valid(state, s) and columns > 1 then
             columns = columns - 1
         end
     end
@@ -246,11 +246,11 @@ function W.get_padding(side)
 
     -- now we need to determine how much we should substract from the remaining padding
     -- if there's side integrations open.
-    for name, tree in pairs(S.get_integrations(S)) do
+    for name, tree in pairs(state.get_integrations(state)) do
         if
             tree.id ~= nil
             and (
-                not S.is_side_win_valid(S, side)
+                not state.is_side_win_valid(state, side)
                 or side == _G.NoNeckPain.config.integrations[name].position
             )
         then
