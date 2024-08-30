@@ -137,17 +137,31 @@ T["checkhealth"]["state is in sync"] = function()
     child.cmd("checkhealth")
     child.wait()
 
-    Helpers.expect.equality(child.get_wins_in_tab(), { 1003 })
+    if child.fn.has("nvim-0.10") == 0 then
+        Helpers.expect.equality(child.get_wins_in_tab(), { 1004 })
 
-    child.nnp()
-    child.wait()
+        child.nnp()
+        child.wait()
 
-    Helpers.expect.equality(child.get_wins_in_tab(), { 1004, 1003, 1005 })
-    Helpers.expect.state(child, "tabs[2].wins.main", {
-        curr = 1003,
-        left = 1004,
-        right = 1005,
-    })
+        Helpers.expect.equality(child.get_wins_in_tab(), { 1005, 1004, 1006 })
+        Helpers.expect.state(child, "tabs[2].wins.main", {
+            curr = 1004,
+            left = 1005,
+            right = 1006,
+        })
+    else
+        Helpers.expect.equality(child.get_wins_in_tab(), { 1003 })
+
+        child.nnp()
+        child.wait()
+
+        Helpers.expect.equality(child.get_wins_in_tab(), { 1004, 1003, 1005 })
+        Helpers.expect.state(child, "tabs[2].wins.main", {
+            curr = 1003,
+            left = 1004,
+            right = 1005,
+        })
+    end
 
     child.cmd("q")
     child.wait()
@@ -182,12 +196,21 @@ T["checkhealth"]["auto opens side buffers"] = function()
     child.cmd("checkhealth")
     child.wait()
 
-    Helpers.expect.equality(child.get_wins_in_tab(), { 1004, 1003, 1005 })
-    Helpers.expect.state(child, "tabs[2].wins.main", {
-        curr = 1003,
-        left = 1004,
-        right = 1005,
-    })
+    if child.fn.has("nvim-0.10") == 0 then
+        Helpers.expect.equality(child.get_wins_in_tab(), { 1005, 1004, 1006 })
+        Helpers.expect.state(child, "tabs[2].wins.main", {
+            curr = 1004,
+            left = 1005,
+            right = 1006,
+        })
+    else
+        Helpers.expect.equality(child.get_wins_in_tab(), { 1004, 1003, 1005 })
+        Helpers.expect.state(child, "tabs[2].wins.main", {
+            curr = 1003,
+            left = 1004,
+            right = 1005,
+        })
+    end
 
     child.cmd("q")
     child.wait()
