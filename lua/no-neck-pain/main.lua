@@ -1,7 +1,7 @@
 local api = require("no-neck-pain.util.api")
 local constants = require("no-neck-pain.util.constants")
 local debug = require("no-neck-pain.util.debug")
-local E = require("no-neck-pain.util.event")
+local event = require("no-neck-pain.util.event")
 local state = require("no-neck-pain.state")
 local W = require("no-neck-pain.wins")
 
@@ -156,7 +156,7 @@ end
 ---@param scope string: internal identifier for logging purposes.
 ---@private
 function N.enable(scope)
-    if E.skip_enable(scope) then
+    if event.skip_enable(scope) then
         return
     end
 
@@ -213,7 +213,7 @@ function N.enable(scope)
         callback = function(p)
             local s = string.format("%s:%d", p.event, vim.api.nvim_get_current_win())
             vim.schedule(function()
-                if not state.is_active_tab_registered(state) or E.skip() then
+                if not state.is_active_tab_registered(state) or event.skip() then
                     return
                 end
 
@@ -245,7 +245,7 @@ function N.enable(scope)
         callback = function(p)
             vim.schedule(function()
                 local s = string.format("%s:%d", p.event, vim.api.nvim_get_current_win())
-                if not state.is_active_tab_registered(state) or E.skip() then
+                if not state.is_active_tab_registered(state) or event.skip() then
                     return
                 end
 
@@ -325,7 +325,7 @@ function N.enable(scope)
                     p.event = string.format("%s:skip_entering_NoNeckPain_buffer", p.event)
                     if
                         not state.is_active_tab_registered(state)
-                        or E.skip()
+                        or event.skip()
                         or state.get_scratchPad(state)
                     then
                         return debug.log(p.event, "skip")

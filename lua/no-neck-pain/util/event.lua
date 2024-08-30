@@ -2,7 +2,7 @@ local api = require("no-neck-pain.util.api")
 local constants = require("no-neck-pain.util.constants")
 local state = require("no-neck-pain.state")
 
-local E = {}
+local event = {}
 
 --- skips the event if:
 --- - the plugin is not enabled
@@ -10,7 +10,7 @@ local E = {}
 --- - the event is triggered in a different tab
 ---
 ---@private
-function E.skip()
+function event.skip()
     if _G.NoNeckPain.state == nil or not _G.NoNeckPain.state.enabled then
         return true
     end
@@ -33,7 +33,7 @@ end
 ---
 ---@param scope string: internal identifier for logging purposes.
 ---@private
-function E.skip_enable(scope)
+function event.skip_enable(scope)
     if state.is_active_tab_registered(state) then
         return true
     end
@@ -57,7 +57,7 @@ function E.skip_enable(scope)
         return true
     end
 
-    return state.is_supported_integration(state, "E.skip_enable", nil)
+    return state.is_supported_integration(state, "event.skip_enable", nil)
 end
 
-return E
+return event
