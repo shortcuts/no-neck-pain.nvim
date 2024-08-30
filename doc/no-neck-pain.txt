@@ -25,7 +25,7 @@ Toggles the config `${side}.enabled` and re-inits the plugin.
 
 ------------------------------------------------------------------------------
                                                            *NoNeckPain.enable()*
-                             `NoNeckPain.enable`()
+                          `NoNeckPain.enable`({scope})
 Initializes the plugin, sets event listeners and internal state.
 
 ------------------------------------------------------------------------------
