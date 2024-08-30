@@ -1,4 +1,4 @@
-local M = require("no-neck-pain.main")
+local main = require("no-neck-pain.main")
 local debug = require("no-neck-pain.util.debug")
 local api = require("no-neck-pain.util.api")
 local C = require("no-neck-pain.config")
@@ -11,7 +11,7 @@ function NoNeckPain.toggle()
         _G.NoNeckPain.config = C.options
     end
 
-    api.debounce("public_api_toggle", M.toggle)
+    api.debounce("public_api_toggle", main.toggle)
 end
 
 --- Toggles the scratchPad feature of the plugin.
@@ -24,7 +24,7 @@ function NoNeckPain.toggleScratchPad()
         _G.NoNeckPain.config = C.options
     end
 
-    M.toggle_scratchPad()
+    main.toggle_scratchPad()
 end
 
 --- Sets the config `width` to the given `width` value and resizes the NoNeckPain windows.
@@ -45,7 +45,7 @@ function NoNeckPain.resize(width)
         _G.NoNeckPain.config = vim.tbl_deep_extend("keep", { width = width }, _G.NoNeckPain.config)
     end
 
-    M.init("public_api_resize", false)
+    main.init("public_api_resize", false)
 end
 
 --- Toggles the config `${side}.enabled` and re-inits the plugin.
@@ -57,7 +57,7 @@ function NoNeckPain.toggleSide(side)
     end
 
     api.debounce("public_api_toggle_side", function(scope)
-        M.toggle_side(scope, side)
+        main.toggle_side(scope, side)
     end)
 end
 
@@ -67,12 +67,12 @@ function NoNeckPain.enable(scope)
         _G.NoNeckPain.config = C.options
     end
 
-    api.debounce(scope or "public_api_enable", M.enable, 10)
+    api.debounce(scope or "public_api_enable", main.enable, 10)
 end
 
 --- Disables the plugin, clear highlight groups and autocmds, closes side buffers and resets the internal state.
 function NoNeckPain.disable()
-    api.debounce("public_api_disable", M.disable)
+    api.debounce("public_api_disable", main.disable)
 end
 
 -- setup NoNeckPain options and merge them with user provided ones.
@@ -98,7 +98,7 @@ function NoNeckPain.setup(opts)
                     end
 
                     _G.NoNeckPain.config = C.defaults(opts)
-                    M.init(p.event)
+                    main.init(p.event)
                 end)
             end,
             group = "NoNeckPainAutocmd",

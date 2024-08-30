@@ -1,5 +1,5 @@
 local api = require("no-neck-pain.util.api")
-local C = require("no-neck-pain.colors")
+local colors = require("no-neck-pain.colors")
 local constants = require("no-neck-pain.util.constants")
 local debug = require("no-neck-pain.util.debug")
 local state = require("no-neck-pain.state")
@@ -188,7 +188,7 @@ function ui.create_side_buffers()
                 end
             end
 
-            C.init(state.get_side_id(state, side), side)
+            colors.init(state.get_side_id(state, side), side)
         end
     end
 

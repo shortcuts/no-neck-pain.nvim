@@ -1,6 +1,6 @@
 local api = require("no-neck-pain.util.api")
 local debug = require("no-neck-pain.util.debug")
-local C = require("no-neck-pain.colors")
+local colors = require("no-neck-pain.colors")
 local constants = require("no-neck-pain.util.constants")
 
 local NoNeckPain = {}
@@ -376,7 +376,7 @@ function NoNeckPain.defaults(options)
     end
 
     NoNeckPain.options = api.tde(options, defaults)
-    NoNeckPain.options.buffers = C.parse(NoNeckPain.options.buffers)
+    NoNeckPain.options.buffers = colors.parse(NoNeckPain.options.buffers)
 
     -- assert `width` values through vim options
     if NoNeckPain.options.width == "textwidth" then

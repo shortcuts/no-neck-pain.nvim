@@ -5,23 +5,23 @@ local event = require("no-neck-pain.util.event")
 local state = require("no-neck-pain.state")
 local ui = require("no-neck-pain.ui")
 
-local N = {}
+local main = {}
 
 -- Toggle the plugin by calling the `enable`/`disable` methods respectively.
 --
 ---@param scope string: internal identifier for logging purposes.
 ---@private
-function N.toggle(scope)
+function main.toggle(scope)
     if state.has_tabs(state) and state.is_active_tab_registered(state) then
-        return N.disable(scope)
+        return main.disable(scope)
     end
 
-    N.enable(scope)
+    main.enable(scope)
 end
 
 --- Toggles the scratchPad feature of the plugin.
 ---@private
-function N.toggle_scratchPad()
+function main.toggle_scratchPad()
     if not state.is_active_tab_registered(state) then
         return
     end
@@ -53,7 +53,7 @@ end
 ---@param scope string: internal identifier for logging purposes.
 ---@param side "left" | "right": the side to toggle.
 ---@private
-function N.toggle_side(scope, side)
+function main.toggle_side(scope, side)
     if not state.is_active_tab_registered(state) then
         debug.log(scope, "skipped because the current tab is not registered")
 
@@ -78,19 +78,19 @@ function N.toggle_side(scope, side)
             _G.NoNeckPain.config
         )
 
-        return N.disable(scope)
+        return main.disable(scope)
     end
 
     state.scan_layout(state, scope)
 
-    N.init(scope)
+    main.init(scope)
 end
 
 --- Creates side buffers and set the tab state, focuses the `curr` window if required.
 ---@param scope string: internal identifier for logging purposes.
 ---@param go_to_curr boolean?: whether we should re-focus the `curr` window.
 ---@private
-function N.init(scope, go_to_curr)
+function main.init(scope, go_to_curr)
     if not state.is_active_tab_registered(state) then
         error("called the internal `init` method on a `nil` tab.")
     end
@@ -155,7 +155,7 @@ end
 ---
 ---@param scope string: internal identifier for logging purposes.
 ---@private
-function N.enable(scope)
+function main.enable(scope)
     if event.skip_enable(scope) then
         return
     end
@@ -170,7 +170,7 @@ function N.enable(scope)
 
     state.set_side_id(state, vim.api.nvim_get_current_win(), "curr")
     state.scan_layout(state, scope)
-    N.init(scope, true)
+    main.init(scope, true)
     state.scan_layout(state, scope)
 
     vim.api.nvim_create_autocmd({ "VimResized" }, {
@@ -188,7 +188,7 @@ function N.enable(scope)
                     end
                 end
 
-                N.init(p.event)
+                main.init(p.event)
             end)
         end,
         group = augroup_name,
@@ -232,7 +232,7 @@ function N.enable(scope)
 
                 if init then
                     api.debounce(s, function()
-                        return N.init(s)
+                        return main.init(s)
                     end)
                 end
             end)
@@ -264,8 +264,8 @@ function N.enable(scope)
 
                         vim.cmd("new")
 
-                        N.disable(string.format("%s:reset", s))
-                        N.enable(string.format("%s:reset", s))
+                        main.disable(string.format("%s:reset", s))
+                        main.enable(string.format("%s:reset", s))
 
                         return
                     end
@@ -274,14 +274,14 @@ function N.enable(scope)
                     if #wins == 0 then
                         debug.log(s, "no active windows found")
 
-                        return N.disable(s)
+                        return main.disable(s)
                     end
 
                     state.set_side_id(state, wins[1], "curr")
 
                     debug.log(s, "re-routing to %d", wins[1])
 
-                    return N.init(s, true)
+                    return main.init(s, true)
                 end
 
                 if
@@ -291,7 +291,7 @@ function N.enable(scope)
                 then
                     debug.log(s, "closed a vsplit when no side buffers were present")
 
-                    return N.init(s)
+                    return main.init(s)
                 end
 
                 if
@@ -306,11 +306,11 @@ function N.enable(scope)
                 then
                     debug.log(s, "one of the NNP side has been closed")
 
-                    return N.disable(s)
+                    return main.disable(s)
                 end
 
                 if refresh then
-                    return N.init(s)
+                    return main.init(s)
                 end
             end)
         end,
@@ -370,7 +370,7 @@ end
 
 --- Disables the plugin for the given tab, clear highlight groups and autocmds, closes side buffers and resets the internal state.
 ---@private
-function N.disable(scope)
+function main.disable(scope)
     local active_tab = state.active_tab
 
     debug.log(scope, "calling disable for tab %d", active_tab)
@@ -396,7 +396,7 @@ function N.disable(scope)
                     )
                     vim.cmd("rightbelow vertical split")
                     vim.cmd("buffer " .. bufname)
-                    N.init(scope)
+                    main.init(scope)
                 end)
                 return
             end
@@ -443,4 +443,4 @@ function N.disable(scope)
     state.save(state)
 end
 
-return N
+return main
