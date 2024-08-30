@@ -164,7 +164,7 @@ function ui.create_side_buffers()
 
             if
                 wins[side].padding > _G.NoNeckPain.config.minSideBufferWidth
-                and not state.is_side_win_valid(state, side)
+                and not state.is_side_enabled_and_valid(state, side)
             then
                 vim.cmd(wins[side].cmd)
 
@@ -193,7 +193,7 @@ function ui.create_side_buffers()
     end
 
     for _, side in pairs(constants.SIDES) do
-        if state.is_side_win_valid(state, side) then
+        if state.is_side_enabled_and_valid(state, side) then
             local padding = wins[side].padding or ui.get_side_width(side)
 
             if padding > _G.NoNeckPain.config.minSideBufferWidth then
@@ -224,7 +224,7 @@ function ui.get_side_width(side)
     local columns = state.get_columns(state)
 
     for _, s in ipairs(constants.SIDES) do
-        if state.is_side_win_valid(state, s) and columns > 1 then
+        if state.is_side_enabled_and_valid(state, s) and columns > 1 then
             columns = columns - 1
         end
     end
@@ -250,7 +250,7 @@ function ui.get_side_width(side)
         if
             tree.id ~= nil
             and (
-                not state.is_side_win_valid(state, side)
+                not state.is_side_enabled_and_valid(state, side)
                 or side == _G.NoNeckPain.config.integrations[name].position
             )
         then

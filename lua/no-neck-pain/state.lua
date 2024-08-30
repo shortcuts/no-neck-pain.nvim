@@ -265,14 +265,12 @@ end
 ---@param side "left"|"right": the side of the window.
 ---@return boolean
 ---@private
-function state:is_side_win_enabled_and_valid(side)
+function state:is_side_enabled_or_valid(side)
     if not self.is_side_enabled(self, side) then
         return true
     end
 
-    local id = self.get_side_id(self, side)
-
-    return id ~= nil and vim.api.nvim_win_is_valid(id)
+    return self.is_side_win_valid(self, side)
 end
 
 --- Whether the side window is registered and a valid window.
@@ -280,11 +278,20 @@ end
 ---@param side "left"|"right"|"curr": the side of the window.
 ---@return boolean
 ---@private
-function state:is_side_win_valid(side)
+function state:is_side_enabled_and_valid(side)
     if side ~= "curr" and not self.is_side_enabled(self, side) then
         return false
     end
 
+    return self.is_side_win_valid(self, side)
+end
+
+--- Whether the side window a valid window.
+---
+---@param side "left"|"right"|"curr": the side of the window.
+---@return boolean
+---@private
+function state:is_side_win_valid(side)
     local id = self.get_side_id(self, side)
 
     return id ~= nil and vim.api.nvim_win_is_valid(id)
@@ -325,12 +332,12 @@ end
 ---@private
 function state:check_sides(condition, expected)
     if condition == "or" then
-        return self.is_side_win_valid(self, "left") == expected
-            or self.is_side_win_valid(self, "right") == expected
+        return self.is_side_enabled_and_valid(self, "left") == expected
+            or self.is_side_enabled_and_valid(self, "right") == expected
     end
 
-    return self.is_side_win_valid(self, "left") == expected
-        and self.is_side_win_valid(self, "right") == expected
+    return self.is_side_enabled_and_valid(self, "left") == expected
+        and self.is_side_enabled_and_valid(self, "right") == expected
 end
 
 --- Gets wins that are not relative or main wins.

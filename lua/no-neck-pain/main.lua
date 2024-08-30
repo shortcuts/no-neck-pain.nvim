@@ -105,8 +105,8 @@ function main.init(scope, go_to_curr)
     -- if we do not have side buffers, we must ensure we only trigger a focus if we re-create them
     local had_side_buffers = true
     if
-        not state.is_side_win_enabled_and_valid(state, "left")
-        or not state.is_side_win_enabled_and_valid(state, "right")
+        not state.is_side_enabled_or_valid(state, "left")
+        or not state.is_side_enabled_or_valid(state, "right")
     then
         had_side_buffers = false
     end
@@ -286,8 +286,8 @@ function main.enable(scope)
 
                 if
                     p.event == "QuitPre"
-                    and not state.is_side_win_valid(state, "left")
-                    and not state.is_side_win_valid(state, "right")
+                    and not state.is_side_enabled_and_valid(state, "left")
+                    and not state.is_side_enabled_and_valid(state, "right")
                 then
                     debug.log(s, "closed a vsplit when no side buffers were present")
 
@@ -297,11 +297,11 @@ function main.enable(scope)
                 if
                     (
                         state.is_side_enabled(state, "left")
-                        and not state.is_side_win_valid(state, "left")
+                        and not state.is_side_enabled_and_valid(state, "left")
                     )
                     or (
                         state.is_side_enabled(state, "right")
-                        and not state.is_side_win_valid(state, "right")
+                        and not state.is_side_enabled_and_valid(state, "right")
                     )
                 then
                     debug.log(s, "one of the NNP side has been closed")
