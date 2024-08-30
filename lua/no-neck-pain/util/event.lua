@@ -9,7 +9,7 @@ local E = {}
 --- - the current window is a relative window
 --- - the event is triggered in a different tab
 ---
---- @private
+---@private
 function E.skip()
     if _G.NoNeckPain.state == nil or not _G.NoNeckPain.state.enabled then
         return true
@@ -31,8 +31,8 @@ end
 --- - we are focusing a floating window
 --- - we are focusing one of the side buffer
 ---
---- @param scope string: internal identifier for logging purposes.
---- @private
+---@param scope string: internal identifier for logging purposes.
+---@private
 function E.skip_enable(scope)
     if S.is_active_tab_registered(S) then
         return true

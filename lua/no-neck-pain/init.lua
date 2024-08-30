@@ -29,7 +29,7 @@ end
 
 --- Sets the config `width` to the given `width` value and resizes the NoNeckPain windows.
 ---
---- @param width number: any positive integer superior to 0.
+---@param width number: any positive integer superior to 0.
 function NoNeckPain.resize(width)
     if _G.NoNeckPain.state == nil or not _G.NoNeckPain.state.enabled then
         error("no-neck-pain.nvim must be enabled, run `NoNeckPain` first.")
@@ -50,7 +50,7 @@ end
 
 --- Toggles the config `${side}.enabled` and re-inits the plugin.
 ---
---- @param side "left" | "right": the side to toggle.
+---@param side "left" | "right": the side to toggle.
 function NoNeckPain.toggleSide(side)
     if _G.NoNeckPain.state == nil or not _G.NoNeckPain.state.enabled then
         error("no-neck-pain.nvim must be enabled, run `NoNeckPain` first.")

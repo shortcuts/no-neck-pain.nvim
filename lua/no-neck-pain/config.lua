@@ -6,48 +6,48 @@ local Co = require("no-neck-pain.util.constants")
 local NoNeckPain = {}
 
 --- NoNeckPain's buffer `vim.wo` options.
---- @see window options `:h vim.wo`
+---@see window options `:h vim.wo`
 ---
---- @type table
+---@type table
 --- Default values:
---- @eval return MiniDoc.afterlines_to_code(MiniDoc.current.eval_section)
+---@eval return MiniDoc.afterlines_to_code(MiniDoc.current.eval_section)
 NoNeckPain.bufferOptionsWo = {
-    --- @type boolean
+    ---@type boolean
     cursorline = false,
-    --- @type boolean
+    ---@type boolean
     cursorcolumn = false,
-    --- @type string
+    ---@type string
     colorcolumn = "0",
-    --- @type boolean
+    ---@type boolean
     number = false,
-    --- @type boolean
+    ---@type boolean
     relativenumber = false,
-    --- @type boolean
+    ---@type boolean
     foldenable = false,
-    --- @type boolean
+    ---@type boolean
     list = false,
-    --- @type boolean
+    ---@type boolean
     wrap = true,
-    --- @type boolean
+    ---@type boolean
     linebreak = true,
 }
 
 --- NoNeckPain's buffer `vim.bo` options.
---- @see buffer options `:h vim.bo`
+---@see buffer options `:h vim.bo`
 ---
---- @type table
+---@type table
 --- Default values:
---- @eval return MiniDoc.afterlines_to_code(MiniDoc.current.eval_section)
+---@eval return MiniDoc.afterlines_to_code(MiniDoc.current.eval_section)
 NoNeckPain.bufferOptionsBo = {
-    --- @type string
+    ---@type string
     filetype = "no-neck-pain",
-    --- @type string
+    ---@type string
     buftype = "nofile",
-    --- @type string
+    ---@type string
     bufhidden = "hide",
-    --- @type boolean
+    ---@type boolean
     buflisted = false,
-    --- @type boolean
+    ---@type boolean
     swapfile = false,
 }
 
@@ -56,39 +56,39 @@ NoNeckPain.bufferOptionsBo = {
 --- Leverages the side buffers as notepads, which work like any Neovim buffer and automatically saves its content at the given `location`.
 --- note: quitting an unsaved scratchPad buffer is non-blocking, and the content is still saved.
 ---
---- @type table
+---@type table
 --- Default values:
---- @eval return MiniDoc.afterlines_to_code(MiniDoc.current.eval_section)
+---@eval return MiniDoc.afterlines_to_code(MiniDoc.current.eval_section)
 NoNeckPain.bufferOptionsScratchPad = {
     -- When `true`, automatically sets the following options to the side buffers:
     -- - `autowriteall`
     -- - `autoread`.
-    --- @type boolean
+    ---@type boolean
     enabled = false,
     -- The name of the generated file. See `location` for more information.
     -- /!\ deprecated /!\ use `pathToFile` instead.
-    --- @type string
-    --- @example: `no-neck-pain-left.norg`
-    --- @deprecated: use `pathToFile` instead.
+    ---@type string
+    ---@example: `no-neck-pain-left.norg`
+    ---@deprecated: use `pathToFile` instead.
     fileName = "no-neck-pain",
     -- By default, files are saved at the same location as the current Neovim session.
     -- note: filetype is defaulted to `norg` (https://github.com/nvim-neorg/neorg), but can be changed in `buffers.bo.filetype` or |NoNeckPain.bufferOptions| for option scoped to the `left` and/or `right` buffer.
     -- /!\ deprecated /!\ use `pathToFile` instead.
-    --- @type string?
-    --- @example: `no-neck-pain-left.norg`
-    --- @deprecated: use `pathToFile` instead.
+    ---@type string?
+    ---@example: `no-neck-pain-left.norg`
+    ---@deprecated: use `pathToFile` instead.
     location = nil,
     -- The path to the file to save the scratchPad content to and load it in the buffer.
-    --- @type string?
-    --- @example: `~/notes.norg`
+    ---@type string?
+    ---@example: `~/notes.norg`
     pathToFile = "",
 }
 
 --- NoNeckPain's buffer color options.
 ---
---- @type table
+---@type table
 --- Default values:
---- @eval return MiniDoc.afterlines_to_code(MiniDoc.current.eval_section)
+---@eval return MiniDoc.afterlines_to_code(MiniDoc.current.eval_section)
 NoNeckPain.bufferOptionsColors = {
     -- Hexadecimal color code to override the current background color of the buffer. (e.g. #24273A)
     -- Transparent backgrounds are supported by default.
@@ -111,119 +111,119 @@ NoNeckPain.bufferOptionsColors = {
     -- - tokyonight-moon
     -- - tokyonight-night
     -- - tokyonight-storm
-    --- @type string?
+    ---@type string?
     background = nil,
     -- Brighten (positive) or darken (negative) the side buffers background color. Accepted values are [-1..1].
-    --- @type integer
+    ---@type integer
     blend = 0,
     -- Hexadecimal color code to override the current text color of the buffer. (e.g. #7480c2)
-    --- @type string?
+    ---@type string?
     text = nil,
 }
 
 --- NoNeckPain's buffer side buffer option.
 ---
---- @type table
+---@type table
 --- Default values:
---- @eval return MiniDoc.afterlines_to_code(MiniDoc.current.eval_section)
+---@eval return MiniDoc.afterlines_to_code(MiniDoc.current.eval_section)
 NoNeckPain.bufferOptions = {
     -- When `false`, the buffer won't be created.
-    --- @type boolean
+    ---@type boolean
     enabled = true,
-    --- @see NoNeckPain.bufferOptionsColors `:h NoNeckPain.bufferOptionsColors`
+    ---@see NoNeckPain.bufferOptionsColors `:h NoNeckPain.bufferOptionsColors`
     colors = NoNeckPain.bufferOptionsColors,
-    --- @see NoNeckPain.bufferOptionsBo `:h NoNeckPain.bufferOptionsBo`
+    ---@see NoNeckPain.bufferOptionsBo `:h NoNeckPain.bufferOptionsBo`
     bo = NoNeckPain.bufferOptionsBo,
-    --- @see NoNeckPain.bufferOptionsWo `:h NoNeckPain.bufferOptionsWo`
+    ---@see NoNeckPain.bufferOptionsWo `:h NoNeckPain.bufferOptionsWo`
     wo = NoNeckPain.bufferOptionsWo,
-    --- @see NoNeckPain.bufferOptionsScratchPad `:h NoNeckPain.bufferOptionsScratchPad`
+    ---@see NoNeckPain.bufferOptionsScratchPad `:h NoNeckPain.bufferOptionsScratchPad`
     scratchPad = NoNeckPain.bufferOptionsScratchPad,
 }
 
 --- NoNeckPain's plugin config.
 ---
---- @type table
+---@type table
 --- Default values:
---- @eval return MiniDoc.afterlines_to_code(MiniDoc.current.eval_section)
+---@eval return MiniDoc.afterlines_to_code(MiniDoc.current.eval_section)
 NoNeckPain.options = {
     -- Prints useful logs about triggered events, and reasons actions are executed.
-    --- @type boolean
+    ---@type boolean
     debug = false,
     -- The width of the focused window that will be centered. When the terminal width is less than the `width` option, the side buffers won't be created.
-    --- @type integer|"textwidth"|"colorcolumn"
+    ---@type integer|"textwidth"|"colorcolumn"
     width = 100,
     -- Represents the lowest width value a side buffer should be.
     -- This option can be useful when switching window size frequently, example:
     -- in full screen screen, width is 210, you define an NNP `width` of 100, which creates each side buffer with a width of 50. If you resize your terminal to the half of the screen, each side buffer would be of width 5 and thereforce might not be useful and/or add "noise" to your workflow.
-    --- @type integer
+    ---@type integer
     minSideBufferWidth = 10,
     -- Disables the plugin if the last valid buffer in the list have been closed.
-    --- @type boolean
+    ---@type boolean
     disableOnLastBuffer = false,
     -- When `true`, disabling the plugin closes every other windows except the initially focused one.
-    --- @usage: this parameter will be renamed `killAllWindowsOnDisable` in the next major release (^2.x.y).
-    --- @type boolean
+    ---@usage: this parameter will be renamed `killAllWindowsOnDisable` in the next major release (^2.x.y).
+    ---@type boolean
     killAllBuffersOnDisable = false,
     -- When `true`, deleting the main no-neck-pain buffer with `:bd`, `:bdelete` does not disable the plugin, it fallbacks on the newly focused window and refreshes the state by re-creating side-windows if necessary.
-    --- @usage: the default value will change to `true` in the next major release (^2.x.y).
-    --- @type boolean
+    ---@usage: the default value will change to `true` in the next major release (^2.x.y).
+    ---@type boolean
     fallbackOnBufferDelete = false,
     -- Adds autocmd (@see `:h autocmd`) which aims at automatically enabling the plugin.
-    --- @type table
+    ---@type table
     autocmds = {
         -- When `true`, enables the plugin when you start Neovim.
         -- If the main window is  a side tree (e.g. NvimTree) or a dashboard, the command is delayed until it finds a valid window.
         -- The command is cleaned once it has successfuly ran once.
-        --- @type boolean
+        ---@type boolean
         enableOnVimEnter = false,
         -- When `true`, enables the plugin when you enter a new Tab.
         -- note: it does not trigger if you come back to an existing tab, to prevent unwanted interfer with user's decisions.
-        --- @type boolean
+        ---@type boolean
         enableOnTabEnter = false,
         -- When `true`, reloads the plugin configuration after a colorscheme change.
-        --- @type boolean
+        ---@type boolean
         reloadOnColorSchemeChange = false,
         -- When `true`, entering one of no-neck-pain side buffer will automatically skip it and go to the next available buffer.
-        --- @type boolean
+        ---@type boolean
         skipEnteringNoNeckPainBuffer = false,
     },
     -- Creates mappings for you to easily interact with the exposed commands.
-    --- @type table
+    ---@type table
     mappings = {
         -- When `true`, creates all the mappings that are not set to `false`.
-        --- @type boolean
+        ---@type boolean
         enabled = false,
         -- Sets a global mapping to Neovim, which allows you to toggle the plugin.
         -- When `false`, the mapping is not created.
-        --- @type string
+        ---@type string
         toggle = "<Leader>np",
         -- Sets a global mapping to Neovim, which allows you to toggle the left side buffer.
         -- When `false`, the mapping is not created.
-        --- @type string
+        ---@type string
         toggleLeftSide = "<Leader>nql",
         -- Sets a global mapping to Neovim, which allows you to toggle the right side buffer.
         -- When `false`, the mapping is not created.
-        --- @type string
+        ---@type string
         toggleRightSide = "<Leader>nqr",
         -- Sets a global mapping to Neovim, which allows you to increase the width (+5) of the main window.
         -- When `false`, the mapping is not created.
-        --- @type string | { mapping: string, value: number }
+        ---@type string | { mapping: string, value: number }
         widthUp = "<Leader>n=",
         -- Sets a global mapping to Neovim, which allows you to decrease the width (-5) of the main window.
         -- When `false`, the mapping is not created.
-        --- @type string | { mapping: string, value: number }
+        ---@type string | { mapping: string, value: number }
         widthDown = "<Leader>n-",
         -- Sets a global mapping to Neovim, which allows you to toggle the scratchPad feature.
         -- When `false`, the mapping is not created.
-        --- @type string
+        ---@type string
         scratchPad = "<Leader>ns",
     },
     --- Common options that are set to both side buffers.
     --- See |NoNeckPain.bufferOptions| for option scoped to the `left` and/or `right` buffer.
-    --- @type table
+    ---@type table
     buffers = {
         -- When `true`, the side buffers will be named `no-neck-pain-left` and `no-neck-pain-right` respectively.
-        --- @type boolean
+        ---@type boolean
         setNames = false,
         -- Leverages the side buffers as notepads, which work like any Neovim buffer and automatically saves its content at the given `location`.
         -- note: quitting an unsaved scratchPad buffer is non-blocking, and the content is still saved.
@@ -233,31 +233,31 @@ NoNeckPain.options = {
         --- see |NoNeckPain.bufferOptionsColors|
         colors = NoNeckPain.bufferOptionsColors,
         -- Vim buffer-scoped options: any `vim.bo` options is accepted here.
-        --- @see NoNeckPain.bufferOptionsBo `:h NoNeckPain.bufferOptionsBo`
+        ---@see NoNeckPain.bufferOptionsBo `:h NoNeckPain.bufferOptionsBo`
         bo = NoNeckPain.bufferOptionsBo,
         -- Vim window-scoped options: any `vim.wo` options is accepted here.
-        --- @see NoNeckPain.bufferOptionsWo `:h NoNeckPain.bufferOptionsWo`
+        ---@see NoNeckPain.bufferOptionsWo `:h NoNeckPain.bufferOptionsWo`
         wo = NoNeckPain.bufferOptionsWo,
         --- Options applied to the `left` buffer, options defined here overrides the `buffers` ones.
-        --- @see NoNeckPain.bufferOptions `:h NoNeckPain.bufferOptions`
+        ---@see NoNeckPain.bufferOptions `:h NoNeckPain.bufferOptions`
         left = NoNeckPain.bufferOptions,
         --- Options applied to the `right` buffer, options defined here overrides the `buffers` ones.
-        --- @see NoNeckPain.bufferOptions `:h NoNeckPain.bufferOptions`
+        ---@see NoNeckPain.bufferOptions `:h NoNeckPain.bufferOptions`
         right = NoNeckPain.bufferOptions,
     },
     -- Supported integrations that might clash with `no-neck-pain.nvim`'s behavior.
-    --- @type table
+    ---@type table
     integrations = {
         -- By default, if NvimTree is open, we will close it and reopen it when enabling the plugin,
         -- this prevents having the side buffers wrongly positioned.
         -- @link https://github.com/nvim-tree/nvim-tree.lua
-        --- @type table
+        ---@type table
         NvimTree = {
             -- The position of the tree.
-            --- @type "left"|"right"
+            ---@type "left"|"right"
             position = "left",
             -- When `true`, if the tree was opened before enabling the plugin, we will reopen it.
-            --- @type boolean
+            ---@type boolean
             reopen = true,
         },
         -- By default, if NeoTree is open, we will close it and reopen it when enabling the plugin,
@@ -265,7 +265,7 @@ NoNeckPain.options = {
         -- @link https://github.com/nvim-neo-tree/neo-tree.nvim
         NeoTree = {
             -- The position of the tree.
-            --- @type "left"|"right"
+            ---@type "left"|"right"
             position = "left",
             -- When `true`, if the tree was opened before enabling the plugin, we will reopen it.
             reopen = true,
@@ -273,13 +273,13 @@ NoNeckPain.options = {
         -- @link https://github.com/mbbill/undotree
         undotree = {
             -- The position of the tree.
-            --- @type "left"|"right"
+            ---@type "left"|"right"
             position = "left",
         },
         -- @link https://github.com/nvim-neotest/neotest
         neotest = {
             -- The position of the tree.
-            --- @type "right"
+            ---@type "right"
             position = "right",
             -- When `true`, if the tree was opened before enabling the plugin, we will reopen it.
             reopen = true,
@@ -287,7 +287,7 @@ NoNeckPain.options = {
         -- @link https://github.com/nvim-treesitter/playground
         TSPlayground = {
             -- The position of the tree.
-            --- @type "right"|"left"
+            ---@type "right"|"left"
             position = "right",
             -- When `true`, if the tree was opened before enabling the plugin, we will reopen it.
             reopen = true,
@@ -295,7 +295,7 @@ NoNeckPain.options = {
         -- @link https://github.com/rcarriga/nvim-dap-ui
         NvimDAPUI = {
             -- The position of the tree.
-            --- @type "none"
+            ---@type "none"
             position = "none",
             -- When `true`, if the tree was opened before enabling the plugin, we will reopen it.
             reopen = true,
@@ -303,7 +303,7 @@ NoNeckPain.options = {
         -- @link https://github.com/hedyhli/outline.nvim
         outline = {
             -- The position of the tree.
-            --- @type "left"|"right"
+            ---@type "left"|"right"
             position = "right",
             -- When `true`, if the tree was opened before enabling the plugin, we will reopen it.
             reopen = true,
@@ -311,7 +311,7 @@ NoNeckPain.options = {
         -- @link https://github.com/stevearc/aerial.nvim
         aerial = {
             -- The position of the tree.
-            --- @type "left"|"right"
+            ---@type "left"|"right"
             position = "right",
             -- When `true`, if the tree was opened before enabling the plugin, we will reopen it.
             reopen = true,
@@ -319,16 +319,16 @@ NoNeckPain.options = {
     },
 }
 
---- @private
+---@private
 local defaults = vim.deepcopy(NoNeckPain.options)
 
 --- Parses the deprecated scratchPad options into the new `pathToFile` option.
 ---
---- @param side "left"|"right" The side of the buffer.
---- @param options table Module config table. See |NoNeckPain.bufferOptionsScratchPads|.
---- @param fileType string The file extension to leverage.
+---@param side "left"|"right" The side of the buffer.
+---@param options table Module config table. See |NoNeckPain.bufferOptionsScratchPads|.
+---@param fileType string The file extension to leverage.
 ---
---- @private
+---@private
 local function parse_deprecated_scratchPad(side, options, fileType)
     -- set the defaults if the user rely on them
     if vim.tbl_count(options) == 0 or options.pathToFile == nil then
@@ -356,9 +356,9 @@ end
 
 --- Defaults NoNeckPain options by merging user provided options with the default plugin values.
 ---
---- @param options table Module config table. See |NoNeckPain.options|.
+---@param options table Module config table. See |NoNeckPain.options|.
 ---
---- @private
+---@private
 function NoNeckPain.defaults(options)
     options.buffers = options.buffers or {}
 
@@ -417,10 +417,10 @@ end
 
 --- Registers the plugin mappings if the option is enabled.
 ---
---- @param options table The mappins provided by the user.
---- @param mappings table A key value map of the mapping name and its command.
+---@param options table The mappins provided by the user.
+---@param mappings table A key value map of the mapping name and its command.
 ---
---- @private
+---@private
 local function register_mappings(options, mappings)
     -- all of the mappings are disabled
     if not options.enabled then
@@ -453,9 +453,9 @@ end
 
 --- Define your no-neck-pain setup.
 ---
---- @param options table Module config table. See |NoNeckPain.options|.
+---@param options table Module config table. See |NoNeckPain.options|.
 ---
---- @usage `require("no-neck-pain").setup()` (add `{}` with your |NoNeckPain.options| table)
+---@usage `require("no-neck-pain").setup()` (add `{}` with your |NoNeckPain.options| table)
 function NoNeckPain.setup(options)
     NoNeckPain.options = NoNeckPain.defaults(options or {})
 
