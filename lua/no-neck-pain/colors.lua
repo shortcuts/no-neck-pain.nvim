@@ -5,25 +5,25 @@ local S = require("no-neck-pain.state")
 
 local C = {}
 
----Converts an hex color code to RGB, values are returned independently.
+--- Converts an hex color code to RGB, values are returned independently.
 ---
----@param hex string: the hex color to conver to rgb.
----@return number?: the r color
----@return number?: the g color
----@return number?: the b color
----@private
+--- @param hex string: the hex color to conver to rgb.
+--- @return number?: the r color
+--- @return number?: the g color
+--- @return number?: the b color
+--- @private
 local function hex_to_rgb(hex)
     local r, g, b = hex:sub(2, 3), hex:sub(4, 5), hex:sub(6, 7)
 
     return tonumber("0x" .. r), tonumber("0x" .. g), tonumber("0x" .. b)
 end
 
----Blend the given `color_code` RGB for the given `factor`.
+--- Blend the given `color_code` RGB for the given `factor`.
 ---
----@param color_code string: the color code string, e.g. #ffffff.
----@param factor number: Brighten (positive) or darken (negative) the side buffers background color. Accepted values are [-1..1].
----@return string: the blended color code.
----@private
+--- @param color_code string: the color code string, e.g. #ffffff.
+--- @param factor number: Brighten (positive) or darken (negative) the side buffers background color. Accepted values are [-1..1].
+--- @return string: the blended color code.
+--- @private
 local function blend(color_code, factor)
     local r, g, b = hex_to_rgb(color_code)
     local format = "#%02x%02x%02x"
@@ -44,13 +44,13 @@ local function blend(color_code, factor)
     )
 end
 
----Tries to match the given `color_code` to an integration name, defaults to the given `color_code` if not found.
----if a `factor` is provided, the color will be blended (brighten/darken) before being returned.
+--- Tries to match the given `color_code` to an integration name, defaults to the given `color_code` if not found.
+--- if a `factor` is provided, the color will be blended (brighten/darken) before being returned.
 ---
----@param color_code string: the color code string, e.g. #ffffff.
----@param factor number: Brighten (positive) or darken (negative) the side buffers background color. Accepted values are [-1..1].
----@return string?: the blended color code.
----@private
+--- @param color_code string: the color code string, e.g. #ffffff.
+--- @param factor number: Brighten (positive) or darken (negative) the side buffers background color. Accepted values are [-1..1].
+--- @return string?: the blended color code.
+--- @private
 function C.match_and_blend(color_code, factor)
     if color_code == nil or string.lower(color_code) == "none" then
         return nil
@@ -85,11 +85,11 @@ function C.match_and_blend(color_code, factor)
     return blend(color_code, factor or 0)
 end
 
----Parses to color for each buffer parameters, considering transparent backgrounds.
+--- Parses to color for each buffer parameters, considering transparent backgrounds.
 ---
----@param buffers table: the buffers table to parse.
----@return table: the parsed buffers.
----@private
+--- @param buffers table: the buffers table to parse.
+--- @return table: the parsed buffers.
+--- @private
 function C.parse(buffers)
     buffers.colors.background = C.match_and_blend(buffers.colors.background, buffers.colors.blend)
 
@@ -107,14 +107,14 @@ function C.parse(buffers)
     return buffers
 end
 
----Creates highlight groups for a given `win` in a `tab` named:
----- `NoNeckPain_background_tab_$ID_side_$SIDE` for the background colors.
----- `NoNeckPain_text_tab_$ID_side_$SIDE` for the text colors.
----note: `cmd` is used instead of native commands for backward compatibility with Neovim 0.7
+--- Creates highlight groups for a given `win` in a `tab` named:
+--- - `NoNeckPain_background_tab_$ID_side_$SIDE` for the background colors.
+--- - `NoNeckPain_text_tab_$ID_side_$SIDE` for the text colors.
+--- note: `cmd` is used instead of native commands for backward compatibility with Neovim 0.7
 ---
----@param win number: the id of the win to init.
----@param side "left"|"right": the side of the window being resized, used for logging only.
----@private
+--- @param win number: the id of the win to init.
+--- @param side "left"|"right": the side of the window being resized, used for logging only.
+--- @private
 function C.init(win, side)
     if win == nil then
         return

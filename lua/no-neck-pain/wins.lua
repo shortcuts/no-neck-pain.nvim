@@ -6,12 +6,12 @@ local S = require("no-neck-pain.state")
 
 local W = {}
 
----Resizes a window if it's valid.
+--- Resizes a window if it's valid.
 ---
----@param id number: the id of the window.
----@param width number: the width to apply to the window.
----@param side "left"|"right"|"curr"|"unregistered": the side of the window being resized, used for logging only.
----@private
+--- @param id number: the id of the window.
+--- @param width number: the width to apply to the window.
+--- @param side "left"|"right"|"curr"|"unregistered": the side of the window being resized, used for logging only.
+--- @private
 function W.resize(id, width, side)
     D.log(side, "resizing %d with padding %d", id, width)
 
@@ -20,10 +20,10 @@ function W.resize(id, width, side)
     end
 end
 
----Initializes the given `side` with the options from the user given configuration.
----@param side "left"|"right"|"curr": the side of the window to initialize.
----@param id number: the id of the window.
----@private
+--- Initializes the given `side` with the options from the user given configuration.
+--- @param side "left"|"right"|"curr": the side of the window to initialize.
+--- @param id number: the id of the window.
+--- @private
 function W.init_side_options(side, id)
     local bufid = vim.api.nvim_win_get_buf(id)
 
@@ -38,10 +38,10 @@ function W.init_side_options(side, id)
     end
 end
 
----Reposition the side buffers to their initial place
+--- Reposition the side buffers to their initial place
 ---
----@param scope string: the scope from where this function is called.
----@private
+--- @param scope string: the scope from where this function is called.
+--- @private
 function W.reposition(scope)
     local sides = {
         left = vim.api.nvim_replace_termcodes("normal <C-W>H", true, false, true),
@@ -87,12 +87,12 @@ function W.reposition(scope)
     end
 end
 
----Closes a window if it's valid.
+--- Closes a window if it's valid.
 ---
----@param scope string: the scope from where this function is called.
----@param id number: the id of the window.
----@param side "left"|"right": the side of the window being closed, used for logging only.
----@private
+--- @param scope string: the scope from where this function is called.
+--- @param id number: the id of the window.
+--- @param side "left"|"right": the side of the window being closed, used for logging only.
+--- @private
 function W.close(scope, id, side)
     if vim.api.nvim_win_is_valid(id) then
         D.log(scope, "closing %s window", side)
@@ -101,12 +101,12 @@ function W.close(scope, id, side)
     end
 end
 
----Sets options to the side buffers to toggle the scratchPad.
+--- Sets options to the side buffers to toggle the scratchPad.
 ---
----@param side "left"|"right": the side of the window being resized, used for logging only.
----@param id number: the side window ID.
----@param cleanup boolean?: cleanup the given buffer
----@private
+--- @param side "left"|"right": the side of the window being resized, used for logging only.
+--- @param id number: the side window ID.
+--- @param cleanup boolean?: cleanup the given buffer
+--- @private
 function W.init_scratchPad(side, id, cleanup)
     if not _G.NoNeckPain.config.buffers[side].enabled then
         return
@@ -147,11 +147,11 @@ function W.init_scratchPad(side, id, cleanup)
     vim.o.autowriteall = true
 end
 
----Creates side buffers with the correct padding, considering the side integrations.
+--- Creates side buffers with the correct padding, considering the side integrations.
 --- - A side buffer is not created if there's not enough space.
 --- - If it already exists, we resize it.
 ---
----@private
+--- @private
 function W.create_side_buffers()
     local wins = {
         left = { cmd = "topleft vnew", padding = 0 },
@@ -206,11 +206,11 @@ function W.create_side_buffers()
     end
 end
 
----Determine the "padding" (width) of the buffer based on the `_G.NoNeckPain.config.width` and the width of the screen.
+--- Determine the "padding" (width) of the buffer based on the `_G.NoNeckPain.config.width` and the width of the screen.
 ---
----@param side "left"|"right": the side of the window.
----@return number: the width of the side window.
----@private
+--- @param side "left"|"right": the side of the window.
+--- @return number: the width of the side window.
+--- @private
 function W.get_padding(side)
     local scope = string.format("W.get_padding:%s", side)
     -- if the available screen size is lower than the config width,

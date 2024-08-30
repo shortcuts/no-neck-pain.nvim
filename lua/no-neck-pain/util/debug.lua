@@ -1,11 +1,11 @@
 local D = {}
 
----prints only if debug is true.
+--- prints only if debug is true.
 ---
----@param scope string: the scope from where this function is called.
----@param str string: the formatted string.
----@param ... any: the arguments of the formatted string.
----@private
+--- @param scope string: the scope from where this function is called.
+--- @param str string: the formatted string.
+--- @param ... any: the arguments of the formatted string.
+--- @private
 function D.log(scope, str, ...)
     if _G.NoNeckPain.config ~= nil and not _G.NoNeckPain.config.debug then
         return
@@ -21,10 +21,10 @@ function D.log(scope, str, ...)
     )
 end
 
----analyzes the user provided `setup` parameters and sends a message if they use a deprecated option, then gives the new option to use.
+--- analyzes the user provided `setup` parameters and sends a message if they use a deprecated option, then gives the new option to use.
 ---
----@param options table: the options provided by the user.
----@private
+--- @param options table: the options provided by the user.
+--- @private
 function D.warn_deprecation(options)
     local uses_deprecated_option = false
 

@@ -1,34 +1,34 @@
-local D = require("no-neck-pain.util.debug")
+local debug = require("no-neck-pain.util.debug")
 
-local A = { debouncers = {} }
+local api = { debouncers = {} }
 
----Returns the current tab page or 1 if it's nil.
+--- Returns the current tab page or 1 if it's nil.
 ---
----@return number: the tabpage id.
----@private
-function A.get_current_tab()
+--- @return number: the tabpage id.
+--- @private
+function api.get_current_tab()
     return vim.api.nvim_get_current_tabpage() or 1
 end
 
-function A.tde(t1, t2)
+function api.tde(t1, t2)
     return vim.deepcopy(vim.tbl_deep_extend("keep", t1 or {}, t2 or {}))
 end
 
----Returns the name of the augroup for the given tab ID.
+--- Returns the name of the augroup for the given tab ID.
 ---
----@param id number?: the id of the tab.
----@return string: the initialied state
----@private
-function A.get_augroup_name(id)
+--- @param id number?: the id of the tab.
+--- @return string: the initialied state
+--- @private
+function api.get_augroup_name(id)
     return string.format("NoNeckPain-%d", id)
 end
 
----Determines if the given `win` or the current window is relative.
+--- Determines if the given `win` or the current window is relative.
 ---
----@param win number?: the id of the window.
----@return boolean: true if the window is relative.
----@private
-function A.is_relative_window(win)
+--- @param win number?: the id of the window.
+--- @return boolean: true if the window is relative.
+--- @private
+function api.is_relative_window(win)
     win = win or vim.api.nvim_get_current_win()
 
     if
@@ -41,13 +41,13 @@ function A.is_relative_window(win)
     return false
 end
 
----Sets buffer option with backward compatibility (nvim <9).
+--- Sets buffer option with backward compatibility (nvim <9).
 ---
----@param id number: the id of the buffer.
----@param opt string: the opt name.
----@param val string|number|boolean: the opt value.
----@private
-function A.set_buffer_option(id, opt, val)
+--- @param id number: the id of the buffer.
+--- @param opt string: the opt name.
+--- @param val string|number|boolean: the opt value.
+--- @private
+function api.set_buffer_option(id, opt, val)
     if _G.NoNeckPain.config.has_nvim9 then
         vim.api.nvim_set_option_value(opt, val, { buf = id })
     else
@@ -55,13 +55,13 @@ function A.set_buffer_option(id, opt, val)
     end
 end
 
----Sets window option with backward compatibility (nvim <9).
+--- Sets window option with backward compatibility (nvim <9).
 ---
----@param id number: the id of the window.
----@param opt string: the opt name.
----@param val string|number: the opt value.
----@private
-function A.set_window_option(id, opt, val)
+--- @param id number: the id of the window.
+--- @param opt string: the opt name.
+--- @param val string|number: the opt value.
+--- @private
+function api.set_window_option(id, opt, val)
     if _G.NoNeckPain.config.has_nvim9 then
         vim.api.nvim_set_option_value(opt, val, { win = id, scope = "local" })
     else
@@ -78,21 +78,21 @@ local function timer_stop_close(timer)
     end
 end
 
----Execute callback timeout ms after the latest invocation with context.
----Waiting invocations for that context will be discarded.
----Invocation will be rescheduled while a callback is being executed.
----Caller must ensure that callback performs the same or functionally equivalent actions.
+--- Execute callback timeout ms after the latest invocation with context.
+--- Waiting invocations for that context will be discarded.
+--- Invocation will be rescheduled while a callback is being executed.
+--- Caller must ensure that callback performs the same or functionally equivalent actions.
 ---
----@param context string: identifies the callback to debounce.
----@param callback function: to execute on completion.
----@param timeout number?: ms to wait for before execution.
----@private
-function A.debounce(context, callback, timeout)
+--- @param context string: identifies the callback to debounce.
+--- @param callback function: to execute on completion.
+--- @param timeout number?: ms to wait for before execution.
+--- @private
+function api.debounce(context, callback, timeout)
     timeout = timeout or 2
     -- all execution here is done in a synchronous context; no thread safety required
 
-    A.debouncers[context] = A.debouncers[context] or {}
-    local debouncer = A.debouncers[context]
+    api.debouncers[context] = api.debouncers[context] or {}
+    local debouncer = api.debouncers[context]
 
     -- cancel waiting or executing timer
     if debouncer.timer then
@@ -105,29 +105,29 @@ function A.debounce(context, callback, timeout)
         timer_stop_close(timer)
 
         if debouncer.executing then
-            D.log(context, "already running on debounce, rescheduling...")
-            return A.debounce(context, callback, timeout)
+            debug.log(context, "already running on debounce, rescheduling...")
+            return api.debounce(context, callback, timeout)
         end
 
         debouncer.executing = true
         vim.schedule(function()
-            D.log(context, ">> debouncer triggered")
+            debug.log(context, ">> debouncer triggered")
             callback(context)
             debouncer.executing = false
 
             -- no other timer waiting
             if debouncer.timer == timer then
-                A.debouncers[context] = nil
+                api.debouncers[context] = nil
             end
         end)
     end)
 end
 
----Returns a map of opened buffer name with a boolean indicating if they are modified or not.
+--- Returns a map of opened buffer name with a boolean indicating if they are modified or not.
 ---
----@return table
----@private
-function A.get_opened_buffers()
+--- @return table
+--- @private
+function api.get_opened_buffers()
     local opened = {}
 
     for _, buf in ipairs(vim.api.nvim_list_bufs()) do
@@ -145,4 +145,4 @@ function A.get_opened_buffers()
     return opened
 end
 
-return A
+return api

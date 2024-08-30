@@ -10,7 +10,7 @@ local N = {}
 -- Toggle the plugin by calling the `enable`/`disable` methods respectively.
 --
 --- @param scope string: internal identifier for logging purposes.
----@private
+--- @private
 function N.toggle(scope)
     if S.has_tabs(S) and S.is_active_tab_registered(S) then
         return N.disable(scope)
@@ -20,7 +20,7 @@ function N.toggle(scope)
 end
 
 --- Toggles the scratchPad feature of the plugin.
----@private
+--- @private
 function N.toggle_scratchPad()
     if not S.is_active_tab_registered(S) then
         return
@@ -52,7 +52,7 @@ end
 ---
 --- @param scope string: internal identifier for logging purposes.
 --- @param side "left" | "right": the side to toggle.
----@private
+--- @private
 function N.toggle_side(scope, side)
     if not S.is_active_tab_registered(S) then
         D.log(scope, "skipped because the current tab is not registered")
@@ -89,7 +89,7 @@ end
 --- Creates side buffers and set the tab state, focuses the `curr` window if required.
 --- @param scope string: internal identifier for logging purposes.
 --- @param go_to_curr boolean?: whether we should re-focus the `curr` window.
----@private
+--- @private
 function N.init(scope, go_to_curr)
     if not S.is_active_tab_registered(S) then
         error("called the internal `init` method on a `nil` tab.")
@@ -104,7 +104,10 @@ function N.init(scope, go_to_curr)
 
     -- if we do not have side buffers, we must ensure we only trigger a focus if we re-create them
     local had_side_buffers = true
-    if not S.is_side_win_enabled_and_valid(S, "left") or not S.is_side_win_enabled_and_valid(S, "right") then
+    if
+        not S.is_side_win_enabled_and_valid(S, "left")
+        or not S.is_side_win_enabled_and_valid(S, "right")
+    then
         had_side_buffers = false
     end
 
@@ -148,7 +151,7 @@ end
 --- Initializes the plugin, sets event listeners and internal state.
 ---
 --- @param scope string: internal identifier for logging purposes.
----@private
+--- @private
 function N.enable(scope)
     if E.skip_enable(scope) then
         return
@@ -352,7 +355,7 @@ function N.enable(scope)
 end
 
 --- Disables the plugin for the given tab, clear highlight groups and autocmds, closes side buffers and resets the internal state.
----@private
+--- @private
 function N.disable(scope)
     local active_tab = S.active_tab
 

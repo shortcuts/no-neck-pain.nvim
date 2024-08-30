@@ -8,9 +8,9 @@ local NoNeckPain = {}
 --- NoNeckPain's buffer `vim.wo` options.
 --- @see window options `:h vim.wo`
 ---
----@type table
----Default values:
----@eval return MiniDoc.afterlines_to_code(MiniDoc.current.eval_section)
+--- @type table
+--- Default values:
+--- @eval return MiniDoc.afterlines_to_code(MiniDoc.current.eval_section)
 NoNeckPain.bufferOptionsWo = {
     --- @type boolean
     cursorline = false,
@@ -35,9 +35,9 @@ NoNeckPain.bufferOptionsWo = {
 --- NoNeckPain's buffer `vim.bo` options.
 --- @see buffer options `:h vim.bo`
 ---
----@type table
----Default values:
----@eval return MiniDoc.afterlines_to_code(MiniDoc.current.eval_section)
+--- @type table
+--- Default values:
+--- @eval return MiniDoc.afterlines_to_code(MiniDoc.current.eval_section)
 NoNeckPain.bufferOptionsBo = {
     --- @type string
     filetype = "no-neck-pain",
@@ -56,9 +56,9 @@ NoNeckPain.bufferOptionsBo = {
 --- Leverages the side buffers as notepads, which work like any Neovim buffer and automatically saves its content at the given `location`.
 --- note: quitting an unsaved scratchPad buffer is non-blocking, and the content is still saved.
 ---
----@type table
----Default values:
----@eval return MiniDoc.afterlines_to_code(MiniDoc.current.eval_section)
+--- @type table
+--- Default values:
+--- @eval return MiniDoc.afterlines_to_code(MiniDoc.current.eval_section)
 NoNeckPain.bufferOptionsScratchPad = {
     -- When `true`, automatically sets the following options to the side buffers:
     -- - `autowriteall`
@@ -86,9 +86,9 @@ NoNeckPain.bufferOptionsScratchPad = {
 
 --- NoNeckPain's buffer color options.
 ---
----@type table
----Default values:
----@eval return MiniDoc.afterlines_to_code(MiniDoc.current.eval_section)
+--- @type table
+--- Default values:
+--- @eval return MiniDoc.afterlines_to_code(MiniDoc.current.eval_section)
 NoNeckPain.bufferOptionsColors = {
     -- Hexadecimal color code to override the current background color of the buffer. (e.g. #24273A)
     -- Transparent backgrounds are supported by default.
@@ -123,9 +123,9 @@ NoNeckPain.bufferOptionsColors = {
 
 --- NoNeckPain's buffer side buffer option.
 ---
----@type table
----Default values:
----@eval return MiniDoc.afterlines_to_code(MiniDoc.current.eval_section)
+--- @type table
+--- Default values:
+--- @eval return MiniDoc.afterlines_to_code(MiniDoc.current.eval_section)
 NoNeckPain.bufferOptions = {
     -- When `false`, the buffer won't be created.
     --- @type boolean
@@ -142,9 +142,9 @@ NoNeckPain.bufferOptions = {
 
 --- NoNeckPain's plugin config.
 ---
----@type table
----Default values:
----@eval return MiniDoc.afterlines_to_code(MiniDoc.current.eval_section)
+--- @type table
+--- Default values:
+--- @eval return MiniDoc.afterlines_to_code(MiniDoc.current.eval_section)
 NoNeckPain.options = {
     -- Prints useful logs about triggered events, and reasons actions are executed.
     --- @type boolean
@@ -319,16 +319,16 @@ NoNeckPain.options = {
     },
 }
 
----@private
+--- @private
 local defaults = vim.deepcopy(NoNeckPain.options)
 
 --- Parses the deprecated scratchPad options into the new `pathToFile` option.
 ---
----@param side "left"|"right" The side of the buffer.
----@param options table Module config table. See |NoNeckPain.bufferOptionsScratchPads|.
----@param fileType string The file extension to leverage.
+--- @param side "left"|"right" The side of the buffer.
+--- @param options table Module config table. See |NoNeckPain.bufferOptionsScratchPads|.
+--- @param fileType string The file extension to leverage.
 ---
----@private
+--- @private
 local function parse_deprecated_scratchPad(side, options, fileType)
     -- set the defaults if the user rely on them
     if vim.tbl_count(options) == 0 or options.pathToFile == nil then
@@ -356,9 +356,9 @@ end
 
 --- Defaults NoNeckPain options by merging user provided options with the default plugin values.
 ---
----@param options table Module config table. See |NoNeckPain.options|.
+--- @param options table Module config table. See |NoNeckPain.options|.
 ---
----@private
+--- @private
 function NoNeckPain.defaults(options)
     options.buffers = options.buffers or {}
 
@@ -417,10 +417,10 @@ end
 
 --- Registers the plugin mappings if the option is enabled.
 ---
----@param options table The mappins provided by the user.
----@param mappings table A key value map of the mapping name and its command.
+--- @param options table The mappins provided by the user.
+--- @param mappings table A key value map of the mapping name and its command.
 ---
----@private
+--- @private
 local function register_mappings(options, mappings)
     -- all of the mappings are disabled
     if not options.enabled then
@@ -453,9 +453,9 @@ end
 
 --- Define your no-neck-pain setup.
 ---
----@param options table Module config table. See |NoNeckPain.options|.
+--- @param options table Module config table. See |NoNeckPain.options|.
 ---
----@usage `require("no-neck-pain").setup()` (add `{}` with your |NoNeckPain.options| table)
+--- @usage `require("no-neck-pain").setup()` (add `{}` with your |NoNeckPain.options| table)
 function NoNeckPain.setup(options)
     NoNeckPain.options = NoNeckPain.defaults(options or {})
 
