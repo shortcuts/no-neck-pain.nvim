@@ -145,4 +145,12 @@ function api.get_opened_buffers()
     return opened
 end
 
+function api.is_side_id(side, id)
+    if side == nil then
+        return false
+    end
+
+    return side == id
+end
+
 return api

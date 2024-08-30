@@ -331,32 +331,66 @@ function main.enable(scope)
                         return debug.log(p.event, "skip")
                     end
 
-                    local current_win = vim.api.nvim_get_current_win()
+                    local current_side = vim.api.nvim_get_current_win()
+                    local other_side = state.get_side_id(state, "right")
                     local left_id = state.get_side_id(state, "left")
                     local right_id = state.get_side_id(state, "right")
 
-                    if current_win ~= left_id and current_win ~= right_id then
+                    if current_side == left_id then
+                        other_side = right_id
+                    elseif current_side == right_id then
+                        other_side = left_id
+                    else
+                        state.set_previously_focused_win(state, vim.api.nvim_get_current_win())
                         return
                     end
 
+                    -- we need to know if the user navigates from ltr or rtl
+                    -- so we keep track of the encounter of prev,curr to determine
+                    -- the next valid window to focus
+
                     local wins = vim.api.nvim_list_wins()
+                    local idx
 
                     for i = 1, #wins do
-                        local id = i == #wins and 1 or i + 1
-                        if
-                            wins[id] ~= current_win
-                            and wins[id] ~= left_id
-                            and wins[id] ~= right_id
-                        then
-                            vim.api.nvim_set_current_win(wins[id])
-
-                            return debug.log(
-                                p.event,
-                                "rerouted focus of %d to %d",
-                                current_win,
-                                wins[id]
-                            )
+                        if api.is_side_id(current_side, wins[i]) then
+                            local j = i - 1 < 1 and #wins or i - 1
+                            while true do
+                                if
+                                    not api.is_side_id(current_side, wins[j])
+                                    and not api.is_side_id(other_side, wins[j])
+                                then
+                                    idx = j
+                                    break
+                                end
+                                j = j == 1 and #wins or j - 1
+                            end
+                            break
+                        elseif api.is_side_id(state.get_previously_focused_win(state), wins[i]) then
+                            local j = i + 1 > #wins and 1 or i + 1
+                            while true do
+                                if
+                                    not api.is_side_id(current_side, wins[j])
+                                    and not api.is_side_id(other_side, wins[j])
+                                then
+                                    idx = j
+                                    break
+                                end
+                                j = j == #wins and 1 or j + 1
+                            end
+                            break
                         end
+                    end
+
+                    if idx then
+                        vim.api.nvim_set_current_win(wins[idx])
+
+                        return debug.log(
+                            p.event,
+                            "rerouted focus of %d to %d",
+                            current_side,
+                            wins[idx]
+                        )
                     end
                 end)
             end,

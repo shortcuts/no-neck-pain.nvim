@@ -10,7 +10,7 @@ local state = {
     active_tab = api.get_current_tab(),
     tabs = {},
     disabled_tabs = {},
-    prev_focused_win = {},
+    previously_focused_win = vim.api.nvim_get_current_win(),
 }
 
 --- Sets the state to its original value.
@@ -530,6 +530,25 @@ end
 ---@private
 function state:get_scratchPad()
     return self.tabs[self.active_tab].scratchpad_enabled
+end
+
+----- focused win tacker =======================================================
+---@private
+
+--- Sets the given `id` as the previously focused window.
+---
+---@param id number
+---@private
+function state:set_previously_focused_win(id)
+    self.previously_focused_win = id
+end
+
+--- Gets the previously focused win id.
+---
+---@return number
+---@private
+function state:get_previously_focused_win()
+    return self.previously_focused_win
 end
 
 return state
