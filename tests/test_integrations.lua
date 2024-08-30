@@ -117,6 +117,12 @@ end
 T["checkhealth"] = MiniTest.new_set()
 
 T["checkhealth"]["state is in sync"] = function()
+    if child.fn.has("nvim-0.8") == 0 then
+        MiniTest.skip("checkhealth runs on 8.0 mini")
+
+        return
+    end
+
     child.lua([[ require('no-neck-pain').setup({width=20}) ]])
     child.nnp()
     child.wait()
@@ -157,6 +163,12 @@ T["checkhealth"]["state is in sync"] = function()
 end
 
 T["checkhealth"]["auto opens side buffers"] = function()
+    if child.fn.has("nvim-0.8") == 0 then
+        MiniTest.skip("checkhealth runs on 8.0 mini")
+
+        return
+    end
+
     child.restart({ "-u", "scripts/init_auto_open.lua" })
     child.wait()
 
