@@ -3,7 +3,7 @@ local constants = require("no-neck-pain.util.constants")
 local debug = require("no-neck-pain.util.debug")
 local event = require("no-neck-pain.util.event")
 local state = require("no-neck-pain.state")
-local W = require("no-neck-pain.wins")
+local ui = require("no-neck-pain.ui")
 
 local N = {}
 
@@ -38,7 +38,7 @@ function N.toggle_scratchPad()
         local id = state.get_side_id(state, side)
         if id ~= nil then
             vim.api.nvim_set_current_win(id)
-            W.init_scratchPad(side, id, current_state)
+            ui.init_scratchPad(side, id, current_state)
         end
     end
 
@@ -67,7 +67,7 @@ function N.toggle_side(scope, side)
     )
 
     if not _G.NoNeckPain.config.buffers[side].enabled then
-        W.close(scope, state.get_side_id(state, side), side)
+        ui.close_win(scope, state.get_side_id(state, side), side)
         state.set_side_id(state, nil, side)
     end
 
@@ -111,10 +111,10 @@ function N.init(scope, go_to_curr)
         had_side_buffers = false
     end
 
-    W.create_side_buffers()
+    ui.create_side_buffers()
 
     if state.consume_redraw(state) then
-        W.reposition(string.format("%s:consume_redraw", scope))
+        ui.move_sides(string.format("%s:consume_redraw", scope))
     end
 
     if
@@ -131,16 +131,16 @@ function N.init(scope, go_to_curr)
     end
 
     -- if we still have side buffers open at this point, and we have vsplit opened,
-    -- there might be width issues so we the resize opened vsplits.
+    -- there might be width issues so we the resize_win opened vsplits.
     if state.check_sides(state, "or", true) and state.get_columns(state) > 1 then
-        debug.log("wins_resize", "have %d columns", state.get_columns(state))
+        debug.log("resize_win", "have %d columns", state.get_columns(state))
 
         for _, win in pairs(state.get_unregistered_wins(state)) do
-            W.resize(win, _G.NoNeckPain.config.width, string.format("win:%d", win))
+            ui.resize_win(win, _G.NoNeckPain.config.width, string.format("win:%d", win))
         end
 
         if not had_side_buffers then
-            W.resize(
+            ui.resize_win(
                 state.get_side_id(state, "curr"),
                 _G.NoNeckPain.config.width,
                 string.format("win:%d", state.get_side_id(state, "curr"))
@@ -425,7 +425,7 @@ function N.disable(scope)
     for side, id in pairs(sides) do
         if vim.api.nvim_win_is_valid(id) then
             state.remove_namespace(state, vim.api.nvim_win_get_buf(id), side)
-            W.close(scope, id, side)
+            ui.close_win(scope, id, side)
         end
     end
 

@@ -4,7 +4,7 @@ local constants = require("no-neck-pain.util.constants")
 local debug = require("no-neck-pain.util.debug")
 local state = require("no-neck-pain.state")
 
-local W = {}
+local ui = {}
 
 --- Resizes a window if it's valid.
 ---
@@ -12,7 +12,7 @@ local W = {}
 ---@param width number: the width to apply to the window.
 ---@param side "left"|"right"|"curr"|"unregistered": the side of the window being resized, used for logging only.
 ---@private
-function W.resize(id, width, side)
+function ui.resize_win(id, width, side)
     debug.log(side, "resizing %d with padding %d", id, width)
 
     if vim.api.nvim_win_is_valid(id) then
@@ -24,7 +24,7 @@ end
 ---@param side "left"|"right"|"curr": the side of the window to initialize.
 ---@param id number: the id of the window.
 ---@private
-function W.init_side_options(side, id)
+function ui.init_side_options(side, id)
     local bufid = vim.api.nvim_win_get_buf(id)
 
     for opt, val in pairs(_G.NoNeckPain.config.buffers[side].bo) do
@@ -38,11 +38,11 @@ function W.init_side_options(side, id)
     end
 end
 
---- Reposition the side buffers to their initial place
+--- Moves the side buffers to their initial place
 ---
 ---@param scope string: the scope from where this function is called.
 ---@private
-function W.reposition(scope)
+function ui.move_sides(scope)
     local sides = {
         left = vim.api.nvim_replace_termcodes("normal <C-W>H", true, false, true),
         right = vim.api.nvim_replace_termcodes("normal <C-W>L", true, false, true),
@@ -93,7 +93,7 @@ end
 ---@param id number: the id of the window.
 ---@param side "left"|"right": the side of the window being closed, used for logging only.
 ---@private
-function W.close(scope, id, side)
+function ui.close_win(scope, id, side)
     if vim.api.nvim_win_is_valid(id) then
         debug.log(scope, "closing %s window", side)
 
@@ -107,7 +107,7 @@ end
 ---@param id number: the side window Idebug.
 ---@param cleanup boolean?: cleanup the given buffer
 ---@private
-function W.init_scratchPad(side, id, cleanup)
+function ui.init_scratchPad(side, id, cleanup)
     if not _G.NoNeckPain.config.buffers[side].enabled then
         return
     end
@@ -115,16 +115,16 @@ function W.init_scratchPad(side, id, cleanup)
     -- cleanup is used when the `toggle` method disables the scratchPad, we then reinitialize it with the user-given configuration.
     if cleanup then
         vim.cmd("enew")
-        return W.init_side_options(side, id)
+        return ui.init_side_options(side, id)
     end
 
     debug.log(
-        string.format("W.init_scratchPad:%s", side),
+        string.format("ui.init_scratchPad:%s", side),
         "enabled with location %s",
         _G.NoNeckPain.config.buffers[side].scratchPad.pathToFile
     )
 
-    W.init_side_options(side, id)
+    ui.init_side_options(side, id)
 
     vim.cmd(string.format("edit %s", _G.NoNeckPain.config.buffers[side].scratchPad.pathToFile))
 
@@ -149,10 +149,10 @@ end
 
 --- Creates side buffers with the correct padding, considering the side integrations.
 --- - A side buffer is not created if there's not enough space.
---- - If it already exists, we resize it.
+--- - If it already exists, we resized it.
 ---
 ---@private
-function W.create_side_buffers()
+function ui.create_side_buffers()
     local wins = {
         left = { cmd = "topleft vnew", padding = 0 },
         right = { cmd = "botright vnew", padding = 0 },
@@ -160,7 +160,7 @@ function W.create_side_buffers()
 
     for _, side in pairs(constants.SIDES) do
         if _G.NoNeckPain.config.buffers[side].enabled then
-            wins[side].padding = W.get_padding(side)
+            wins[side].padding = ui.get_side_width(side)
 
             if
                 wins[side].padding > _G.NoNeckPain.config.minSideBufferWidth
@@ -182,9 +182,9 @@ function W.create_side_buffers()
 
                 if _G.NoNeckPain.config.buffers[side].scratchPad.enabled then
                     state.set_scratchPad(state, true)
-                    W.init_scratchPad(side, state.get_side_id(state, side))
+                    ui.init_scratchPad(side, state.get_side_id(state, side))
                 else
-                    W.init_side_options(side, state.get_side_id(state, side))
+                    ui.init_side_options(side, state.get_side_id(state, side))
                 end
             end
 
@@ -194,12 +194,12 @@ function W.create_side_buffers()
 
     for _, side in pairs(constants.SIDES) do
         if state.is_side_win_valid(state, side) then
-            local padding = wins[side].padding or W.get_padding(side)
+            local padding = wins[side].padding or ui.get_side_width(side)
 
             if padding > _G.NoNeckPain.config.minSideBufferWidth then
-                W.resize(state.get_side_id(state, side), padding, side)
+                ui.resize_win(state.get_side_id(state, side), padding, side)
             else
-                W.close("W.create_side_buffers", state.get_side_id(state, side), side)
+                ui.close_win("ui.create_side_buffers", state.get_side_id(state, side), side)
                 state.set_side_id(state, nil, side)
             end
         end
@@ -211,8 +211,8 @@ end
 ---@param side "left"|"right": the side of the window.
 ---@return number: the width of the side window.
 ---@private
-function W.get_padding(side)
-    local scope = string.format("W.get_padding:%s", side)
+function ui.get_side_width(side)
+    local scope = string.format("ui.get_side_width:%s", side)
     -- if the available screen size is lower than the config width,
     -- we don't have to create side buffers.
     if _G.NoNeckPain.config.width >= vim.o.columns then
@@ -267,4 +267,4 @@ function W.get_padding(side)
     return final
 end
 
-return W
+return ui
