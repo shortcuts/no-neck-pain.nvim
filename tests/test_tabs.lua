@@ -91,9 +91,9 @@ T["tabs"]["previous tab kept side buffers if enabled"] = function()
     Helpers.expect.state(child, "active_tab", 1)
 end
 
-T["TabNewEntered"] = MiniTest.new_set()
+T["TabEnter"] = MiniTest.new_set()
 
-T["TabNewEntered"]["starts the plugin on new tab"] = function()
+T["TabEnter"]["starts the plugin on new tab"] = function()
     child.restart({ "-u", "scripts/init_auto_open.lua" })
     child.wait()
 
@@ -113,7 +113,7 @@ T["TabNewEntered"]["starts the plugin on new tab"] = function()
     Helpers.expect.equality(child.get_wins_in_tab(), { 1004, 1003, 1005 })
 end
 
-T["TabNewEntered"]["does not re-enable if the user disables it"] = function()
+T["TabEnter"]["does not re-enable if the user disables it"] = function()
     child.restart({ "-u", "scripts/init_auto_open.lua" })
     child.wait()
 
@@ -147,6 +147,46 @@ T["TabNewEntered"]["does not re-enable if the user disables it"] = function()
     Helpers.expect.state(child, "active_tab", 2)
 
     Helpers.expect.equality(child.get_wins_in_tab(), { 1003 })
+end
+
+T["TabEnter"]["allows re-enabling a tab manually disabled"] = function()
+    child.restart({ "-u", "scripts/init_auto_open.lua" })
+    child.wait()
+
+    Helpers.expect.state(child, "enabled", true)
+
+    -- tab 1
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+
+    Helpers.expect.state(child, "active_tab", 1)
+
+    -- tab 2
+    child.cmd("tabnew")
+    child.wait()
+    Helpers.expect.state(child, "active_tab", 2)
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1004, 1003, 1005 })
+
+    child.nnp()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1003 })
+    Helpers.expect.state(child, "active_tab", 2)
+
+    -- tab 1
+    child.cmd("tabprevious")
+    child.wait()
+    Helpers.expect.state(child, "active_tab", 1)
+
+    -- tab 2
+    child.cmd("tabnext")
+    child.wait()
+    Helpers.expect.state(child, "active_tab", 2)
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1003 })
+
+    child.nnp()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1006, 1003, 1007 })
 end
 
 T["tabnew/tabclose"] = MiniTest.new_set()

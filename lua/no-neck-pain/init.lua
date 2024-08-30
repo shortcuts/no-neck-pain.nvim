@@ -62,12 +62,12 @@ function NoNeckPain.toggleSide(side)
 end
 
 --- Initializes the plugin, sets event listeners and internal state.
-function NoNeckPain.enable()
+function NoNeckPain.enable(scope)
     if _G.NoNeckPain.config == nil then
         _G.NoNeckPain.config = C.options
     end
 
-    A.debounce("public_api_enable", M.enable, 10)
+    A.debounce(scope or "public_api_enable", M.enable, 10)
 end
 
 --- Disables the plugin, clear highlight groups and autocmds, closes side buffers and resets the internal state.
@@ -138,7 +138,7 @@ function NoNeckPain.setup(opts)
                         return D.log(p.event, "plugin is disabled")
                     end
 
-                    NoNeckPain.enable()
+                    NoNeckPain.enable("enable_on_tab_enter")
                 end)
             end,
             group = "NoNeckPainAutocmd",
