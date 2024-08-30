@@ -117,12 +117,6 @@ end
 T["nvimdapui"] = MiniTest.new_set()
 
 T["nvimdapui"]["keeps sides open"] = function()
-    if child.fn.has("nvim-0.8") == 0 then
-        MiniTest.skip("NvimDAPUI doesn't support version below 8")
-
-        return
-    end
-
     child.restart({ "-u", "scripts/init_with_nvimdapui.lua" })
 
     child.nnp()
@@ -155,12 +149,6 @@ end
 T["neotest"] = MiniTest.new_set()
 
 T["neotest"]["keeps sides open"] = function()
-    if child.fn.has("nvim-0.8") == 0 then
-        MiniTest.skip("neotest doesn't support version below 8")
-
-        return
-    end
-
     child.restart({ "-u", "scripts/init_with_neotest.lua", "lua/no-neck-pain/main.lua" })
 
     child.nnp()

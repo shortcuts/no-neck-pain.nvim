@@ -29,7 +29,8 @@ _Creates evenly sized empty buffers on each side of your focused buffer, which a
 - [Themed side buffers](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase#custom-background-color)
 - Fully integrates with [neo-tree.nvim](https://github.com/nvim-neo-tree/neo-tree.nvim), [nvim-tree.lua](https://github.com/nvim-tree/nvim-tree.lua), [undotree](https://github.com/mbbill/undotree), [tmux, and more!](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase#window-layout-support)
 - Keep your workflow intact
-- Neovim >= 0.6 support
+- Neovim >= 0.7 support
+    - 0.7 and 0.8 support is unmaintained, see [frozen version](https://github.com/shortcuts/no-neck-pain.nvim/tree/v7-v8-v9)
 
 > Want to see it in action? Take a look at [the showcase section](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase)
 
@@ -98,10 +99,6 @@ require("lazy").setup({"shortcuts/no-neck-pain.nvim"})
 </tbody>
 </table>
 </div>
-
-## 🏗 v1.0.0 breaking changes
-
-See [the release description](https://github.com/shortcuts/no-neck-pain.nvim/pull/201) for the full list of breaking changes.
 
 ## ☄ Getting started
 
@@ -375,6 +372,16 @@ NoNeckPain.bufferOptionsColors = {
 |`:NoNeckPainToggleRightSide`| Toggles the right side buffer (open/close). |
 |`:NoNeckPainWidthUp`| Increases the config `width` by 5 and resizes the no-neck-pain windows. |
 |`:NoNeckPainWidthDown`| Decreases the config `width` by 5 and resizes the no-neck-pain windows. |
+
+## 🏗 breaking changes
+
+### v1.0.0
+
+See [the release description](https://github.com/shortcuts/no-neck-pain.nvim/pull/201) for the full list of breaking changes.
+
+### v2.0.0
+
+See [the release description](https://github.com/shortcuts/no-neck-pain.nvim/pull/201) for the full list of breaking changes.
 
 ## ⌨ Contributing
 

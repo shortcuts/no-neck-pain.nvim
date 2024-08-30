@@ -409,12 +409,6 @@ T["disable"]["(on file) does not close the window if unsaved buffer"] = function
 end
 
 T["disable"]["relative window doesn't prevent quitting nvim"] = function()
-    if child.fn.has("nvim-0.8") == 0 then
-        MiniTest.skip("incline doesn't support version below 8")
-
-        return
-    end
-
     child.restart({ "-u", "scripts/init_with_incline.lua" })
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     child.nnp()
