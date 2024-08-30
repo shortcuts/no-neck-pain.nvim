@@ -171,6 +171,7 @@ T["TabEnter"]["allows re-enabling a tab manually disabled"] = function()
 
     Helpers.expect.equality(child.get_wins_in_tab(), { 1003 })
     Helpers.expect.state(child, "active_tab", 2)
+    Helpers.expect.state(child, "disabled_tabs", { vim.NIL, true })
 
     -- tab 1
     child.cmd("tabprevious")
@@ -185,6 +186,8 @@ T["TabEnter"]["allows re-enabling a tab manually disabled"] = function()
     Helpers.expect.equality(child.get_wins_in_tab(), { 1003 })
 
     child.nnp()
+
+    Helpers.expect.state(child, "disabled_tabs", { })
 
     Helpers.expect.equality(child.get_wins_in_tab(), { 1006, 1003, 1007 })
 end

@@ -42,12 +42,12 @@ function E.skip_enable(scope)
         return true
     end
 
-    if S.manually_disabled_tabs[S.active_tab] then
+    if S.disabled_tabs[S.active_tab] then
         if scope == "enable_on_tab_enter" then
             return true
         end
 
-        S.manually_disabled_tabs[S.active_tab] = nil
+        S.disabled_tabs[S.active_tab] = nil
 
         return false
     end

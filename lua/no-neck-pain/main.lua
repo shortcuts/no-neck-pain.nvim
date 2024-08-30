@@ -420,7 +420,7 @@ function N.disable(scope)
         end
     end
 
-    S.manually_disabled_tabs[active_tab] = true
+    S.disabled_tabs[active_tab] = true
 
     S.save(S)
 end
