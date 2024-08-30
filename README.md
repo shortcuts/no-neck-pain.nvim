@@ -29,9 +29,13 @@ _Creates evenly sized empty buffers on each side of your focused buffer, which a
 - [Themed side buffers](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase#custom-background-color)
 - Fully integrates with [neo-tree.nvim](https://github.com/nvim-neo-tree/neo-tree.nvim), [nvim-tree.lua](https://github.com/nvim-tree/nvim-tree.lua), [undotree](https://github.com/mbbill/undotree), [tmux, and more!](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase#window-layout-support)
 - Keep your workflow intact
-- Neovim >= 0.6 support
+- Neovim >= 0.7 support
+    - [Looking for newer version? Browse stable](https://github.com/shortcuts/no-neck-pain.nvim/tree/main)
+    - [0.7 and 0.8 compatible version](https://github.com/shortcuts/no-neck-pain.nvim/tree/v7-v8-v9)
 
 > Want to see it in action? Take a look at [the showcase section](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase)
+
+>
 
 ## 📋 Installation
 
@@ -54,7 +58,7 @@ _Creates evenly sized empty buffers on each side of your focused buffer, which a
 
 ```lua
 -- stable version
-use {"shortcuts/no-neck-pain.nvim", tag = "*" }
+use {"shortcuts/no-neck-pain.nvim", tag = "1.4.1" }
 -- dev version
 use {"shortcuts/no-neck-pain.nvim"}
 ```
@@ -71,7 +75,7 @@ use {"shortcuts/no-neck-pain.nvim"}
 
 ```lua
 -- stable version
-Plug 'shortcuts/no-neck-pain.nvim', { 'tag': '*' }
+Plug 'shortcuts/no-neck-pain.nvim', { 'tag': '1.4.1' }
 -- dev version
 Plug 'shortcuts/no-neck-pain.nvim'
 ```
@@ -88,7 +92,7 @@ Plug 'shortcuts/no-neck-pain.nvim'
 
 ```lua
 -- stable version
-require("lazy").setup({{"shortcuts/no-neck-pain.nvim", version = "*"}})
+require("lazy").setup({{"shortcuts/no-neck-pain.nvim", version = "1.4.1"}})
 -- dev version
 require("lazy").setup({"shortcuts/no-neck-pain.nvim"})
 ```
