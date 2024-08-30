@@ -1,7 +1,7 @@
 local api = require("no-neck-pain.util.api")
 local C = require("no-neck-pain.colors")
 local constants = require("no-neck-pain.util.constants")
-local D = require("no-neck-pain.util.debug")
+local debug = require("no-neck-pain.util.debug")
 local state = require("no-neck-pain.state")
 
 local W = {}
@@ -13,7 +13,7 @@ local W = {}
 ---@param side "left"|"right"|"curr"|"unregistered": the side of the window being resized, used for logging only.
 ---@private
 function W.resize(id, width, side)
-    D.log(side, "resizing %d with padding %d", id, width)
+    debug.log(side, "resizing %d with padding %d", id, width)
 
     if vim.api.nvim_win_is_valid(id) then
         vim.api.nvim_win_set_width(id, width)
@@ -59,7 +59,7 @@ function W.reposition(scope)
             local curr = vim.api.nvim_get_current_win()
 
             if curr ~= id then
-                D.log(sscope, "wrong win focused %d re-routing to %d", curr, id)
+                debug.log(sscope, "wrong win focused %d re-routing to %d", curr, id)
 
                 vim.api.nvim_set_current_win(id)
             end
@@ -69,7 +69,7 @@ function W.reposition(scope)
             wins = vim.api.nvim_tabpage_list_wins(state.active_tab)
 
             if (side == "left" and wins[1] ~= id) or (side == "right" and wins[#wins] ~= id) then
-                D.log(
+                debug.log(
                     sscope,
                     "wrong position after window move, focusing %s, should be %d, wins order %s",
                     vim.api.nvim_get_current_win(),
@@ -95,7 +95,7 @@ end
 ---@private
 function W.close(scope, id, side)
     if vim.api.nvim_win_is_valid(id) then
-        D.log(scope, "closing %s window", side)
+        debug.log(scope, "closing %s window", side)
 
         vim.api.nvim_win_close(id, false)
     end
@@ -104,7 +104,7 @@ end
 --- Sets options to the side buffers to toggle the scratchPad.
 ---
 ---@param side "left"|"right": the side of the window being resized, used for logging only.
----@param id number: the side window ID.
+---@param id number: the side window Idebug.
 ---@param cleanup boolean?: cleanup the given buffer
 ---@private
 function W.init_scratchPad(side, id, cleanup)
@@ -118,7 +118,7 @@ function W.init_scratchPad(side, id, cleanup)
         return W.init_side_options(side, id)
     end
 
-    D.log(
+    debug.log(
         string.format("W.init_scratchPad:%s", side),
         "enabled with location %s",
         _G.NoNeckPain.config.buffers[side].scratchPad.pathToFile
@@ -216,7 +216,7 @@ function W.get_padding(side)
     -- if the available screen size is lower than the config width,
     -- we don't have to create side buffers.
     if _G.NoNeckPain.config.width >= vim.o.columns then
-        D.log(scope, "[%s] - ui %s - no space left to create side buffers", side, vim.o.columns)
+        debug.log(scope, "[%s] - ui %s - no space left to create side buffers", side, vim.o.columns)
 
         return 0
     end
@@ -232,17 +232,17 @@ function W.get_padding(side)
     -- we need to see if there's enough space left to have side buffers
     local occupied = _G.NoNeckPain.config.width * columns
 
-    D.log(scope, "have %d columns", columns)
+    debug.log(scope, "have %d columns", columns)
 
     -- if there's no space left according to the config width,
     -- then we don't have to create side buffers.
     if occupied >= vim.o.columns then
-        D.log(scope, "%d occupied - no space left to create side", occupied)
+        debug.log(scope, "%d occupied - no space left to create side", occupied)
 
         return 0
     end
 
-    D.log(scope, "%d/%d with columns, computing integrations", occupied, vim.o.columns)
+    debug.log(scope, "%d/%d with columns, computing integrations", occupied, vim.o.columns)
 
     -- now we need to determine how much we should substract from the remaining padding
     -- if there's side integrations open.
@@ -254,7 +254,7 @@ function W.get_padding(side)
                 or side == _G.NoNeckPain.config.integrations[name].position
             )
         then
-            D.log(scope, "%s opened with width %d", name, tree.width)
+            debug.log(scope, "%s opened with width %d", name, tree.width)
 
             occupied = occupied + tree.width
         end
@@ -262,7 +262,7 @@ function W.get_padding(side)
 
     local final = math.floor((vim.o.columns - occupied) / 2)
 
-    D.log(scope, "%d/%d with integrations - final %d", occupied, vim.o.columns, final)
+    debug.log(scope, "%d/%d with integrations - final %d", occupied, vim.o.columns, final)
 
     return final
 end

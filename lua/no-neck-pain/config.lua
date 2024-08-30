@@ -1,5 +1,5 @@
 local api = require("no-neck-pain.util.api")
-local D = require("no-neck-pain.util.debug")
+local debug = require("no-neck-pain.util.debug")
 local C = require("no-neck-pain.colors")
 local constants = require("no-neck-pain.util.constants")
 
@@ -461,7 +461,7 @@ function NoNeckPain.setup(options)
 
     NoNeckPain.options.hasNvim9 = vim.fn.has("nvim-0.9") == 1
 
-    D.warn_deprecation(NoNeckPain.options)
+    debug.warn_deprecation(NoNeckPain.options)
 
     register_mappings(NoNeckPain.options.mappings, {
         toggle = ":NoNeckPain<CR>",

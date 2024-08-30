@@ -14,7 +14,7 @@ function api.tde(t1, t2)
     return vim.deepcopy(vim.tbl_deep_extend("keep", t1 or {}, t2 or {}))
 end
 
---- Returns the name of the augroup for the given tab ID.
+--- Returns the name of the augroup for the given tab Idebug.
 ---
 ---@param id number?: the id of the tab.
 ---@return string: the initialied state

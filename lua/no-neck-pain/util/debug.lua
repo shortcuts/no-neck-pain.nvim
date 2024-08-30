@@ -1,4 +1,4 @@
-local D = {}
+local debug = {}
 
 --- prints only if debug is true.
 ---
@@ -6,7 +6,7 @@ local D = {}
 ---@param str string: the formatted string.
 ---@param ... any: the arguments of the formatted string.
 ---@private
-function D.log(scope, str, ...)
+function debug.log(scope, str, ...)
     if _G.NoNeckPain.config ~= nil and not _G.NoNeckPain.config.debug then
         return
     end
@@ -25,7 +25,7 @@ end
 ---
 ---@param options table: the options provided by the user.
 ---@private
-function D.warn_deprecation(options)
+function debug.warn_deprecation(options)
     local uses_deprecated_option = false
 
     local notice = "is now deprecated, use `%s` instead."
@@ -70,4 +70,4 @@ function D.warn_deprecation(options)
     end
 end
 
-return D
+return debug
