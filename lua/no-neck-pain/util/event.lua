@@ -42,12 +42,12 @@ function event.skip_enable(scope)
         return true
     end
 
-    if state.disabled_tabs[state.active_tab] then
+    if state.is_active_tab_disabled(state) then
         if scope == "enable_on_tab_enter" then
             return true
         end
 
-        state.disabled_tabs[state.active_tab] = nil
+        state.remove_active_tab_from_disabled(state)
 
         return false
     end

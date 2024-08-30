@@ -2,7 +2,13 @@ local api = require("no-neck-pain.util.api")
 local constants = require("no-neck-pain.util.constants")
 local debug = require("no-neck-pain.util.debug")
 
-local state = { enabled = false, active_tab = api.get_current_tab(), tabs = {}, disabled_tabs = {} }
+local state = {
+    enabled = false,
+    active_tab = api.get_current_tab(),
+    tabs = {},
+    disabled_tabs = {},
+    prev_focused_win = {},
+}
 
 --- Sets the state to its original value.
 ---
@@ -32,6 +38,29 @@ end
 ---@private
 function state:save()
     _G.NoNeckPain.state = self
+end
+
+--- Registers the given `id` as manually disabled tabs.
+---
+---@param id number: the id of the tab.
+---@private
+function state:set_tab_disabled(id)
+    self.disabled_tabs[id] = true
+end
+
+--- Removes the currently active tab from the disabled ones.
+---
+---@private
+function state:remove_active_tab_from_disabled()
+    self.disabled_tabs[self.active_tab] = nil
+end
+
+--- Whether the currently active tab has been manually disabled or not.
+---
+---@return boolean
+---@private
+function state:is_active_tab_disabled()
+    return self.disabled_tabs[self.active_tab]
 end
 
 --- Gets the columns count in the current layout.

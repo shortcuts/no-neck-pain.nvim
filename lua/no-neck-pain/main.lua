@@ -438,7 +438,7 @@ function main.disable(scope)
         end
     end
 
-    state.disabled_tabs[active_tab] = true
+    state.set_tab_disabled(state, active_tab)
 
     state.save(state)
 end
