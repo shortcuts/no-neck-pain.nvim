@@ -30,7 +30,7 @@ _Creates evenly sized empty buffers on each side of your focused buffer, which a
 - Fully integrates with [neo-tree.nvim](https://github.com/nvim-neo-tree/neo-tree.nvim), [nvim-tree.lua](https://github.com/nvim-tree/nvim-tree.lua), [undotree](https://github.com/mbbill/undotree), [tmux, and more!](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase#window-layout-support)
 - Keep your workflow intact
 - Neovim >= 0.9 compatibility
-    - 0.7 and 0.8 support is still available in the [1.x frozen version](https://github.com/shortcuts/no-neck-pain.nvim/tree/v7-v8-v9)
+    - 0.7 and 0.8 support is still available in the [1.x frozen version](https://github.com/shortcuts/no-neck-pain.nvim/tree/1.x)
 
 > Want to see it in action? Take a look at [the showcase section](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase)
 
