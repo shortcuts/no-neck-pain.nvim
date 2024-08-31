@@ -1,6 +1,6 @@
 local api = require("no-neck-pain.util.api")
 local constants = require("no-neck-pain.util.constants")
-local debug = require("no-neck-pain.util.debug")
+local log = require("no-neck-pain.util.debug")
 local state = require("no-neck-pain.state")
 
 local colors = {}
@@ -125,7 +125,7 @@ function colors.init(win, side)
         and _G.NoNeckPain.config.buffers[side].colors.text == nil
         and _G.NoNeckPain.config.buffers[side].colors.blend == 0
     then
-        return debug.log("colors.init", "skipping color initialization for side %s", side)
+        return log.debug("colors.init", "skipping color initialization for side %s", side)
     end
 
     -- init namespace for the current tab

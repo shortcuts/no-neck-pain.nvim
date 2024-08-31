@@ -1,5 +1,5 @@
 local main = require("no-neck-pain.main")
-local debug = require("no-neck-pain.util.debug")
+local log = require("no-neck-pain.util.debug")
 local api = require("no-neck-pain.util.api")
 local config = require("no-neck-pain.config")
 
@@ -135,7 +135,7 @@ function NoNeckPain.setup(opts)
                 vim.schedule(function()
                     vim.print("bar")
                     if _G.NoNeckPain.state == nil or not _G.NoNeckPain.state.enabled then
-                        return debug.log(p.event, "plugin is disabled")
+                        return log.debug(p.event, "plugin is disabled")
                     end
 
                     NoNeckPain.enable("enable_on_tab_enter")

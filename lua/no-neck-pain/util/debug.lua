@@ -1,4 +1,6 @@
-local debug = {}
+local log = {}
+
+local longest_scope = 15
 
 --- prints only if debug is true.
 ---
@@ -6,18 +8,23 @@ local debug = {}
 ---@param str string: the formatted string.
 ---@param ... any: the arguments of the formatted string.
 ---@private
-function debug.log(scope, str, ...)
+function log.debug(scope, str, ...)
     if _G.NoNeckPain.config ~= nil and not _G.NoNeckPain.config.debug then
         return
     end
 
-    print(
-        string.format(
-            "[no-neck-pain@%s in '%s'] > %s",
-            os.date("%X"),
-            scope,
-            string.format(str, ...)
-        )
+    if string.len(scope) > longest_scope then
+        longest_scope = string.len(scope)
+    end
+
+    for _ = longest_scope, string.len(scope), -1 do
+        scope = string.format("%s ", scope)
+    end
+
+    vim.notify(
+        string.format("[%s] %s", scope, string.format(str, ...)),
+        vim.log.levels.DEBUG,
+        { title = "no-neck-pain.nvim" }
     )
 end
 
@@ -25,7 +32,7 @@ end
 ---
 ---@param options table: the options provided by the user.
 ---@private
-function debug.warn_deprecation(options)
+function log.warn_deprecation(options)
     local uses_deprecated_option = false
 
     local notice = "is now deprecated, use `%s` instead."
@@ -70,4 +77,4 @@ function debug.warn_deprecation(options)
     end
 end
 
-return debug
+return log

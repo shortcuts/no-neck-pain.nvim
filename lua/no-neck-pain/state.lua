@@ -1,6 +1,6 @@
 local api = require("no-neck-pain.util.api")
 local constants = require("no-neck-pain.util.constants")
-local debug = require("no-neck-pain.util.debug")
+local log = require("no-neck-pain.util.debug")
 
 ----- default values and toggles =======================================================
 ---@private
@@ -108,7 +108,7 @@ end
 ---@return number: the total `tabs` in the state.
 ---@private
 function state:refresh_tabs(scope, skip_id)
-    debug.log(scope, "refreshing tabs...")
+    log.debug(scope, "refreshing tabs...")
 
     for _, tab in pairs(self.tabs) do
         if tab.id == skip_id or not vim.api.nvim_tabpage_is_valid(tab.id) then
@@ -130,7 +130,7 @@ end
 ---@param id number: the id of the tab.
 ---@private
 function state:set_tab(id)
-    debug.log("set_tab", "registered new tab %d", id)
+    log.debug("set_tab", "registered new tab %d", id)
 
     self.tabs[id] = {
         id = id,
@@ -226,7 +226,7 @@ function state:is_supported_integration(scope, win)
 
     local integration_name, integration_info = self.get_integration(self, win)
     if integration_name and integration_info then
-        debug.log(scope, "integration already registered, skipping computing...")
+        log.debug(scope, "integration already registered, skipping computing...")
 
         return true, integration_name, integration_info
     end
@@ -235,7 +235,7 @@ function state:is_supported_integration(scope, win)
 
     for name, integration in pairs(registered_integrations) do
         if vim.startswith(string.lower(filetype), integration.fileTypePattern) then
-            debug.log(scope, "win '%d' is an integration '%s'", win, filetype)
+            log.debug(scope, "win '%d' is an integration '%s'", win, filetype)
 
             if tab ~= nil then
                 return true, name, integration
@@ -421,7 +421,7 @@ function state:walk_layout(scope, tree, has_col_parent)
         return
     end
 
-    -- debug.log(scope, "new layer entered%s: %s", has_col_parent and " from col" or "", vim.inspect(tree))
+    -- log.debug(scope, "new layer entered%s: %s", has_col_parent and " from col" or "", vim.inspect(tree))
     for idx, leaf in ipairs(tree) do
         if leaf == "row" then
             local leafs = tree[idx + 1]
@@ -463,10 +463,9 @@ function state:scan_layout(scope)
     end
     self.save(self)
 
-    debug.log(
+    log.debug(
         scope,
-        "[tab %d] computed columns: %d - %d",
-        self.active_tab,
+        "computed columns: %d - %d",
         columns,
         self.get_columns(self)
     )

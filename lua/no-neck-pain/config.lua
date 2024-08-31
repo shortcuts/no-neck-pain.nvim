@@ -1,5 +1,5 @@
 local api = require("no-neck-pain.util.api")
-local debug = require("no-neck-pain.util.debug")
+local log = require("no-neck-pain.util.debug")
 local colors = require("no-neck-pain.colors")
 local constants = require("no-neck-pain.util.constants")
 
@@ -458,7 +458,7 @@ end
 function NoNeckPain.setup(options)
     NoNeckPain.options = NoNeckPain.defaults(options or {})
 
-    debug.warn_deprecation(NoNeckPain.options)
+    log.warn_deprecation(NoNeckPain.options)
 
     register_mappings(NoNeckPain.options.mappings, {
         toggle = ":NoNeckPain<CR>",

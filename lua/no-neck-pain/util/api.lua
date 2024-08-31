@@ -1,4 +1,4 @@
-local debug = require("no-neck-pain.util.debug")
+local log = require("no-neck-pain.util.debug")
 
 local api = { debouncers = {} }
 
@@ -105,13 +105,13 @@ function api.debounce(context, callback, timeout)
         timer_stop_close(timer)
 
         if debouncer.executing then
-            debug.log(context, "already running on debounce, rescheduling...")
+            log.debug(context, "already running on debounce, rescheduling...")
             return api.debounce(context, callback, timeout)
         end
 
         debouncer.executing = true
         vim.schedule(function()
-            debug.log(context, ">> debouncer triggered")
+            log.debug(context, ">> debouncer triggered")
             callback(context)
             debouncer.executing = false
 
