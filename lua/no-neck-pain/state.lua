@@ -463,12 +463,7 @@ function state:scan_layout(scope)
     end
     self.save(self)
 
-    log.debug(
-        scope,
-        "computed columns: %d - %d",
-        columns,
-        self.get_columns(self)
-    )
+    log.debug(scope, "computed columns: %d - %d", columns, self.get_columns(self))
 
     return columns ~= self.get_columns(self)
 end
