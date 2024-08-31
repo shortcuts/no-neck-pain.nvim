@@ -26,6 +26,14 @@ T["auto command"]["does not create side buffers window's width < options.width"]
     })
 end
 
+T["auto command"]["starts the plugin on VimEnter"] = function()
+    child.restart({ "-u", "scripts/init_auto_open.lua" })
+    child.wait()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+    Helpers.expect.state(child, "enabled", true)
+end
+
 T["auto command"]["disabling clears VimEnter autocmd"] = function()
     child.restart({ "-u", "scripts/init_auto_open.lua" })
     child.nnp()

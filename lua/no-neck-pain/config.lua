@@ -165,9 +165,8 @@ NoNeckPain.options = {
     ---@type boolean
     killAllBuffersOnDisable = false,
     -- When `true`, deleting the main no-neck-pain buffer with `:bd`, `:bdelete` does not disable the plugin, it fallbacks on the newly focused window and refreshes the state by re-creating side-windows if necessary.
-    ---@usage: the default value will change to `true` in the next major release (^2.x.y).
     ---@type boolean
-    fallbackOnBufferDelete = false,
+    fallbackOnBufferDelete = true,
     -- Adds autocmd (@see `:h autocmd`) which aims at automatically enabling the plugin.
     ---@type table
     autocmds = {
@@ -458,8 +457,6 @@ end
 ---@usage `require("no-neck-pain").setup()` (add `{}` with your |NoNeckPain.options| table)
 function NoNeckPain.setup(options)
     NoNeckPain.options = NoNeckPain.defaults(options or {})
-
-    NoNeckPain.options.hasNvim9 = vim.fn.has("nvim-0.9") == 1
 
     debug.warn_deprecation(NoNeckPain.options)
 

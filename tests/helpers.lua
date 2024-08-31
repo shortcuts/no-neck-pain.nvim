@@ -38,7 +38,11 @@ Helpers.expect.global_type = MiniTest.new_expectation(
 Helpers.expect.config = MiniTest.new_expectation(
     "config option matches",
     function(child, field, value)
-        return Helpers.expect.global(child, "_G.NoNeckPain.config." .. field, value)
+        if field == "" then
+            return Helpers.expect.global(child, "_G.NoNeckPain.config" .. field, value)
+        else
+            return Helpers.expect.global(child, "_G.NoNeckPain.config." .. field, value)
+        end
     end,
     error_message
 )
