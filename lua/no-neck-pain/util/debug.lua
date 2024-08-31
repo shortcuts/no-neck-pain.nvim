@@ -9,7 +9,19 @@ local longest_scope = 15
 ---@param ... any: the arguments of the formatted string.
 ---@private
 function log.debug(scope, str, ...)
-    if _G.NoNeckPain.config ~= nil and not _G.NoNeckPain.config.debug then
+    return log.notify(scope, vim.log.levels.DEBUG, false, str, ...)
+end
+
+--- prints only if debug is true.
+---
+---@param scope string: the scope from where this function is called.
+---@param level string: the log level of vim.notify.
+---@param verbose boolean: when false, only prints when config.debug is true.
+---@param str string: the formatted string.
+---@param ... any: the arguments of the formatted string.
+---@private
+function log.notify(scope, level, verbose, str, ...)
+    if not verbose and _G.NoNeckPain.config ~= nil and not _G.NoNeckPain.config.debug then
         return
     end
 
@@ -17,13 +29,17 @@ function log.debug(scope, str, ...)
         longest_scope = string.len(scope)
     end
 
-    for _ = longest_scope, string.len(scope), -1 do
-        scope = string.format("%s ", scope)
+    for i = longest_scope, string.len(scope), -1 do
+        if i < string.len(scope) then
+            scope = string.format("%s ", scope)
+        else
+            scope = string.format("%s", scope)
+        end
     end
 
     vim.notify(
-        string.format("[%s] %s", scope, string.format(str, ...)),
-        vim.log.levels.DEBUG,
+        string.format("[no-neck-pain.nvim@%s] %s", scope, string.format(str, ...)),
+        level,
         { title = "no-neck-pain.nvim" }
     )
 end
@@ -52,8 +68,11 @@ function log.warn_deprecation(options)
     for name, warning in pairs(root_deprecated) do
         if options[name] ~= nil then
             uses_deprecated_option = true
-            print(
-                string.format("[no-neck-pain.nvim] `%s` %s", name, string.format(notice, warning))
+            log.notify(
+                "deprecated_options",
+                vim.log.levels.WARN,
+                true,
+                string.format("`%s` %s", name, string.format(notice, warning))
             )
         end
     end
@@ -65,15 +84,28 @@ function log.warn_deprecation(options)
             or options.buffers.right[name] ~= nil
         then
             uses_deprecated_option = true
-            print(
-                string.format("[no-neck-pain.nvim] `%s` %s", name, string.format(notice, warning))
+            log.notify(
+                "deprecated_options",
+                vim.log.levels.WARN,
+                true,
+                string.format("`%s` %s", name, string.format(notice, warning))
             )
         end
     end
 
     if uses_deprecated_option then
-        print("[no-neck-pain.nvim]     sorry to bother you with the breaking changes :(")
-        print("[no-neck-pain.nvim]     use `:h NoNeckPain.options` to read more.")
+        log.notify(
+            "deprecated_options",
+            vim.log.levels.WARN,
+            true,
+            "sorry to bother you with the breaking changes :("
+        )
+        log.notify(
+            "deprecated_options",
+            vim.log.levels.WARN,
+            true,
+            "use `:h NoNeckPain.options` to read more."
+        )
     end
 end
 
