@@ -27,8 +27,10 @@ end
 function W.init_side_options(side, id)
     local bufid = vim.api.nvim_win_get_buf(id)
 
+    vim.print(S.get_scratchPad(S))
+
     for opt, val in pairs(_G.NoNeckPain.config.buffers[side].bo) do
-        if not S.get_scratchPad(S) and opt ~= "filetype" then
+        if not (S.get_scratchPad(S) and opt == "filetype") then
             A.set_buffer_option(bufid, opt, val)
         end
     end
