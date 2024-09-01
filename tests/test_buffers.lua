@@ -17,6 +17,23 @@ local T = MiniTest.new_set({
 
 T["setup"] = MiniTest.new_set()
 
+T["setup"]["sets default filetypes"] = function()
+    child.lua([[require('no-neck-pain').setup({width=30})]])
+    child.nnp()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+
+    Helpers.expect.equality(
+        child.lua_get("vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(1001), 'filetype')"),
+        "no-neck-pain"
+    )
+
+    Helpers.expect.equality(
+        child.lua_get("vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(1002), 'filetype')"),
+        "no-neck-pain"
+    )
+end
+
 T["setup"]["overrides default values"] = function()
     child.lua([[require('no-neck-pain').setup({
         buffers = {
