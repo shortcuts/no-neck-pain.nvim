@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [1.16.1](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.16.0...v1.16.1) (2024-09-01)
+
+
+### Bug Fixes
+
+* default filetype not set ([#386](https://github.com/shortcuts/no-neck-pain.nvim/issues/386)) ([c42db61](https://github.com/shortcuts/no-neck-pain.nvim/commit/c42db61979a5e7cea5bbda8adc8ec879b231d663))
+
 ## [1.16.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.15.0...v1.16.0) (2024-08-29)
 
 
