@@ -69,7 +69,11 @@ T["fallbackOnBufferDelete"]["invoking :bd keeps nnp enabled"] = function()
     child.cmd("bd")
     child.loop.sleep(500)
 
-    Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1004, left = 1005, right = 1006 })
+    if child.fn.has("nvim-0.10") == 0 then
+        Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1003, left = 1004, right = 1005 })
+    else
+        Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1004, left = 1005, right = 1006 })
+    end
 end
 
 T["fallbackOnBufferDelete"]["still allows nvim to quit"] = function()
