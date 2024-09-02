@@ -433,9 +433,11 @@ function main.disable(scope)
                 end
 
                 vim.schedule(function()
-                    vim.notify(
-                        "[no-neck-pain.nvim] unable to quit nvim because one or more buffer has modified files, please save or discard changes",
-                        vim.log.levels.ERROR
+                    log.notify(
+                        scope,
+                        vim.log.levels.ERROR,
+                        true,
+                        "unable to quit nvim because one or more buffer has modified files, please save or discard changes"
                     )
                     vim.cmd("rightbelow vertical split")
                     vim.cmd("buffer " .. bufname)
