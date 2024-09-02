@@ -133,7 +133,6 @@ function NoNeckPain.setup(opts)
         vim.api.nvim_create_autocmd({ "TabEnter" }, {
             callback = function(p)
                 vim.schedule(function()
-                    vim.print("bar")
                     if _G.NoNeckPain.state == nil or not _G.NoNeckPain.state.enabled then
                         return log.debug(p.event, "plugin is disabled")
                     end
