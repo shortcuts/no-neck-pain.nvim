@@ -262,7 +262,16 @@ function main.enable(scope)
                     if p.event == "BufDelete" and _G.NoNeckPain.config.fallbackOnBufferDelete then
                         log.debug(s, "`curr` has been deleted, resetting state")
 
-                        vim.cmd("new")
+                        local opened_buffers = api.get_opened_buffers()
+
+                        vim.cmd("rightbelow vertical split")
+
+                        if vim.tbl_count(opened_buffers) > 0 then
+                            local bufname, _ = next(opened_buffers)
+
+                            vim.cmd("buffer " .. bufname)
+                            log.debug(s, "fallback to %s", bufname)
+                        end
 
                         main.disable(string.format("%s:reset", s))
                         main.enable(string.format("%s:reset", s))
