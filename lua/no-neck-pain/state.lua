@@ -452,12 +452,14 @@ function state:scan_layout(scope)
 
     local layout = vim.fn.winlayout(self.active_tab)
 
-    -- basically when opening vim with nnp autocmds, nothing else than a curr window
+    -- when opening vim with nnp autocmds, nothing else than a curr window
     if layout[1] == "leaf" then
         self.set_layout_windows(self, scope, { layout })
-    -- when a helper or vsplit takes most of the width
+    -- when:
+    -- - nnp is opened with an active column of splits opened
+    -- - opening a help or qflist window that takes full width
     elseif layout[1] == "col" and vim.tbl_count(layout) == 2 then
-        self.walk_layout(self, scope, layout[2], false)
+        self.walk_layout(self, scope, { "row", layout[2] }, true)
     else
         self.walk_layout(self, scope, layout, false)
     end

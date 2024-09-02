@@ -101,6 +101,34 @@ T["split"]["keeps correct focus"] = function()
     Helpers.expect.equality(child.get_current_win(), 1000)
 end
 
+T["split"]["correctly starts nnp with previously opened splits"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=20}) ]])
+
+    child.cmd("split")
+    Helpers.expect.equality(child.get_wins_in_tab(1), { 1001, 1000 })
+
+    child.nnp()
+
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1002)"), 30)
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1003)"), 28)
+
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1000)"), 20)
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1001)"), 20)
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1002, 1001, 1000, 1003 })
+end
+
+T["split"]["correctly starts nnp with previously opened splits (only one side)"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=20, buffers={right={enabled=false}}}) ]])
+
+    child.cmd("split")
+    Helpers.expect.equality(child.get_wins_in_tab(1), { 1001, 1000 })
+
+    child.nnp()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1002, 1001, 1000 })
+end
+
 T["vsplit"] = MiniTest.new_set()
 
 T["vsplit"]["does not create side buffers when there's not enough space"] = function()
