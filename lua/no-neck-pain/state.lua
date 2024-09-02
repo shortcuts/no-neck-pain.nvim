@@ -459,7 +459,19 @@ function state:scan_layout(scope)
     -- - nnp is opened with an active column of splits opened
     -- - opening a help or qflist window that takes full width
     elseif layout[1] == "col" and vim.tbl_count(layout) == 2 then
-        self.walk_layout(self, scope, { "row", layout[2] }, true)
+        local leafOnly = true
+        for _, sub in ipairs(layout[2]) do
+            if sub[1] ~= "leaf" then
+                leafOnly = false
+                break
+            end
+        end
+
+        if leafOnly then
+            self.walk_layout(self, scope, { "row", layout[2] }, true)
+        else
+            self.walk_layout(self, scope, layout[2], false)
+        end
     else
         self.walk_layout(self, scope, layout, false)
     end
