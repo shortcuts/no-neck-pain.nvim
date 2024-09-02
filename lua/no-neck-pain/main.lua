@@ -363,30 +363,10 @@ function main.enable(scope)
 
                     for i = 1, #wins do
                         if api.is_side_id(current_side, wins[i]) then
-                            local j = i - 1 < 1 and #wins or i - 1
-                            while true do
-                                if
-                                    not api.is_side_id(current_side, wins[j])
-                                    and not api.is_side_id(other_side, wins[j])
-                                then
-                                    idx = j
-                                    break
-                                end
-                                j = j == 1 and #wins or j - 1
-                            end
+                            idx = api.find_next_side_idx(i - 1, -1, wins, current_side, other_side)
                             break
                         elseif api.is_side_id(state.get_previously_focused_win(state), wins[i]) then
-                            local j = i + 1 > #wins and 1 or i + 1
-                            while true do
-                                if
-                                    not api.is_side_id(current_side, wins[j])
-                                    and not api.is_side_id(other_side, wins[j])
-                                then
-                                    idx = j
-                                    break
-                                end
-                                j = j == #wins and 1 or j + 1
-                            end
+                            idx = api.find_next_side_idx(i + 1, 1, wins, current_side, other_side)
                             break
                         end
                     end

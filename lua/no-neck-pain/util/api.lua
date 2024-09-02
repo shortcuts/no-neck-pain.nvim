@@ -145,12 +145,47 @@ function api.get_opened_buffers()
     return opened
 end
 
+--- Whether the given id is a side id or not.
+---
+---@param side number?: the id of the side to compare.
+---@param id number: the id to compare to the side.
+---@return boolean
+---@private
 function api.is_side_id(side, id)
     if side == nil then
         return false
     end
 
     return side == id
+end
+
+--- Itherates over a given list of wins, starting from a given index, walking from a given step (+1/-1).
+--- Once an id that is not any of the side is found, return the position in the table, nil otherwise.
+---
+---@param start_idx number: the idx to start from in `wins`.
+---@param step -1|1: the walk direction in `wins`, from `start_idx`.
+---@param wins table: the table of wins ids to walk in.
+---@param current_side number: the `left` or `right` side id..
+---@param other_side number: the `left` or `right` side id..
+---@return number?
+---@private
+function api.find_next_side_idx(start_idx, step, wins, current_side, other_side)
+    local n = #wins
+
+    for k = 1, n do
+        -- Calculate the next index using modular arithmetic
+        local index = (start_idx + (k - 1) * step - 1) % n + 1
+
+        if
+            not api.is_side_id(current_side, wins[index])
+            and not api.is_side_id(other_side, wins[index])
+        then
+            return index
+        end
+    end
+
+    -- Fallback in case no valid index is found
+    return nil
 end
 
 return api

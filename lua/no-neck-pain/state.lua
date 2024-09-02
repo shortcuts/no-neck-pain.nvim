@@ -456,7 +456,7 @@ function state:scan_layout(scope)
     if layout[1] == "leaf" then
         self.set_layout_windows(self, scope, { layout })
     -- when:
-    -- - nnp is opened with an active column of splits opened
+    -- - nnp is opened with an active column of splits opened (leafOnly)
     -- - opening a help or qflist window that takes full width
     elseif layout[1] == "col" and vim.tbl_count(layout) == 2 then
         local leafOnly = true
