@@ -246,17 +246,18 @@ function ui.get_side_width(side)
 
     -- now we need to determine how much we should substract from the remaining padding
     -- if there's side integrations open.
-    for name, tree in pairs(state.get_integrations(state)) do
+    for name, opts in pairs(state.get_integrations(state)) do
         if
-            tree.id ~= nil
+            opts.id ~= nil
             and (
                 not state.is_side_enabled_and_valid(state, side)
                 or side == _G.NoNeckPain.config.integrations[name].position
             )
         then
-            log.debug(scope, "%s opened with width %d", name, tree.width)
+            local integration_width = vim.api.nvim_win_get_width(opts.id)
+            log.debug(scope, "%s opened with width %d", name, integration_width)
 
-            occupied = occupied + tree.width
+            occupied = occupied + integration_width
         end
     end
 

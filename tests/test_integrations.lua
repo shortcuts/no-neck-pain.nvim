@@ -268,7 +268,6 @@ T["neotest"]["keeps sides open"] = function()
         fileTypePattern = "neotest",
         id = 1003,
         open = "lua require('neotest').summary.open()",
-        width = 74,
     })
 end
 
@@ -296,7 +295,6 @@ T["outline"]["keeps sides open"] = function()
         fileTypePattern = "outline",
         id = 1004,
         open = "Outline",
-        width = 40,
     })
 end
 
@@ -339,7 +337,6 @@ T["NvimTree"]["keeps sides open"] = function()
         fileTypePattern = "nvimtree",
         id = 1004,
         open = "NvimTreeOpen",
-        width = 38,
     })
 end
 
@@ -377,7 +374,6 @@ T["neo-tree"]["keeps sides open"] = function()
         fileTypePattern = "neo-tree",
         id = 1004,
         open = "Neotree reveal",
-        width = 60,
     })
 end
 
@@ -414,7 +410,6 @@ T["TSPlayground"]["keeps sides open"] = function()
         fileTypePattern = "tsplayground",
         id = 1004,
         open = "TSPlaygroundToggle",
-        width = 38,
     })
 
     Helpers.expect.state(child, "tabs[1].wins.main", {
@@ -482,7 +477,6 @@ T["TSPlayground"]["reduces `left` side if only active when integration is on `ri
         fileTypePattern = "tsplayground",
         id = 1003,
         open = "TSPlaygroundToggle",
-        width = 52,
     })
     Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,

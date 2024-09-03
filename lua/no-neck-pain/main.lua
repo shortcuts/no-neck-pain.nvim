@@ -135,7 +135,7 @@ function main.init(scope, go_to_curr)
     if state.check_sides(state, "or", true) and state.get_columns(state) > 1 then
         log.debug("resize_win", "have %d columns", state.get_columns(state))
 
-        for _, win in pairs(state.get_unregistered_wins(state)) do
+        for _, win in pairs(state.get_unregistered_wins(state, scope)) do
             ui.resize_win(win, _G.NoNeckPain.config.width, string.format("win:%d", win))
         end
 
@@ -279,7 +279,7 @@ function main.enable(scope)
                         return
                     end
 
-                    local wins = state.get_unregistered_wins(state)
+                    local wins = state.get_unregistered_wins(state, scope)
                     if #wins == 0 then
                         log.debug(s, "no active windows found")
 

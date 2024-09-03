@@ -342,15 +342,16 @@ end
 
 --- Gets wins that are not relative or main wins.
 ---
+---@param scope string: caller of the method.
 ---@return table: the list of windows IDs.
 ---@private
-function state:get_unregistered_wins()
+function state:get_unregistered_wins(scope)
     return vim.tbl_filter(function(win)
         return not api.is_relative_window(win)
             and win ~= self.get_side_id(self, "curr")
             and win ~= self.get_side_id(self, "left")
             and win ~= self.get_side_id(self, "right")
-            and not self.is_supported_integration(self, "_", win)
+            and not self.is_supported_integration(self, scope, win)
     end, vim.api.nvim_tabpage_list_wins(self.active_tab))
 end
 
@@ -389,7 +390,6 @@ function state:set_layout_windows(scope, wins)
         if win[1] == "leaf" and not api.is_relative_window(id) then
             local supported, name, integration = self.is_supported_integration(self, scope, id)
             if supported and name and integration then
-                integration.width = vim.api.nvim_win_get_width(id) * 2
                 integration.id = id
 
                 self.tabs[self.active_tab].redraw = true
