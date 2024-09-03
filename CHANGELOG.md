@@ -1,4 +1,16 @@
 <a name="0.2.3"></a>
+## [2.0.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.16.1...v2.0.0) (2024-09-03)
+
+There should be no breaking changes in this new major, however a lot of behavioral changes (for the better!). Thanks for using the plugin :)
+
+### ⚠ BREAKING CHANGES
+
+* **next:** 2.0.0 major version ([#384](https://github.com/shortcuts/no-neck-pain.nvim/issues/384))
+
+### Features
+
+* **next:** 2.0.0 major version ([#384](https://github.com/shortcuts/no-neck-pain.nvim/issues/384)) ([63c5094](https://github.com/shortcuts/no-neck-pain.nvim/commit/63c5094090521354ad8b69a0a0627d4552c56f2b))
+
 ## [1.16.1](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.16.0...v1.16.1) (2024-09-01)
 
 
