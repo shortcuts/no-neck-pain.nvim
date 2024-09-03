@@ -1,5 +1,5 @@
 local main = require("no-neck-pain.main")
-local log = require("no-neck-pain.util.debug")
+local log = require("no-neck-pain.util.log")
 local api = require("no-neck-pain.util.api")
 local config = require("no-neck-pain.config")
 

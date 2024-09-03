@@ -1,6 +1,6 @@
 local api = require("no-neck-pain.util.api")
 local constants = require("no-neck-pain.util.constants")
-local log = require("no-neck-pain.util.debug")
+local log = require("no-neck-pain.util.log")
 local event = require("no-neck-pain.util.event")
 local state = require("no-neck-pain.state")
 local ui = require("no-neck-pain.ui")

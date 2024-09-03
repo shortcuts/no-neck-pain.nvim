@@ -1,7 +1,7 @@
 local api = require("no-neck-pain.util.api")
 local colors = require("no-neck-pain.colors")
 local constants = require("no-neck-pain.util.constants")
-local log = require("no-neck-pain.util.debug")
+local log = require("no-neck-pain.util.log")
 local state = require("no-neck-pain.state")
 
 local ui = {}

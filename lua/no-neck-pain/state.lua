@@ -1,6 +1,6 @@
 local api = require("no-neck-pain.util.api")
 local constants = require("no-neck-pain.util.constants")
-local log = require("no-neck-pain.util.debug")
+local log = require("no-neck-pain.util.log")
 
 ----- default values and toggles =======================================================
 ---@private

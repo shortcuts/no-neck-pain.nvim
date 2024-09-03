@@ -1,4 +1,4 @@
-local log = require("no-neck-pain.util.debug")
+local log = require("no-neck-pain.util.log")
 
 local api = { debouncers = {} }
 
