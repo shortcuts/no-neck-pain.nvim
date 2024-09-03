@@ -89,8 +89,8 @@ Helpers.new_child_neovim = function()
         error(msg)
     end
 
-    child.wait = function()
-        child.loop.sleep(10)
+    child.wait = function(ms)
+        child.loop.sleep(ms or 10)
     end
 
     child.nnp = function()

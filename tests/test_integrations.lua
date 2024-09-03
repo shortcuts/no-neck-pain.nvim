@@ -375,6 +375,55 @@ T["neo-tree"]["keeps sides open"] = function()
         id = 1004,
         open = "Neotree reveal",
     })
+
+    child.nnp()
+    child.nnp()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1005, 1004, 1000, 1006 })
+
+    Helpers.expect.state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1005,
+        right = 1006,
+    })
+
+    Helpers.expect.state(child, "tabs[1].wins.columns", 4)
+
+    Helpers.expect.state(child, "tabs[1].wins.integrations.NeoTree", {
+        close = "Neotree close",
+        fileTypePattern = "neo-tree",
+        id = 1004,
+        open = "Neotree reveal",
+    })
+end
+
+
+T["neo-tree"]["properly enables nnp with tree already opened"] = function()
+    child.restart({ "-u", "scripts/init_with_neotree.lua", "." })
+
+    Helpers.expect.equality(child.get_wins_in_tab(1), { 1002, 1000 })
+
+    child.cmd("e Makefile")
+
+    child.nnp()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1004, 1002, 1000, 1005 })
+
+    Helpers.expect.state(child, "enabled", true)
+
+    Helpers.expect.state(child, "tabs[1].wins.integrations.NeoTree", {
+        close = "Neotree close",
+        fileTypePattern = "neo-tree",
+        id = 1002,
+        open = "Neotree reveal",
+    })
+
+
+    Helpers.expect.state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1004,
+        right = 1005,
+    })
 end
 
 T["TSPlayground"] = MiniTest.new_set()
