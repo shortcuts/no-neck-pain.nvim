@@ -29,7 +29,8 @@ _Creates evenly sized empty buffers on each side of your focused buffer, which a
 - [Themed side buffers](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase#custom-background-color)
 - Fully integrates with [neo-tree.nvim](https://github.com/nvim-neo-tree/neo-tree.nvim), [nvim-tree.lua](https://github.com/nvim-tree/nvim-tree.lua), [undotree](https://github.com/mbbill/undotree), [tmux, and more!](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase#window-layout-support)
 - Keep your workflow intact
-- Neovim >= 0.6 support
+- Neovim >= 0.9 compatibility
+    - 0.7 and 0.8 support is still available in the [1.x frozen version](https://github.com/shortcuts/no-neck-pain.nvim/tree/1.x)
 
 > Want to see it in action? Take a look at [the showcase section](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase)
 
@@ -98,10 +99,6 @@ require("lazy").setup({"shortcuts/no-neck-pain.nvim"})
 </tbody>
 </table>
 </div>
-
-## 🏗 v1.0.0 breaking changes
-
-See [the release description](https://github.com/shortcuts/no-neck-pain.nvim/pull/201) for the full list of breaking changes.
 
 ## ☄ Getting started
 
@@ -375,14 +372,25 @@ NoNeckPain.bufferOptionsColors = {
 |`:NoNeckPainToggleRightSide`| Toggles the right side buffer (open/close). |
 |`:NoNeckPainWidthUp`| Increases the config `width` by 5 and resizes the no-neck-pain windows. |
 |`:NoNeckPainWidthDown`| Decreases the config `width` by 5 and resizes the no-neck-pain windows. |
+|`:NoNeckPainScratchPad`| Uses the side buffers as a persistent scratchpad so you can take notes easily. |
+
+## 🏗 breaking changes
+
+### v1.0.0
+
+See [the release description](https://github.com/shortcuts/no-neck-pain.nvim/pull/201) for the full list of breaking changes.
+
+### v2.0.0
+
+See [the release description](https://github.com/shortcuts/no-neck-pain.nvim/pull/384) for the full list of breaking changes.
 
 ## ⌨ Contributing
 
 PRs and issues are always welcome. Make sure to provide as much context as possible when opening one.
 
-See [Makefile](./Makefile) for the available commends
+See [Makefile](./Makefile) for the available commands
 
-> You'll need to install [Bob](https://github.com/MordechaiHadad/bob), a useful nvim version manager in order to run the test suite for every supported versions.
+> It's recommended to use [Bob](https://github.com/MordechaiHadad/bob), a useful nvim version manager in order to run the test suite for every supported versions.
 
 ## 🗞 Wiki
 

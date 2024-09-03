@@ -1,25 +1,25 @@
-local A = require("no-neck-pain.util.api")
-local Co = require("no-neck-pain.util.constants")
-local S = require("no-neck-pain.state")
+local api = require("no-neck-pain.util.api")
+local constants = require("no-neck-pain.util.constants")
+local state = require("no-neck-pain.state")
 
-local E = {}
+local event = {}
 
----skips the event if:
+--- skips the event if:
 --- - the plugin is not enabled
 --- - the current window is a relative window
 --- - the event is triggered in a different tab
 ---
 ---@private
-function E.skip()
+function event.skip()
     if _G.NoNeckPain.state == nil or not _G.NoNeckPain.state.enabled then
         return true
     end
 
-    if A.is_relative_window() then
+    if api.is_relative_window() then
         return true
     end
 
-    return A.get_current_tab() ~= S.active_tab
+    return api.get_current_tab() ~= state.active_tab
 end
 
 --- determines if we should skip the enabling of the plugin:
@@ -31,22 +31,33 @@ end
 --- - we are focusing a floating window
 --- - we are focusing one of the side buffer
 ---
+---@param scope string: internal identifier for logging purposes.
 ---@private
-function E.skip_enable()
-    if S.is_active_tab_registered(S) then
+function event.skip_enable(scope)
+    if state.is_active_tab_registered(state) then
         return true
     end
 
-    if A.is_relative_window() then
+    if api.is_relative_window() then
         return true
+    end
+
+    if state.is_active_tab_disabled(state) then
+        if scope == "enable_on_tab_enter" then
+            return true
+        end
+
+        state.remove_active_tab_from_disabled(state)
+
+        return false
     end
 
     -- dashboards delays the plugin enable step until next buffer entered
-    if vim.tbl_contains(Co.DASHBOARDS, vim.bo.filetype) then
+    if vim.tbl_contains(constants.DASHBOARDS, vim.bo.filetype) then
         return true
     end
 
-    return S.is_supported_integration(S, "E.skip_enable", nil)
+    return state.is_supported_integration(state, "event.skip_enable", nil)
 end
 
-return E
+return event

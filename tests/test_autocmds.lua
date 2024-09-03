@@ -26,6 +26,14 @@ T["auto command"]["does not create side buffers window's width < options.width"]
     })
 end
 
+T["auto command"]["starts the plugin on VimEnter"] = function()
+    child.restart({ "-u", "scripts/init_auto_open.lua" })
+    child.wait()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+    Helpers.expect.state(child, "enabled", true)
+end
+
 T["auto command"]["disabling clears VimEnter autocmd"] = function()
     child.restart({ "-u", "scripts/init_auto_open.lua" })
     child.nnp()
@@ -118,9 +126,44 @@ T["skipEnteringNoNeckPainBuffer"]["goes to new valid buffer when entering side"]
 
     child.fn.win_gotoid(1001)
     child.wait()
-    Helpers.expect.equality(child.api.nvim_get_current_win(), 1003)
+    Helpers.expect.equality(child.api.nvim_get_current_win(), 1000)
 
     child.fn.win_gotoid(1002)
+    child.wait()
+    Helpers.expect.equality(child.api.nvim_get_current_win(), 1003)
+end
+
+T["skipEnteringNoNeckPainBuffer"]["handles ltr and rtl on many buffers"] = function()
+    child.lua(
+        [[ require('no-neck-pain').setup({width=50, autocmds = { skipEnteringNoNeckPainBuffer = true }}) ]]
+    )
+    child.nnp()
+
+    Helpers.expect.config(child, "autocmds.skipEnteringNoNeckPainBuffer", true)
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+    Helpers.expect.equality(child.api.nvim_get_current_win(), 1000)
+
+    child.cmd("top new")
+    child.cmd("top new")
+    child.wait()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1004, 1003, 1001, 1000, 1002 })
+    Helpers.expect.equality(child.api.nvim_get_current_win(), 1004)
+
+    child.fn.win_gotoid(1003)
+    child.wait()
+    Helpers.expect.equality(child.api.nvim_get_current_win(), 1003)
+
+    child.fn.win_gotoid(1001)
+    child.wait()
+    Helpers.expect.equality(child.api.nvim_get_current_win(), 1000)
+
+    child.fn.win_gotoid(1000)
+    child.wait()
+    Helpers.expect.equality(child.api.nvim_get_current_win(), 1000)
+
+    child.fn.win_gotoid(1001)
     child.wait()
     Helpers.expect.equality(child.api.nvim_get_current_win(), 1003)
 end

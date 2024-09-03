@@ -38,7 +38,11 @@ Helpers.expect.global_type = MiniTest.new_expectation(
 Helpers.expect.config = MiniTest.new_expectation(
     "config option matches",
     function(child, field, value)
-        return Helpers.expect.global(child, "_G.NoNeckPain.config." .. field, value)
+        if field == "" then
+            return Helpers.expect.global(child, "_G.NoNeckPain.config" .. field, value)
+        else
+            return Helpers.expect.global(child, "_G.NoNeckPain.config." .. field, value)
+        end
     end,
     error_message
 )
@@ -85,8 +89,8 @@ Helpers.new_child_neovim = function()
         error(msg)
     end
 
-    child.wait = function()
-        child.loop.sleep(10)
+    child.wait = function(ms)
+        child.loop.sleep(ms or 10)
     end
 
     child.nnp = function()
@@ -180,10 +184,6 @@ Helpers.new_child_neovim = function()
     end
 
     child.expect_screenshot = function(opts, path, screenshot_opts)
-        if child.fn.has("nvim-0.8") == 0 then
-            MiniTest.skip("Screenshots are tested for Neovim>=0.8 (for simplicity).")
-        end
-
         MiniTest.expect.reference_screenshot(child.get_screenshot(screenshot_opts), path, opts)
     end
 

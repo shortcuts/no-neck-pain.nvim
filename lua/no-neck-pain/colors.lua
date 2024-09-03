@@ -1,11 +1,11 @@
-local A = require("no-neck-pain.util.api")
-local Co = require("no-neck-pain.util.constants")
-local D = require("no-neck-pain.util.debug")
-local S = require("no-neck-pain.state")
+local api = require("no-neck-pain.util.api")
+local constants = require("no-neck-pain.util.constants")
+local log = require("no-neck-pain.util.debug")
+local state = require("no-neck-pain.state")
 
-local C = {}
+local colors = {}
 
----Converts an hex color code to RGB, values are returned independently.
+--- Converts an hex color code to RGB, values are returned independently.
 ---
 ---@param hex string: the hex color to conver to rgb.
 ---@return number?: the r color
@@ -18,7 +18,7 @@ local function hex_to_rgb(hex)
     return tonumber("0x" .. r), tonumber("0x" .. g), tonumber("0x" .. b)
 end
 
----Blend the given `color_code` RGB for the given `factor`.
+--- Blend the given `color_code` RGB for the given `factor`.
 ---
 ---@param color_code string: the color code string, e.g. #ffffff.
 ---@param factor number: Brighten (positive) or darken (negative) the side buffers background color. Accepted values are [-1..1].
@@ -44,14 +44,14 @@ local function blend(color_code, factor)
     )
 end
 
----Tries to match the given `color_code` to an integration name, defaults to the given `color_code` if not found.
----if a `factor` is provided, the color will be blended (brighten/darken) before being returned.
+--- Tries to match the given `color_code` to an integration name, defaults to the given `color_code` if not found.
+--- if a `factor` is provided, the color will be blended (brighten/darken) before being returned.
 ---
 ---@param color_code string: the color code string, e.g. #ffffff.
 ---@param factor number: Brighten (positive) or darken (negative) the side buffers background color. Accepted values are [-1..1].
 ---@return string?: the blended color code.
 ---@private
-function C.match_and_blend(color_code, factor)
+local function match_and_blend(color_code, factor)
     if color_code == nil or string.lower(color_code) == "none" then
         return nil
     end
@@ -66,8 +66,8 @@ function C.match_and_blend(color_code, factor)
         )
     end
 
-    if Co.THEMES[color_code] ~= nil then
-        color_code = Co.THEMES[color_code]
+    if constants.THEMES[color_code] ~= nil then
+        color_code = constants.THEMES[color_code]
     end
 
     local hex_pattern = "^#" .. "[abcdef0-9]" .. ("[abcdef0-9]"):rep(5) .. "$"
@@ -85,17 +85,17 @@ function C.match_and_blend(color_code, factor)
     return blend(color_code, factor or 0)
 end
 
----Parses to color for each buffer parameters, considering transparent backgrounds.
+--- Parses to color for each buffer parameters, considering transparent backgrounds.
 ---
 ---@param buffers table: the buffers table to parse.
 ---@return table: the parsed buffers.
 ---@private
-function C.parse(buffers)
-    buffers.colors.background = C.match_and_blend(buffers.colors.background, buffers.colors.blend)
+function colors.parse(buffers)
+    buffers.colors.background = match_and_blend(buffers.colors.background, buffers.colors.blend)
 
-    for _, side in pairs(Co.SIDES) do
+    for _, side in pairs(constants.SIDES) do
         if buffers[side].enabled then
-            buffers[side].colors.background = C.match_and_blend(
+            buffers[side].colors.background = match_and_blend(
                 buffers[side].colors.background,
                 buffers[side].colors.blend or buffers.colors.blend
             ) or buffers.colors.background
@@ -107,15 +107,15 @@ function C.parse(buffers)
     return buffers
 end
 
----Creates highlight groups for a given `win` in a `tab` named:
----- `NoNeckPain_background_tab_$ID_side_$SIDE` for the background colors.
----- `NoNeckPain_text_tab_$ID_side_$SIDE` for the text colors.
----note: `cmd` is used instead of native commands for backward compatibility with Neovim 0.7
+--- Creates highlight groups for a given `win` in a `tab` named:
+--- - `NoNeckPain_background_tab_$ID_side_$SIDE` for the background colors.
+--- - `NoNeckPain_text_tab_$ID_side_$SIDE` for the text colors.
+--- note: `cmd` is used instead of native commands for backward compatibility with Neovim 0.7
 ---
 ---@param win number: the id of the win to init.
 ---@param side "left"|"right": the side of the window being resized, used for logging only.
 ---@private
-function C.init(win, side)
+function colors.init(win, side)
     if win == nil then
         return
     end
@@ -125,17 +125,17 @@ function C.init(win, side)
         and _G.NoNeckPain.config.buffers[side].colors.text == nil
         and _G.NoNeckPain.config.buffers[side].colors.blend == 0
     then
-        return D.log("C.init", "skipping color initialization for side %s", side)
+        return log.debug("colors.init", "skipping color initialization for side %s", side)
     end
 
     -- init namespace for the current tab
-    local id, _ = S.set_namespace(S, side)
+    local id, _ = state.set_namespace(state, side)
     local bufnr = vim.api.nvim_win_get_buf(win)
 
     -- create groups to assign them to the namespace
     local background_group =
-        string.format("NoNeckPain_background_tab_%s_side_%s", S.active_tab, side)
-    local text_group = string.format("NoNeckPain_text_tab_%s_side_%s", S.active_tab, side)
+        string.format("NoNeckPain_background_tab_%s_side_%s", state.active_tab, side)
+    local text_group = string.format("NoNeckPain_text_tab_%s_side_%s", state.active_tab, side)
 
     vim.cmd(
         string.format(
@@ -184,7 +184,7 @@ function C.init(win, side)
         table.insert(string_groups, string.format("%s:%s", hl, group))
     end
 
-    A.set_window_option(win, "winhl", table.concat(string_groups, ","))
+    api.set_window_option(win, "winhl", table.concat(string_groups, ","))
 end
 
-return C
+return colors

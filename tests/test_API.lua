@@ -34,126 +34,143 @@ T["setup"]["sets exposed methods and default options value"] = function()
     Helpers.expect.global_type(child, "_G.NoNeckPain.toggle", "function")
     Helpers.expect.global_type(child, "_G.NoNeckPain.enable", "function")
     Helpers.expect.global_type(child, "_G.NoNeckPain.setup", "function")
+    Helpers.expect.global_type(child, "_G.NoNeckPain.resize", "function")
+    Helpers.expect.global_type(child, "_G.NoNeckPain.disable", "function")
+    Helpers.expect.global_type(child, "_G.NoNeckPain.toggleSide", "function")
+    Helpers.expect.global_type(child, "_G.NoNeckPain.toggleScratchPad", "function")
 
     -- config
     Helpers.expect.global_type(child, "_G.NoNeckPain.config", "table")
     Helpers.expect.config_type(child, "buffers", "table")
 
-    Helpers.expect.config(child, "width", 100)
-    Helpers.expect.config(child, "minSideBufferWidth", 10)
-    Helpers.expect.config(child, "debug", false)
-    Helpers.expect.config(child, "disableOnLastBuffer", false)
-    Helpers.expect.config(child, "killAllBuffersOnDisable", false)
-
-    Helpers.expect.config(child, "autocmds", {
-        enableOnVimEnter = false,
-        enableOnTabEnter = false,
-        reloadOnColorSchemeChange = false,
-        skipEnteringNoNeckPainBuffer = false,
-    })
-
-    Helpers.expect.config(child, "mappings", {
-        enabled = false,
-        scratchPad = "<Leader>ns",
-        toggle = "<Leader>np",
-        toggleLeftSide = "<Leader>nql",
-        toggleRightSide = "<Leader>nqr",
-        widthUp = "<Leader>n=",
-        widthDown = "<Leader>n-",
-    })
-
-    -- buffers
-    Helpers.expect.config_type(child, "buffers", "table")
-    Helpers.expect.config_type(child, "buffers.bo", "table")
-    Helpers.expect.config_type(child, "buffers.wo", "table")
-
-    Helpers.expect.config(child, "buffers.setNames", false)
-
-    Helpers.expect.config(child, "buffers.colors", {
-        blend = 0,
-    })
-
-    Helpers.expect.config(child, "buffers.bo", {
-        bufhidden = "hide",
-        buflisted = false,
-        buftype = "nofile",
-        filetype = "no-neck-pain",
-        swapfile = false,
-    })
-
-    Helpers.expect.config(child, "buffers.wo", {
-        colorcolumn = "0",
-        cursorcolumn = false,
-        cursorline = false,
-        foldenable = false,
-        linebreak = true,
-        list = false,
-        number = false,
-        relativenumber = false,
-        wrap = true,
-    })
-
-    for _, scope in pairs(Co.SIDES) do
-        Helpers.expect.config_type(child, "buffers." .. scope, "table")
-        Helpers.expect.config_type(child, "buffers." .. scope .. ".bo", "table")
-        Helpers.expect.config_type(child, "buffers." .. scope .. ".wo", "table")
-
-        Helpers.expect.config(child, "buffers." .. scope .. ".colors", {
-            blend = 0,
-        })
-
-        Helpers.expect.config(child, "buffers." .. scope .. ".bo", {
-            bufhidden = "hide",
-            buflisted = false,
-            buftype = "nofile",
-            filetype = "no-neck-pain",
-            swapfile = false,
-        })
-
-        Helpers.expect.config(child, "buffers." .. scope .. ".wo", {
-            colorcolumn = "0",
-            cursorcolumn = false,
-            cursorline = false,
-            foldenable = false,
-            linebreak = true,
-            list = false,
-            number = false,
-            relativenumber = false,
-            wrap = true,
-        })
-    end
-
-    Helpers.expect.config(child, "integrations", {
-        NeoTree = {
-            position = "left",
-            reopen = true,
+    Helpers.expect.config(child, "", {
+        width = 100,
+        minSideBufferWidth = 10,
+        debug = false,
+        disableOnLastBuffer = false,
+        killAllBuffersOnDisable = false,
+        fallbackOnBufferDelete = true,
+        autocmds = {
+            enableOnVimEnter = false,
+            enableOnTabEnter = false,
+            reloadOnColorSchemeChange = false,
+            skipEnteringNoNeckPainBuffer = false,
         },
-        NvimDAPUI = {
-            position = "none",
-            reopen = true,
+        mappings = {
+            enabled = false,
+            scratchPad = "<Leader>ns",
+            toggle = "<Leader>np",
+            toggleLeftSide = "<Leader>nql",
+            toggleRightSide = "<Leader>nqr",
+            widthUp = "<Leader>n=",
+            widthDown = "<Leader>n-",
         },
-        NvimTree = {
-            position = "left",
-            reopen = true,
+        buffers = {
+            setNames = false,
+            colors = { blend = 0 },
+            bo = {
+                bufhidden = "hide",
+                buflisted = false,
+                buftype = "nofile",
+                filetype = "no-neck-pain",
+                swapfile = false,
+            },
+            wo = {
+                colorcolumn = "0",
+                cursorcolumn = false,
+                cursorline = false,
+                foldenable = false,
+                linebreak = true,
+                list = false,
+                number = false,
+                relativenumber = false,
+                wrap = true,
+            },
+            left = {
+                enabled = true,
+                scratchPad = {
+                    enabled = false,
+                    pathToFile = "no-neck-pain-left.norg",
+                },
+                colors = { blend = 0 },
+                bo = {
+                    bufhidden = "hide",
+                    buflisted = false,
+                    buftype = "nofile",
+                    filetype = "no-neck-pain",
+                    swapfile = false,
+                },
+                wo = {
+                    colorcolumn = "0",
+                    cursorcolumn = false,
+                    cursorline = false,
+                    foldenable = false,
+                    linebreak = true,
+                    list = false,
+                    number = false,
+                    relativenumber = false,
+                    wrap = true,
+                },
+            },
+            right = {
+                enabled = true,
+                scratchPad = {
+                    enabled = false,
+                    pathToFile = "no-neck-pain-right.norg",
+                },
+                colors = { blend = 0 },
+                bo = {
+                    bufhidden = "hide",
+                    buflisted = false,
+                    buftype = "nofile",
+                    filetype = "no-neck-pain",
+                    swapfile = false,
+                },
+                wo = {
+                    colorcolumn = "0",
+                    cursorcolumn = false,
+                    cursorline = false,
+                    foldenable = false,
+                    linebreak = true,
+                    list = false,
+                    number = false,
+                    relativenumber = false,
+                    wrap = true,
+                },
+            },
         },
-        TSPlayground = {
-            position = "right",
-            reopen = true,
-        },
-        neotest = {
-            position = "right",
-            reopen = true,
-        },
-        undotree = {
-            position = "left",
-        },
-        outline = {
-            position = "right",
-            reopen = true,
-        },
-        aerial = {
-            position = "right",
-            reopen = true,
+        integrations = {
+            NeoTree = {
+                position = "left",
+                reopen = true,
+            },
+            NvimDAPUI = {
+                position = "none",
+                reopen = true,
+            },
+            NvimTree = {
+                position = "left",
+                reopen = true,
+            },
+            TSPlayground = {
+                position = "right",
+                reopen = true,
+            },
+            neotest = {
+                position = "right",
+                reopen = true,
+            },
+            undotree = {
+                position = "left",
+            },
+            outline = {
+                position = "right",
+                reopen = true,
+            },
+            aerial = {
+                position = "right",
+                reopen = true,
+            },
         },
     })
 end
@@ -162,27 +179,148 @@ T["setup"]["overrides default values"] = function()
     child.lua([[require('no-neck-pain').setup({
         width = 42,
         minSideBufferWidth = 0,
+        debug = true,
+        disableOnLastBuffer = true,
+        killAllBuffersOnDisable = true,
+        fallbackOnBufferDelete = false,
         autocmds = {
             enableOnVimEnter = true,
             enableOnTabEnter = true,
             reloadOnColorSchemeChange = true,
             skipEnteringNoNeckPainBuffer = true,
         },
+        mappings = {enabled = true}
+    })]])
+
+    Helpers.expect.config(child, "", {
+        width = 42,
+        minSideBufferWidth = 0,
         debug = true,
         disableOnLastBuffer = true,
         killAllBuffersOnDisable = true,
-    })]])
-
-    Helpers.expect.config(child, "width", 42)
-    Helpers.expect.config(child, "minSideBufferWidth", 0)
-    Helpers.expect.config(child, "debug", true)
-    Helpers.expect.config(child, "disableOnLastBuffer", true)
-    Helpers.expect.config(child, "killAllBuffersOnDisable", true)
-    Helpers.expect.config(child, "autocmds", {
-        enableOnVimEnter = true,
-        enableOnTabEnter = true,
-        reloadOnColorSchemeChange = true,
-        skipEnteringNoNeckPainBuffer = true,
+        fallbackOnBufferDelete = false,
+        autocmds = {
+            enableOnVimEnter = true,
+            enableOnTabEnter = true,
+            reloadOnColorSchemeChange = true,
+            skipEnteringNoNeckPainBuffer = true,
+        },
+        mappings = {
+            enabled = true,
+            scratchPad = "<Leader>ns",
+            toggle = "<Leader>np",
+            toggleLeftSide = "<Leader>nql",
+            toggleRightSide = "<Leader>nqr",
+            widthUp = "<Leader>n=",
+            widthDown = "<Leader>n-",
+        },
+        buffers = {
+            setNames = false,
+            colors = { blend = 0 },
+            bo = {
+                bufhidden = "hide",
+                buflisted = false,
+                buftype = "nofile",
+                filetype = "no-neck-pain",
+                swapfile = false,
+            },
+            wo = {
+                colorcolumn = "0",
+                cursorcolumn = false,
+                cursorline = false,
+                foldenable = false,
+                linebreak = true,
+                list = false,
+                number = false,
+                relativenumber = false,
+                wrap = true,
+            },
+            left = {
+                enabled = true,
+                scratchPad = {
+                    enabled = false,
+                    pathToFile = "no-neck-pain-left.norg",
+                },
+                colors = { blend = 0 },
+                bo = {
+                    bufhidden = "hide",
+                    buflisted = false,
+                    buftype = "nofile",
+                    filetype = "no-neck-pain",
+                    swapfile = false,
+                },
+                wo = {
+                    colorcolumn = "0",
+                    cursorcolumn = false,
+                    cursorline = false,
+                    foldenable = false,
+                    linebreak = true,
+                    list = false,
+                    number = false,
+                    relativenumber = false,
+                    wrap = true,
+                },
+            },
+            right = {
+                enabled = true,
+                scratchPad = {
+                    enabled = false,
+                    pathToFile = "no-neck-pain-right.norg",
+                },
+                colors = { blend = 0 },
+                bo = {
+                    bufhidden = "hide",
+                    buflisted = false,
+                    buftype = "nofile",
+                    filetype = "no-neck-pain",
+                    swapfile = false,
+                },
+                wo = {
+                    colorcolumn = "0",
+                    cursorcolumn = false,
+                    cursorline = false,
+                    foldenable = false,
+                    linebreak = true,
+                    list = false,
+                    number = false,
+                    relativenumber = false,
+                    wrap = true,
+                },
+            },
+        },
+        integrations = {
+            NeoTree = {
+                position = "left",
+                reopen = true,
+            },
+            NvimDAPUI = {
+                position = "none",
+                reopen = true,
+            },
+            NvimTree = {
+                position = "left",
+                reopen = true,
+            },
+            TSPlayground = {
+                position = "right",
+                reopen = true,
+            },
+            neotest = {
+                position = "right",
+                reopen = true,
+            },
+            undotree = {
+                position = "left",
+            },
+            outline = {
+                position = "right",
+                reopen = true,
+            },
+            aerial = {
+                position = "right",
+                reopen = true,
+            },
+        },
     })
 end
 
@@ -208,14 +346,6 @@ T["setup"]["width - throws with non-supported string"] = function()
     Helpers.expect.error(function()
         child.lua([[require('no-neck-pain').setup({ width = "foo" })]])
     end)
-end
-
-T["setup"]["starts the plugin on VimEnter"] = function()
-    child.restart({ "-u", "scripts/init_auto_open.lua" })
-    child.wait()
-
-    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
-    Helpers.expect.state(child, "enabled", true)
 end
 
 T["enable"] = MiniTest.new_set()
@@ -409,12 +539,6 @@ T["disable"]["(on file) does not close the window if unsaved buffer"] = function
 end
 
 T["disable"]["relative window doesn't prevent quitting nvim"] = function()
-    if child.fn.has("nvim-0.8") == 0 then
-        MiniTest.skip("incline doesn't support version below 8")
-
-        return
-    end
-
     child.restart({ "-u", "scripts/init_with_incline.lua" })
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     child.nnp()

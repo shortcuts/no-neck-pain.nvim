@@ -114,15 +114,108 @@ T["integrations"]["NeoTree throws with wrong values"] = function()
     end)
 end
 
+T["checkhealth"] = MiniTest.new_set()
+
+T["checkhealth"]["state is in sync"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=20}) ]])
+    child.nnp()
+    child.wait()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+    Helpers.expect.state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
+
+    child.cmd("checkhealth")
+    child.wait()
+
+    if child.fn.has("nvim-0.10") == 0 then
+        Helpers.expect.equality(child.get_wins_in_tab(), { 1004 })
+
+        child.nnp()
+        child.wait()
+
+        Helpers.expect.equality(child.get_wins_in_tab(), { 1005, 1004, 1006 })
+        Helpers.expect.state(child, "tabs[2].wins.main", {
+            curr = 1004,
+            left = 1005,
+            right = 1006,
+        })
+    else
+        Helpers.expect.equality(child.get_wins_in_tab(), { 1003 })
+
+        child.nnp()
+        child.wait()
+
+        Helpers.expect.equality(child.get_wins_in_tab(), { 1004, 1003, 1005 })
+        Helpers.expect.state(child, "tabs[2].wins.main", {
+            curr = 1003,
+            left = 1004,
+            right = 1005,
+        })
+    end
+
+    child.cmd("q")
+    child.wait()
+
+    Helpers.expect.state(child, "tabs[2]", vim.NIL)
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+    Helpers.expect.state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
+end
+
+T["checkhealth"]["auto opens side buffers"] = function()
+    child.restart({ "-u", "scripts/init_auto_open.lua" })
+    child.wait()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+    Helpers.expect.state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
+
+    child.cmd("checkhealth")
+    child.wait()
+
+    if child.fn.has("nvim-0.10") == 0 then
+        Helpers.expect.equality(child.get_wins_in_tab(), { 1005, 1004, 1006 })
+        Helpers.expect.state(child, "tabs[2].wins.main", {
+            curr = 1004,
+            left = 1005,
+            right = 1006,
+        })
+    else
+        Helpers.expect.equality(child.get_wins_in_tab(), { 1004, 1003, 1005 })
+        Helpers.expect.state(child, "tabs[2].wins.main", {
+            curr = 1003,
+            left = 1004,
+            right = 1005,
+        })
+    end
+
+    child.cmd("q")
+    child.wait()
+
+    Helpers.expect.state(child, "tabs[2]", vim.NIL)
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+    Helpers.expect.state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
+end
+
 T["nvimdapui"] = MiniTest.new_set()
 
 T["nvimdapui"]["keeps sides open"] = function()
-    if child.fn.has("nvim-0.8") == 0 then
-        MiniTest.skip("NvimDAPUI doesn't support version below 8")
-
-        return
-    end
-
     child.restart({ "-u", "scripts/init_with_nvimdapui.lua" })
 
     child.nnp()
@@ -155,12 +248,6 @@ end
 T["neotest"] = MiniTest.new_set()
 
 T["neotest"]["keeps sides open"] = function()
-    if child.fn.has("nvim-0.8") == 0 then
-        MiniTest.skip("neotest doesn't support version below 8")
-
-        return
-    end
-
     child.restart({ "-u", "scripts/init_with_neotest.lua", "lua/no-neck-pain/main.lua" })
 
     child.nnp()
@@ -181,7 +268,6 @@ T["neotest"]["keeps sides open"] = function()
         fileTypePattern = "neotest",
         id = 1003,
         open = "lua require('neotest').summary.open()",
-        width = 74,
     })
 end
 
@@ -209,7 +295,6 @@ T["outline"]["keeps sides open"] = function()
         fileTypePattern = "outline",
         id = 1004,
         open = "Outline",
-        width = 40,
     })
 end
 
@@ -252,7 +337,6 @@ T["NvimTree"]["keeps sides open"] = function()
         fileTypePattern = "nvimtree",
         id = 1004,
         open = "NvimTreeOpen",
-        width = 38,
     })
 end
 
@@ -290,8 +374,66 @@ T["neo-tree"]["keeps sides open"] = function()
         fileTypePattern = "neo-tree",
         id = 1004,
         open = "Neotree reveal",
-        width = 60,
     })
+
+    child.nnp()
+    child.nnp()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1005, 1004, 1000, 1006 })
+
+    Helpers.expect.state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1005,
+        right = 1006,
+    })
+
+    Helpers.expect.state(child, "tabs[1].wins.columns", 4)
+
+    Helpers.expect.state(child, "tabs[1].wins.integrations.NeoTree", {
+        close = "Neotree close",
+        fileTypePattern = "neo-tree",
+        id = 1004,
+        open = "Neotree reveal",
+    })
+end
+
+T["neo-tree"]["properly enables nnp with tree already opened"] = function()
+    child.restart({ "-u", "scripts/init_with_neotree.lua", "." })
+
+    Helpers.expect.equality(child.get_wins_in_tab(1), { 1002, 1000 })
+
+    child.cmd("e Makefile")
+
+    child.nnp()
+
+    if child.fn.has("nvim-0.10") == 0 then
+        Helpers.expect.equality(child.get_wins_in_tab(), { 1003, 1002, 1000, 1004 })
+    else
+        Helpers.expect.equality(child.get_wins_in_tab(), { 1004, 1002, 1000, 1005 })
+    end
+
+    Helpers.expect.state(child, "enabled", true)
+
+    Helpers.expect.state(child, "tabs[1].wins.integrations.NeoTree", {
+        close = "Neotree close",
+        fileTypePattern = "neo-tree",
+        id = 1002,
+        open = "Neotree reveal",
+    })
+
+    if child.fn.has("nvim-0.10") == 0 then
+        Helpers.expect.state(child, "tabs[1].wins.main", {
+            curr = 1000,
+            left = 1003,
+            right = 1004,
+        })
+    else
+        Helpers.expect.state(child, "tabs[1].wins.main", {
+            curr = 1000,
+            left = 1004,
+            right = 1005,
+        })
+    end
 end
 
 T["TSPlayground"] = MiniTest.new_set()
@@ -327,7 +469,6 @@ T["TSPlayground"]["keeps sides open"] = function()
         fileTypePattern = "tsplayground",
         id = 1004,
         open = "TSPlaygroundToggle",
-        width = 38,
     })
 
     Helpers.expect.state(child, "tabs[1].wins.main", {
@@ -395,7 +536,6 @@ T["TSPlayground"]["reduces `left` side if only active when integration is on `ri
         fileTypePattern = "tsplayground",
         id = 1003,
         open = "TSPlaygroundToggle",
-        width = 52,
     })
     Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,

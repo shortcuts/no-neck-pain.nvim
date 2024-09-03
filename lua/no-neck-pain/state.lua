@@ -1,84 +1,114 @@
-local A = require("no-neck-pain.util.api")
-local Co = require("no-neck-pain.util.constants")
-local D = require("no-neck-pain.util.debug")
+local api = require("no-neck-pain.util.api")
+local constants = require("no-neck-pain.util.constants")
+local log = require("no-neck-pain.util.debug")
 
-local State = { enabled = false, active_tab = A.get_current_tab(), tabs = {} }
+----- default values and toggles =======================================================
+---@private
 
----Sets the state to its original value.
+local state = {
+    enabled = false,
+    active_tab = api.get_current_tab(),
+    tabs = {},
+    disabled_tabs = {},
+    previously_focused_win = vim.api.nvim_get_current_win(),
+}
+
+--- Sets the state to its original value.
 ---
 ---@private
-function State:init()
+function state:init()
     self.enabled = false
-    self.active_tab = A.get_current_tab()
+    self.active_tab = api.get_current_tab()
     self.tabs = {}
 end
 
----Sets the integrations state of the current tab to its original value.
+--- Sets the integrations state of the current tab to its original value.
 ---
 ---@private
-function State:init_integrations()
-    self.tabs[self.active_tab].wins.integrations = vim.deepcopy(Co.INTEGRATIONS)
+function state:init_integrations()
+    self.tabs[self.active_tab].wins.integrations = vim.deepcopy(constants.INTEGRATIONS)
 end
 
----Sets the columns state of the current tab to its original value.
+--- Sets the columns state of the current tab to its original value.
 ---
 ---@private
-function State:init_columns()
+function state:init_columns()
     self.tabs[self.active_tab].wins.columns = 0
 end
 
----Saves the state in the global _G.NoNeckPain.state object.
+--- Saves the state in the global _G.NoNeckPain.state object.
 ---
 ---@private
-function State:save()
+function state:save()
     _G.NoNeckPain.state = self
 end
 
----Gets the columns count in the current layout.
+--- Sets the global state as enabled.
 ---
----@return table: the columns window IDs.
 ---@private
-function State:get_columns()
-    return self.tabs[self.active_tab].wins.columns
+function state:set_enabled()
+    self.enabled = true
 end
 
----Consumes the redraw value in the state, in order to know if we should redraw sides or not.
+----- tab tracker =======================================================
+---@private
+
+--- Whether the `active_tab` is registered in the state and valid.
 ---
 ---@return boolean
 ---@private
-function State:consume_redraw()
-    local redraw = self.tabs[self.active_tab].redraw
-
-    self.tabs[self.active_tab].redraw = false
-
-    return redraw
+function state:is_active_tab_registered()
+    return self.has_tabs(self)
+        and self.tabs[self.active_tab] ~= nil
+        and vim.api.nvim_tabpage_is_valid(self.active_tab)
 end
 
----Whether the side is enabled in the config or not.
+--- Whether there is tabs registered or not.
 ---
----@param side "left"|"right"|"curr": the side of the window.
 ---@return boolean
 ---@private
-function State:is_side_enabled(side)
-    return _G.NoNeckPain.config.buffers[side].enabled
+function state:has_tabs()
+    return self.tabs ~= nil
 end
 
----Gets all integrations.
+--- Sets the active tab.
+---@param id number: the id of the active tab.
 ---
----@return table: the integration infos.
 ---@private
-function State:get_integrations()
-    return self.tabs[self.active_tab].wins.integrations
+function state:set_active_tab(id)
+    self.active_tab = id
 end
 
----Iterates over the tabs in the state to remove invalid tabs.
+--- Gets the tab with the given `id` from the state.
+---
+---@return table: the `tab` information.
+---@private
+function state:get_tab()
+    local id = self.active_tab or api.get_current_tab()
+
+    return self.tabs[id]
+end
+
+--- Gets the tab with the given `id` from the state, safely returns nil if we are not sure it exists.
+---
+---@return table?: the `tab` information, or `nil` if it's not found.
+---@private
+function state:get_tab_safe()
+    if not self.has_tabs(self) then
+        return nil
+    end
+
+    return self.get_tab(self)
+end
+
+--- Iterates over the tabs in the state to remove invalid tabs.
 ---
 ---@param scope string: caller of the method.
 ---@param skip_id number?: the ID to skip from potentially valid tabs.
 ---@return number: the total `tabs` in the state.
 ---@private
-function State:refresh_tabs(scope, skip_id)
-    D.log(scope, "refreshing tabs...")
+function state:refresh_tabs(scope, skip_id)
+    log.debug(scope, "refreshing tabs...")
 
     for _, tab in pairs(self.tabs) do
         if tab.id == skip_id or not vim.api.nvim_tabpage_is_valid(tab.id) then
@@ -95,77 +125,73 @@ function State:refresh_tabs(scope, skip_id)
     return len
 end
 
----Closes side integrations if opened.
+--- Register a new `tab` with the given `id` in the state.
 ---
----@return boolean: whether we closed something or not.
+---@param id number: the id of the tab.
 ---@private
-function State:close_integration()
-    local wins = vim.api.nvim_list_wins()
-    local has_closed_integration = false
+function state:set_tab(id)
+    log.debug("set_tab", "registered new tab %d", id)
 
-    for name, opts in pairs(self.tabs[self.active_tab].wins.integrations) do
-        if opts.id ~= nil and opts.close ~= nil then
-            local scope = string.format("close_integration:%s", name)
-            -- if this integration doesn't belong to any side we don't have to
-            -- close it to redraw side buffers
-            local side = _G.NoNeckPain.config.integrations[name].position
-            if side ~= "left" and side ~= "right" then
-                D.log(scope, "skipped because not a side integration")
-
-                goto continue
-            end
-
-            -- first element in the current wins list means it's the far left one,
-            -- if the integration is already at this spot then we don't have to close anything
-            if side == "left" and wins[1] == self.tabs[self.active_tab].wins.main[side] then
-                D.log(scope, "skipped because already at the far left side")
-
-                goto continue
-            end
-
-            -- last element in the current wins list means it's the far right one,
-            -- if the integration is already at this spot then we don't have to close anything
-            if side == "right" and wins[#wins] == self.tabs[self.active_tab].wins.main[side] then
-                D.log(scope, "skipped because already at the far right side")
-
-                goto continue
-            end
-
-            D.log(string.format("close_integration:%s", name), "integration was opened")
-
-            vim.cmd(opts.close)
-            has_closed_integration = true
-        end
-        ::continue::
-    end
-
-    return has_closed_integration
+    self.tabs[id] = {
+        id = id,
+        scratchpad_enabled = false,
+        wins = {
+            columns = 0,
+            main = {
+                curr = nil,
+                left = nil,
+                right = nil,
+            },
+            integrations = vim.deepcopy(constants.INTEGRATIONS),
+        },
+    }
+    self.active_tab = id
 end
 
----Reopens the integrations if they were previously closed.
----
+----- disabled tabs ====================================================
 ---@private
-function State:reopen_integration()
-    for name, opts in pairs(self.tabs[self.active_tab].wins.integrations) do
-        if
-            opts.id ~= nil
-            and opts.open ~= nil
-            and _G.NoNeckPain.config.integrations[name].reopen == true
-        then
-            D.log(string.format("reopen_integration:%s", name), "integration was closed previously")
 
-            vim.cmd(opts.open)
-        end
-    end
+--- Registers the given `id` as manually disabled tabs.
+---
+---@param id number: the id of the tab.
+---@private
+function state:set_tab_disabled(id)
+    self.disabled_tabs[id] = true
 end
 
----Gets the integration with the given `win` if it's already registered.
+--- Removes the currently active tab from the disabled ones.
+---
+---@private
+function state:remove_active_tab_from_disabled()
+    self.disabled_tabs[self.active_tab] = nil
+end
+
+--- Whether the currently active tab has been manually disabled or not.
+---
+---@return boolean
+---@private
+function state:is_active_tab_disabled()
+    return self.disabled_tabs[self.active_tab]
+end
+
+----- integrations tracker ====================================================
+---@private
+
+--- Gets all integrations.
+---
+---@return table: the integration infos.
+---@private
+function state:get_integrations()
+    return self.tabs[self.active_tab].wins.integrations
+end
+
+--- Gets the integration with the given `win` if it's already registered.
 ---
 ---@param id integer: the integration to search for.
 ---@return string?: the integration name.
 ---@return table?: the integration infos.
 ---@private
-function State:get_integration(id)
+function state:get_integration(id)
     if
         not self.enabled
         or not self.has_tabs(self)
@@ -184,21 +210,7 @@ function State:get_integration(id)
     return nil, nil
 end
 
----Gets wins that are not relative or main wins.
----
----@return table: the list of windows IDs.
----@private
-function State:get_unregistered_wins()
-    return vim.tbl_filter(function(win)
-        return not A.is_relative_window(win)
-            and win ~= self.get_side_id(self, "curr")
-            and win ~= self.get_side_id(self, "left")
-            and win ~= self.get_side_id(self, "right")
-            and not self.is_supported_integration(self, "_", win)
-    end, vim.api.nvim_tabpage_list_wins(self.active_tab))
-end
-
----Whether the given `filetype` matches a supported integration or not.
+--- Whether the given `filetype` matches a supported integration or not.
 ---
 ---@param scope string: caller of the method.
 ---@param win integer?: the id of the win
@@ -206,7 +218,7 @@ end
 ---@return string?: the supported integration name.
 ---@return table?: the supported integration infos.
 ---@private
-function State:is_supported_integration(scope, win)
+function state:is_supported_integration(scope, win)
     win = win or 0
     local tab = self.get_tab_safe(self)
     local buffer = vim.api.nvim_win_get_buf(win)
@@ -214,16 +226,16 @@ function State:is_supported_integration(scope, win)
 
     local integration_name, integration_info = self.get_integration(self, win)
     if integration_name and integration_info then
-        D.log(scope, "integration already registered, skipping computing...")
+        log.debug(scope, "integration already registered, skipping computing...")
 
         return true, integration_name, integration_info
     end
 
-    local registered_integrations = tab ~= nil and tab.wins.integrations or Co.INTEGRATIONS
+    local registered_integrations = tab ~= nil and tab.wins.integrations or constants.INTEGRATIONS
 
     for name, integration in pairs(registered_integrations) do
         if vim.startswith(string.lower(filetype), integration.fileTypePattern) then
-            D.log(scope, "win '%d' is an integration '%s'", win, filetype)
+            log.debug(scope, "win '%d' is an integration '%s'", win, filetype)
 
             if tab ~= nil then
                 return true, name, integration
@@ -236,248 +248,148 @@ function State:is_supported_integration(scope, win)
     return false, nil
 end
 
----Whether the `active_tab` is registered in the state and valid.
----
----@return boolean
+----- side buffers =======================================================
 ---@private
-function State:is_active_tab_registered()
-    return self.has_tabs(self)
-        and self.tabs[self.active_tab] ~= nil
-        and vim.api.nvim_tabpage_is_valid(self.active_tab)
-end
 
----Returns true if the win isn't registered, or if it is and valid, false otherwise.
----
----@param side "left"|"right": the side of the window.
----@return boolean
----@private
-function State:is_side_win_enabled_and_valid(side)
-    if not self.is_side_enabled(self, side) then
-        return true
-    end
-
-    local id = self.get_side_id(self, side)
-
-    return id ~= nil and vim.api.nvim_win_is_valid(id)
-end
-
----Whether the side window is registered and a valid window.
+--- Whether the side is enabled in the config or not.
 ---
 ---@param side "left"|"right"|"curr": the side of the window.
 ---@return boolean
 ---@private
-function State:is_side_win_valid(side)
+function state:is_side_enabled(side)
+    return _G.NoNeckPain.config.buffers[side].enabled
+end
+
+--- Returns true if the win isn't registered, or if it is and valid, false otherwise.
+---
+---@param side "left"|"right": the side of the window.
+---@return boolean
+---@private
+function state:is_side_enabled_or_valid(side)
+    if not self.is_side_enabled(self, side) then
+        return true
+    end
+
+    return self.is_side_win_valid(self, side)
+end
+
+--- Whether the side window is registered and a valid window.
+---
+---@param side "left"|"right"|"curr": the side of the window.
+---@return boolean
+---@private
+function state:is_side_enabled_and_valid(side)
     if side ~= "curr" and not self.is_side_enabled(self, side) then
         return false
     end
 
+    return self.is_side_win_valid(self, side)
+end
+
+--- Whether the side window a valid window.
+---
+---@param side "left"|"right"|"curr": the side of the window.
+---@return boolean
+---@private
+function state:is_side_win_valid(side)
     local id = self.get_side_id(self, side)
 
     return id ~= nil and vim.api.nvim_win_is_valid(id)
 end
 
----Whether the sides window are registered and enabled in the config or not.
+--- Whether the side window is the currently active one or not.
+---
+---@param side "left"|"right"|"curr": the side of the window.
+---@return boolean
+---@private
+function state:is_side_the_active_win(side)
+    return vim.api.nvim_get_current_win() == self.get_side_id(self, side)
+end
+
+--- Returns the ID of the given `side`.
+---
+---@param side "left"|"right"|"curr": the side of the window.
+---@return number
+---@private
+function state:get_side_id(side)
+    return self.tabs[self.active_tab].wins.main[side]
+end
+
+--- Sets the ID of the given `side`.
+---
+---@param id number?: the id of the window.
+---@param side "left"|"right"|"curr": the side of the window.
+---@private
+function state:set_side_id(id, side)
+    self.tabs[self.active_tab].wins.main[side] = id
+end
+
+--- Whether the sides window are registered and enabled in the config or not.
 ---
 ---@param condition "or"|"and"
 ---@param expected boolean
 ---@return boolean
 ---@private
-function State:check_sides(condition, expected)
+function state:check_sides(condition, expected)
     if condition == "or" then
-        return self.is_side_win_valid(self, "left") == expected
-            or self.is_side_win_valid(self, "right") == expected
+        return self.is_side_enabled_and_valid(self, "left") == expected
+            or self.is_side_enabled_and_valid(self, "right") == expected
     end
 
-    return self.is_side_win_valid(self, "left") == expected
-        and self.is_side_win_valid(self, "right") == expected
+    return self.is_side_enabled_and_valid(self, "left") == expected
+        and self.is_side_enabled_and_valid(self, "right") == expected
 end
 
----Whether the side window is the currently active one or not.
+--- Gets wins that are not relative or main wins.
 ---
----@param side "left"|"right"|"curr": the side of the window.
----@return boolean
+---@param scope string: caller of the method.
+---@return table: the list of windows IDs.
 ---@private
-function State:is_side_the_active_win(side)
-    return vim.api.nvim_get_current_win() == self.get_side_id(self, side)
+function state:get_unregistered_wins(scope)
+    return vim.tbl_filter(function(win)
+        return not api.is_relative_window(win)
+            and win ~= self.get_side_id(self, "curr")
+            and win ~= self.get_side_id(self, "left")
+            and win ~= self.get_side_id(self, "right")
+            and not self.is_supported_integration(self, scope, win)
+    end, vim.api.nvim_tabpage_list_wins(self.active_tab))
 end
 
----Whether there is tabs registered or not.
+----- layout =======================================================
+---@private
+
+--- Gets the columns count in the current layout.
 ---
----@return boolean
+---@return table: the columns window IDs.
 ---@private
-function State:has_tabs()
-    return self.tabs ~= nil
+function state:get_columns()
+    return self.tabs[self.active_tab].wins.columns
 end
 
----Whether there is integrations registered in the active tab or not.
----
----@return boolean
----@private
-function State:has_integrations()
-    if not self.has_tabs(self) then
-        return false
-    end
-
-    for _, integration in pairs(self.tabs[self.active_tab].wins.integrations) do
-        if integration.id ~= nil then
-            return true
-        end
-    end
-
-    return false
-end
-
----Whether the user wants both sides to be opened or not.
+--- Consumes the redraw value in the state, in order to know if we should redraw sides or not.
 ---
 ---@return boolean
 ---@private
-function State:wants_sides()
-    return _G.NoNeckPain.config.buffers.left.enabled and _G.NoNeckPain.config.buffers.right.enabled
+function state:consume_redraw()
+    local redraw = self.tabs[self.active_tab].redraw
+
+    self.tabs[self.active_tab].redraw = false
+
+    return redraw
 end
 
----Returns the ID of the given `side`.
----
----@param side "left"|"right"|"curr": the side of the window.
----@return number
----@private
-function State:get_side_id(side)
-    return self.tabs[self.active_tab].wins.main[side]
-end
-
----Sets the ID of the given `side`.
----
----@param id number?: the id of the window.
----@param side "left"|"right"|"curr": the side of the window.
----@private
-function State:set_side_id(id, side)
-    self.tabs[self.active_tab].wins.main[side] = id
-end
-
----Sets the global state as enabled.
----
----@private
-function State:set_enabled()
-    self.enabled = true
-end
-
----Creates a namespace for the given `side` and stores it in the state.
----
----@param side "left"|"right": the side.
----@return number: the created namespace id.
----@return string: the name of the created namespace.
----@private
-function State:set_namespace(side)
-    if self.namespaces == nil then
-        self.namespaces = {}
-    end
-
-    local name = string.format("NoNeckPain_tab_%s_side_%s", self.active_tab, side)
-    local id = vim.api.nvim_create_namespace(name)
-
-    self.namespaces[side] = id
-
-    return id, name
-end
-
----Clears the given `side` namespace and resets its state value.
----
----@param bufnr number: the buffer number.
----@param side "left"|"right": the side.
----@private
-function State:remove_namespace(bufnr, side)
-    if self.namespaces == nil or self.namespaces[side] == nil then
-        return
-    end
-
-    if not vim.api.nvim_buf_is_valid(bufnr) then
-        return
-    end
-
-    vim.api.nvim_buf_clear_namespace(bufnr, self.namespaces[side], 0, -1)
-end
-
----Sets the active tab.
----@param id number: the id of the active tab.
----
----@private
-function State:set_active_tab(id)
-    self.active_tab = id
-end
-
----Gets the tab with the given `id` from the state.
----
----@return table: the `tab` information.
----@private
-function State:get_tab()
-    local id = self.active_tab or A.get_current_tab()
-
-    return self.tabs[id]
-end
-
----Gets the tab with the given `id` from the state, safely returns nil if we are not sure it exists.
----
----@return table?: the `tab` information, or `nil` if it's not found.
----@private
-function State:get_tab_safe()
-    if not self.has_tabs(self) then
-        return nil
-    end
-
-    return self.get_tab(self)
-end
-
----Sets the given `bool` value to the active tab scratchPad.
----
----@param bool boolean: the value of the scratchPad.
----@private
-function State:set_scratchPad(bool)
-    self.tabs[self.active_tab].scratchpad_enabled = bool
-end
-
----Gets the scratchPad value for the active tab.
----
----@return boolean: the value of the scratchPad.
----@private
-function State:get_scratchPad()
-    return self.tabs[self.active_tab].scratchpad_enabled
-end
-
----Register a new `tab` with the given `id` in the state.
----
----@param id number: the id of the tab.
----@private
-function State:set_tab(id)
-    D.log("set_tab", "registered new tab %d", id)
-
-    self.tabs[id] = {
-        id = id,
-        scratchpad_enabled = false,
-        wins = {
-            columns = 0,
-            main = {
-                curr = nil,
-                left = nil,
-                right = nil,
-            },
-            integrations = vim.deepcopy(Co.INTEGRATIONS),
-        },
-    }
-    self.active_tab = id
-end
-
----Increases the columns if the encountered window of the given table is not an integration, otherwise sets the integration.
----When a column in encountered, it counts for a column but we don't consider its child windows, it will be walked in at a later time.
+--- Increases the columns if the encountered window of the given table is not an integration, otherwise sets the integration.
+--- When a column in encountered, it counts for a column but we don't consider its child windows, it will be walked in at a later time.
 ---
 ---@param scope string: the caller of the method.
 ---@param wins table: the layout windows.
 ---@private
-function State:set_layout_windows(scope, wins)
+function state:set_layout_windows(scope, wins)
     for _, win in ipairs(wins) do
         local id = win[2]
-        if win[1] == "leaf" and not A.is_relative_window(id) then
+        if win[1] == "leaf" and not api.is_relative_window(id) then
             local supported, name, integration = self.is_supported_integration(self, scope, id)
             if supported and name and integration then
-                integration.width = vim.api.nvim_win_get_width(id) * 2
                 integration.id = id
 
                 self.tabs[self.active_tab].redraw = true
@@ -490,17 +402,17 @@ function State:set_layout_windows(scope, wins)
     end
 end
 
----Recursively walks in the `winlayout` until it has computed every column present.
+--- Recursively walks in the `winlayout` until it has computed every column present.
 ---
----When a leaf is 'col', we walk in the next element (its windows), and keep track of the previous 'col' origin in order to deduce it from the potential 'row'.
----When a leaf is 'row', if we had a column previously, we remove 1 element from the next element (its windows), because at least 1 window is also part of this column. If there was no column, we consider every leafs in the row.
----When a leaf is a table that contains a 'col' or 'row', we directly walk in it.
+--- When a leaf is 'col', we walk in the next element (its windows), and keep track of the previous 'col' origin in order to deduce it from the potential 'row'.
+--- When a leaf is 'row', if we had a column previously, we remove 1 element from the next element (its windows), because at least 1 window is also part of this column. If there was no column, we consider every leafs in the row.
+--- When a leaf is a table that contains a 'col' or 'row', we directly walk in it.
 ---
 ---@param scope string: the caller of the method.
 ---@param tree table: the tree to walk in.
 ---@param has_col_parent boolean: whether or not the previous walked tree was a column.
 ---@private
-function State:walk_layout(scope, tree, has_col_parent)
+function state:walk_layout(scope, tree, has_col_parent)
     -- col -- represents a vertical association of window, e.g. { { "leaf", int }, { "col", { ... } }, { "row", { ...} } }
     -- row -- represents an horizontal association of window, e.g  { { "leaf", int }, { "col", { ... } }, { "row", { ...} } }
     -- leaf -- represents a window, e.g. { "leaf", int }
@@ -509,7 +421,7 @@ function State:walk_layout(scope, tree, has_col_parent)
         return
     end
 
-    -- D.log(scope, "new layer entered%s: %s", has_col_parent and " from col" or "", vim.inspect(tree))
+    -- log.debug(scope, "new layer entered%s: %s", has_col_parent and " from col" or "", vim.inspect(tree))
     for idx, leaf in ipairs(tree) do
         if leaf == "row" then
             local leafs = tree[idx + 1]
@@ -527,12 +439,12 @@ function State:walk_layout(scope, tree, has_col_parent)
     end
 end
 
----Scans the winlayout in order to identify window position and type.
+--- Scans the winlayout in order to identify window position and type.
 ---
 ---@param scope string: the caller of the method.
 ---@return boolean: whether the number of columns changed or not.
 ---@private
-function State:scan_layout(scope)
+function state:scan_layout(scope)
     local columns = self.get_columns(self)
 
     self.init_columns(self)
@@ -540,26 +452,111 @@ function State:scan_layout(scope)
 
     local layout = vim.fn.winlayout(self.active_tab)
 
-    -- basically when opening vim with nnp autocmds, nothing else than a curr window
+    -- when opening vim with nnp autocmds, nothing else than a curr window
     if layout[1] == "leaf" then
         self.set_layout_windows(self, scope, { layout })
-    -- when a helper or vsplit takes most of the width
+    -- when:
+    -- - nnp is opened with an active column of splits opened (leafOnly)
+    -- - opening a help or qflist window that takes full width
     elseif layout[1] == "col" and vim.tbl_count(layout) == 2 then
-        self.walk_layout(self, scope, layout[2], false)
+        local leafOnly = true
+        for _, sub in ipairs(layout[2]) do
+            if sub[1] ~= "leaf" then
+                leafOnly = false
+                break
+            end
+        end
+
+        if leafOnly then
+            self.walk_layout(self, scope, { "row", layout[2] }, true)
+        else
+            self.walk_layout(self, scope, layout[2], false)
+        end
     else
         self.walk_layout(self, scope, layout, false)
     end
     self.save(self)
 
-    D.log(
-        scope,
-        "[tab %d] computed columns: %d - %d",
-        self.active_tab,
-        columns,
-        self.get_columns(self)
-    )
+    log.debug(scope, "computed columns: %d - %d", columns, self.get_columns(self))
 
     return columns ~= self.get_columns(self)
 end
 
-return State
+----- namespace =======================================================
+---@private
+
+--- Creates a namespace for the given `side` and stores it in the state.
+---
+---@param side "left"|"right": the side.
+---@return number: the created namespace id.
+---@return string: the name of the created namespace.
+---@private
+function state:set_namespace(side)
+    if self.namespaces == nil then
+        self.namespaces = {}
+    end
+
+    local name = string.format("NoNeckPain_tab_%s_side_%s", self.active_tab, side)
+    local id = vim.api.nvim_create_namespace(name)
+
+    self.namespaces[side] = id
+
+    return id, name
+end
+
+--- Clears the given `side` namespace and resets its state value.
+---
+---@param bufnr number: the buffer number.
+---@param side "left"|"right": the side.
+---@private
+function state:remove_namespace(bufnr, side)
+    if self.namespaces == nil or self.namespaces[side] == nil then
+        return
+    end
+
+    if not vim.api.nvim_buf_is_valid(bufnr) then
+        return
+    end
+
+    vim.api.nvim_buf_clear_namespace(bufnr, self.namespaces[side], 0, -1)
+end
+
+----- scratchpad =======================================================
+---@private
+
+--- Sets the given `bool` value to the active tab scratchPad.
+---
+---@param bool boolean: the value of the scratchPad.
+---@private
+function state:set_scratchPad(bool)
+    self.tabs[self.active_tab].scratchpad_enabled = bool
+end
+
+--- Gets the scratchPad value for the active tab.
+---
+---@return boolean: the value of the scratchPad.
+---@private
+function state:get_scratchPad()
+    return self.tabs[self.active_tab].scratchpad_enabled
+end
+
+----- focused win tacker =======================================================
+---@private
+
+--- Sets the given `id` as the previously focused window.
+---
+---@param id number
+---@private
+function state:set_previously_focused_win(id)
+    self.previously_focused_win = id
+end
+
+--- Gets the previously focused win id.
+---
+---@return number
+---@private
+function state:get_previously_focused_win()
+    return self.previously_focused_win
+end
+
+return state
