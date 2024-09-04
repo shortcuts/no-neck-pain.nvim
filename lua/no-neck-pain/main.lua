@@ -133,19 +133,7 @@ function main.init(scope, go_to_curr)
     -- if we still have side buffers open at this point, and we have vsplit opened,
     -- there might be width issues so we the resize_win opened vsplits.
     if state.check_sides(state, "or", true) and state.get_columns(state) > 1 then
-        log.debug("resize_win", "have %d columns", state.get_columns(state))
-
-        for _, win in pairs(state.get_unregistered_wins(state, scope)) do
-            ui.resize_win(win, _G.NoNeckPain.config.width, string.format("win:%d", win))
-        end
-
-        if not had_side_buffers then
-            ui.resize_win(
-                state.get_side_id(state, "curr"),
-                _G.NoNeckPain.config.width,
-                string.format("win:%d", state.get_side_id(state, "curr"))
-            )
-        end
+        state.walk_layout(state, scope, vim.fn.winlayout(state.active_tab), false, true)
     end
 
     state.save(state)
