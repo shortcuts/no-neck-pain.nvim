@@ -125,8 +125,9 @@ function main.init(scope)
         vim.api.nvim_set_current_win(state.get_side_id(state, "curr"))
 
         if
-            state.active_tab
-            == vim.api.nvim_win_get_tabpage(state.get_previously_focused_win(state))
+            vim.api.nvim_win_is_valid(state.get_previously_focused_win(state))
+            and state.active_tab
+                == vim.api.nvim_win_get_tabpage(state.get_previously_focused_win(state))
         then
             vim.api.nvim_set_current_win(state.get_previously_focused_win(state))
         end

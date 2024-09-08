@@ -43,8 +43,6 @@ function ui.move_sides(scope)
             local curr = vim.api.nvim_get_current_win()
 
             if curr ~= id then
-                log.debug(sscope, "wrong win focused %d re-routing to %d", curr, id)
-
                 vim.api.nvim_set_current_win(id)
             end
 
