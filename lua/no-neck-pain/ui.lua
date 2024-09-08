@@ -34,8 +34,6 @@ function ui.move_sides(scope)
         right = vim.api.nvim_replace_termcodes("normal <C-W>L", true, false, true),
     }
 
-    local restore_focus = false
-
     for side, keys in pairs(sides) do
         local sscope = string.format("%s:%s", scope, side)
 
@@ -63,13 +61,7 @@ function ui.move_sides(scope)
                     vim.inspect(wins)
                 )
             end
-
-            restore_focus = true
         end
-    end
-
-    if restore_focus and state.get_side_id(state, "curr") ~= nil then
-        vim.api.nvim_set_current_win(state.get_side_id(state, "curr"))
     end
 end
 
@@ -237,7 +229,7 @@ function ui.get_side_width(side)
 
     log.debug(
         scope,
-        "%d/%d after integrations - %d columns remaining after removing integrations",
+        "%d/%d after integrations - %d columns remaining",
         occupied,
         vim.o.columns,
         columns

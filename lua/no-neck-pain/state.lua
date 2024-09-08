@@ -340,6 +340,18 @@ function state:check_sides(condition, expected)
         and self.is_side_enabled_and_valid(self, "right") == expected
 end
 
+--- Returns the number of enabled and valid sides.
+---
+---@return number
+---@private
+function state:get_nb_sides()
+    if self.is_side_enabled(self, "left") and self.is_side_enabled(self, "right") then
+        return 2
+    end
+
+    return 1
+end
+
 --- Gets wins that are not relative or main wins.
 ---
 ---@param scope string: caller of the method.
@@ -455,7 +467,6 @@ function state:walk_layout(scope, tree, has_col_parent, resize_only)
                         and not self.is_supported_integration(self, scope, id)
                     then
                         self.resize_win(self, id, _G.NoNeckPain.config.width, "unregistered")
-                        break
                     end
                 end
             end

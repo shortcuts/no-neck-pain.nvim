@@ -45,7 +45,7 @@ function NoNeckPain.resize(width)
         _G.NoNeckPain.config = vim.tbl_deep_extend("keep", { width = width }, _G.NoNeckPain.config)
     end
 
-    main.init("public_api_resize", false)
+    main.init("public_api_resize")
 end
 
 --- Toggles the config `${side}.enabled` and re-inits the plugin.
