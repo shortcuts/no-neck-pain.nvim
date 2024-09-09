@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [2.0.1](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.0.0...v2.0.1) (2024-09-09)
+
+
+### Bug Fixes
+
+* **split:** vsplits integration resize inconsistencies ([#391](https://github.com/shortcuts/no-neck-pain.nvim/issues/391)) ([09736f4](https://github.com/shortcuts/no-neck-pain.nvim/commit/09736f4a1d11c2746dc6538986a2ded097e4fbdd))
+
 ## [2.0.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v1.16.1...v2.0.0) (2024-09-03)
 
 There should be no breaking changes in this new major, however a lot of behavioral changes (for the better!). Thanks for using the plugin :)
