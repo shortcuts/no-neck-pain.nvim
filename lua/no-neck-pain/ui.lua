@@ -6,20 +6,6 @@ local state = require("no-neck-pain.state")
 
 local ui = {}
 
---- Resizes a window if it's valid.
----
----@param id number: the id of the window.
----@param width number: the width to apply to the window.
----@param side "left"|"right"|"curr"|"unregistered": the side of the window being resized, used for logging only.
----@private
-function ui.resize_win(id, width, side)
-    log.debug(side, "resizing %d with padding %d", id, width)
-
-    if vim.api.nvim_win_is_valid(id) then
-        vim.api.nvim_win_set_width(id, width)
-    end
-end
-
 --- Initializes the given `side` with the options from the user given configuration.
 ---@param side "left"|"right"|"curr": the side of the window to initialize.
 ---@param id number: the id of the window.
@@ -48,8 +34,6 @@ function ui.move_sides(scope)
         right = vim.api.nvim_replace_termcodes("normal <C-W>L", true, false, true),
     }
 
-    local restore_focus = false
-
     for side, keys in pairs(sides) do
         local sscope = string.format("%s:%s", scope, side)
 
@@ -59,8 +43,6 @@ function ui.move_sides(scope)
             local curr = vim.api.nvim_get_current_win()
 
             if curr ~= id then
-                log.debug(sscope, "wrong win focused %d re-routing to %d", curr, id)
-
                 vim.api.nvim_set_current_win(id)
             end
 
@@ -77,13 +59,7 @@ function ui.move_sides(scope)
                     vim.inspect(wins)
                 )
             end
-
-            restore_focus = true
         end
-    end
-
-    if restore_focus and state.get_side_id(state, "curr") ~= nil then
-        vim.api.nvim_set_current_win(state.get_side_id(state, "curr"))
     end
 end
 
@@ -197,7 +173,7 @@ function ui.create_side_buffers()
             local padding = wins[side].padding or ui.get_side_width(side)
 
             if padding > _G.NoNeckPain.config.minSideBufferWidth then
-                ui.resize_win(state.get_side_id(state, side), padding, side)
+                state.resize_win(state, state.get_side_id(state, side), padding, side)
             else
                 ui.close_win("ui.create_side_buffers", state.get_side_id(state, side), side)
                 state.set_side_id(state, nil, side)
@@ -224,46 +200,53 @@ function ui.get_side_width(side)
     local columns = state.get_columns(state)
 
     for _, s in ipairs(constants.SIDES) do
+        -- remove sides but always keep 1 column for the curr, which will be computed with "splits"
         if state.is_side_enabled_and_valid(state, s) and columns > 1 then
             columns = columns - 1
         end
     end
 
-    -- we need to see if there's enough space left to have side buffers
-    local occupied = _G.NoNeckPain.config.width * columns
+    local occupied = 0
 
-    log.debug(scope, "have %d columns", columns)
+    -- remove width of registered integrations to the correct side
+    for name, opts in pairs(state.get_integrations(state)) do
+        if opts.id ~= nil then
+            if
+                not state.is_side_enabled_and_valid(state, side)
+                or side == _G.NoNeckPain.config.integrations[name].position
+            then
+                local integration_width = vim.api.nvim_win_get_width(opts.id)
+                log.debug(scope, "%s opened with width %d", name, integration_width)
 
-    -- if there's no space left according to the config width,
+                occupied = occupied + integration_width
+            end
+
+            columns = columns - 1
+        end
+    end
+
+    log.debug(
+        scope,
+        "%d/%d after integrations - %d columns remaining",
+        occupied,
+        vim.o.columns,
+        columns
+    )
+
+    while columns > 0 do
+        occupied = occupied + _G.NoNeckPain.config.width
+        columns = columns - 1
+    end
     -- then we don't have to create side buffers.
     if occupied >= vim.o.columns then
-        log.debug(scope, "%d occupied - no space left to create side", occupied)
+        log.debug(scope, "%d/%d - no space left to create side", occupied, vim.o.columns)
 
         return 0
     end
 
-    log.debug(scope, "%d/%d with columns, computing integrations", occupied, vim.o.columns)
-
-    -- now we need to determine how much we should substract from the remaining padding
-    -- if there's side integrations open.
-    for name, opts in pairs(state.get_integrations(state)) do
-        if
-            opts.id ~= nil
-            and (
-                not state.is_side_enabled_and_valid(state, side)
-                or side == _G.NoNeckPain.config.integrations[name].position
-            )
-        then
-            local integration_width = vim.api.nvim_win_get_width(opts.id)
-            log.debug(scope, "%s opened with width %d", name, integration_width)
-
-            occupied = occupied + integration_width
-        end
-    end
-
     local final = math.floor((vim.o.columns - occupied) / 2)
 
-    log.debug(scope, "%d/%d with integrations - final %d", occupied, vim.o.columns, final)
+    log.debug(scope, "%d/%d after splits - final %d", occupied, vim.o.columns, final)
 
     return final
 end

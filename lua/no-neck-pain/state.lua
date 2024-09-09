@@ -340,6 +340,18 @@ function state:check_sides(condition, expected)
         and self.is_side_enabled_and_valid(self, "right") == expected
 end
 
+--- Returns the number of enabled and valid sides.
+---
+---@return number
+---@private
+function state:get_nb_sides()
+    if self.is_side_enabled(self, "left") and self.is_side_enabled(self, "right") then
+        return 2
+    end
+
+    return 1
+end
+
 --- Gets wins that are not relative or main wins.
 ---
 ---@param scope string: caller of the method.
@@ -348,7 +360,6 @@ end
 function state:get_unregistered_wins(scope)
     return vim.tbl_filter(function(win)
         return not api.is_relative_window(win)
-            and win ~= self.get_side_id(self, "curr")
             and win ~= self.get_side_id(self, "left")
             and win ~= self.get_side_id(self, "right")
             and not self.is_supported_integration(self, scope, win)
@@ -357,6 +368,20 @@ end
 
 ----- layout =======================================================
 ---@private
+
+--- Resizes a window if it's valid.
+---
+---@param id number: the id of the window.
+---@param width number: the width to apply to the window.
+---@param side "left"|"right"|"curr"|"unregistered": the side of the window being resized, used for logging only.
+---@private
+function state:resize_win(id, width, side)
+    log.debug(side, "resizing %d with padding %d", id, width)
+
+    if vim.api.nvim_win_is_valid(id) then
+        vim.api.nvim_win_set_width(id, width)
+    end
+end
 
 --- Gets the columns count in the current layout.
 ---
@@ -411,8 +436,9 @@ end
 ---@param scope string: the caller of the method.
 ---@param tree table: the tree to walk in.
 ---@param has_col_parent boolean: whether or not the previous walked tree was a column.
+---@param resize_only boolean?: walks the layout in order to find columns, but only resize 1 window of each column
 ---@private
-function state:walk_layout(scope, tree, has_col_parent)
+function state:walk_layout(scope, tree, has_col_parent, resize_only)
     -- col -- represents a vertical association of window, e.g. { { "leaf", int }, { "col", { ... } }, { "row", { ...} } }
     -- row -- represents an horizontal association of window, e.g  { { "leaf", int }, { "col", { ... } }, { "row", { ...} } }
     -- leaf -- represents a window, e.g. { "leaf", int }
@@ -425,16 +451,29 @@ function state:walk_layout(scope, tree, has_col_parent)
     for idx, leaf in ipairs(tree) do
         if leaf == "row" then
             local leafs = tree[idx + 1]
-            -- if on a row we were on a col, then it means one iteam of the row must be of the same width as a col one
-            if has_col_parent and vim.tbl_count(leafs) > 1 then
-                table.remove(leafs, 1)
+            if not resize_only then
+                -- if on a row we were on a col, then it means one iteam of the row must be of the same width as a col one
+                if has_col_parent and vim.tbl_count(leafs) > 1 then
+                    table.remove(leafs, 1)
+                end
+                self.set_layout_windows(self, scope, leafs)
+            else
+                for _, sub_leaf in ipairs(leafs) do
+                    local id = sub_leaf[2]
+                    if
+                        sub_leaf[1] == "leaf"
+                        and self.get_side_id(self, "left") ~= id
+                        and self.get_side_id(self, "right") ~= id
+                    then
+                        self.resize_win(self, id, _G.NoNeckPain.config.width, "unregistered")
+                    end
+                end
             end
-            self.set_layout_windows(self, scope, leafs)
-            self.walk_layout(self, scope, tree[idx + 1], false)
+            self.walk_layout(self, scope, tree[idx + 1], false, resize_only)
         elseif leaf == "col" then
-            self.walk_layout(self, scope, tree[idx + 1], true)
+            self.walk_layout(self, scope, tree[idx + 1], true, resize_only)
         elseif type(leaf) == "table" and type(leaf[1]) == "string" then
-            self.walk_layout(self, scope, leaf, has_col_parent)
+            self.walk_layout(self, scope, leaf, has_col_parent, resize_only)
         end
     end
 end
