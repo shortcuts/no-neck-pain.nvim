@@ -48,8 +48,6 @@ function ui.move_sides(scope)
 
             vim.cmd(keys)
 
-            wins = vim.api.nvim_tabpage_list_wins(state.active_tab)
-
             if (side == "left" and wins[1] ~= id) or (side == "right" and wins[#wins] ~= id) then
                 log.debug(
                     sscope,

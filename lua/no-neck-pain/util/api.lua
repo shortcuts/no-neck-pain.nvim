@@ -165,11 +165,12 @@ end
 ---@param start_idx number: the idx to start from in `wins`.
 ---@param step -1|1: the walk direction in `wins`, from `start_idx`.
 ---@param wins table: the table of wins ids to walk in.
----@param current_side number: the `left` or `right` side id..
----@param other_side number: the `left` or `right` side id..
+---@param current_side number: the `left` or `right` side id.
+---@param other_side number: the `left` or `right` side id.
+---@param previously_focused number: the previously focused window.
 ---@return number?
 ---@private
-function api.find_next_side_idx(start_idx, step, wins, current_side, other_side)
+function api.find_next_side_idx(start_idx, step, wins, current_side, other_side, previously_focused)
     local n = #wins
 
     for k = 1, n do
@@ -179,6 +180,7 @@ function api.find_next_side_idx(start_idx, step, wins, current_side, other_side)
         if
             not api.is_side_id(current_side, wins[index])
             and not api.is_side_id(other_side, wins[index])
+            and wins[index] ~= previously_focused
         then
             return index
         end
