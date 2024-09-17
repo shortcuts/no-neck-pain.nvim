@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [2.0.2](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.0.1...v2.0.2) (2024-09-17)
+
+
+### Bug Fixes
+
+* **autocmds:** prevent stucked focus on skip enter ([#394](https://github.com/shortcuts/no-neck-pain.nvim/issues/394)) ([974216f](https://github.com/shortcuts/no-neck-pain.nvim/commit/974216f8d143ac1a74e70586bea6b1aac00eac9a))
+
 ## [2.0.1](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.0.0...v2.0.1) (2024-09-09)
 
 
