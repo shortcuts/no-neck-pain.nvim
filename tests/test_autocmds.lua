@@ -222,4 +222,24 @@ T["skipEnteringNoNeckPainBuffer"]["does not register if scratchPad feature is en
     Helpers.expect.equality(child.api.nvim_get_current_win(), 1001)
 end
 
+T["skipEnteringNoNeckPainBuffer"]["one side only + full width split doesn't bring back to original position"] = function()
+    child.lua(
+        [[ require('no-neck-pain').setup({width=50, autocmds = { skipEnteringNoNeckPainBuffer = true }, buffers = { right = { enabled = false }}}) ]]
+    )
+    child.nnp()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000 })
+    Helpers.expect.equality(child.api.nvim_get_current_win(), 1000)
+
+    child.cmd("botright new")
+    child.wait()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+    Helpers.expect.equality(child.api.nvim_get_current_win(), 1002)
+
+    child.fn.win_gotoid(1001)
+    child.wait()
+    Helpers.expect.equality(child.api.nvim_get_current_win(), 1000)
+end
+
 return T

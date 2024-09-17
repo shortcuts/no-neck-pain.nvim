@@ -339,7 +339,7 @@ function main.enable(scope)
                 end
 
                 local current_side = vim.api.nvim_get_current_win()
-                local other_side = state.get_side_id(state, "right")
+                local other_side
                 local left_id = state.get_side_id(state, "left")
                 local right_id = state.get_side_id(state, "right")
 
@@ -361,19 +361,33 @@ function main.enable(scope)
 
                 for i = 1, #wins do
                     if api.is_side_id(current_side, wins[i]) then
-                        idx = api.find_next_side_idx(i - 1, -1, wins, current_side, other_side)
+                        idx = api.find_next_side_idx(
+                            i - 1,
+                            -1,
+                            wins,
+                            current_side,
+                            other_side,
+                            state.get_previously_focused_win(state)
+                        )
                         break
                     elseif api.is_side_id(state.get_previously_focused_win(state), wins[i]) then
-                        idx = api.find_next_side_idx(i + 1, 1, wins, current_side, other_side)
+                        idx = api.find_next_side_idx(
+                            i + 1,
+                            1,
+                            wins,
+                            current_side,
+                            other_side,
+                            state.get_previously_focused_win(state)
+                        )
                         break
                     end
                 end
 
-                if idx then
-                    vim.api.nvim_set_current_win(wins[idx])
+                local new_focus = wins[idx] or state.get_previously_focused_win(state)
 
-                    return log.debug(p.event, "rerouted focus of %d to %d", current_side, wins[idx])
-                end
+                vim.api.nvim_set_current_win(new_focus)
+
+                return log.debug(p.event, "rerouted focus of %d to %d", current_side, new_focus)
             end)
         end,
         group = augroup_name,
