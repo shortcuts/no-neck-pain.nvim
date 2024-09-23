@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [2.0.3](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.0.2...v2.0.3) (2024-09-23)
+
+
+### Bug Fixes
+
+* **buffers:** compute width before creating sides ([#397](https://github.com/shortcuts/no-neck-pain.nvim/issues/397)) ([3f69467](https://github.com/shortcuts/no-neck-pain.nvim/commit/3f694679fb59611677a226d0c4a534e2348050c2))
+
 ## [2.0.2](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.0.1...v2.0.2) (2024-09-17)
 
 
