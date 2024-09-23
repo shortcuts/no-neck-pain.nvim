@@ -128,14 +128,12 @@ end
 ---@private
 function ui.create_side_buffers()
     local wins = {
-        left = { cmd = "topleft vnew", padding = 0 },
-        right = { cmd = "botright vnew", padding = 0 },
+        left = { cmd = "topleft vnew", padding = ui.get_side_width("left") },
+        right = { cmd = "botright vnew", padding = ui.get_side_width("right") },
     }
 
     for _, side in pairs(constants.SIDES) do
         if _G.NoNeckPain.config.buffers[side].enabled then
-            wins[side].padding = ui.get_side_width(side)
-
             if
                 wins[side].padding > _G.NoNeckPain.config.minSideBufferWidth
                 and not state.is_side_enabled_and_valid(state, side)
@@ -235,6 +233,7 @@ function ui.get_side_width(side)
         occupied = occupied + _G.NoNeckPain.config.width
         columns = columns - 1
     end
+
     -- then we don't have to create side buffers.
     if occupied >= vim.o.columns then
         log.debug(scope, "%d/%d - no space left to create side", occupied, vim.o.columns)
