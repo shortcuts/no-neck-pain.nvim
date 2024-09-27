@@ -154,10 +154,12 @@ function main.enable(scope)
         return
     end
 
-    log.debug(scope, "calling enable for tab %d", api.get_current_tab())
+    state.set_active_tab(state, api.get_current_tab())
+
+    log.debug(scope, "calling enable for tab %d", state.active_tab)
 
     state.set_enabled(state)
-    state.set_tab(state, api.get_current_tab())
+    state.set_tab(state, state.active_tab)
 
     local augroup_name = api.get_augroup_name(state.active_tab)
     vim.api.nvim_create_augroup(augroup_name, { clear = true })
@@ -177,7 +179,7 @@ function main.enable(scope)
                 local tab = state.get_tab(state)
 
                 if tab ~= nil then
-                    if api.get_current_tab() ~= tab.id then
+                    if state.active_tab ~= tab.id then
                         return
                     end
                 end
@@ -192,11 +194,11 @@ function main.enable(scope)
     vim.api.nvim_create_autocmd({ "TabEnter" }, {
         callback = function(p)
             api.debounce(p.event, function()
+                state.set_active_tab(state, api.get_current_tab())
+
                 log.debug(p.event, "tab %d entered", state.active_tab)
 
                 state.refresh_tabs(state, p.event)
-
-                state.set_active_tab(state, api.get_current_tab())
             end)
         end,
         group = augroup_name,

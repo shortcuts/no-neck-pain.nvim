@@ -130,7 +130,7 @@ function NoNeckPain.setup(opts)
     end
 
     if _G.NoNeckPain.config.autocmds.enableOnTabEnter then
-        vim.api.nvim_create_autocmd({ "TabEnter" }, {
+        vim.api.nvim_create_autocmd({ "TabNewEntered" }, {
             callback = function(p)
                 vim.schedule(function()
                     if _G.NoNeckPain.state == nil or not _G.NoNeckPain.state.enabled then
