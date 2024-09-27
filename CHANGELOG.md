@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [2.0.5](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.0.4...v2.0.5) (2024-09-27)
+
+
+### Bug Fixes
+
+* **tabs:** prevent wrong resize on tabnew ([#404](https://github.com/shortcuts/no-neck-pain.nvim/issues/404)) ([f4c1b54](https://github.com/shortcuts/no-neck-pain.nvim/commit/f4c1b54b6d335e612f201c7fbf2e4447ef3790ac))
+
 ## [2.0.4](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.0.3...v2.0.4) (2024-09-27)
 
 
