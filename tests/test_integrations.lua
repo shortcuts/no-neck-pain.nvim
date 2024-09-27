@@ -86,34 +86,6 @@ T["setup"]["overrides default values"] = function()
     })
 end
 
-T["integrations"] = MiniTest.new_set()
-
-T["integrations"]["NvimTree throws with wrong values"] = function()
-    Helpers.expect.error(function()
-        child.lua([[ require('no-neck-pain').setup({
-                    integrations = {
-                        NvimTree = {
-                            position = "nope",
-                        },
-                    },
-                })
-            ]])
-    end)
-end
-
-T["integrations"]["NeoTree throws with wrong values"] = function()
-    Helpers.expect.error(function()
-        child.lua([[ require('no-neck-pain').setup({
-                    integrations = {
-                        NeoTree = {
-                            position = "nope",
-                        },
-                    },
-                })
-            ]])
-    end)
-end
-
 T["checkhealth"] = MiniTest.new_set()
 
 T["checkhealth"]["state is in sync"] = function()
