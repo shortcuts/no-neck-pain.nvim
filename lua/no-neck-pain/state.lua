@@ -489,7 +489,7 @@ function state:scan_layout(scope)
     self.init_columns(self)
     self.init_integrations(self)
 
-    local layout = vim.fn.winlayout(self.active_tab)
+    local layout = vim.fn.winlayout()
 
     -- when opening vim with nnp autocmds, nothing else than a curr window
     if layout[1] == "leaf" then
