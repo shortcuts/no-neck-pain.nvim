@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [2.0.4](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.0.3...v2.0.4) (2024-09-27)
+
+
+### Bug Fixes
+
+* **integrations:** do not assert position ([#401](https://github.com/shortcuts/no-neck-pain.nvim/issues/401)) ([af83256](https://github.com/shortcuts/no-neck-pain.nvim/commit/af832565cbd467e65c2ec3ea1d8b60f1fb53d8c5))
+
 ## [2.0.3](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.0.2...v2.0.3) (2024-09-23)
 
 
