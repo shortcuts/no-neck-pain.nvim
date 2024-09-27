@@ -395,15 +395,6 @@ function NoNeckPain.defaults(options)
         "`minSideBufferWidth` must be equal or greater than 0."
     )
 
-    -- assert `integrations` values
-    for _, tree in pairs({ "NvimTree", "NeoTree" }) do
-        assert(
-            NoNeckPain.options.integrations[tree].position == "left"
-                or NoNeckPain.options.integrations[tree].position == "right",
-            string.format("%s position can only be `left` or `right`", tree)
-        )
-    end
-
     -- cleanup deprecated options to sanitize the saved config
     NoNeckPain.options.buffers.left.scratchPad.location = nil
     NoNeckPain.options.buffers.left.scratchPad.fileName = nil
