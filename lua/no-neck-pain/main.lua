@@ -107,22 +107,22 @@ function main.init(scope)
 
     ui.create_side_buffers()
 
-    local current_win = vim.api.nvim_get_current_win()
-
     if
         (
             state.is_side_the_active_win(state, "left")
             or state.is_side_the_active_win(state, "right")
-        ) and state.get_previously_focused_win(state) ~= current_win
+        ) and state.get_previously_focused_win(state) ~= vim.api.nvim_get_current_win()
     then
         log.debug(
             scope,
             "rerouting focus of %d to %s",
-            current_win,
+            vim.api.nvim_get_current_win(),
             state.get_previously_focused_win(state)
         )
 
-        vim.api.nvim_set_current_win(state.get_side_id(state, "curr"))
+        if vim.api.nvim_win_is_valid(state.get_side_id(state, "curr")) then
+            vim.api.nvim_set_current_win(state.get_side_id(state, "curr"))
+        end
 
         if
             vim.api.nvim_win_is_valid(state.get_previously_focused_win(state))
@@ -217,11 +217,11 @@ function main.enable(scope)
 
                 if
                     not state.tabs[state.active_tab].redraw
-                    and (
-                        state.is_side_the_active_win(state, "left")
-                        or state.is_side_the_active_win(state, "right")
-                        or state.is_side_the_active_win(state, "curr")
-                    )
+                    and (state.is_side_the_active_win(state, "left") or state.is_side_the_active_win(
+                        state,
+                        "right"
+                    ) or state.is_side_the_active_win(state, "curr"))
+                    and not init
                 then
                     return
                 end
@@ -262,8 +262,13 @@ function main.enable(scope)
 
                         vim.cmd("rightbelow vertical split")
 
+                        vim.print(opened_buffers)
+
                         if vim.tbl_count(opened_buffers) > 0 then
                             local bufname, _ = next(opened_buffers)
+                            if vim.startswith(bufname, "NoNamePain") then
+                                bufname = string.sub(bufname, 11)
+                            end
 
                             vim.cmd("buffer " .. bufname)
                             log.debug(s, "fallback to %s", bufname)
@@ -415,9 +420,8 @@ function main.disable(scope)
     if #vim.api.nvim_list_tabpages() == 1 and #wins == 0 then
         for name, modified in pairs(api.get_opened_buffers()) do
             if modified then
-                local bufname = name
                 if vim.startswith(name, "NoNamePain") then
-                    bufname = string.sub(name, 11)
+                    name = string.sub(name, 11)
                 end
 
                 vim.schedule(function()
@@ -428,7 +432,7 @@ function main.disable(scope)
                         "unable to quit nvim because one or more buffer has modified files, please save or discard changes"
                     )
                     vim.cmd("rightbelow vertical split")
-                    vim.cmd("buffer " .. bufname)
+                    vim.cmd("buffer " .. name)
                     main.init(scope)
                 end)
                 return
