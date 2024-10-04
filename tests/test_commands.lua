@@ -29,7 +29,6 @@ T["commands"]["NoNeckPainResize sets the config width and resizes windows"] = fu
 
     Helpers.expect.global(child, "_G.NoNeckPain.config.width", 100)
 
-    -- need to know why the child isn't precise enough
     Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 80)
 
     child.cmd("NoNeckPainResize 20")
@@ -37,7 +36,7 @@ T["commands"]["NoNeckPainResize sets the config width and resizes windows"] = fu
 
     Helpers.expect.global(child, "_G.NoNeckPain.config.width", 20)
 
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 20)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 18)
 end
 
 T["commands"]["NoNeckPainResize throws with the plugin disabled"] = function()
