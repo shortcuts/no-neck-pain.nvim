@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [2.0.6](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.0.5...v2.0.6) (2024-10-04)
+
+
+### Bug Fixes
+
+* **splits:** check curr id before rerouting ([#409](https://github.com/shortcuts/no-neck-pain.nvim/issues/409)) ([e3d0d8b](https://github.com/shortcuts/no-neck-pain.nvim/commit/e3d0d8b1a9118c1e899ded1eb1a1558f794a3a8f))
+
 ## [2.0.5](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.0.4...v2.0.5) (2024-09-27)
 
 
