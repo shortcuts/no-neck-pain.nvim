@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [2.1.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.0.6...v2.1.0) (2024-11-26)
+
+
+### Features
+
+* **integrations:** support snacks.nvim ([#416](https://github.com/shortcuts/no-neck-pain.nvim/issues/416)) ([b0c7a3a](https://github.com/shortcuts/no-neck-pain.nvim/commit/b0c7a3ab099fe53b797d0a414b23778d02082c2c))
+
 ## [2.0.6](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.0.5...v2.0.6) (2024-10-04)
 
 
