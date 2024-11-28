@@ -82,6 +82,6 @@ constants.INTEGRATIONS = {
 --- Dashboards filetypes that delays the plugin enable step until next buffer entered.
 ---
 ---@private
-constants.DASHBOARDS = { "dashboard", "alpha", "starter" }
+constants.DASHBOARDS = { "dashboard", "alpha", "starter", "snacks_dashboard" }
 
 return constants
