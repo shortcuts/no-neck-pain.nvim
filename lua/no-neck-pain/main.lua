@@ -332,7 +332,7 @@ function main.enable(scope)
         callback = function(p)
             vim.schedule(function()
                 p.event = string.format("%s:skip_entering", p.event)
-                if not state.is_active_tab_registered(state) or event.skip() then
+                if not state.is_active_tab_registered(state) then
                     return log.debug(p.event, "skip")
                 end
 
