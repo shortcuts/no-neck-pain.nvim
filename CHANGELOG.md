@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [2.1.1](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.1.0...v2.1.1) (2024-11-28)
+
+
+### Bug Fixes
+
+* do not skip relative windows on re-route ([#418](https://github.com/shortcuts/no-neck-pain.nvim/issues/418)) ([6943bc9](https://github.com/shortcuts/no-neck-pain.nvim/commit/6943bc96ae5816e466e38651521d8b92ee566601))
+
 ## [2.1.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.0.6...v2.1.0) (2024-11-26)
 
 
