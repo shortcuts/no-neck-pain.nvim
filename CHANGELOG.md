@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [2.1.2](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.1.1...v2.1.2) (2024-11-29)
+
+
+### Bug Fixes
+
+* prevent non-focusable windows from being focused ([#421](https://github.com/shortcuts/no-neck-pain.nvim/issues/421)) ([581e715](https://github.com/shortcuts/no-neck-pain.nvim/commit/581e71577c01ee622fc272bff56ee40017bb24b8))
+
 ## [2.1.1](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.1.0...v2.1.1) (2024-11-28)
 
 
