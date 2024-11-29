@@ -181,6 +181,7 @@ function api.find_next_side_idx(start_idx, step, wins, current_side, other_side,
             not api.is_side_id(current_side, wins[index])
             and not api.is_side_id(other_side, wins[index])
             and wins[index] ~= previously_focused
+            and vim.api.nvim_win_get_config(wins[index]).focusable
         then
             return index
         end
