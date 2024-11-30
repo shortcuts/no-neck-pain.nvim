@@ -242,4 +242,25 @@ T["skipEnteringNoNeckPainBuffer"]["one side only + full width split doesn't brin
     Helpers.expect.equality(child.api.nvim_get_current_win(), 1000)
 end
 
+T["skipEnteringNoNeckPainBuffer"]["does not reroute to invalid windows"] = function()
+    child.lua(
+        [[ require('no-neck-pain').setup({width=50, autocmds = { skipEnteringNoNeckPainBuffer = true }}) ]]
+    )
+    child.nnp()
+
+    child.cmd("e foo")
+    child.wait()
+    child.cmd("e bar")
+    child.wait()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+    Helpers.expect.equality(child.api.nvim_get_current_win(), 1000)
+
+    child.cmd("bd")
+    child.wait()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1005, 1004, 1006 })
+    Helpers.expect.equality(child.api.nvim_get_current_win(), 1004)
+end
+
 return T

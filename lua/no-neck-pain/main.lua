@@ -262,8 +262,6 @@ function main.enable(scope)
 
                         vim.cmd("rightbelow vertical split")
 
-                        vim.print(opened_buffers)
-
                         if vim.tbl_count(opened_buffers) > 0 then
                             local bufname, _ = next(opened_buffers)
                             if vim.startswith(bufname, "NoNamePain") then
@@ -391,6 +389,14 @@ function main.enable(scope)
                 end
 
                 local new_focus = wins[idx] or state.get_previously_focused_win(state)
+
+                if not vim.api.nvim_win_is_valid(new_focus) then
+                    return log.debug(
+                        p.event,
+                        "aborting reroute, %d is not a valid window",
+                        new_focus
+                    )
+                end
 
                 vim.api.nvim_set_current_win(new_focus)
 
