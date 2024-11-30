@@ -260,11 +260,11 @@ T["skipEnteringNoNeckPainBuffer"]["does not reroute to invalid windows"] = funct
     child.wait()
 
     if child.fn.has("nvim-0.10") == 0 then
-        Helpers.expect.equality(child.get_wins_in_tab(), { 1005, 1004, 1006 })
-        Helpers.expect.equality(child.api.nvim_get_current_win(), 1004)
-    else
         Helpers.expect.equality(child.get_wins_in_tab(), { 1004, 1003, 1005 })
         Helpers.expect.equality(child.api.nvim_get_current_win(), 1003)
+    else
+        Helpers.expect.equality(child.get_wins_in_tab(), { 1005, 1004, 1006 })
+        Helpers.expect.equality(child.api.nvim_get_current_win(), 1004)
     end
 end
 
