@@ -38,7 +38,7 @@ jobs:
         uses: rhysd/action-setup-vim@v1
         with:
           neovim: true
-          version: v0.10.1
+          version: v0.10.2
 
       - name: generate documentation
         run: make documentation-ci
@@ -54,7 +54,7 @@ jobs:
     timeout-minutes: 1
     strategy:
       matrix:
-        neovim_version: ['v0.9.5', 'v0.10.1']
+        neovim_version: ['v0.9.5', 'v0.10.2']
 
     steps:
       - uses: actions/checkout@v4
