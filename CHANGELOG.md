@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [2.1.3](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.1.2...v2.1.3) (2024-11-30)
+
+
+### Bug Fixes
+
+* do not reroute to invalid (deleted) window ([#423](https://github.com/shortcuts/no-neck-pain.nvim/issues/423)) ([b89b557](https://github.com/shortcuts/no-neck-pain.nvim/commit/b89b55706d7e5ff8ab6700a76b23835aeecb9052))
+
 ## [2.1.2](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.1.1...v2.1.2) (2024-11-29)
 
 
