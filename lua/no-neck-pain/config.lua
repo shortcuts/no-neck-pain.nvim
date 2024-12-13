@@ -245,10 +245,14 @@ NoNeckPain.options = {
         right = NoNeckPain.bufferOptions,
     },
     -- Supported integrations that might clash with `no-neck-pain.nvim`'s behavior.
+    --
+    -- The `position` is used when the plugin scans the layout in order to compute the width that should be added
+    -- on each side. For example, if you were supposed to have a padding of 100 columns on each side, but an
+    -- integration takes 42, only 58 will be added so your layout is still centered.
+    --
+    -- If `reopen` is set to `false`, we won't account the width but close the integration when encountered.
     ---@type table
     integrations = {
-        -- By default, if NvimTree is open, we will close it and reopen it when enabling the plugin,
-        -- this prevents having the side buffers wrongly positioned.
         -- @link https://github.com/nvim-tree/nvim-tree.lua
         ---@type table
         NvimTree = {
@@ -259,8 +263,6 @@ NoNeckPain.options = {
             ---@type boolean
             reopen = true,
         },
-        -- By default, if NeoTree is open, we will close it and reopen it when enabling the plugin,
-        -- this prevents having the side buffers wrongly positioned.
         -- @link https://github.com/nvim-neo-tree/neo-tree.nvim
         NeoTree = {
             -- The position of the tree.
