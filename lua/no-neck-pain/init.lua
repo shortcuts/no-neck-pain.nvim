@@ -106,7 +106,7 @@ function NoNeckPain.setup(opts)
         })
     end
 
-    if _G.NoNeckPain.config.autocmds.enableOnVimEnter == true then
+    if _G.NoNeckPain.config.autocmds.enableOnVimEnter then
         vim.api.nvim_create_autocmd({ "BufEnter" }, {
             pattern = "*",
             callback = function()
@@ -130,7 +130,7 @@ function NoNeckPain.setup(opts)
     end
 
     if _G.NoNeckPain.config.autocmds.enableOnVimEnter == "fast" then
-        NoNeckPain.enable()
+        NoNeckPain.enable("enable_on_vim_enter_fast")
     end
 
     if _G.NoNeckPain.config.autocmds.enableOnTabEnter then
