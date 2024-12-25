@@ -67,7 +67,7 @@ function NoNeckPain.enable(scope)
         _G.NoNeckPain.config = config.options
     end
 
-    api.debounce(scope or "public_api_enable", main.enable, 10)
+    api.debounce(scope or "public_api_enable", main.enable)
 end
 
 --- Disables the plugin, clear highlight groups and autocmds, closes side buffers and resets the internal state.
@@ -106,7 +106,7 @@ function NoNeckPain.setup(opts)
         })
     end
 
-    if _G.NoNeckPain.config.autocmds.enableOnVimEnter then
+    if _G.NoNeckPain.config.autocmds.enableOnVimEnter == true then
         vim.api.nvim_create_autocmd({ "BufEnter" }, {
             pattern = "*",
             callback = function()
@@ -127,6 +127,10 @@ function NoNeckPain.setup(opts)
             group = "NoNeckPainVimEnterAutocmd",
             desc = "Triggers until it finds the correct moment/buffer to enable the plugin.",
         })
+    end
+
+    if _G.NoNeckPain.config.autocmds.enableOnVimEnter == "fast" then
+        NoNeckPain.enable()
     end
 
     if _G.NoNeckPain.config.autocmds.enableOnTabEnter then
