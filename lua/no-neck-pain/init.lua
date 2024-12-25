@@ -88,7 +88,7 @@ function NoNeckPain.setup(opts)
         vim.api.nvim_create_augroup("NoNeckPainVimEnterAutocmd", { clear = true })
     end
 
-    if _G.NoNeckPain.config.autocmds.reloadOnColorSchemeChange then
+    if _G.NoNeckPain.config.autocmds.reloadOnColorSchemeChange == true then
         vim.api.nvim_create_autocmd({ "ColorScheme" }, {
             pattern = "*",
             callback = function(p)
