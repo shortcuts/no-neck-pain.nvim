@@ -67,7 +67,7 @@ function NoNeckPain.enable(scope)
         _G.NoNeckPain.config = config.options
     end
 
-    api.debounce(scope or "public_api_enable", main.enable, 10)
+    main.enable(scope or "public_api_enable")
 end
 
 --- Disables the plugin, clear highlight groups and autocmds, closes side buffers and resets the internal state.
@@ -106,43 +106,20 @@ function NoNeckPain.setup(opts)
         })
     end
 
-    if _G.NoNeckPain.config.autocmds.enableOnVimEnter == true then
-        vim.api.nvim_create_autocmd({ "BufEnter" }, {
-            pattern = "*",
-            callback = function()
-                vim.schedule(function()
-                    if _G.NoNeckPain.state ~= nil and _G.NoNeckPain.state.enabled then
-                        return
-                    end
-
-                    local scope = "enable_on_vim_enter"
-
-                    NoNeckPain.enable(scope)
-
-                    api.debounce(scope, function()
-                        if _G.NoNeckPain.state ~= nil then
-                            pcall(vim.api.nvim_del_augroup_by_name, "NoNeckPainVimEnterAutocmd")
-                        end
-                    end, 20)
-                end)
-            end,
-            group = "NoNeckPainVimEnterAutocmd",
-            desc = "Triggers until it finds the correct moment/buffer to enable the plugin.",
-        })
-    end
-
-    if _G.NoNeckPain.config.autocmds.enableOnVimEnter == "fast" then
+    if _G.NoNeckPain.config.autocmds.enableOnVimEnter then
         vim.api.nvim_create_autocmd({ "BufWinEnter" }, {
             pattern = "*",
             callback = function()
-                local scope = "enable_on_vim_enter_fast"
+                local scope = "enable_on_vim_enter"
 
-                main.enable(scope)
+                NoNeckPain.enable(scope)
 
                 api.debounce(scope, function()
                     if _G.NoNeckPain.state ~= nil then
                         pcall(vim.api.nvim_del_augroup_by_name, "NoNeckPainVimEnterAutocmd")
                     end
+                end)
+                vim.schedule(function()
                     main.init(scope)
                 end)
             end,
