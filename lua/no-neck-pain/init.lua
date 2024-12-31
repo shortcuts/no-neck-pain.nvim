@@ -67,7 +67,7 @@ function NoNeckPain.enable(scope)
         _G.NoNeckPain.config = config.options
     end
 
-    main.enable(scope or "public_api_enable")
+    api.debounce(scope or "public_api_enable", main.enable, 10)
 end
 
 --- Disables the plugin, clear highlight groups and autocmds, closes side buffers and resets the internal state.
@@ -112,7 +112,8 @@ function NoNeckPain.setup(opts)
             callback = function()
                 local scope = "enable_on_vim_enter"
 
-                NoNeckPain.enable(scope)
+
+                main.enable(scope)
 
                 api.debounce(scope, function()
                     if _G.NoNeckPain.state ~= nil then
