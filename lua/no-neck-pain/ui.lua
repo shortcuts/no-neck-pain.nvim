@@ -43,6 +43,7 @@ function ui.move_sides(scope)
             local curr = vim.api.nvim_get_current_win()
 
             if curr ~= id then
+                print("here6")
                 vim.api.nvim_set_current_win(id)
             end
 

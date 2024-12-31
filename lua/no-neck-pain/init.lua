@@ -67,7 +67,7 @@ function NoNeckPain.enable(scope)
         _G.NoNeckPain.config = config.options
     end
 
-    api.debounce(scope or "public_api_enable", main.enable)
+    api.debounce(scope or "public_api_enable", main.enable, 10)
 end
 
 --- Disables the plugin, clear highlight groups and autocmds, closes side buffers and resets the internal state.
@@ -106,7 +106,7 @@ function NoNeckPain.setup(opts)
         })
     end
 
-    if _G.NoNeckPain.config.autocmds.enableOnVimEnter then
+    if _G.NoNeckPain.config.autocmds.enableOnVimEnter == true then
         vim.api.nvim_create_autocmd({ "BufEnter" }, {
             pattern = "*",
             callback = function()
@@ -115,9 +115,11 @@ function NoNeckPain.setup(opts)
                         return
                     end
 
-                    NoNeckPain.enable()
+                    local scope = "enable_on_vim_enter"
 
-                    api.debounce("enable_on_vim_enter", function()
+                    NoNeckPain.enable(scope)
+
+                    api.debounce(scope, function()
                         if _G.NoNeckPain.state ~= nil then
                             pcall(vim.api.nvim_del_augroup_by_name, "NoNeckPainVimEnterAutocmd")
                         end
@@ -130,7 +132,23 @@ function NoNeckPain.setup(opts)
     end
 
     if _G.NoNeckPain.config.autocmds.enableOnVimEnter == "fast" then
-        main.enable("enable_on_vim_enter_fast")
+        vim.api.nvim_create_autocmd({ "BufWinEnter" }, {
+            pattern = "*",
+            callback = function()
+                local scope = "enable_on_vim_enter_fast"
+
+                main.enable(scope)
+
+                api.debounce(scope, function()
+                    if _G.NoNeckPain.state ~= nil then
+                        pcall(vim.api.nvim_del_augroup_by_name, "NoNeckPainVimEnterAutocmd")
+                    end
+                    main.init(scope)
+                end)
+            end,
+            group = "NoNeckPainVimEnterAutocmd",
+            desc = "Triggers until it finds the correct moment/buffer to enable the plugin.",
+        })
     end
 
     if _G.NoNeckPain.config.autocmds.enableOnTabEnter then
