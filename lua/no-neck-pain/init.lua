@@ -130,7 +130,7 @@ function NoNeckPain.setup(opts)
     end
 
     if _G.NoNeckPain.config.autocmds.enableOnVimEnter == "fast" then
-        NoNeckPain.enable("enable_on_vim_enter_fast")
+        main.enable("enable_on_vim_enter_fast")
     end
 
     if _G.NoNeckPain.config.autocmds.enableOnTabEnter then
