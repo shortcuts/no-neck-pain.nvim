@@ -6,5 +6,6 @@ vim.cmd("set rtp+=deps/mini.nvim")
 require("no-neck-pain").setup({
     width = 50,
     autocmds = { enableOnVimEnter = true, enableOnTabEnter = true },
+    buffers = { colors = { background = "tokyonight-moon" } },
 })
 require("mini.test").setup()
