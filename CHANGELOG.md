@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [2.1.4](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.1.3...v2.1.4) (2025-01-16)
+
+
+### Bug Fixes
+
+* **enableOnVimEnter:** prevent flicker on enter ([#429](https://github.com/shortcuts/no-neck-pain.nvim/issues/429)) ([36979b5](https://github.com/shortcuts/no-neck-pain.nvim/commit/36979b57535da51f40bb4deef16192333e92f2aa))
+
 ## [2.1.3](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.1.2...v2.1.3) (2024-11-30)
 
 
