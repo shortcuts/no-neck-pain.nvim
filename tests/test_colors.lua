@@ -110,8 +110,8 @@ T["setup"]["`left` or `right` buffer options overrides `common` ones"] = functio
 end
 
 T["setup"]["does not throw on invalid windows"] = function()
-    child.set_size(30, 30)
     child.restart({ "-u", "scripts/init_auto_open.lua" })
+    child.set_size(80, 80)
     child.wait()
 
     Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
