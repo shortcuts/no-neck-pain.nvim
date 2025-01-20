@@ -110,6 +110,7 @@ T["setup"]["`left` or `right` buffer options overrides `common` ones"] = functio
 end
 
 T["setup"]["does not throw on invalid windows"] = function()
+    child.set_size(30, 30)
     child.restart({ "-u", "scripts/init_auto_open.lua" })
     child.wait()
 
