@@ -326,7 +326,7 @@ function main.enable(scope)
         desc = "keeps track of the state after closing windows and deleting buffers",
     })
 
-    vim.api.nvim_create_autocmd({ "WinLeave" }, {
+    vim.api.nvim_create_autocmd({ "WinEnter" }, {
         callback = function(p)
             vim.schedule(function()
                 p.event = string.format("%s:skip_entering", p.event)
