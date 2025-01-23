@@ -158,9 +158,9 @@ function ui.create_side_buffers()
                 else
                     ui.init_side_options(side, state.get_side_id(state, side))
                 end
-            end
 
-            colors.init(state.get_side_id(state, side), side)
+                colors.init(state.get_side_id(state, side), side)
+            end
         end
     end
 

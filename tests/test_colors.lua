@@ -109,6 +109,33 @@ T["setup"]["`left` or `right` buffer options overrides `common` ones"] = functio
     })
 end
 
+T["setup"]["does not throw on invalid windows"] = function()
+    child.restart({ "-u", "scripts/init_auto_open.lua" })
+    child.set_size(80, 80)
+    child.wait()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+    Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1000, left = 1001, right = 1002 })
+
+    child.cmd("e aaa.txt")
+    child.cmd("vnew aaa.txt")
+    child.cmd("mksession! deps/mk.vim")
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1003, 1000, 1002 })
+    Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1000, left = 1001, right = 1002 })
+
+    child.restart({ "-u", "scripts/init_auto_open.lua" })
+    child.wait()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+
+    child.cmd("source deps/mk.vim")
+    child.wait()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1000, 1003, 1004, 1005 })
+    Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1000, left = 1001, right = 1002 })
+end
+
 T["setup"]["`common` options spreads it to `left` and `right` buffers"] = function()
     child.cmd([[colorscheme peachpuff]])
     child.lua([[
