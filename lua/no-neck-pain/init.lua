@@ -107,7 +107,7 @@ function NoNeckPain.setup(opts)
     end
 
     if _G.NoNeckPain.config.autocmds.enableOnVimEnter then
-        vim.api.nvim_create_autocmd({ "BufWinEnter" }, {
+        vim.api.nvim_create_autocmd({ "BufEnter" }, {
             pattern = "*",
             callback = function()
                 local scope = "enable_on_vim_enter"
