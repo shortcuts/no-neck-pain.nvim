@@ -1,4 +1,12 @@
 <a name="0.2.3"></a>
+## [2.1.5](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.1.4...v2.1.5) (2025-01-23)
+
+
+### Bug Fixes
+
+* 'Invalid window id ...' error when restoring a session saved with an invisible Scratch Window ([#430](https://github.com/shortcuts/no-neck-pain.nvim/issues/430)) ([#431](https://github.com/shortcuts/no-neck-pain.nvim/issues/431)) ([2ca9857](https://github.com/shortcuts/no-neck-pain.nvim/commit/2ca98574e04a7ac68da6051626e661c386331ac8))
+* **autocmds:** BufWinEnter race condition? ([#434](https://github.com/shortcuts/no-neck-pain.nvim/issues/434)) ([3fc4642](https://github.com/shortcuts/no-neck-pain.nvim/commit/3fc4642702a3d736196977e948800a6aff5f7262))
+
 ## [2.1.4](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.1.3...v2.1.4) (2025-01-16)
 
 
