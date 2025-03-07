@@ -48,6 +48,10 @@ T["setup"]["overrides default values"] = function()
                 position = "left",
                 reopen = false,
             },
+            dashboard = {
+                enabled = true,
+                filetype = "foobar",
+            },
         }
     })]])
 
@@ -82,6 +86,10 @@ T["setup"]["overrides default values"] = function()
         aerial = {
             position = "left",
             reopen = false,
+        },
+        dashboard = {
+            enabled = true,
+            filetype = "foobar",
         },
     })
 end
