@@ -110,19 +110,30 @@ function NoNeckPain.setup(opts)
         vim.api.nvim_create_autocmd({ "BufEnter" }, {
             pattern = "*",
             callback = function()
-                local scope = "enable_on_vim_enter"
+                local scope = string.format(
+                    "enable_on_vim_enter:%s",
+                    config.options.integrations.dashboard.enabled
+                )
 
+                if config.options.integrations.dashboard.enabled == true then
+                    api.debounce(scope, function()
+                        main.enable(scope)
+                        if _G.NoNeckPain.state ~= nil then
+                            pcall(vim.api.nvim_del_augroup_by_name, "NoNeckPainVimEnterAutocmd")
+                        end
+                    end)
+                else
+                    main.enable(scope)
 
-                main.enable(scope)
-
-                api.debounce(scope, function()
-                    if _G.NoNeckPain.state ~= nil then
-                        pcall(vim.api.nvim_del_augroup_by_name, "NoNeckPainVimEnterAutocmd")
-                    end
-                end)
-                vim.schedule(function()
-                    main.init(scope)
-                end)
+                    api.debounce(scope, function()
+                        if _G.NoNeckPain.state ~= nil then
+                            pcall(vim.api.nvim_del_augroup_by_name, "NoNeckPainVimEnterAutocmd")
+                        end
+                    end)
+                    vim.schedule(function()
+                        main.init(scope)
+                    end)
+                end
             end,
             group = "NoNeckPainVimEnterAutocmd",
             desc = "Triggers until it finds the correct moment/buffer to enable the plugin.",

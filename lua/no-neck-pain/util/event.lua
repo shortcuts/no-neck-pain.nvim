@@ -1,3 +1,4 @@
+local log = require("no-neck-pain.util.log")
 local api = require("no-neck-pain.util.api")
 local constants = require("no-neck-pain.util.constants")
 local state = require("no-neck-pain.state")
@@ -35,14 +36,17 @@ end
 ---@private
 function event.skip_enable(scope)
     if state.is_active_tab_registered(state) then
+        log.debug(string.format("skip_enable:%s", scope), "tab already registered")
         return true
     end
 
     if api.is_relative_window() then
+        log.debug(string.format("skip_enable:%s", scope), "relative window")
         return true
     end
 
     if state.is_active_tab_disabled(state) then
+        log.debug(string.format("skip_enable:%s", scope), "disabled")
         if scope == "enable_on_tab_enter" then
             return true
         end
@@ -54,8 +58,10 @@ function event.skip_enable(scope)
 
     -- dashboards delays the plugin enable step until next buffer entered
     if vim.tbl_contains(constants.DASHBOARDS, vim.bo.filetype) then
+        log.debug(string.format("skip_enable:%s", scope), "dashboard")
         return true
     end
+    log.debug(string.format("skip_enable:%s", scope), vim.bo.filetype)
 
     return state.is_supported_integration(state, "event.skip_enable", nil)
 end

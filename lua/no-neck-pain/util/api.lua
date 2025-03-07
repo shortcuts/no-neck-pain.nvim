@@ -105,7 +105,6 @@ function api.debounce(context, callback, timeout)
         timer_stop_close(timer)
 
         if debouncer.executing then
-            log.debug(context, "already running on debounce, rescheduling...")
             return api.debounce(context, callback, timeout)
         end
 
