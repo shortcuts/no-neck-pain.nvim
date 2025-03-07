@@ -27,8 +27,7 @@ _Creates evenly sized empty buffers on each side of your focused buffer, which a
 - [Support split/vsplit windows](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase#window-layout-support)
 - [Built-in scratchPad feature](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase#side-buffer-as-scratch-pad)
 - [Themed side buffers](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase#custom-background-color)
-- Fully integrates with [neo-tree.nvim](https://github.com/nvim-neo-tree/neo-tree.nvim), [nvim-tree.lua](https://github.com/nvim-tree/nvim-tree.lua), [undotree](https://github.com/mbbill/undotree), [tmux, and more!](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase#window-layout-support)
-- Keep your workflow intact
+- Fully integrates with file trees ([neo-tree.nvim](https://github.com/nvim-neo-tree/neo-tree.nvim), [nvim-tree.lua](https://github.com/nvim-tree/nvim-tree.lua), etc.) and dashboard ([alpha-nvim](https://github.com/goolord/alpha-nvim), [snacks.nvim](https://github.com/folke/snacks.nvim), etc.)
 - Neovim >= 0.9 compatibility
     - 0.7 and 0.8 support is still available in the [1.x frozen version](https://github.com/shortcuts/no-neck-pain.nvim/tree/1.x)
 
@@ -288,6 +287,16 @@ require("no-neck-pain").setup({
             position = "right",
             -- When `true`, if the tree was opened before enabling the plugin, we will reopen it.
             reopen = true,
+        },
+        -- this is a generic field to hint no-neck-pain that you use a dashboard plugin.
+        -- you can find the filetype list of natively supported dashboards here: https://github.com/shortcuts/no-neck-pain.nvim/blob/main/lua/no-neck-pain/util/constants.lua#L82-L85
+        -- if a dashboard that you use isn't supported, either set `dashboard.filetype` to the expected file type, or open a pull-request with the edited list.
+        dashboard = {
+            -- When `true`, debounce will be applied to the init method, leaving time for the dashboard to open.
+            enabled = false,
+            -- if a dashboard that you use isn't supported, set this field value to the dashboard filetype, also don't hesitate to open a pull-request with the edited list.
+            ---@type string|nil
+            filetype = nil,
         },
     },
 })

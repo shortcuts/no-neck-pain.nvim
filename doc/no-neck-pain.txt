@@ -378,6 +378,16 @@ Default values:
               -- When `true`, if the tree was opened before enabling the plugin, we will reopen it.
               reopen = true,
           },
+          -- this is a generic field to hint no-neck-pain that you use a dashboard plugin.
+          -- you can find the filetype list of natively supported dashboards here: https://github.com/shortcuts/no-neck-pain.nvim/blob/main/lua/no-neck-pain/util/constants.lua#L82-L85
+          -- if a dashboard that you use isn't supported, either set `dashboard.filetype` to the expected file type, or open a pull-request with the edited list.
+          dashboard = {
+              -- When `true`, debounce will be applied to the init method, leaving time for the dashboard to open.
+              enabled = false,
+              -- if a dashboard that you use isn't supported, set this field value to the dashboard filetype, also don't hesitate to open a pull-request with the edited list.
+              ---@type string|nil
+              filetype = nil,
+          },
       },
   }
 

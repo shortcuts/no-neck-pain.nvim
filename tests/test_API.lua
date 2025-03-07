@@ -171,6 +171,10 @@ T["setup"]["sets exposed methods and default options value"] = function()
                 position = "right",
                 reopen = true,
             },
+            dashboard = {
+                enabled = false,
+                filetype = nil,
+            },
         },
     })
 end
@@ -319,6 +323,10 @@ T["setup"]["overrides default values"] = function()
             aerial = {
                 position = "right",
                 reopen = true,
+            },
+            dashboard = {
+                enabled = false,
+                filetype = nil,
             },
         },
     })
