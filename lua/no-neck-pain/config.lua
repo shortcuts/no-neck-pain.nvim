@@ -328,6 +328,18 @@ NoNeckPain.options = {
             filetype = nil,
         },
     },
+    -- Allows you to provide custom code to run before (pre) and after (post) no-neck-pain steps (e.g. enabling).
+    ---@type table
+    callbacks = {
+        ---@type function|nil
+        preEnable   = nil,
+        ---@type function|nil
+        postEnable  = nil,
+        ---@type function|nil
+        preDisable  = nil,
+        ---@type function|nil
+        postDisable = nil
+    }
 }
 
 ---@private
