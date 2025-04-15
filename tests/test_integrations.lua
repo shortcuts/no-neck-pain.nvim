@@ -386,6 +386,12 @@ T["neo-tree"]["properly enables nnp with tree already opened"] = function()
 
     child.nnp()
 
+    if child.fn.has("nvim-0.10") == 0 then
+        Helpers.expect.equality(child.get_wins_in_tab(), { 1003, 1002, 1000, 1004 })
+    else
+        Helpers.expect.equality(child.get_wins_in_tab(), { 1004, 1002, 1000, 1005 })
+    end
+
     Helpers.expect.state(child, "enabled", true)
 
     Helpers.expect.state(child, "tabs[1].wins.integrations.NeoTree", {
@@ -395,11 +401,19 @@ T["neo-tree"]["properly enables nnp with tree already opened"] = function()
         open = "Neotree reveal",
     })
 
-    Helpers.expect.state(child, "tabs[1].wins.main", {
-        curr = 1000,
-        left = 1004,
-        right = 1005,
-    })
+    if child.fn.has("nvim-0.10") == 0 then
+        Helpers.expect.state(child, "tabs[1].wins.main", {
+            curr = 1000,
+            left = 1003,
+            right = 1004,
+        })
+    else
+        Helpers.expect.state(child, "tabs[1].wins.main", {
+            curr = 1000,
+            left = 1004,
+            right = 1005,
+        })
+    end
 end
 
 T["TSPlayground"] = MiniTest.new_set()
