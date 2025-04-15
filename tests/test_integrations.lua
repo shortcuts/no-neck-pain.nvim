@@ -386,7 +386,11 @@ T["neo-tree"]["properly enables nnp with tree already opened"] = function()
 
     child.nnp()
 
-    Helpers.expect.equality(child.get_wins_in_tab(), { 1004, 1002, 1000, 1005 })
+    if child.fn.has("nvim-0.10") == 0 then
+        Helpers.expect.equality(child.get_wins_in_tab(), { 1003, 1002, 1000, 1005 })
+    else
+        Helpers.expect.equality(child.get_wins_in_tab(), { 1004, 1002, 1000, 1005 })
+    end
 
     Helpers.expect.state(child, "enabled", true)
 
