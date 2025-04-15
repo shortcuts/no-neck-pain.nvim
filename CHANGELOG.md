@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [2.3.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.2.0...v2.3.0) (2025-04-15)
+
+
+### Features
+
+* provide pre/post enable and pre/post disable callback methods ([#451](https://github.com/shortcuts/no-neck-pain.nvim/issues/451)) ([c713b1f](https://github.com/shortcuts/no-neck-pain.nvim/commit/c713b1fbd1114a27cbba68daa553418c695b10e6))
+
 ## [2.2.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.1.5...v2.2.0) (2025-03-07)
 
 
