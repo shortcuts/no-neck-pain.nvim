@@ -65,6 +65,7 @@ T["setup"]["sets exposed methods and default options value"] = function()
             widthUp = "<Leader>n=",
             widthDown = "<Leader>n-",
         },
+        callbacks = {},
         buffers = {
             setNames = false,
             colors = { blend = 0 },
@@ -209,6 +210,7 @@ T["setup"]["overrides default values"] = function()
             reloadOnColorSchemeChange = true,
             skipEnteringNoNeckPainBuffer = true,
         },
+        callbacks = {},
         mappings = {
             enabled = true,
             scratchPad = "<Leader>ns",
