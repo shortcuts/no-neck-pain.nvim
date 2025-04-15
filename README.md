@@ -193,20 +193,17 @@ require("no-neck-pain").setup({
     ---@type table
     callbacks = {
         -- Runs right before centering the buffer
-        ---@type function|nil
-        ---@param state { enabled: bool, active_tab: number, tabs: number[], disabled_tabs: number[], previously_focused_win: number }
+        ---@type fun(state: { enabled: boolean, active_tab: number, tabs: number[], disabled_tabs: number[], previously_focused_win: number })|nil
         preEnable = nil,
         -- Runs right after the buffer is centered
-        ---@type function|nil
-        ---@param state { enabled: bool, active_tab: number, tabs: number[], disabled_tabs: number[], previously_focused_win: number }
+        ---@type fun(state: { enabled: boolean, active_tab: number, tabs: number[], disabled_tabs: number[], previously_focused_win: number })|nil
         postEnable = nil,
         -- Runs right before toggling NoNeckPain off
-        ---@type function|nil
+        ---@type fun(state: { enabled: boolean, active_tab: number, tabs: number[], disabled_tabs: number[], previously_focused_win: number })|nil
         preDisable = nil,
         -- Runs right after NoNeckPain has been turned off
-        ---@type function|nil
-        ---@param state { enabled: bool, active_tab: number, tabs: number[], disabled_tabs: number[], previously_focused_win: number }
-        preDisable = nil
+        ---@type fun(state: { enabled: boolean, active_tab: number, tabs: number[], disabled_tabs: number[], previously_focused_win: number })|nil
+        postDisable = nil,
     },
     --- Common options that are set to both side buffers.
     --- See |NoNeckPain.bufferOptions| for option scoped to the `left` and/or `right` buffer.

@@ -174,35 +174,6 @@ Default values:
 
 <
 ------------------------------------------------------------------------------
-                                                      *NoNeckPain.callbacks*
-                           `NoNeckPain.callbacks`
-NoNeckPain's pre/post enable and pre/post disable callback methods.
-
-Type ~
-`(table)`
-Default values:
->lua
-  NoNeckPain.callbacks = {
-      -- Runs right before centering the buffer
-      ---@type function|nil
-      ---@param state { enabled: bool, active_tab: number, tabs: number[], disabled_tabs: number[], previously_focused_win: number }
-      preEnable = nil,
-      -- Runs right after the buffer is centered
-      ---@type function|nil
-      ---@param state { enabled: bool, active_tab: number, tabs: number[], disabled_tabs: number[], previously_focused_win: number }
-      postEnable = nil,
-      -- Runs right before toggling NoNeckPain off
-      ---@type function|nil
-      ---@param state { enabled: bool, active_tab: number, tabs: number[], disabled_tabs: number[], previously_focused_win: number }
-      preDisable = nil,
-      -- Runs right after NoNeckPain has been turned off
-      ---@type function|nil
-      ---@param state { enabled: bool, active_tab: number, tabs: number[], disabled_tabs: number[], previously_focused_win: number }
-      preDisable = nil
-  }
-
-<
-------------------------------------------------------------------------------
                                                       *NoNeckPain.bufferOptions*
                            `NoNeckPain.bufferOptions`
 NoNeckPain's buffer side buffer option.
@@ -306,27 +277,6 @@ Default values:
           -- When `false`, the mapping is not created.
           ---@type string
           scratchPad = "<Leader>ns",
-      },
-      --- Allows you to provide custom code to run before (pre) and after (post) no-neck-pain steps (e.g. enabling).
-      --- See |NoNeckPain.callbacks|
-      ---@type table
-      callbacks = {
-          -- Runs right before centering the buffer
-          ---@type function|nil
-          ---@param state { enabled: bool, active_tab: number, tabs: number[], disabled_tabs: number[], previously_focused_win: number }
-          preEnable = nil,
-          -- Runs right after the buffer is centered
-          ---@type function|nil
-          ---@param state { enabled: bool, active_tab: number, tabs: number[], disabled_tabs: number[], previously_focused_win: number }
-          postEnable = nil,
-          -- Runs right before toggling NoNeckPain off
-          ---@type function|nil
-          ---@param state { enabled: bool, active_tab: number, tabs: number[], disabled_tabs: number[], previously_focused_win: number }
-          preDisable = nil,
-          -- Runs right after NoNeckPain has been turned off
-          ---@type function|nil
-          ---@param state { enabled: bool, active_tab: number, tabs: number[], disabled_tabs: number[], previously_focused_win: number }
-          preDisable = nil
       },
       --- Common options that are set to both side buffers.
       --- See |NoNeckPain.bufferOptions| for option scoped to the `left` and/or `right` buffer.
@@ -438,6 +388,23 @@ Default values:
               ---@type string|nil
               filetype = nil,
           },
+      },
+      --- Allows you to provide custom code to run before (pre) and after (post) no-neck-pain steps (e.g. enabling).
+      --- See |NoNeckPain.callbacks|
+      ---@type table
+      callbacks = {
+          -- Runs right before centering the buffer
+          ---@type fun(state: { enabled: boolean, active_tab: number, tabs: number[], disabled_tabs: number[], previously_focused_win: number })|nil
+          preEnable = nil,
+          -- Runs right after the buffer is centered
+          ---@type fun(state: { enabled: boolean, active_tab: number, tabs: number[], disabled_tabs: number[], previously_focused_win: number })|nil
+          postEnable = nil,
+          -- Runs right before toggling NoNeckPain off
+          ---@type fun(state: { enabled: boolean, active_tab: number, tabs: number[], disabled_tabs: number[], previously_focused_win: number })|nil
+          preDisable = nil,
+          -- Runs right after NoNeckPain has been turned off
+          ---@type fun(state: { enabled: boolean, active_tab: number, tabs: number[], disabled_tabs: number[], previously_focused_win: number })|nil
+          postDisable = nil,
       },
   }
 
