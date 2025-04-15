@@ -154,6 +154,10 @@ function main.enable(scope)
         return
     end
 
+    if _G.NoNeckPain.config.callbacks.preEnable ~= nil then
+        _G.NoNeckPain.config.callbacks.preEnable(state)
+    end
+
     state.set_active_tab(state, api.get_current_tab())
 
     log.debug(scope, "calling enable for tab %d", state.active_tab)
@@ -408,11 +412,19 @@ function main.enable(scope)
     })
 
     state.save(state)
+
+    if _G.NoNeckPain.config.callbacks.postEnable ~= nil then
+        _G.NoNeckPain.config.callbacks.postEnable(state)
+    end
 end
 
 --- Disables the plugin for the given tab, clear highlight groups and autocmds, closes side buffers and resets the internal state.
 ---@private
 function main.disable(scope)
+    if _G.NoNeckPain.config.callbacks.preDisable ~= nil then
+        _G.NoNeckPain.config.callbacks.preDisable(state)
+    end
+
     local active_tab = state.active_tab
 
     log.debug(scope, "calling disable for tab %d", active_tab)
@@ -484,6 +496,10 @@ function main.disable(scope)
     state.set_tab_disabled(state, active_tab)
 
     state.save(state)
+
+    if _G.NoNeckPain.config.callbacks.postDisable ~= nil then
+        _G.NoNeckPain.config.callbacks.postDisable(state)
+    end
 end
 
 return main

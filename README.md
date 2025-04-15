@@ -188,6 +188,23 @@ require("no-neck-pain").setup({
         ---@type string
         scratchPad = "<Leader>ns",
     },
+    --- Allows you to provide custom code to run before (pre) and after (post) no-neck-pain steps (e.g. enabling).
+    --- See |NoNeckPain.callbacks|
+    ---@type table
+    callbacks = {
+        -- Runs right before centering the buffer
+        ---@type fun(state: { enabled: boolean, active_tab: number, tabs: number[], disabled_tabs: number[], previously_focused_win: number })|nil
+        preEnable = nil,
+        -- Runs right after the buffer is centered
+        ---@type fun(state: { enabled: boolean, active_tab: number, tabs: number[], disabled_tabs: number[], previously_focused_win: number })|nil
+        postEnable = nil,
+        -- Runs right before toggling NoNeckPain off
+        ---@type fun(state: { enabled: boolean, active_tab: number, tabs: number[], disabled_tabs: number[], previously_focused_win: number })|nil
+        preDisable = nil,
+        -- Runs right after NoNeckPain has been turned off
+        ---@type fun(state: { enabled: boolean, active_tab: number, tabs: number[], disabled_tabs: number[], previously_focused_win: number })|nil
+        postDisable = nil,
+    },
     --- Common options that are set to both side buffers.
     --- See |NoNeckPain.bufferOptions| for option scoped to the `left` and/or `right` buffer.
     ---@type table
