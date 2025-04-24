@@ -1,4 +1,16 @@
 <a name="0.2.3"></a>
+## [2.4.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.3.0...v2.4.0) (2025-04-24)
+
+
+### Features
+
+* allow safe `enableOnVimEnter` ([#456](https://github.com/shortcuts/no-neck-pain.nvim/issues/456)) ([4dc80b2](https://github.com/shortcuts/no-neck-pain.nvim/commit/4dc80b2d55aef6c6486514f9896351164d531b4d))
+
+
+### Bug Fixes
+
+* allow custom dashboards ([#461](https://github.com/shortcuts/no-neck-pain.nvim/issues/461)) ([289bc6d](https://github.com/shortcuts/no-neck-pain.nvim/commit/289bc6d5693feff6b952fc534cbfc8f00c44545d))
+
 ## [2.3.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.2.0...v2.3.0) (2025-04-15)
 
 
