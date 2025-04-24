@@ -327,9 +327,9 @@ NoNeckPain.options = {
         dashboard = {
             -- When `true`, debounce will be applied to the init method, leaving time for the dashboard to open.
             enabled = false,
-            -- if a dashboard that you use isn't supported, set this field value to the dashboard filetype, also don't hesitate to open a pull-request with the edited list.
-            ---@type string|nil
-            filetype = nil,
+            -- if a dashboard that you use isn't supported, you can use this field to set a matching filetype, also don't hesitate to open a pull-request with the edited list (DASHBOARDS) found in lua/no-neck-pain/util/constants.lua.
+            ---@type string[]|nil
+            filetypes = nil,
         },
     },
     --- Allows you to provide custom code to run before (pre) and after (post) no-neck-pain steps (e.g. enabling).
@@ -423,6 +423,10 @@ function NoNeckPain.defaults(options)
 
     if NoNeckPain.options.integrations.dashboard.enabled == true then
         NoNeckPain.options.autocmds.enableOnVimEnter = "safe"
+
+        for _, value in pairs(NoNeckPain.options.integrations.dashboard.filetypes) do
+            table.insert(constants.DASHBOARDS, value)
+        end
     end
 
     assert(NoNeckPain.options.width > 0, "`width` must be greater than 0.")
