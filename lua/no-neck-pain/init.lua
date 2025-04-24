@@ -106,7 +106,7 @@ function NoNeckPain.setup(opts)
         })
     end
 
-    if _G.NoNeckPain.config.autocmds.enableOnVimEnter then
+    if _G.NoNeckPain.config.autocmds.enableOnVimEnter ~= nil then
         vim.api.nvim_create_autocmd({ "BufEnter" }, {
             pattern = "*",
             callback = function()
@@ -115,7 +115,7 @@ function NoNeckPain.setup(opts)
                     config.options.integrations.dashboard.enabled
                 )
 
-                if config.options.integrations.dashboard.enabled == true then
+                if config.options.autocmds.enableOnVimEnter == "safe" then
                     api.debounce(scope, function()
                         main.enable(scope)
                         if _G.NoNeckPain.state ~= nil then
