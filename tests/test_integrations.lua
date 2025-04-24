@@ -50,7 +50,7 @@ T["setup"]["overrides default values"] = function()
             },
             dashboard = {
                 enabled = true,
-                filetype = "foobar",
+                filetypes = {"foobar"},
             },
         }
     })]])
@@ -89,7 +89,7 @@ T["setup"]["overrides default values"] = function()
         },
         dashboard = {
             enabled = true,
-            filetype = "foobar",
+            filetypes = { "foobar" },
         },
     })
 end
