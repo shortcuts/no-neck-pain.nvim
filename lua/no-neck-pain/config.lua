@@ -424,8 +424,10 @@ function NoNeckPain.defaults(options)
     if NoNeckPain.options.integrations.dashboard.enabled == true then
         NoNeckPain.options.autocmds.enableOnVimEnter = "safe"
 
-        for _, value in pairs(NoNeckPain.options.integrations.dashboard.filetypes) do
-            table.insert(constants.DASHBOARDS, value)
+        if NoNeckPain.options.integrations.dashboard.filetypes ~= nil then
+            for _, value in pairs(NoNeckPain.options.integrations.dashboard.filetypes) do
+                table.insert(constants.DASHBOARDS, value)
+            end
         end
     end
 
