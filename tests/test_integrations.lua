@@ -16,6 +16,47 @@ local T = MiniTest.new_set({
 
 T["setup"] = MiniTest.new_set()
 
+T["setup"]["sets default values"] = function()
+    child.lua([[require('no-neck-pain').setup()]])
+
+    Helpers.expect.config(child, "integrations", {
+        NeoTree = {
+            position = "left",
+            reopen = true,
+        },
+        NvimDAPUI = {
+            position = "none",
+            reopen = true,
+        },
+        NvimTree = {
+            position = "left",
+            reopen = true,
+        },
+        TSPlayground = {
+            position = "right",
+            reopen = true,
+        },
+        aerial = {
+            position = "right",
+            reopen = true,
+        },
+        dashboard = {
+            enabled = false,
+        },
+        neotest = {
+            position = "right",
+            reopen = true,
+        },
+        outline = {
+            position = "right",
+            reopen = true,
+        },
+        undotree = {
+            position = "left",
+        },
+    })
+end
+
 T["setup"]["overrides default values"] = function()
     child.lua([[require('no-neck-pain').setup({
         integrations = {
@@ -49,8 +90,7 @@ T["setup"]["overrides default values"] = function()
                 reopen = false,
             },
             dashboard = {
-                enabled = true,
-                filetypes = {"foobar"},
+                enabled = true
             },
         }
     })]])
@@ -89,7 +129,6 @@ T["setup"]["overrides default values"] = function()
         },
         dashboard = {
             enabled = true,
-            filetypes = { "foobar" },
         },
     })
 end
