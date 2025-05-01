@@ -263,12 +263,36 @@ function main.enable(scope)
                         log.debug(s, "`curr` has been deleted, resetting state")
 
                         local opened_buffers = api.get_opened_buffers()
+                        local win = vim.api.nvim_get_current_win()
 
                         vim.cmd("rightbelow vertical split")
 
+                        -- if we are currently on a side window, nvim's above command will copy the
+                        -- side window options to the newly opened window
+                        -- which will override the user's default window options
+                        -- we then need to reset it to the initial value we stored at startup
+                        if
+                            api.is_side_id(state.get_side_id(state, "left"), win)
+                            or api.is_side_id(state.get_side_id(state, "right"), win)
+                            or api.is_relative_window(win)
+                        then
+                            local new_win = vim.api.nvim_get_current_win()
+
+                            log.debug(
+                                s,
+                                "currently on a side %d, new win is %d, resetting window options",
+                                win,
+                                new_win
+                            )
+
+                            for opt, val in pairs(state.initial_window_opts) do
+                                api.set_window_option(new_win, opt, val)
+                            end
+                        end
+
                         if vim.tbl_count(opened_buffers) > 0 then
                             local bufname, _ = next(opened_buffers)
-                            if vim.startswith(bufname, "NoNamePain") then
+                            if bufname and vim.startswith(bufname, "NoNamePain") then
                                 bufname = string.sub(bufname, 11)
                             end
 
