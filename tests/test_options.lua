@@ -90,4 +90,25 @@ T["fallbackOnBufferDelete"]["still allows nvim to quit"] = function()
     end)
 end
 
+T["fallbackOnBufferDelete"]["invoking :bd properly resets window options"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=50,fallbackOnBufferDelete=true}) ]])
+
+    Helpers.expect.config(child, "fallbackOnBufferDelete", true)
+    child.nnp()
+
+    Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1000, left = 1001, right = 1002 })
+
+    child.cmd("badd 1")
+    child.cmd("bd")
+    child.loop.sleep(500)
+
+    if child.fn.has("nvim-0.10") == 0 then
+        Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1003, left = 1004, right = 1005 })
+    else
+        Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1004, left = 1005, right = 1006 })
+    end
+
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_option(0, 'linebreak')"), false)
+end
+
 return T
