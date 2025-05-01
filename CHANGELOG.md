@@ -1,4 +1,12 @@
 <a name="0.2.3"></a>
+## [2.4.1](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.4.0...v2.4.1) (2025-05-01)
+
+
+### Bug Fixes
+
+* npe on dashboard's filetypes ([#463](https://github.com/shortcuts/no-neck-pain.nvim/issues/463)) ([33a19ae](https://github.com/shortcuts/no-neck-pain.nvim/commit/33a19ae4c4e79df1ed13c56c64c371f0e1a51d65))
+* properly reset window options on `bd` ([#465](https://github.com/shortcuts/no-neck-pain.nvim/issues/465)) ([2299b41](https://github.com/shortcuts/no-neck-pain.nvim/commit/2299b41c086369e4636daa533ebd7ecb82eef3e6))
+
 ## [2.4.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.3.0...v2.4.0) (2025-04-24)
 
 
