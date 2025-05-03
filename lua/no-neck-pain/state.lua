@@ -237,13 +237,16 @@ end
 --- Whether the given `filetype` matches a supported integration or not.
 ---
 ---@param scope string: caller of the method.
----@param win integer?: the id of the win
+---@param win integer: the id of the win
 ---@return boolean: whether the current win is a integration or not.
 ---@return string?: the supported integration name.
 ---@return table?: the supported integration infos.
 ---@private
 function state:is_supported_integration(scope, win)
-    win = win or 0
+    if win == nil or not vim.api.nvim_win_is_valid(win) then
+        return false
+    end
+
     local tab = self.get_tab_safe(self)
     local buffer = vim.api.nvim_win_get_buf(win)
     local filetype = vim.api.nvim_buf_get_option(buffer, "filetype")
@@ -484,6 +487,13 @@ function state:walk_layout(scope, tree, has_col_parent, resize_only)
             else
                 for _, sub_leaf in ipairs(leafs) do
                     local id = sub_leaf[2]
+                    local supported, name, integration =
+                        self.is_supported_integration(self, scope, id)
+                    if supported and name and integration then
+                        log.debug(scope, "skipping resize itegration %s with id %d", name, id)
+                        goto continue
+                    end
+
                     if
                         sub_leaf[1] == "leaf"
                         and self.get_side_id(self, "left") ~= id
@@ -491,6 +501,7 @@ function state:walk_layout(scope, tree, has_col_parent, resize_only)
                     then
                         self.resize_win(self, id, _G.NoNeckPain.config.width, "unregistered")
                     end
+                    ::continue::
                 end
             end
             self.walk_layout(self, scope, tree[idx + 1], false, resize_only)
