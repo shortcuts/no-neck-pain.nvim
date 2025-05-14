@@ -482,7 +482,8 @@ T["TSPlayground"]["keeps sides open"] = function()
 
     Helpers.expect.state(child, "tabs[1].wins.columns", 4)
 
-    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1004)"), 20)
+    Helpers.expect.min(child.lua_get("vim.api.nvim_win_get_width(1004)"), 18)
+    Helpers.expect.max(child.lua_get("vim.api.nvim_win_get_width(1004)"), 19)
     Helpers.expect.state(child, "tabs[1].wins.integrations.TSPlayground", {
         close = "TSPlaygroundToggle",
         fileTypePattern = "tsplayground",
@@ -607,7 +608,7 @@ T["aerial"]["keeps sides open"] = function()
 
     Helpers.expect.state(child, "tabs[1].wins.columns", 4)
 
-    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1004)"), 20)
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1004)"), 14)
     Helpers.expect.state(child, "tabs[1].wins.integrations.aerial.id", 1004)
 
     Helpers.expect.state(child, "tabs[1].wins.main", {

@@ -19,6 +19,36 @@ Helpers.expect.buf_width = MiniTest.new_expectation(
     error_message
 )
 
+Helpers.expect.min = MiniTest.new_expectation(
+    "variable in child process matches",
+    function(min, value)
+        if min < value then
+            local context = string.format('Left:  %s\nRight: %s', vim.inspect(min), vim.inspect(value))
+            MiniTest.error_expect('min', context)
+
+            return
+        end
+
+        return true
+    end,
+    error_message
+)
+
+Helpers.expect.max = MiniTest.new_expectation(
+    "variable in child process matches",
+    function(max, value)
+        if max > value then
+            local context = string.format('Left:  %s\nRight: %s', vim.inspect(max), vim.inspect(value))
+            MiniTest.error_expect('max', context)
+
+            return
+        end
+
+        return true
+    end,
+    error_message
+)
+
 Helpers.expect.global = MiniTest.new_expectation(
     "variable in child process matches",
     function(child, field, value)

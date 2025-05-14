@@ -486,21 +486,28 @@ function state:walk_layout(scope, tree, has_col_parent, resize_only)
                 self.set_layout_windows(self, scope, leafs)
             else
                 for _, sub_leaf in ipairs(leafs) do
+                    if sub_leaf[1] ~= "leaf" then
+                        goto continue
+                    end
+
                     local id = sub_leaf[2]
+
                     local supported, name, integration =
                         self.is_supported_integration(self, scope, id)
+
                     if supported and name and integration then
                         log.debug(scope, "skipping resize itegration %s with id %d", name, id)
+
                         goto continue
                     end
 
                     if
-                        sub_leaf[1] == "leaf"
-                        and self.get_side_id(self, "left") ~= id
+                        self.get_side_id(self, "left") ~= id
                         and self.get_side_id(self, "right") ~= id
                     then
                         self.resize_win(self, id, _G.NoNeckPain.config.width, "unregistered")
                     end
+
                     ::continue::
                 end
             end
