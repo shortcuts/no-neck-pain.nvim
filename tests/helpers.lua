@@ -23,8 +23,9 @@ Helpers.expect.min = MiniTest.new_expectation(
     "variable in child process matches",
     function(min, value)
         if min < value then
-            local context = string.format('Left:  %s\nRight: %s', vim.inspect(min), vim.inspect(value))
-            MiniTest.error_expect('min', context)
+            local context =
+                string.format("Left:  %s\nRight: %s", vim.inspect(min), vim.inspect(value))
+            MiniTest.error_expect("min", context)
 
             return
         end
@@ -38,8 +39,9 @@ Helpers.expect.max = MiniTest.new_expectation(
     "variable in child process matches",
     function(max, value)
         if max > value then
-            local context = string.format('Left:  %s\nRight: %s', vim.inspect(max), vim.inspect(value))
-            MiniTest.error_expect('max', context)
+            local context =
+                string.format("Left:  %s\nRight: %s", vim.inspect(max), vim.inspect(value))
+            MiniTest.error_expect("max", context)
 
             return
         end

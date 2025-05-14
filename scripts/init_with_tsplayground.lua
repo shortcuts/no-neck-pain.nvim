@@ -11,11 +11,12 @@ require("nvim-treesitter.configs").setup({
 })
 require("mini.test").setup()
 require("no-neck-pain").setup({
-    debug = true, width = 20,
+    debug = true,
+    width = 20,
     integrations = {
         TSPlayground = {
             position = "left",
             reopen = true,
         },
-    }
+    },
 })
