@@ -114,8 +114,9 @@ function NoNeckPain.setup(opts)
             pattern = "*",
             callback = function()
                 local scope = string.format(
-                    "enable_on_vim_enter:%s",
-                    config.options.integrations.dashboard.enabled
+                    "enable_on_vim_enter:%s:%s",
+                    config.options.integrations.dashboard.enabled,
+                    config.options.autocmds.enableOnVimEnter
                 )
 
                 if config.options.autocmds.enableOnVimEnter == "safe" then

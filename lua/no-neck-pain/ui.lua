@@ -52,7 +52,7 @@ function ui.move_sides(scope)
                 log.debug(
                     sscope,
                     "wrong position after window move, focusing %s, should be %d, wins order %s",
-                    vim.api.nvim_get_current_win(),
+                    curr,
                     id,
                     vim.inspect(wins)
                 )

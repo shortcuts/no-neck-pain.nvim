@@ -57,7 +57,7 @@ function event.skip_enable(scope)
         return true
     end
 
-    return state.is_supported_integration(state, "event.skip_enable", nil)
+    return state.is_supported_integration(state, "event.skip_enable", 0)
 end
 
 return event
