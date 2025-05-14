@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [2.4.2](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.4.1...v2.4.2) (2025-05-14)
+
+
+### Bug Fixes
+
+* do not resize integration windows ([#466](https://github.com/shortcuts/no-neck-pain.nvim/issues/466)) ([7d83f3e](https://github.com/shortcuts/no-neck-pain.nvim/commit/7d83f3ef1c29c0401d12ea3bcd1675399b3e53c0))
+
 ## [2.4.1](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.4.0...v2.4.1) (2025-05-01)
 
 
