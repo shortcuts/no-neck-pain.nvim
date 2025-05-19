@@ -220,6 +220,10 @@ NoNeckPain.options = {
         -- When `false`, the mapping is not created.
         ---@type string
         scratchPad = "<Leader>ns",
+        -- Sets a global mapping to Neovim, which allows you to toggle the debug mode.
+        -- When `false`, the mapping is not created.
+        ---@type string
+        debug = "<Leader>nd",
     },
     --- Common options that are set to both side buffers.
     --- See |NoNeckPain.bufferOptions| for option scoped to the `left` and/or `right` buffer.
@@ -501,6 +505,7 @@ function NoNeckPain.setup(options)
         widthUp = ":NoNeckPainWidthUp<CR>",
         widthDown = ":NoNeckPainWidthDown<CR>",
         scratchPad = ":NoNeckPainScratchPad<CR>",
+        debug = ":NoNeckPainDebug<CR>",
     })
 
     return NoNeckPain.options

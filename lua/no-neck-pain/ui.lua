@@ -202,48 +202,53 @@ function ui.get_side_width(side)
         end
     end
 
-    local occupied = 0
+    log.debug(scope, "%d/%d columns after side removal", columns, state.get_columns(state))
 
-    -- remove width of registered integrations to the correct side
+    local integration_width = 0
+
+    -- remove columns of registered integrations
     for name, opts in pairs(state.get_integrations(state)) do
         if opts.id ~= nil then
             if
                 not state.is_side_enabled_and_valid(state, side)
                 or side == _G.NoNeckPain.config.integrations[name].position
             then
-                local integration_width = vim.api.nvim_win_get_width(opts.id)
+                local width = vim.api.nvim_win_get_width(opts.id)
+
                 log.debug(scope, "%s opened with width %d", name, integration_width)
 
-                occupied = occupied + integration_width
+                integration_width = integration_width + width
             end
 
             columns = columns - 1
         end
     end
 
-    log.debug(
-        scope,
-        "%d/%d after integrations - %d columns remaining",
-        occupied,
-        vim.o.columns,
-        columns
-    )
+    log.debug(scope, "%d/%d columns after integration removal", columns, state.get_columns(state))
+
+    if integration_width > 0 then
+        log.debug(
+            scope,
+            "%d total width integrations - %d columns remaining",
+            integration_width,
+            columns
+        )
+    end
+
+    local columns_width = 0
 
     while columns > 0 do
-        occupied = occupied + _G.NoNeckPain.config.width
+        columns_width = columns_width + _G.NoNeckPain.config.width
         columns = columns - 1
     end
 
-    -- then we don't have to create side buffers.
-    if occupied >= vim.o.columns then
-        log.debug(scope, "%d/%d - no space left to create side", occupied, vim.o.columns)
+    log.debug(scope, "%d total width columns - %d columns remaining", columns_width, columns)
 
-        return 0
+    local final = math.floor((vim.o.columns - columns_width) / 2) - integration_width
+
+    if final <= _G.NoNeckPain.config.minSideBufferWidth then
+        log.debug(scope, "%d/%d not enough space", final, vim.o.columns)
     end
-
-    local final = math.floor((vim.o.columns - occupied) / 2)
-
-    log.debug(scope, "%d/%d after splits - final %d", occupied, vim.o.columns, final)
 
     return final
 end
