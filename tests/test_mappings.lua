@@ -67,7 +67,8 @@ T["setup"]["overrides default values"] = function()
             widthDown = "<Leader>k=",
             toggleLeftSide = "<Leader>kl",
             toggleRightSide = "<Leader>kr",
-            scratchPad = "<Leader>ks"
+            scratchPad = "<Leader>ks",
+            debug = "<Leader>kd"
         }
     })]])
 
@@ -79,6 +80,7 @@ T["setup"]["overrides default values"] = function()
         toggleRightSide = "<Leader>kr",
         widthDown = "<Leader>k=",
         widthUp = "<Leader>k-",
+        debug = "<Leader>kd",
     })
 end
 
@@ -97,6 +99,7 @@ T["setup"]["allow widthUp and widthDown to be configurable"] = function()
         toggle = "<Leader>np",
         toggleLeftSide = "<Leader>nql",
         toggleRightSide = "<Leader>nqr",
+        debug = "<Leader>nd",
         widthDown = {
             mapping = "<Leader>k=",
             value = 99,
@@ -117,7 +120,8 @@ T["setup"]["does not create mappings if false"] = function()
             toggleRightSide = false,
             widthUp = false,
             widthDown = false,
-            scratchPad = false
+            scratchPad = false,
+            debug = false
         }
     })]])
 
@@ -129,6 +133,7 @@ T["setup"]["does not create mappings if false"] = function()
         toggleRightSide = false,
         widthUp = false,
         widthDown = false,
+        debug = false,
     })
 
     -- toggle plugin state

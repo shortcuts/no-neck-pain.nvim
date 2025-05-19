@@ -9,11 +9,11 @@ vim.api.nvim_create_user_command("NoNeckPain", function()
 end, { desc = "Toggles the plugin." })
 
 vim.api.nvim_create_user_command("NoNeckPainToggleLeftSide", function()
-    require("no-neck-pain").toggleSide("left")
+    require("no-neck-pain").toggle_side("left")
 end, { desc = "Toggles the left side buffer (open/close)." })
 
 vim.api.nvim_create_user_command("NoNeckPainToggleRightSide", function()
-    require("no-neck-pain").toggleSide("right")
+    require("no-neck-pain").toggle_side("right")
 end, { desc = "Toggles the right side buffer (open/close)." })
 
 vim.api.nvim_create_user_command("NoNeckPainResize", function(tbl)
@@ -33,5 +33,9 @@ vim.api.nvim_create_user_command("NoNeckPainWidthDown", function()
 end, { desc = "Decrease the width of the main window by 5." })
 
 vim.api.nvim_create_user_command("NoNeckPainScratchPad", function()
-    require("no-neck-pain").toggleScratchPad()
+    require("no-neck-pain").toggle_scratchPad()
 end, { desc = "Toggles the scratchPad feature of the plugin." })
+
+vim.api.nvim_create_user_command("NoNeckPainDebug", function()
+    require("no-neck-pain").toggle_debug()
+end, { desc = "Toggles the debug mode of the plugin." })

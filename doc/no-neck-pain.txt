@@ -5,9 +5,14 @@
 Toggle the plugin by calling the `enable`/`disable` methods respectively.
 
 ------------------------------------------------------------------------------
-                                                 *NoNeckPain.toggleScratchPad()*
-                        `NoNeckPain.toggleScratchPad`()
+                                                *NoNeckPain.toggle_scratchPad()*
+                        `NoNeckPain.toggle_scratchPad`()
 Toggles the scratchPad feature of the plugin.
+
+------------------------------------------------------------------------------
+                                                     *NoNeckPain.toggle_debug()*
+                          `NoNeckPain.toggle_debug`()
+Toggles the debug mode of the plugin.
 
 ------------------------------------------------------------------------------
                                                            *NoNeckPain.resize()*
@@ -281,6 +286,10 @@ Default values:
           -- When `false`, the mapping is not created.
           ---@type string
           scratchPad = "<Leader>ns",
+          -- Sets a global mapping to Neovim, which allows you to toggle the debug mode.
+          -- When `false`, the mapping is not created.
+          ---@type string
+          debug = "<Leader>nd",
       },
       --- Common options that are set to both side buffers.
       --- See |NoNeckPain.bufferOptions| for option scoped to the `left` and/or `right` buffer.
