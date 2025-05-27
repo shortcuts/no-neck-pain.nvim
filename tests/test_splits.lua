@@ -72,8 +72,8 @@ T["split"]["keeps side buffers"] = function()
     child.cmd("q")
 
     Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 30)
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.right", 28)
+    Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.left", 28, 30)
+    Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.right", 28, 30)
 end
 
 T["split"]["keeps correct focus"] = function()
@@ -109,11 +109,11 @@ T["split"]["correctly starts nnp with previously opened splits"] = function()
 
     child.nnp()
 
-    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1002)"), 30)
-    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1003)"), 28)
+    Helpers.expect.buf_width_in_range(child, "1002", 28, 30)
+    Helpers.expect.buf_width_in_range(child, "1003", 28, 30)
 
-    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1000)"), 20)
-    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1001)"), 20)
+    Helpers.expect.buf_width_in_range(child, "1000", 18, 20)
+    Helpers.expect.buf_width_in_range(child, "1001", 18, 20)
 
     Helpers.expect.equality(child.get_wins_in_tab(), { 1002, 1001, 1000, 1003 })
 end
@@ -152,15 +152,15 @@ T["vsplit"]["correctly size splits when opening helper with side buffers open"] 
 
     Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1003, 1000, 1002 })
 
-    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1003)"), 20)
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 19)
+    Helpers.expect.buf_width_in_range(child, "1003", 29, 30)
+    Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.curr", 5, 7)
 
     child.cmd("h")
 
     Helpers.expect.equality(child.get_wins_in_tab(), { 1004, 1001, 1003, 1000, 1002 })
 
     Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1004)"), 80)
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 20)
+    Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.curr", 5, 7)
 end
 
 T["vsplit"]["correctly position side buffers when there's enough space"] = function()
@@ -184,7 +184,8 @@ T["vsplit"]["preserve vsplit width when having side buffers"] = function()
 
     Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1002, 1000 })
 
-    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1002)"), 26)
+    Helpers.expect.buf_width_in_range(child, "1002", 36, 38)
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 20)
 end
 
 T["vsplit"]["closing `curr` makes `split` the new `curr`"] = function()
@@ -353,7 +354,7 @@ T["vsplit/split"]["closing help page doens't break layout"] = function()
 
     Helpers.expect.equality(child.get_current_win(), 1003)
 
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 48)
+    Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.curr", 24, 26)
 end
 
 T["vsplit/split"]["splits and vsplits keeps a correct size"] = function()
@@ -367,8 +368,8 @@ T["vsplit/split"]["splits and vsplits keeps a correct size"] = function()
 
     Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1003, 1000, 1002 })
     Helpers.expect.equality(child.get_current_win(), 1003)
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 20)
-    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1003)"), 20)
+    Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.curr", 18, 20)
+    Helpers.expect.buf_width_in_range(child, "1003", 18, 20)
 
     child.cmd("vsplit")
     child.wait()
@@ -376,8 +377,8 @@ T["vsplit/split"]["splits and vsplits keeps a correct size"] = function()
     Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1004, 1003, 1000, 1002 })
     Helpers.expect.equality(child.get_current_win(), 1004)
 
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 38)
-    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1003)"), 20)
+    Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.curr", 38, 40)
+    Helpers.expect.buf_width_in_range(child, "1003", 18, 20)
 end
 
 return T

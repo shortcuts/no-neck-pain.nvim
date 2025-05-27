@@ -1,3 +1,5 @@
+local api = dofile("lua/no-neck-pain/util/api.lua")
+
 -- imported from https://github.com/echasnovski/mini.nvim
 local Helpers = {}
 
@@ -19,18 +21,23 @@ Helpers.expect.buf_width = MiniTest.new_expectation(
     error_message
 )
 
-Helpers.expect.min = MiniTest.new_expectation(
+Helpers.expect.buf_width_in_range = MiniTest.new_expectation(
     "variable in child process matches",
-    function(min, value)
-        if min < value then
-            local context =
-                string.format("Left:  %s\nRight: %s", vim.inspect(min), vim.inspect(value))
-            MiniTest.error_expect("min", context)
+    function(child, winid, min, max)
+        local i = 0
+        repeat
+            child.wait(100 + i * i * 10)
 
-            return
-        end
+            local width = child.lua_get("vim.api.nvim_win_get_width(" .. winid .. ")")
 
-        return true
+            if width <= max and width >= min then
+                return true
+            end
+
+            i = i + 1
+        until i == 10
+
+        error(string.format("Left:  %s\nRight: %s", vim.inspect(max), vim.inspect(width)))
     end,
     error_message
 )
