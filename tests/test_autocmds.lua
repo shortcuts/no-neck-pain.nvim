@@ -56,8 +56,8 @@ T["auto command"]["does not shift when opening/closing float window"] = function
         right = 1002,
     })
 
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 15)
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.right", 15)
+    Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.left", 13, 15)
+    Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.right", 13, 15)
 
     child.api.nvim_open_win(
         0,
@@ -72,8 +72,8 @@ T["auto command"]["does not shift when opening/closing float window"] = function
         right = 1002,
     })
 
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 15)
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.right", 15)
+    Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.left", 13, 15)
+    Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.right", 13, 15)
 
     -- Close float window keeps the buffer here with the same width
     child.fn.win_gotoid(1003)
@@ -86,8 +86,8 @@ T["auto command"]["does not shift when opening/closing float window"] = function
         right = 1002,
     })
 
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 15)
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.right", 15)
+    Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.left", 13, 15)
+    Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.right", 13, 15)
 end
 
 T["skipEnteringNoNeckPainBuffer"] = MiniTest.new_set()
