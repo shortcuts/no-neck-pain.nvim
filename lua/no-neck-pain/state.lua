@@ -403,10 +403,14 @@ end
 ---@param side "left"|"right"|"curr"|"unregistered": the side of the window being resized, used for logging only.
 ---@private
 function state:resize_win(id, width, side)
-    log.debug(side, "resizing %d with padding %d", id, width)
+    local scope = string.format("resize_win_%s", side)
+
+    log.debug(scope, "win %d with width %d", id, width)
 
     if vim.api.nvim_win_is_valid(id) then
         vim.api.nvim_win_set_width(id, width)
+    else
+        log.debug(scope, "win is not valid")
     end
 end
 

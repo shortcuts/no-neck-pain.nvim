@@ -23,8 +23,8 @@ Parameters ~
 {width} `(number:)` any positive integer superior to 0.
 
 ------------------------------------------------------------------------------
-                                                       *NoNeckPain.toggleSide()*
-                        `NoNeckPain.toggleSide`({side})
+                                                      *NoNeckPain.toggle_side()*
+                        `NoNeckPain.toggle_side`({side})
 Toggles the config `${side}.enabled` and re-inits the plugin.
 
 Parameters ~

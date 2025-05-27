@@ -231,9 +231,7 @@ function main.enable(scope)
                 end
 
                 if init then
-                    api.debounce(s, function()
-                        return main.init(s)
-                    end)
+                    api.debounce(s, main.init)
                 end
             end)
         end,

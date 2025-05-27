@@ -167,11 +167,14 @@ function ui.create_side_buffers()
     for _, side in pairs(constants.SIDES) do
         if state.is_side_enabled_and_valid(state, side) then
             local padding = wins[side].padding or ui.get_side_width(side)
+            local scope = string.format("ui.create_side_buffers:%s", side)
 
             if padding > _G.NoNeckPain.config.minSideBufferWidth then
-                state.resize_win(state, state.get_side_id(state, side), padding, side)
+                api.debounce(scope, function()
+                    state.resize_win(state, state.get_side_id(state, side), padding, side)
+                end)
             else
-                ui.close_win("ui.create_side_buffers", state.get_side_id(state, side), side)
+                ui.close_win(scope, state.get_side_id(state, side), side)
                 state.set_side_id(state, nil, side)
             end
         end
@@ -215,7 +218,7 @@ function ui.get_side_width(side)
             then
                 local width = vim.api.nvim_win_get_width(opts.id)
 
-                log.debug(scope, "%s opened with width %d", name, integration_width)
+                log.debug(scope, "%s opened with width %d", name, width)
 
                 integration_width = integration_width + width
             end
@@ -224,16 +227,12 @@ function ui.get_side_width(side)
         end
     end
 
-    log.debug(scope, "%d/%d columns after integration removal", columns, state.get_columns(state))
-
-    if integration_width > 0 then
-        log.debug(
-            scope,
-            "%d total width integrations - %d columns remaining",
-            integration_width,
-            columns
-        )
-    end
+    log.debug(
+        scope,
+        "%d total width integrations - %d columns remaining",
+        integration_width,
+        columns
+    )
 
     local columns_width = 0
 
