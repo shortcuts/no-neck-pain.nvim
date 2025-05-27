@@ -481,15 +481,15 @@ T["TSPlayground"]["keeps sides open"] = function()
     child.wait()
 
     Helpers.expect.state(child, "tabs[1].wins.columns", 4)
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1004, 1000, 1002 })
 
-    Helpers.expect.min(child.lua_get("vim.api.nvim_win_get_width(1004)"), 18)
-    Helpers.expect.max(child.lua_get("vim.api.nvim_win_get_width(1004)"), 19)
     Helpers.expect.state(child, "tabs[1].wins.integrations.TSPlayground", {
         close = "TSPlaygroundToggle",
         fileTypePattern = "tsplayground",
         id = 1004,
         open = "TSPlaygroundToggle",
     })
+    Helpers.expect.buf_width_in_range(child, "1004", 18, 19)
 
     Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,
@@ -549,8 +549,8 @@ T["TSPlayground"]["reduces `left` side if only active when integration is on `ri
 
     Helpers.expect.state(child, "tabs[1].wins.columns", 3)
 
+    Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.left", 28, 30)
     Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1003)"), 28)
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 30)
     Helpers.expect.state(child, "tabs[1].wins.integrations.TSPlayground", {
         close = "TSPlaygroundToggle",
         fileTypePattern = "tsplayground",
@@ -578,7 +578,7 @@ T["TSPlayground"]["reduces `left` side if only active when integration is on `ri
         left = 1001,
         right = nil,
     })
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 30)
+    Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.left", 38, 40)
 end
 
 T["aerial"] = MiniTest.new_set()
