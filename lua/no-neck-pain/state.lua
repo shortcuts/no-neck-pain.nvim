@@ -398,13 +398,12 @@ end
 
 --- Resizes a window if it's valid.
 ---
+---@param scope string: the caller of the method.
 ---@param id number: the id of the window.
 ---@param width number: the width to apply to the window.
 ---@param side "left"|"right"|"curr"|"unregistered": the side of the window being resized, used for logging only.
 ---@private
-function state:resize_win(id, width, side)
-    local scope = string.format("resize_win_%s", side)
-
+function state:resize_win(scope, id, width, side)
     log.debug(scope, "win %d with width %d", id, width)
 
     if vim.api.nvim_win_is_valid(id) then
@@ -500,7 +499,7 @@ function state:walk_layout(scope, tree, has_col_parent, resize_only)
                         self.is_supported_integration(self, scope, id)
 
                     if supported and name and integration then
-                        log.debug(scope, "skipping resize itegration %s with id %d", name, id)
+                        log.debug(scope, "skipping resize integration %s with id %d", name, id)
 
                         goto continue
                     end
@@ -509,7 +508,7 @@ function state:walk_layout(scope, tree, has_col_parent, resize_only)
                         self.get_side_id(self, "left") ~= id
                         and self.get_side_id(self, "right") ~= id
                     then
-                        self.resize_win(self, id, _G.NoNeckPain.config.width, "unregistered")
+                        self.resize_win(self, scope, id, _G.NoNeckPain.config.width, "unregistered")
                     end
 
                     ::continue::
