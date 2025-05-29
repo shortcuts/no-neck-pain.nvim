@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [2.4.3](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.4.2...v2.4.3) (2025-05-29)
+
+
+### Bug Fixes
+
+* properly compute remaining width after integrations ([#469](https://github.com/shortcuts/no-neck-pain.nvim/issues/469)) ([4367884](https://github.com/shortcuts/no-neck-pain.nvim/commit/43678849d6c9a101b58a307d4a26f58681f15b19))
+
 ## [2.4.2](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.4.1...v2.4.2) (2025-05-14)
 
 
