@@ -5,9 +5,14 @@
 Toggle the plugin by calling the `enable`/`disable` methods respectively.
 
 ------------------------------------------------------------------------------
-                                                 *NoNeckPain.toggleScratchPad()*
-                        `NoNeckPain.toggleScratchPad`()
+                                                *NoNeckPain.toggle_scratchPad()*
+                        `NoNeckPain.toggle_scratchPad`()
 Toggles the scratchPad feature of the plugin.
+
+------------------------------------------------------------------------------
+                                                     *NoNeckPain.toggle_debug()*
+                          `NoNeckPain.toggle_debug`()
+Toggles the debug mode of the plugin.
 
 ------------------------------------------------------------------------------
                                                            *NoNeckPain.resize()*
@@ -15,15 +20,15 @@ Toggles the scratchPad feature of the plugin.
 Sets the config `width` to the given `width` value and resizes the NoNeckPain windows.
 
 Parameters ~
-{width} `(number:)` any positive integer superior to 0.
+{width} `(number)`: any positive integer superior to 0.
 
 ------------------------------------------------------------------------------
-                                                       *NoNeckPain.toggleSide()*
-                        `NoNeckPain.toggleSide`({side})
+                                                      *NoNeckPain.toggle_side()*
+                        `NoNeckPain.toggle_side`({side})
 Toggles the config `${side}.enabled` and re-inits the plugin.
 
 Parameters ~
-{side} "left" | "right": the side to toggle.
+{side} "`(left)`" | "right": the side to toggle.
 
 ------------------------------------------------------------------------------
                                                            *NoNeckPain.enable()*
@@ -281,6 +286,10 @@ Default values:
           -- When `false`, the mapping is not created.
           ---@type string
           scratchPad = "<Leader>ns",
+          -- Sets a global mapping to Neovim, which allows you to toggle the debug mode.
+          -- When `false`, the mapping is not created.
+          ---@type string
+          debug = "<Leader>nd",
       },
       --- Common options that are set to both side buffers.
       --- See |NoNeckPain.bufferOptions| for option scoped to the `left` and/or `right` buffer.

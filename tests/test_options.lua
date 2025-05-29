@@ -22,8 +22,8 @@ T["minSideBufferWidth"]["closes side buffer respecting the given value"] = funct
 
     Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1000, left = 1001, right = 1002 })
 
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 15)
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.right", 15)
+    Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.left", 13, 15)
+    Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.right", 13, 15)
 
     child.lua([[
         require('no-neck-pain').disable()

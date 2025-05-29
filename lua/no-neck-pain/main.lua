@@ -133,15 +133,6 @@ function main.init(scope)
         end
     end
 
-    -- if we still have side buffers and something else opened than the `curr`
-    -- there might be width issues so we the resize_win opened vsplits.
-    if
-        state.check_sides(state, "or", true)
-        and state.get_columns(state) > state.get_nb_sides(state) + 1
-    then
-        state.walk_layout(state, scope, vim.fn.winlayout(state.active_tab), false, true)
-    end
-
     state.save(state)
 end
 
@@ -231,9 +222,7 @@ function main.enable(scope)
                 end
 
                 if init then
-                    api.debounce(s, function()
-                        return main.init(s)
-                    end)
+                    api.debounce(s, main.init)
                 end
             end)
         end,

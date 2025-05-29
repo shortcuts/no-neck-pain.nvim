@@ -36,8 +36,9 @@ T["setup"]["sets exposed methods and default options value"] = function()
     Helpers.expect.global_type(child, "_G.NoNeckPain.setup", "function")
     Helpers.expect.global_type(child, "_G.NoNeckPain.resize", "function")
     Helpers.expect.global_type(child, "_G.NoNeckPain.disable", "function")
-    Helpers.expect.global_type(child, "_G.NoNeckPain.toggleSide", "function")
-    Helpers.expect.global_type(child, "_G.NoNeckPain.toggleScratchPad", "function")
+    Helpers.expect.global_type(child, "_G.NoNeckPain.toggle_side", "function")
+    Helpers.expect.global_type(child, "_G.NoNeckPain.toggle_scratchPad", "function")
+    Helpers.expect.global_type(child, "_G.NoNeckPain.toggle_debug", "function")
 
     -- config
     Helpers.expect.global_type(child, "_G.NoNeckPain.config", "table")
@@ -64,6 +65,7 @@ T["setup"]["sets exposed methods and default options value"] = function()
             toggleRightSide = "<Leader>nqr",
             widthUp = "<Leader>n=",
             widthDown = "<Leader>n-",
+            debug = "<Leader>nd",
         },
         callbacks = {},
         buffers = {
@@ -219,6 +221,7 @@ T["setup"]["overrides default values"] = function()
             toggleRightSide = "<Leader>nqr",
             widthUp = "<Leader>n=",
             widthDown = "<Leader>n-",
+            debug = "<Leader>nd",
         },
         buffers = {
             setNames = false,

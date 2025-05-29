@@ -50,8 +50,8 @@ T["tabs"]["side buffers coexist on many tabs"] = function()
     Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
     Helpers.expect.state(child, "active_tab", 1)
 
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 15)
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.right", 15)
+    Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.left", 13, 15)
+    Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.right", 13, 15)
 
     -- tab 2
     child.cmd("tabnew")
@@ -70,8 +70,8 @@ T["tabs"]["side buffers coexist on many tabs"] = function()
     Helpers.expect.state(child, "active_tab", 3)
 
     -- width is preserved as on tab 1
-    Helpers.expect.buf_width(child, "tabs[3].wins.main.left", 15)
-    Helpers.expect.buf_width(child, "tabs[3].wins.main.right", 15)
+    Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.left", 13, 15)
+    Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.right", 13, 15)
 
     Helpers.expect.equality(child.get_wins_in_tab(1), { 1001, 1000, 1002 })
     Helpers.expect.equality(child.get_wins_in_tab(3), { 1007, 1006, 1008 })

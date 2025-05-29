@@ -9,5 +9,6 @@ NoNeckPain.options	no-neck-pain.txt	/*NoNeckPain.options*
 NoNeckPain.resize()	no-neck-pain.txt	/*NoNeckPain.resize()*
 NoNeckPain.setup()	no-neck-pain.txt	/*NoNeckPain.setup()*
 NoNeckPain.toggle()	no-neck-pain.txt	/*NoNeckPain.toggle()*
-NoNeckPain.toggleScratchPad()	no-neck-pain.txt	/*NoNeckPain.toggleScratchPad()*
-NoNeckPain.toggleSide()	no-neck-pain.txt	/*NoNeckPain.toggleSide()*
+NoNeckPain.toggle_debug()	no-neck-pain.txt	/*NoNeckPain.toggle_debug()*
+NoNeckPain.toggle_scratchPad()	no-neck-pain.txt	/*NoNeckPain.toggle_scratchPad()*
+NoNeckPain.toggle_side()	no-neck-pain.txt	/*NoNeckPain.toggle_side()*

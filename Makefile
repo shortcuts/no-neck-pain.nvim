@@ -10,6 +10,9 @@ test:
 	nvim --headless --noplugin -u ./scripts/minimal_init.lua \
 		-c "lua MiniTest.run({ execute = { reporter = MiniTest.gen_reporter.stdout({ group_depth = 2 }) } })"
 
+test-race:
+	for i in {1..10}; do make test || break ; done
+
 test-nightly:
 	bob use nightly
 	make test
@@ -18,6 +21,10 @@ $(addprefix test-, $(TESTFILES)): test-%:
 	nvim --version | head -n 1 && echo ''
 	nvim --headless --noplugin -u ./scripts/minimal_init.lua \
 		-c "lua MiniTest.run_file('tests/test_$*.lua', { execute = { reporter = MiniTest.gen_reporter.stdout({ group_depth = 2 }) } })"
+
+$(addprefix test-race-, $(TESTFILES)): test-race-%:
+	for i in {1..10}; do make test-$* || break ; done
+
 deps:
 	./scripts/clone_deps.sh 1 || true
 
@@ -27,7 +34,7 @@ deps-lint:
 	luarocks install lanes --force
 	luarocks install luacheck --force
 
-test-ci: deps test
+test-ci: deps test-race
 
 documentation:
 	nvim --headless --noplugin -u ./scripts/minimal_init.lua -c "lua require('mini.doc').generate()" -c "qa!"
