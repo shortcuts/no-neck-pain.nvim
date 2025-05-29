@@ -171,7 +171,7 @@ function ui.create_side_buffers()
 
             if padding > _G.NoNeckPain.config.minSideBufferWidth then
                 api.debounce(scope, function()
-                    state.resize_win(state, scope, state.get_side_id(state, side), padding, side)
+                    state.resize_win(state, scope, state.get_side_id(state, side), padding)
 
                     -- if we columns other than side buffer and curr,
                     -- we should resize every windows that are not an integration
@@ -180,7 +180,7 @@ function ui.create_side_buffers()
                     if state.get_columns(state) > state.get_nb_sides(state) + 1 then
                         state.walk_layout(
                             state,
-                            "ui.create_side_buffers:unregistered",
+                            string.format("%s:unregistered", scope),
                             vim.fn.winlayout(state.active_tab),
                             false,
                             true

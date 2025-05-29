@@ -401,12 +401,11 @@ end
 ---@param scope string: the caller of the method.
 ---@param id number: the id of the window.
 ---@param width number: the width to apply to the window.
----@param side "left"|"right"|"curr"|"unregistered": the side of the window being resized, used for logging only.
 ---@private
-function state:resize_win(scope, id, width, side)
+function state:resize_win(scope, id, width)
     log.debug(scope, "win %d with width %d", id, width)
 
-    if vim.api.nvim_win_is_valid(id) then
+    if id ~= nil and vim.api.nvim_win_is_valid(id) then
         vim.api.nvim_win_set_width(id, width)
     else
         log.debug(scope, "win is not valid")
@@ -508,7 +507,7 @@ function state:walk_layout(scope, tree, has_col_parent, resize_only)
                         self.get_side_id(self, "left") ~= id
                         and self.get_side_id(self, "right") ~= id
                     then
-                        self.resize_win(self, scope, id, _G.NoNeckPain.config.width, "unregistered")
+                        self.resize_win(self, scope, id, _G.NoNeckPain.config.width)
                     end
 
                     ::continue::
