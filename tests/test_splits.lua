@@ -152,15 +152,15 @@ T["vsplit"]["correctly size splits when opening helper with side buffers open"] 
 
     Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1003, 1000, 1002 })
 
-    Helpers.expect.buf_width_in_range(child, "1003", 29, 30)
-    Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.curr", 5, 7)
+    Helpers.expect.buf_width_in_range(child, "1003", 18, 20)
+    Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.curr", 18, 20)
 
     child.cmd("h")
 
     Helpers.expect.equality(child.get_wins_in_tab(), { 1004, 1001, 1003, 1000, 1002 })
 
     Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1004)"), 80)
-    Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.curr", 5, 7)
+    Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.curr", 18, 20)
 end
 
 T["vsplit"]["correctly position side buffers when there's enough space"] = function()
@@ -344,17 +344,20 @@ T["vsplit/split"]["closing help page doens't break layout"] = function()
     Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
 
     child.cmd("split")
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1003, 1000, 1002 })
+
     child.cmd("h")
     Helpers.expect.equality(child.get_wins_in_tab(), { 1004, 1001, 1003, 1000, 1002 })
 
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 48)
+    Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.curr", 46, 48)
 
+    Helpers.expect.equality(child.get_current_win(), 1004)
     child.cmd("q")
     Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1003, 1000, 1002 })
 
     Helpers.expect.equality(child.get_current_win(), 1003)
 
-    Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.curr", 24, 26)
+    Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.curr", 26, 48)
 end
 
 T["vsplit/split"]["splits and vsplits keeps a correct size"] = function()

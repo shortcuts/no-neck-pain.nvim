@@ -25,10 +25,11 @@ Helpers.expect.buf_width_in_range = MiniTest.new_expectation(
     "variable in child process matches",
     function(child, winid, min, max)
         local i = 0
+        local width = 0
         repeat
             child.wait(100 + i * i * 10)
 
-            local width = child.lua_get("vim.api.nvim_win_get_width(" .. winid .. ")")
+            width = child.lua_get("vim.api.nvim_win_get_width(" .. winid .. ")")
 
             if width <= max and width >= min then
                 return true
