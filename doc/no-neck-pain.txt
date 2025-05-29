@@ -20,7 +20,7 @@ Toggles the debug mode of the plugin.
 Sets the config `width` to the given `width` value and resizes the NoNeckPain windows.
 
 Parameters ~
-{width} `(number:)` any positive integer superior to 0.
+{width} `(number)`: any positive integer superior to 0.
 
 ------------------------------------------------------------------------------
                                                       *NoNeckPain.toggle_side()*
@@ -28,7 +28,7 @@ Parameters ~
 Toggles the config `${side}.enabled` and re-inits the plugin.
 
 Parameters ~
-{side} "left" | "right": the side to toggle.
+{side} "`(left)`" | "right": the side to toggle.
 
 ------------------------------------------------------------------------------
                                                            *NoNeckPain.enable()*
