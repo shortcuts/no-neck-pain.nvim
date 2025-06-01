@@ -468,9 +468,8 @@ end
 ---@param scope string: the caller of the method.
 ---@param tree table: the tree to walk in.
 ---@param has_col_parent boolean: whether or not the previous walked tree was a column.
----@param resize_only boolean?: walks the layout in order to find columns, but only resize 1 window of each column
 ---@private
-function state:walk_layout(scope, tree, has_col_parent, resize_only)
+function state:walk_layout(scope, tree, has_col_parent)
     -- col -- represents a vertical association of window, e.g. { { "leaf", int }, { "col", { ... } }, { "row", { ...} } }
     -- row -- represents an horizontal association of window, e.g  { { "leaf", int }, { "col", { ... } }, { "row", { ...} } }
     -- leaf -- represents a window, e.g. { "leaf", int }
@@ -483,44 +482,16 @@ function state:walk_layout(scope, tree, has_col_parent, resize_only)
     for idx, leaf in ipairs(tree) do
         if leaf == "row" then
             local leafs = tree[idx + 1]
-            if not resize_only then
-                -- if on a row we were on a col, then it means one iteam of the row must be of the same width as a col one
-                if has_col_parent and vim.tbl_count(leafs) > 1 then
-                    table.remove(leafs, 1)
-                end
-                self.set_layout_windows(self, scope, leafs)
-            else
-                for _, sub_leaf in ipairs(leafs) do
-                    if sub_leaf[1] ~= "leaf" then
-                        goto continue
-                    end
-
-                    local id = sub_leaf[2]
-
-                    local supported, name, integration =
-                        self.is_supported_integration(self, scope, id)
-
-                    if supported and name and integration then
-                        log.debug(scope, "skipping resize integration %s with id %d", name, id)
-
-                        goto continue
-                    end
-
-                    if
-                        self.get_side_id(self, "left") ~= id
-                        and self.get_side_id(self, "right") ~= id
-                    then
-                        self.resize_win(self, scope, id, _G.NoNeckPain.config.width)
-                    end
-
-                    ::continue::
-                end
+            -- if on a row we were on a col, then it means one iteam of the row must be of the same width as a col one
+            if has_col_parent and vim.tbl_count(leafs) > 1 then
+                table.remove(leafs, 1)
             end
-            self.walk_layout(self, scope, tree[idx + 1], false, resize_only)
+            self.set_layout_windows(self, scope, leafs)
+            self.walk_layout(self, scope, tree[idx + 1], false)
         elseif leaf == "col" then
-            self.walk_layout(self, scope, tree[idx + 1], true, resize_only)
+            self.walk_layout(self, scope, tree[idx + 1], true)
         elseif type(leaf) == "table" and type(leaf[1]) == "string" then
-            self.walk_layout(self, scope, leaf, has_col_parent, resize_only)
+            self.walk_layout(self, scope, leaf, has_col_parent)
         end
     end
 end
