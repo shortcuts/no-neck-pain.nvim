@@ -257,7 +257,7 @@ function ui.get_side_width(side)
 
     log.debug(scope, "%d total width columns - %d columns remaining", columns_width, columns)
 
-    local final = math.floor((vim.o.columns - columns_width) / 2) - integration_width
+    local final = math.floor((vim.o.columns - columns_width - integration_width) / 2)
 
     if final <= _G.NoNeckPain.config.minSideBufferWidth then
         log.debug(scope, "%d/%d not enough space", final, vim.o.columns)
