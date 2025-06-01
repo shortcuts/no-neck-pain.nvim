@@ -372,7 +372,10 @@ end
 ---@return number
 ---@private
 function state:get_nb_sides()
-    if self.is_side_enabled(self, "left") and self.is_side_enabled(self, "right") then
+    if
+        self.is_side_enabled_and_valid(self, "left")
+        and self.is_side_enabled_and_valid(self, "right")
+    then
         return 2
     end
 

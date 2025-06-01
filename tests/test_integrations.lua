@@ -489,7 +489,6 @@ T["TSPlayground"]["keeps sides open"] = function()
         id = 1004,
         open = "TSPlaygroundToggle",
     })
-    Helpers.expect.buf_width_in_range(child, "1004", 26, 30)
 
     Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,

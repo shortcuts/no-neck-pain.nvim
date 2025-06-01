@@ -116,7 +116,7 @@ end
 ---@param side "left"|"right": the side of the window being resized, used for logging only.
 ---@private
 function colors.init(win, side)
-    if win == nil then
+    if win == nil or not vim.api.nvim_win_is_valid(win) then
         return
     end
 
