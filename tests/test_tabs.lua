@@ -99,6 +99,41 @@ T["tabs"]["previous tab kept side buffers if enabled"] = function()
     Helpers.expect.state(child, "active_tab", 1)
 end
 
+T["tabs"]["does not throw when resizing and tab isn't registered"] = function()
+    child.restart({
+        "-u",
+        "scripts/minimal_init.lua",
+        "-p",
+        "lua/no-neck-pain/main.lua",
+        "lua/no-neck-pain/config.lua",
+    })
+
+    child.lua([[ require('no-neck-pain').setup({width=30}) ]])
+    child.nnp()
+
+    -- tab 1
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1002, 1000, 1003 })
+    Helpers.expect.state(child, "active_tab", 1)
+
+    -- tab 2
+    child.cmd("tabnext")
+    child.wait()
+
+    Helpers.expect.state(child, "active_tab", 2)
+
+    Helpers.expect.equality(child.get_size(), { 24, 80 })
+    child.cmd("set columns=30")
+    child.wait()
+
+    Helpers.expect.equality(child.get_size(), { 24, 30 })
+
+    child.cmd("tabnext")
+    child.wait()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1002, 1000, 1003 })
+    Helpers.expect.state(child, "active_tab", 1)
+end
+
 T["TabEnter"] = MiniTest.new_set()
 
 T["TabEnter"]["starts the plugin on new tab"] = function()
