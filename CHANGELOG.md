@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [2.4.4](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.4.3...v2.4.4) (2025-06-01)
+
+
+### Bug Fixes
+
+* prevent unexpected error on resize for unknown tabs ([#475](https://github.com/shortcuts/no-neck-pain.nvim/issues/475)) ([26d18f2](https://github.com/shortcuts/no-neck-pain.nvim/commit/26d18f26f3a6ea038dd7604f23b6f7155a2c513f))
+
 ## [2.4.3](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.4.2...v2.4.3) (2025-05-29)
 
 
