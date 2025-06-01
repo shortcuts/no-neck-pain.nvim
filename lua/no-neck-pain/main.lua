@@ -167,16 +167,12 @@ function main.enable(scope)
     vim.api.nvim_create_autocmd({ "VimResized" }, {
         callback = function(p)
             vim.schedule(function()
-                if _G.NoNeckPain.state == nil or not _G.NoNeckPain.state.enabled then
+                if
+                    _G.NoNeckPain.state == nil
+                    or not _G.NoNeckPain.state.enabled
+                    or not state.is_active_tab_registered(state)
+                then
                     return
-                end
-
-                local tab = state.get_tab(state)
-
-                if tab ~= nil then
-                    if state.active_tab ~= tab.id then
-                        return
-                    end
                 end
 
                 main.init(p.event)
