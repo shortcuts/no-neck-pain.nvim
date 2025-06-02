@@ -1,4 +1,12 @@
 <a name="0.2.3"></a>
+## [2.4.5](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.4.4...v2.4.5) (2025-06-02)
+
+
+### Bug Fixes
+
+* do not resize vsplits ([#474](https://github.com/shortcuts/no-neck-pain.nvim/issues/474)) ([3be8d37](https://github.com/shortcuts/no-neck-pain.nvim/commit/3be8d375c36fba9e6376e0c4a3043310c2e021d7))
+* subtract `integration_width` first to calculate the side buffer width ([#472](https://github.com/shortcuts/no-neck-pain.nvim/issues/472)) ([cf76573](https://github.com/shortcuts/no-neck-pain.nvim/commit/cf76573a806a4986d2ea62aae5dca500726df767))
+
 ## [2.4.4](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.4.3...v2.4.4) (2025-06-01)
 
 
