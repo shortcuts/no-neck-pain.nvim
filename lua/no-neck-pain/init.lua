@@ -147,9 +147,7 @@ function NoNeckPain.setup(opts)
                             pcall(vim.api.nvim_del_augroup_by_name, "NoNeckPainVimEnterAutocmd")
                         end
                     end)
-                    vim.schedule(function()
-                        main.init(scope)
-                    end)
+                    main.init(scope)
                 end
             end,
             group = "NoNeckPainVimEnterAutocmd",

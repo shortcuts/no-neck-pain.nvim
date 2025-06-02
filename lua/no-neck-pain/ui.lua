@@ -68,7 +68,7 @@ end
 ---@param side "left"|"right": the side of the window being closed, used for logging only.
 ---@private
 function ui.close_win(scope, id, side)
-    if vim.api.nvim_win_is_valid(id) then
+    if id ~= nil and vim.api.nvim_win_is_valid(id) then
         log.debug(scope, "closing %s window", side)
 
         vim.api.nvim_win_close(id, false)
@@ -133,34 +133,32 @@ function ui.create_side_buffers()
     }
 
     for _, side in pairs(constants.SIDES) do
-        if _G.NoNeckPain.config.buffers[side].enabled then
-            if
-                wins[side].padding > _G.NoNeckPain.config.minSideBufferWidth
-                and not state.is_side_enabled_and_valid(state, side)
-            then
-                vim.cmd(wins[side].cmd)
+        if
+            wins[side].padding > _G.NoNeckPain.config.minSideBufferWidth
+            and not state.is_side_enabled_and_valid(state, side)
+        then
+            vim.cmd(wins[side].cmd)
 
-                state.set_side_id(state, vim.api.nvim_get_current_win(), side)
+            state.set_side_id(state, vim.api.nvim_get_current_win(), side)
 
-                if _G.NoNeckPain.config.buffers.set_names then
-                    local exist = vim.fn.bufnr("no-neck-pain-" .. side)
+            if _G.NoNeckPain.config.buffers.set_names then
+                local exist = vim.fn.bufnr("no-neck-pain-" .. side)
 
-                    if exist ~= -1 then
-                        vim.api.nvim_buf_delete(exist, { force = true })
-                    end
-
-                    vim.api.nvim_buf_set_name(0, "no-neck-pain-" .. side)
+                if exist ~= -1 then
+                    vim.api.nvim_buf_delete(exist, { force = true })
                 end
 
-                if _G.NoNeckPain.config.buffers[side].scratchPad.enabled then
-                    state.set_scratchPad(state, true)
-                    ui.init_scratchPad(side, state.get_side_id(state, side))
-                else
-                    ui.init_side_options(side, state.get_side_id(state, side))
-                end
-
-                colors.init(state.get_side_id(state, side), side)
+                vim.api.nvim_buf_set_name(0, "no-neck-pain-" .. side)
             end
+
+            if _G.NoNeckPain.config.buffers[side].scratchPad.enabled then
+                state.set_scratchPad(state, true)
+                ui.init_scratchPad(side, state.get_side_id(state, side))
+            else
+                ui.init_side_options(side, state.get_side_id(state, side))
+            end
+
+            colors.init(state.get_side_id(state, side), side)
         end
     end
 
@@ -170,23 +168,7 @@ function ui.create_side_buffers()
             local scope = string.format("ui.create_side_buffers:%s", side)
 
             if padding > _G.NoNeckPain.config.minSideBufferWidth then
-                api.debounce(scope, function()
-                    state.resize_win(state, scope, state.get_side_id(state, side), padding)
-
-                    -- if we columns other than side buffer and curr,
-                    -- we should resize every windows that are not an integration
-                    -- or a side, in order to make sure the resize of the side
-                    -- does not squeeze them
-                    if state.get_columns(state) > state.get_nb_sides(state) + 1 then
-                        state.walk_layout(
-                            state,
-                            string.format("%s:unregistered", scope),
-                            vim.fn.winlayout(state.active_tab),
-                            false,
-                            true
-                        )
-                    end
-                end)
+                state.resize_win(state, scope, state.get_side_id(state, side), padding)
             else
                 ui.close_win(scope, state.get_side_id(state, side), side)
                 state.set_side_id(state, nil, side)
@@ -195,72 +177,82 @@ function ui.create_side_buffers()
     end
 end
 
---- Determine the "padding" (width) of the buffer based on the `_G.NoNeckPain.config.width` and the width of the screen.
+--- Determine the "padding" (width) of a side window (`left` or `right` nnp buffer)
+--- considering the currently occupied columns (vsplit) on the screen.
+--- The reminder is the sum of: (nvim width - columns width) / 2
+---
+--- When 0 is returned, it means we can't and should not create the current side.
 ---
 ---@param side "left"|"right": the side of the window.
 ---@return number: the width of the side window.
 ---@private
 function ui.get_side_width(side)
     local scope = string.format("get_side_width:%s", side)
+
+    if not state.is_side_enabled(state, side) then
+        log.debug(scope, "disabled")
+
+        return 0
+    end
+
+    local width = vim.o.columns
+
     -- if the available screen size is lower than the config width,
     -- we don't have to create side buffers.
     if _G.NoNeckPain.config.width >= vim.o.columns then
-        log.debug(scope, "[%s] - ui %s - no space left to create side buffers", side, vim.o.columns)
+        log.debug(
+            scope,
+            "defined width in config is bigger than the current ui %d/%d",
+            _G.NoNeckPain.config.width,
+            width
+        )
 
         return 0
     end
 
     local columns = state.get_columns(state)
 
-    for _, s in ipairs(constants.SIDES) do
-        -- remove sides but always keep 1 column for the curr, which will be computed with "splits"
-        if state.is_side_enabled_and_valid(state, s) and columns > 1 then
+    log.debug(scope, "%d width available, %d vsplit columns", width, columns)
+
+    for _, _side in pairs(constants.SIDES) do
+        if state.is_side_enabled_and_valid(state, _side) then
             columns = columns - 1
         end
     end
 
-    log.debug(scope, "%d/%d columns after side removal", columns, state.get_columns(state))
-
-    local integration_width = 0
-
     -- remove columns of registered integrations
     for name, opts in pairs(state.get_integrations(state)) do
-        if opts.id ~= nil then
-            if
-                not state.is_side_enabled_and_valid(state, side)
-                or side == _G.NoNeckPain.config.integrations[name].position
-            then
-                local width = vim.api.nvim_win_get_width(opts.id)
+        if opts.id ~= nil and side == _G.NoNeckPain.config.integrations[name].position then
+            local integration_width = vim.api.nvim_win_get_width(opts.id)
 
-                log.debug(scope, "%s opened with width %d", name, width)
+            log.debug(scope, "%s opened with width %d", name, integration_width)
 
-                integration_width = integration_width + width
-
-                columns = columns - 1
-            end
+            width = width - integration_width
+            columns = columns - 1
         end
     end
 
     log.debug(
         scope,
-        "%d total width integrations - %d columns remaining",
-        integration_width,
+        "%d/%d after integrations - %d columns remaining",
+        width,
+        vim.o.columns,
         columns
     )
 
-    local columns_width = 0
-
     while columns > 0 do
-        columns_width = columns_width + _G.NoNeckPain.config.width
+        width = width - _G.NoNeckPain.config.width
         columns = columns - 1
     end
 
-    log.debug(scope, "%d total width columns - %d columns remaining", columns_width, columns)
+    log.debug(scope, "%d/%d after vsplits - %d columns remaining", width, vim.o.columns, columns)
 
-    local final = math.floor((vim.o.columns - columns_width - integration_width) / 2)
+    local final = math.floor(width / 2)
 
-    if final <= _G.NoNeckPain.config.minSideBufferWidth then
-        log.debug(scope, "%d/%d not enough space", final, vim.o.columns)
+    if final <= _G.NoNeckPain.config.minSideBufferWidth or final < 0 then
+        log.debug(scope, "no space left to create side buffer")
+
+        return 0
     end
 
     return final
