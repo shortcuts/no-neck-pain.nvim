@@ -103,26 +103,18 @@ function state:set_active_tab(id)
     self.active_tab = id
 end
 
---- Gets the tab with the given `id` from the state.
----
----@return table: the `tab` information.
----@private
-function state:get_tab()
-    local id = self.active_tab or api.get_current_tab()
-
-    return self.tabs[id]
-end
-
 --- Gets the tab with the given `id` from the state, safely returns nil if we are not sure it exists.
 ---
 ---@return table?: the `tab` information, or `nil` if it's not found.
 ---@private
-function state:get_tab_safe()
+function state:get_tab()
     if not self.has_tabs(self) then
         return nil
     end
 
-    return self.get_tab(self)
+    local id = self.active_tab or api.get_current_tab()
+
+    return self.tabs[id]
 end
 
 --- Iterates over the tabs in the state to remove invalid tabs.
@@ -218,7 +210,6 @@ end
 function state:get_integration(id)
     if
         not self.enabled
-        or not self.has_tabs(self)
         or self.get_tab(self) == nil
         or self.tabs[self.active_tab].wins.integrations == nil
     then
@@ -247,7 +238,7 @@ function state:is_supported_integration(scope, win)
         return false
     end
 
-    local tab = self.get_tab_safe(self)
+    local tab = self.get_tab(self)
     local buffer = vim.api.nvim_win_get_buf(win)
     local filetype = vim.api.nvim_buf_get_option(buffer, "filetype")
 
@@ -287,19 +278,6 @@ function state:is_side_enabled(side)
     return _G.NoNeckPain.config.buffers[side].enabled
 end
 
---- Returns true if the win isn't registered, or if it is and valid, false otherwise.
----
----@param side "left"|"right": the side of the window.
----@return boolean
----@private
-function state:is_side_enabled_or_valid(side)
-    if not self.is_side_enabled(self, side) then
-        return true
-    end
-
-    return self.is_side_win_valid(self, side)
-end
-
 --- Whether the side window is registered and a valid window.
 ---
 ---@param side "left"|"right"|"curr": the side of the window.
@@ -310,15 +288,6 @@ function state:is_side_enabled_and_valid(side)
         return false
     end
 
-    return self.is_side_win_valid(self, side)
-end
-
---- Whether the side window a valid window.
----
----@param side "left"|"right"|"curr": the side of the window.
----@return boolean
----@private
-function state:is_side_win_valid(side)
     local id = self.get_side_id(self, side)
 
     return id ~= nil and vim.api.nvim_win_is_valid(id)
@@ -349,37 +318,6 @@ end
 ---@private
 function state:set_side_id(id, side)
     self.tabs[self.active_tab].wins.main[side] = id
-end
-
---- Whether the sides window are registered and enabled in the config or not.
----
----@param condition "or"|"and"
----@param expected boolean
----@return boolean
----@private
-function state:check_sides(condition, expected)
-    if condition == "or" then
-        return self.is_side_enabled_and_valid(self, "left") == expected
-            or self.is_side_enabled_and_valid(self, "right") == expected
-    end
-
-    return self.is_side_enabled_and_valid(self, "left") == expected
-        and self.is_side_enabled_and_valid(self, "right") == expected
-end
-
---- Returns the number of enabled and valid sides.
----
----@return number
----@private
-function state:get_nb_sides()
-    if
-        self.is_side_enabled_and_valid(self, "left")
-        and self.is_side_enabled_and_valid(self, "right")
-    then
-        return 2
-    end
-
-    return 1
 end
 
 --- Gets wins that are not relative or main wins.

@@ -71,7 +71,12 @@ function main.toggle_side(scope, side)
         state.set_side_id(state, nil, side)
     end
 
-    if not state.check_sides(state, "or", true) then
+    if
+        not (
+            state.is_side_enabled_and_valid(state, "left")
+            or state.is_side_enabled_and_valid(state, "right")
+        )
+    then
         _G.NoNeckPain.config = vim.tbl_deep_extend(
             "keep",
             { buffers = { left = { enabled = true }, right = { enabled = true } } },
