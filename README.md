@@ -95,6 +95,20 @@ require("lazy").setup({"shortcuts/no-neck-pain.nvim"})
 
 </td>
 </tr>
+<tr>
+<td>
+
+[nix-community/nixvim](https://github.com/nix-community/nixvim)
+</td>
+<td>
+
+```nix
+
+plugins.no-neck-pain.enable = true;
+```
+
+</td>
+</tr>
 </tbody>
 </table>
 </div>
