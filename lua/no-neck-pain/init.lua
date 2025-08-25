@@ -14,8 +14,8 @@ function NoNeckPain.toggle()
     api.debounce("public_api_toggle", main.toggle)
 end
 
---- Toggles the scratchPad feature of the plugin.
-function NoNeckPain.toggle_scratchPad()
+--- Toggles the scratch_pad feature of the plugin.
+function NoNeckPain.toggle_scratch_pad()
     if _G.NoNeckPain.state == nil or not _G.NoNeckPain.state.enabled then
         error("no-neck-pain.nvim must be enabled, run `NoNeckPain` first.")
     end
@@ -24,7 +24,7 @@ function NoNeckPain.toggle_scratchPad()
         _G.NoNeckPain.config = config.options
     end
 
-    main.toggle_scratchPad()
+    main.toggle_scratch_pad()
 end
 
 --- Toggles the debug mode of the plugin.

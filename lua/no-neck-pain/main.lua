@@ -19,9 +19,9 @@ function main.toggle(scope)
     main.enable(scope)
 end
 
---- Toggles the scratchPad feature of the plugin.
+--- Toggles the scratch_pad feature of the plugin.
 ---@private
-function main.toggle_scratchPad()
+function main.toggle_scratch_pad()
     if not state.is_active_tab_registered(state) then
         return
     end
@@ -30,15 +30,15 @@ function main.toggle_scratchPad()
     local curr_win = vim.api.nvim_get_current_win()
     local current_state = state.tabs[state.active_tab].scratchpad_enabled
 
-    -- save new state of the scratchPad and update tabs
-    state.set_scratchPad(state, not current_state)
+    -- save new state of the scratch_pad and update tabs
+    state.set_scratch_pad(state, not current_state)
 
     -- map over both sides and let the init method either setup or cleanup the side buffers
     for _, side in pairs(constants.SIDES) do
         local id = state.get_side_id(state, side)
         if id ~= nil then
             vim.api.nvim_set_current_win(id)
-            ui.init_scratchPad(side, id, current_state)
+            ui.init_scratch_pad(side, id, current_state)
         end
     end
 
@@ -357,7 +357,7 @@ function main.enable(scope)
                     return
                 end
 
-                if state.get_scratchPad(state) then
+                if state.get_scratch_pad(state) then
                     return log.debug(p.event, "skip because scratchpad is enabled")
                 end
 

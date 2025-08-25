@@ -14,7 +14,7 @@ function ui.init_side_options(side, id)
     local bufid = vim.api.nvim_win_get_buf(id)
 
     for opt, val in pairs(_G.NoNeckPain.config.buffers[side].bo) do
-        if not (state.get_scratchPad(state) and opt == "filetype") then
+        if not (state.get_scratch_pad(state) and opt == "filetype") then
             api.set_buffer_option(bufid, opt, val)
         end
     end
@@ -75,25 +75,25 @@ function ui.close_win(scope, id, side)
     end
 end
 
---- Sets options to the side buffers to toggle the scratchPad.
+--- Sets options to the side buffers to toggle the scratch_pad.
 ---
 ---@param side "left"|"right": the side of the window being resized, used for logging only.
 ---@param id number: the side window Idebug.
 ---@param cleanup boolean?: cleanup the given buffer
 ---@private
-function ui.init_scratchPad(side, id, cleanup)
+function ui.init_scratch_pad(side, id, cleanup)
     if not _G.NoNeckPain.config.buffers[side].enabled then
         return
     end
 
-    -- cleanup is used when the `toggle` method disables the scratchPad, we then reinitialize it with the user-given configuration.
+    -- cleanup is used when the `toggle` method disables the scratch_pad, we then reinitialize it with the user-given configuration.
     if cleanup then
         vim.cmd("enew")
         return ui.init_side_options(side, id)
     end
 
     log.debug(
-        string.format("ui.init_scratchPad:%s", side),
+        string.format("ui.init_scratch_pad:%s", side),
         "enabled with location %s",
         _G.NoNeckPain.config.buffers[side].scratchPad.pathToFile
     )
@@ -152,8 +152,8 @@ function ui.create_side_buffers()
             end
 
             if _G.NoNeckPain.config.buffers[side].scratchPad.enabled then
-                state.set_scratchPad(state, true)
-                ui.init_scratchPad(side, state.get_side_id(state, side))
+                state.set_scratch_pad(state, true)
+                ui.init_scratch_pad(side, state.get_side_id(state, side))
             else
                 ui.init_side_options(side, state.get_side_id(state, side))
             end

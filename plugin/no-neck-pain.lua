@@ -33,7 +33,7 @@ vim.api.nvim_create_user_command("NoNeckPainWidthDown", function()
 end, { desc = "Decrease the width of the main window by 5." })
 
 vim.api.nvim_create_user_command("NoNeckPainScratchPad", function()
-    require("no-neck-pain").toggle_scratchPad()
+    require("no-neck-pain").toggle_scratch_pad()
 end, { desc = "Toggles the scratchPad feature of the plugin." })
 
 vim.api.nvim_create_user_command("NoNeckPainDebug", function()
