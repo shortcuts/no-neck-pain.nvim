@@ -26,8 +26,6 @@ function main.toggle_scratch_pad()
         return
     end
 
-    -- store the current win to later restore focus
-    local curr_win = vim.api.nvim_get_current_win()
     local current_state = state.tabs[state.active_tab].scratchpad_enabled
 
     -- save new state of the scratch_pad and update tabs
@@ -43,7 +41,7 @@ function main.toggle_scratch_pad()
     end
 
     -- restore focus
-    vim.api.nvim_set_current_win(curr_win)
+    vim.api.nvim_set_current_win(state.get_previously_focused_win(state))
 
     state.save(state)
 end
