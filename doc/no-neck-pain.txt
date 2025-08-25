@@ -5,9 +5,9 @@
 Toggle the plugin by calling the `enable`/`disable` methods respectively.
 
 ------------------------------------------------------------------------------
-                                                *NoNeckPain.toggle_scratchPad()*
-                        `NoNeckPain.toggle_scratchPad`()
-Toggles the scratchPad feature of the plugin.
+                                               *NoNeckPain.toggle_scratch_pad()*
+                       `NoNeckPain.toggle_scratch_pad`()
+Toggles the scratch_pad feature of the plugin.
 
 ------------------------------------------------------------------------------
                                                      *NoNeckPain.toggle_debug()*
