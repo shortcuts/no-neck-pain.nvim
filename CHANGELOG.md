@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [2.4.6](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.4.5...v2.4.6) (2025-08-25)
+
+
+### Bug Fixes
+
+* **scratchPad:** restore focus when disabling ([#489](https://github.com/shortcuts/no-neck-pain.nvim/issues/489)) ([658ea7d](https://github.com/shortcuts/no-neck-pain.nvim/commit/658ea7daffede1543b9846f8128a205b96a4786b))
+
 ## [2.4.5](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.4.4...v2.4.5) (2025-06-02)
 
 
