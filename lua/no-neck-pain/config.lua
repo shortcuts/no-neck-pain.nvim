@@ -465,25 +465,25 @@ local function register_mappings(options, mappings)
     end
 
     for name, command in pairs(mappings) do
-        -- this specific mapping is disabled
-        if not options[name] then
-            return
-        end
-
-        if (name == "widthUp" or name == "widthDown") and type(options[name]) ~= "string" then
-            assert(
-                type(options[name]) == "table"
-                    and options[name]["mapping"] ~= nil
-                    and options[name]["value"] ~= nil,
-                string.format(
-                    "`%s` must be a string or a table with the following properties {mapping: 'your_mapping', value: 5}",
-                    name
+        if options[name] then
+            if (name == "widthUp" or name == "widthDown") and type(options[name]) ~= "string" then
+                assert(
+                    type(options[name]) == "table"
+                        and options[name]["mapping"] ~= nil
+                        and options[name]["value"] ~= nil,
+                    string.format(
+                        "`%s` must be a string or a table with the following properties {mapping: 'your_mapping', value: 5}",
+                        name
+                    )
                 )
-            )
-            vim.api.nvim_set_keymap("n", options[name].mapping, command, { silent = true })
-        else
-            assert(type(options[name]) == "string", string.format("`%s` must be a string", name))
-            vim.api.nvim_set_keymap("n", options[name], command, { silent = true })
+                vim.api.nvim_set_keymap("n", options[name].mapping, command, { silent = true })
+            else
+                assert(
+                    type(options[name]) == "string",
+                    string.format("`%s` must be a string", name)
+                )
+                vim.api.nvim_set_keymap("n", options[name], command, { silent = true })
+            end
         end
     end
 end
