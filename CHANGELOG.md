@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [2.4.7](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.4.6...v2.4.7) (2025-09-13)
+
+
+### Bug Fixes
+
+* **mappings:** race conditions ([#492](https://github.com/shortcuts/no-neck-pain.nvim/issues/492)) ([31adc88](https://github.com/shortcuts/no-neck-pain.nvim/commit/31adc8887b7cee6c067634d40761905feb194d35))
+
 ## [2.4.6](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.4.5...v2.4.6) (2025-08-25)
 
 
