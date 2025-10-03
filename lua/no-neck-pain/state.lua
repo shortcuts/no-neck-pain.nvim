@@ -480,11 +480,10 @@ end
 ----- namespace =======================================================
 ---@private
 
---- Creates a namespace for the given `side` and stores it in the state.
+--- Creates a namespace for the given `win` and stores it in the state.
 ---
----@param side "left"|"right": the side.
+---@param side number: the side window id.
 ---@return number: the created namespace id.
----@return string: the name of the created namespace.
 ---@private
 function state:set_namespace(side)
     if self.namespaces == nil then
@@ -496,7 +495,7 @@ function state:set_namespace(side)
 
     self.namespaces[side] = id
 
-    return id, name
+    return id
 end
 
 --- Clears the given `side` namespace and resets its state value.

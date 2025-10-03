@@ -37,7 +37,7 @@ T["setup"]["sets exposed methods and default options value"] = function()
     Helpers.expect.global_type(child, "_G.NoNeckPain.resize", "function")
     Helpers.expect.global_type(child, "_G.NoNeckPain.disable", "function")
     Helpers.expect.global_type(child, "_G.NoNeckPain.toggle_side", "function")
-    Helpers.expect.global_type(child, "_G.NoNeckPain.toggle_scratchPad", "function")
+    Helpers.expect.global_type(child, "_G.NoNeckPain.toggle_scratch_pad", "function")
     Helpers.expect.global_type(child, "_G.NoNeckPain.toggle_debug", "function")
 
     -- config
