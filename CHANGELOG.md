@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [2.5.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.4.7...v2.5.0) (2025-10-03)
+
+
+### Features
+
+* **highlight:** create namespace and empty groups by default ([#495](https://github.com/shortcuts/no-neck-pain.nvim/issues/495)) ([9efbc12](https://github.com/shortcuts/no-neck-pain.nvim/commit/9efbc12c5707ef81f614ffb36f11ea7a78652bbc))
+
 ## [2.4.7](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.4.6...v2.4.7) (2025-09-13)
 
 
