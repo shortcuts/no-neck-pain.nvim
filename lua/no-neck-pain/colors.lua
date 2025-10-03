@@ -1,4 +1,3 @@
-local api = require("no-neck-pain.util.api")
 local constants = require("no-neck-pain.util.constants")
 local log = require("no-neck-pain.util.log")
 local state = require("no-neck-pain.state")
@@ -120,6 +119,19 @@ function colors.init(win, side)
         return
     end
 
+    local id = state.set_namespace(state, win)
+
+    -- assign namespace to win
+    vim.api.nvim_win_set_hl_ns(win, id)
+
+    local background_group =
+        string.format("NoNeckPain_background_tab_%s_side_%s", state.active_tab, side)
+    local text_group = string.format("NoNeckPain_text_tab_%s_side_%s", state.active_tab, side)
+
+    -- set win scoped empty group for anyone to override it
+    vim.api.nvim_set_hl(id, background_group, {})
+    vim.api.nvim_set_hl(id, text_group, {})
+
     if
         _G.NoNeckPain.config.buffers[side].colors.background == nil
         and _G.NoNeckPain.config.buffers[side].colors.text == nil
@@ -128,35 +140,14 @@ function colors.init(win, side)
         return log.debug("colors.init", "skipping color initialization for side %s", side)
     end
 
-    -- init namespace for the current tab
-    local id, _ = state.set_namespace(state, side)
-    local bufnr = vim.api.nvim_win_get_buf(win)
-
-    -- create groups to assign them to the namespace
-    local background_group =
-        string.format("NoNeckPain_background_tab_%s_side_%s", state.active_tab, side)
-    local text_group = string.format("NoNeckPain_text_tab_%s_side_%s", state.active_tab, side)
-
-    vim.cmd(
-        string.format(
-            "hi! %s guifg=%s guibg=%s",
-            background_group,
-            _G.NoNeckPain.config.buffers[side].colors.background,
-            _G.NoNeckPain.config.buffers[side].colors.background
-        )
-    )
-    vim.cmd(
-        string.format(
-            "hi! %s guifg=%s guibg=%s",
-            text_group,
-            _G.NoNeckPain.config.buffers[side].colors.text,
-            _G.NoNeckPain.config.buffers[side].colors.background
-        )
-    )
-
-    -- assign groups to the namespace
-    vim.api.nvim_buf_add_highlight(bufnr, id, background_group, 0, 0, -1)
-    vim.api.nvim_buf_add_highlight(bufnr, id, text_group, 0, 0, -1)
+    vim.api.nvim_set_hl(id, background_group, {
+        fg = _G.NoNeckPain.config.buffers[side].colors.background,
+        bg = _G.NoNeckPain.config.buffers[side].colors.background,
+    })
+    vim.api.nvim_set_hl(id, text_group, {
+        fg = _G.NoNeckPain.config.buffers[side].colors.text,
+        bg = _G.NoNeckPain.config.buffers[side].colors.background,
+    })
 
     -- link nnp and neovim hl groups
     local groups = { Normal = text_group, NormalNC = text_group }
@@ -178,13 +169,9 @@ function colors.init(win, side)
         })
     end
 
-    local string_groups = {}
-
     for hl, group in pairs(groups) do
-        table.insert(string_groups, string.format("%s:%s", hl, group))
+        vim.api.nvim_set_hl(id, hl, { link = group })
     end
-
-    api.set_window_option(win, "winhl", table.concat(string_groups, ","))
 end
 
 return colors
