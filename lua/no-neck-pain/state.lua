@@ -14,24 +14,30 @@ local state = {
     previously_focused_win = vim.api.nvim_get_current_win(),
 }
 
-if state.initial_window_opts == nil or #state.initial_window_opts == 0 then
-    state.initial_window_opts = {}
+--- Captures initial window options from normal buffers.
+--- Only captures if initial_window_opts is empty (first time).
+---
+---@private
+function state:capture_initial_window_opts()
+    if state.initial_window_opts == nil or #state.initial_window_opts == 0 then
+        state.initial_window_opts = {}
 
-    for _, win in ipairs(vim.api.nvim_tabpage_list_wins(state.active_tab)) do
-        if not api.is_relative_window(win) then
-            -- keep this list in sync with config.NoNeckPain.bufferOptionsWo
-            for _, opt in ipairs({
-                "cursorline",
-                "cursorcolumn",
-                "colorcolumn",
-                "number",
-                "relativenumber",
-                "foldenable",
-                "list",
-                "wrap",
-                "linebreak",
-            }) do
-                state.initial_window_opts[opt] = vim.api.nvim_win_get_option(win, opt)
+        for _, win in ipairs(vim.api.nvim_tabpage_list_wins(state.active_tab)) do
+            if not api.is_relative_window(win) then
+                -- keep this list in sync with config.NoNeckPain.bufferOptionsWo
+                for _, opt in ipairs({
+                    "cursorline",
+                    "cursorcolumn",
+                    "colorcolumn",
+                    "number",
+                    "relativenumber",
+                    "foldenable",
+                    "list",
+                    "wrap",
+                    "linebreak",
+                }) do
+                    state.initial_window_opts[opt] = vim.api.nvim_win_get_option(win, opt)
+                end
             end
         end
     end

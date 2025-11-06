@@ -159,6 +159,10 @@ function main.enable(scope)
     state.set_enabled(state)
     state.set_tab(state, state.active_tab)
 
+    -- Capture initial window options from the current normal window
+    -- This must be done before creating side buffers to capture user's configured options
+    state.capture_initial_window_opts(state)
+
     local augroup_name = api.get_augroup_name(state.active_tab)
     vim.api.nvim_create_augroup(augroup_name, { clear = true })
 
