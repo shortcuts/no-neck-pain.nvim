@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [2.5.1](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.5.0...v2.5.1) (2025-11-09)
+
+
+### Bug Fixes
+
+* respect user-configured window options on buffer delete ([#497](https://github.com/shortcuts/no-neck-pain.nvim/issues/497)) ([#498](https://github.com/shortcuts/no-neck-pain.nvim/issues/498)) ([7ed79dc](https://github.com/shortcuts/no-neck-pain.nvim/commit/7ed79dc86ad9293a41eb39d6e207ff501f2e6d6d))
+
 ## [2.5.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.4.7...v2.5.0) (2025-10-03)
 
 
