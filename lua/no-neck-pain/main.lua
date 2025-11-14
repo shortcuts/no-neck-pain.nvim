@@ -252,14 +252,13 @@ function main.enable(scope)
 
                 if not vim.api.nvim_win_is_valid(state.get_side_id(state, "curr")) then
                     if p.event == "BufDelete" and _G.NoNeckPain.config.fallbackOnBufferDelete then
-                        log.debug(s, "`curr` has been deleted, resetting state")
-
-                        local opened_buffers = api.get_opened_buffers()
                         local win = vim.api.nvim_get_current_win()
 
-                        vim.cmd("rightbelow vertical split")
+                        log.debug(s, "`curr` has been deleted, resetting state, now focusing %d", win)
 
-                        -- if we are currently on a side window, nvim's above command will copy the
+                        local opened_buffers = api.get_opened_buffers()
+
+                        -- if we are currently on a side window,
                         -- side window options to the newly opened window
                         -- which will override the user's default window options
                         -- we then need to reset it to the initial value we stored at startup
@@ -268,6 +267,8 @@ function main.enable(scope)
                             or api.is_side_id(state.get_side_id(state, "right"), win)
                             or api.is_relative_window(win)
                         then
+                            vim.cmd("rightbelow vertical split")
+
                             local new_win = vim.api.nvim_get_current_win()
 
                             log.debug(
