@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [2.5.2](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.5.1...v2.5.2) (2025-11-14)
+
+
+### Bug Fixes
+
+* allow closing main buffer ([#501](https://github.com/shortcuts/no-neck-pain.nvim/issues/501)) ([d19b7eb](https://github.com/shortcuts/no-neck-pain.nvim/commit/d19b7eb8094338e8e1f6a622c5e9c53ff76f1982))
+
 ## [2.5.1](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.5.0...v2.5.1) (2025-11-09)
 
 
