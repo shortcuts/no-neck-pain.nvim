@@ -193,6 +193,7 @@ T["vsplit"]["closing `curr` makes `split` the new `curr`"] = function()
     child.nnp()
 
     child.cmd("vsplit")
+    child.wait()
 
     Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1003, 1000, 1002 })
     Helpers.expect.state(child, "tabs[1].wins.main", {
@@ -203,6 +204,7 @@ T["vsplit"]["closing `curr` makes `split` the new `curr`"] = function()
 
     child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.tabs[1].wins.main.curr)")
     child.cmd("q")
+    child.wait()
 
     Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1003,
@@ -211,6 +213,36 @@ T["vsplit"]["closing `curr` makes `split` the new `curr`"] = function()
     })
     Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1003, 1002 })
     Helpers.expect.equality(child.get_current_win(), 1003)
+end
+
+T["vsplit"]["(#425) closing `curr` with only one side buffer and not enough spaces properly resets the state"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=55,buffers={right={enabled=false}}}) ]])
+    child.nnp()
+
+    Helpers.expect.equality(child.get_current_win(), 1000)
+    Helpers.expect.state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+    })
+
+    child.cmd("vsplit")
+    child.wait()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1002, 1000 })
+    Helpers.expect.state(child, "tabs[1].wins.main", {
+        curr = 1000,
+    })
+
+    child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.tabs[1].wins.main.curr)")
+    child.cmd("q")
+    child.wait()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1003, 1002 })
+    Helpers.expect.state(child, "tabs[1].wins.main", {
+        curr = 1002,
+        left = 1003,
+    })
+    Helpers.expect.equality(child.get_current_win(), 1002)
 end
 
 T["vsplit"]["hides side buffers"] = function()
