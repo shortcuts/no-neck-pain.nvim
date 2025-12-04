@@ -119,7 +119,7 @@ function colors.init(win, side)
         return
     end
 
-    local id = state.set_namespace(state, win)
+    local id = state:set_namespace(win)
 
     -- assign namespace to win
     vim.api.nvim_win_set_hl_ns(win, id)

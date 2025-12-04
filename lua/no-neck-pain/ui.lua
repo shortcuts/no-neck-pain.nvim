@@ -14,7 +14,7 @@ function ui.init_side_options(side, id)
     local bufid = vim.api.nvim_win_get_buf(id)
 
     for opt, val in pairs(_G.NoNeckPain.config.buffers[side].bo) do
-        if not (state.get_scratch_pad(state) and opt == "filetype") then
+        if not (state:get_scratch_pad() and opt == "filetype") then
             api.set_buffer_option(bufid, opt, val)
         end
     end
@@ -37,7 +37,7 @@ function ui.move_sides(scope)
     for side, keys in pairs(sides) do
         local sscope = string.format("%s:%s", scope, side)
 
-        local id = state.get_side_id(state, side)
+        local id = state:get_side_id(side)
         if id ~= nil then
             local wins = vim.api.nvim_tabpage_list_wins(state.active_tab)
             local curr = vim.api.nvim_get_current_win()
@@ -135,11 +135,11 @@ function ui.create_side_buffers()
     for _, side in pairs(constants.SIDES) do
         if
             wins[side].padding > _G.NoNeckPain.config.minSideBufferWidth
-            and not state.is_side_enabled_and_valid(state, side)
+            and not state:is_side_enabled_and_valid(side)
         then
             vim.cmd(wins[side].cmd)
 
-            state.set_side_id(state, vim.api.nvim_get_current_win(), side)
+            state:set_side_id(vim.api.nvim_get_current_win(), side)
 
             if _G.NoNeckPain.config.buffers.set_names then
                 local exist = vim.fn.bufnr("no-neck-pain-" .. side)
@@ -152,26 +152,26 @@ function ui.create_side_buffers()
             end
 
             if _G.NoNeckPain.config.buffers[side].scratchPad.enabled then
-                state.set_scratch_pad(state, true)
-                ui.init_scratch_pad(side, state.get_side_id(state, side))
+                state:set_scratch_pad(true)
+                ui.init_scratch_pad(side, state:get_side_id(side))
             else
-                ui.init_side_options(side, state.get_side_id(state, side))
+                ui.init_side_options(side, state:get_side_id(side))
             end
 
-            colors.init(state.get_side_id(state, side), side)
+            colors.init(state:get_side_id(side), side)
         end
     end
 
     for _, side in pairs(constants.SIDES) do
-        if state.is_side_enabled_and_valid(state, side) then
+        if state:is_side_enabled_and_valid(side) then
             local padding = wins[side].padding or ui.get_side_width(side)
             local scope = string.format("ui.create_side_buffers:%s", side)
 
             if padding > _G.NoNeckPain.config.minSideBufferWidth then
-                state.resize_win(state, scope, state.get_side_id(state, side), padding)
+                state:resize_win(scope, state:get_side_id(side), padding)
             else
-                ui.close_win(scope, state.get_side_id(state, side), side)
-                state.set_side_id(state, nil, side)
+                ui.close_win(scope, state:get_side_id(side), side)
+                state:set_side_id(nil, side)
             end
         end
     end
@@ -189,7 +189,7 @@ end
 function ui.get_side_width(side)
     local scope = string.format("get_side_width:%s", side)
 
-    if not state.is_side_enabled(state, side) then
+    if not state:is_side_enabled(side) then
         log.debug(scope, "disabled")
 
         return 0
@@ -210,18 +210,18 @@ function ui.get_side_width(side)
         return 0
     end
 
-    local columns = state.get_columns(state)
+    local columns = state:get_columns()
 
     log.debug(scope, "%d width available, %d vsplit columns", width, columns)
 
     for _, _side in pairs(constants.SIDES) do
-        if state.is_side_enabled_and_valid(state, _side) then
+        if state:is_side_enabled_and_valid(_side) then
             columns = columns - 1
         end
     end
 
     -- remove columns of registered integrations
-    for name, opts in pairs(state.get_integrations(state)) do
+    for name, opts in pairs(state:get_integrations()) do
         if opts.id ~= nil and side == _G.NoNeckPain.config.integrations[name].position then
             local integration_width = vim.api.nvim_win_get_width(opts.id)
 

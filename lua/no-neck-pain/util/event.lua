@@ -34,7 +34,7 @@ end
 ---@param scope string: internal identifier for logging purposes.
 ---@private
 function event.skip_enable(scope)
-    if state.is_active_tab_registered(state) then
+    if state:is_active_tab_registered() then
         return true
     end
 
@@ -42,12 +42,12 @@ function event.skip_enable(scope)
         return true
     end
 
-    if state.is_active_tab_disabled(state) then
+    if state:is_active_tab_disabled() then
         if scope == "enable_on_tab_enter" then
             return true
         end
 
-        state.remove_active_tab_from_disabled(state)
+        state:remove_active_tab_from_disabled()
 
         return false
     end
@@ -57,7 +57,7 @@ function event.skip_enable(scope)
         return true
     end
 
-    return state.is_supported_integration(state, "event.skip_enable", 0)
+    return state:is_supported_integration("event.skip_enable", 0)
 end
 
 return event
