@@ -93,7 +93,7 @@ end
 ---@return boolean
 ---@private
 function state:is_active_tab_registered()
-    return self.has_tabs(self)
+    return self:has_tabs()
         and self.tabs[self.active_tab] ~= nil
         and vim.api.nvim_tabpage_is_valid(self.active_tab)
 end
@@ -119,7 +119,7 @@ end
 ---@return table?: the `tab` information, or `nil` if it's not found.
 ---@private
 function state:get_tab()
-    if not self.has_tabs(self) then
+    if not self:has_tabs() then
         return nil
     end
 
@@ -146,7 +146,7 @@ function state:refresh_tabs(scope, skip_id)
     local len = vim.tbl_count(self.tabs)
 
     if len == 0 then
-        self.init(self)
+        self:init()
     end
 
     return len
@@ -221,7 +221,7 @@ end
 function state:get_integration(id)
     if
         not self.enabled
-        or self.get_tab(self) == nil
+        or self:get_tab() == nil
         or self.tabs[self.active_tab].wins.integrations == nil
     then
         return nil, nil
@@ -249,11 +249,11 @@ function state:is_supported_integration(scope, win)
         return false
     end
 
-    local tab = self.get_tab(self)
+    local tab = self:get_tab()
     local buffer = vim.api.nvim_win_get_buf(win)
     local filetype = vim.api.nvim_buf_get_option(buffer, "filetype")
 
-    local integration_name, integration_info = self.get_integration(self, win)
+    local integration_name, integration_info = self:get_integration(win)
     if integration_name and integration_info then
         log.debug(scope, "integration already registered, skipping computing...")
 
@@ -295,11 +295,11 @@ end
 ---@return boolean
 ---@private
 function state:is_side_enabled_and_valid(side)
-    if side ~= "curr" and not self.is_side_enabled(self, side) then
+    if side ~= "curr" and not self:is_side_enabled(side) then
         return false
     end
 
-    local id = self.get_side_id(self, side)
+    local id = self:get_side_id(side)
 
     return id ~= nil and vim.api.nvim_win_is_valid(id)
 end
@@ -310,7 +310,7 @@ end
 ---@return boolean
 ---@private
 function state:is_side_the_active_win(side)
-    return vim.api.nvim_get_current_win() == self.get_side_id(self, side)
+    return vim.api.nvim_get_current_win() == self:get_side_id(side)
 end
 
 --- Returns the ID of the given `side`.
@@ -339,9 +339,9 @@ end
 function state:get_unregistered_wins(scope)
     return vim.tbl_filter(function(win)
         return not api.is_relative_window(win)
-            and win ~= self.get_side_id(self, "left")
-            and win ~= self.get_side_id(self, "right")
-            and not self.is_supported_integration(self, scope, win)
+            and win ~= self:get_side_id("left")
+            and win ~= self:get_side_id("right")
+            and not self:is_supported_integration(scope, win)
     end, vim.api.nvim_tabpage_list_wins(self.active_tab))
 end
 
@@ -394,7 +394,7 @@ function state:set_layout_windows(scope, wins)
     for _, win in ipairs(wins) do
         local id = win[2]
         if win[1] == "leaf" and not api.is_relative_window(id) then
-            local supported, name, integration = self.is_supported_integration(self, scope, id)
+            local supported, name, integration = self:is_supported_integration(scope, id)
             if supported and name and integration then
                 integration.id = id
 
@@ -435,12 +435,12 @@ function state:walk_layout(scope, tree, has_col_parent)
             if has_col_parent and vim.tbl_count(leafs) > 1 then
                 table.remove(leafs, 1)
             end
-            self.set_layout_windows(self, scope, leafs)
-            self.walk_layout(self, scope, tree[idx + 1], false)
+            self:set_layout_windows(scope, leafs)
+            self:walk_layout(scope, tree[idx + 1], false)
         elseif leaf == "col" then
-            self.walk_layout(self, scope, tree[idx + 1], true)
+            self:walk_layout(scope, tree[idx + 1], true)
         elseif type(leaf) == "table" and type(leaf[1]) == "string" then
-            self.walk_layout(self, scope, leaf, has_col_parent)
+            self:walk_layout(scope, leaf, has_col_parent)
         end
     end
 end
@@ -451,41 +451,40 @@ end
 ---@return boolean: whether the number of columns changed or not.
 ---@private
 function state:scan_layout(scope)
-    local columns = self.get_columns(self)
+    local initial_columns = self:get_columns()
 
-    self.init_columns(self)
-    self.init_integrations(self)
+    self:init_columns()
+    self:init_integrations()
 
     local layout = vim.fn.winlayout()
+    local layout_type = layout[1]
 
-    -- when opening vim with nnp autocmds, nothing else than a curr window
-    if layout[1] == "leaf" then
-        self.set_layout_windows(self, scope, { layout })
-    -- when:
-    -- - nnp is opened with an active column of splits opened (leafOnly)
-    -- - opening a help or qflist window that takes full width
-    elseif layout[1] == "col" and vim.tbl_count(layout) == 2 then
-        local leafOnly = true
-        for _, sub in ipairs(layout[2]) do
-            if sub[1] ~= "leaf" then
-                leafOnly = false
-                break
-            end
-        end
+    if layout_type == "leaf" then
+        -- Single window layout (e.g., vim startup with nnp autocmds)
+        self:set_layout_windows(scope, { layout })
+    elseif layout_type == "col" and vim.tbl_count(layout) == 2 then
+        -- Column layout with potential leaf-only structure
+        local sub_layouts = layout[2]
+        local is_leaf_only = vim.iter(sub_layouts):all(function(sub)
+            return sub[1] == "leaf"
+        end)
 
-        if leafOnly then
-            self.walk_layout(self, scope, { "row", layout[2] }, true)
+        if is_leaf_only then
+            self:walk_layout(scope, { "row", sub_layouts }, true)
         else
-            self.walk_layout(self, scope, layout[2], false)
+            self:walk_layout(scope, sub_layouts, false)
         end
     else
-        self.walk_layout(self, scope, layout, false)
+        -- Complex layout structure
+        self:walk_layout(scope, layout, false)
     end
-    self.save(self)
 
-    log.debug(scope, "computed columns: %d - %d", columns, self.get_columns(self))
+    self:save()
 
-    return columns ~= self.get_columns(self)
+    local final_columns = self:get_columns()
+    log.debug(scope, "computed columns: %d - %d", initial_columns, final_columns)
+
+    return initial_columns ~= final_columns
 end
 
 ----- namespace =======================================================
