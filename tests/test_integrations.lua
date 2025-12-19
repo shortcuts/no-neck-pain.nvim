@@ -32,10 +32,6 @@ T["setup"]["sets default values"] = function()
             position = "left",
             reopen = true,
         },
-        TSPlayground = {
-            position = "right",
-            reopen = true,
-        },
         aerial = {
             position = "right",
             reopen = true,
@@ -77,10 +73,6 @@ T["setup"]["overrides default values"] = function()
             neotest = {
                 reopen = false,
             },
-            TSPlayground = {
-                reopen = false,
-                position = "left",
-            },
             outline = {
                 reopen = false,
                 position = "left",
@@ -114,10 +106,6 @@ T["setup"]["overrides default values"] = function()
         },
         undotree = {
             position = "right",
-        },
-        TSPlayground = {
-            position = "left",
-            reopen = false,
         },
         outline = {
             position = "left",
@@ -320,12 +308,6 @@ end
 T["NvimTree"] = MiniTest.new_set()
 
 T["NvimTree"]["keeps sides open"] = function()
-    if child.fn.has("nvim-0.9") == 0 then
-        MiniTest.skip("NvimTree doesn't support version below 9")
-
-        return
-    end
-
     child.restart({ "-u", "scripts/init_with_nvimtree.lua", "foo" })
 
     child.nnp()
@@ -455,136 +437,11 @@ T["neo-tree"]["properly enables nnp with tree already opened"] = function()
     end
 end
 
-T["TSPlayground"] = MiniTest.new_set()
-
-T["TSPlayground"]["keeps sides open"] = function()
-    if child.fn.has("nvim-0.9") == 0 then
-        MiniTest.skip("tsplayground doesn't support version below 9")
-
-        return
-    end
-
-    child.restart({ "-u", "scripts/init_with_tsplayground.lua" })
-
-    child.nnp()
-
-    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
-
-    Helpers.expect.state(child, "enabled", true)
-    Helpers.expect.state(child, "tabs[1].wins.main", {
-        curr = 1000,
-        left = 1001,
-        right = 1002,
-    })
-
-    child.cmd("TSPlaygroundToggle")
-    child.wait()
-
-    Helpers.expect.state(child, "tabs[1].wins.columns", 4)
-    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1004, 1000, 1002 })
-
-    Helpers.expect.state(child, "tabs[1].wins.integrations.TSPlayground", {
-        close = "TSPlaygroundToggle",
-        fileTypePattern = "tsplayground",
-        id = 1004,
-        open = "TSPlaygroundToggle",
-    })
-
-    Helpers.expect.state(child, "tabs[1].wins.main", {
-        curr = 1000,
-        left = 1001,
-        right = 1002,
-    })
-
-    child.cmd("TSPlaygroundToggle")
-
-    Helpers.expect.state(child, "tabs[1].wins.integrations.TSPlayground", {
-        close = "TSPlaygroundToggle",
-        fileTypePattern = "tsplayground",
-        open = "TSPlaygroundToggle",
-    })
-    Helpers.expect.state(child, "tabs[1].wins.main", {
-        curr = 1000,
-        left = 1001,
-        right = 1002,
-    })
-end
-
-T["TSPlayground"]["reduces `left` side if only active when integration is on `right`"] = function()
-    if child.fn.has("nvim-0.9") == 0 then
-        MiniTest.skip("tsplayground doesn't support version below 9")
-
-        return
-    end
-
-    child.restart({ "-u", "scripts/init_with_tsplayground.lua" })
-
-    child.lua([[
-        require('no-neck-pain').setup({
-            width = 20,
-            buffers = {
-                right = {
-                    enabled = false,
-                },
-            },
-        })
-    ]])
-    child.nnp()
-    child.wait()
-
-    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000 })
-
-    Helpers.expect.state(child, "enabled", true)
-    Helpers.expect.state(child, "tabs[1].wins.main", {
-        curr = 1000,
-        left = 1001,
-        right = nil,
-    })
-    Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 30)
-    Helpers.expect.state(child, "tabs[1].wins.columns", 2)
-
-    child.cmd("TSPlaygroundToggle")
-    child.wait()
-
-    Helpers.expect.state(child, "tabs[1].wins.columns", 3)
-
-    Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.left", 18, 20)
-    Helpers.expect.buf_width_in_range(child, "1003", 26, 38)
-    Helpers.expect.state(child, "tabs[1].wins.integrations.TSPlayground", {
-        close = "TSPlaygroundToggle",
-        fileTypePattern = "tsplayground",
-        id = 1003,
-        open = "TSPlaygroundToggle",
-    })
-    Helpers.expect.state(child, "tabs[1].wins.main", {
-        curr = 1000,
-        left = 1001,
-        right = nil,
-    })
-
-    child.cmd("TSPlaygroundToggle")
-    child.wait()
-
-    Helpers.expect.state(child, "tabs[1].wins.columns", 2)
-
-    Helpers.expect.state(child, "tabs[1].wins.integrations.TSPlayground", {
-        close = "TSPlaygroundToggle",
-        fileTypePattern = "tsplayground",
-        open = "TSPlaygroundToggle",
-    })
-    Helpers.expect.state(child, "tabs[1].wins.main", {
-        curr = 1000,
-        left = 1001,
-        right = nil,
-    })
-    Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.left", 28, 40)
-end
-
 T["aerial"] = MiniTest.new_set()
 
 T["aerial"]["keeps sides open"] = function()
-    if child.fn.has("nvim-0.9") == 0 then
-        MiniTest.skip("aerial doesn't support version below 8")
+    if child.fn.has("nvim-0.11") == 0 then
+        MiniTest.skip("aerial doesn't support version below 11")
 
         return
     end

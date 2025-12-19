@@ -108,6 +108,9 @@ T["split"]["correctly starts nnp with previously opened splits"] = function()
     Helpers.expect.equality(child.get_wins_in_tab(1), { 1001, 1000 })
 
     child.nnp()
+    child.wait()
+
+    Helpers.expect.equality(child.get_wins_in_tab(1), { 1001, 1000 })
 
     Helpers.expect.buf_width_in_range(child, "1002", 28, 30)
     Helpers.expect.buf_width_in_range(child, "1003", 28, 30)
@@ -415,5 +418,78 @@ T["vsplit/split"]["splits and vsplits keeps a correct size"] = function()
     Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.curr", 38, 40)
     Helpers.expect.buf_width_in_range(child, "1003", 16, 18)
 end
+
+T["InspectTree"] = MiniTest.new_set()
+
+T["InspectTree"]["keeps sides open"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=10}) ]])
+    child.nnp()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+
+    Helpers.expect.state(child, "enabled", true)
+    Helpers.expect.state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
+
+    child.cmd("InspectTree")
+    child.wait()
+
+    Helpers.expect.state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
+end
+
+-- T["InspectTree"]["reduces `left` side if only active when integration is on `right`"] = function()
+--     child.lua([[
+--         require('no-neck-pain').setup({
+--             width = 20,
+--             buffers = {
+--                 right = {
+--                     enabled = false,
+--                 },
+--             },
+--         })
+--     ]])
+--     child.nnp()
+--     child.wait()
+--
+--     Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000 })
+--
+--     Helpers.expect.state(child, "enabled", true)
+--     Helpers.expect.state(child, "tabs[1].wins.main", {
+--         curr = 1000,
+--         left = 1001,
+--         right = nil,
+--     })
+--     Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 30)
+--
+--     child.cmd("InspectTree")
+--     child.wait()
+--
+--     Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.left", 18, 20)
+--     Helpers.expect.buf_width_in_range(child, "1003", 26, 38)
+--     Helpers.expect.state(child, "tabs[1].wins.main", {
+--         curr = 1000,
+--         left = 1001,
+--         right = nil,
+--     })
+--
+--     child.cmd("InspectTree")
+--     child.wait()
+--
+--     Helpers.expect.state(child, "tabs[1].wins.columns", 2)
+--
+--     Helpers.expect.state(child, "tabs[1].wins.main", {
+--         curr = 1000,
+--         left = 1001,
+--         right = nil,
+--     })
+--     Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.left", 28, 40)
+-- end
 
 return T

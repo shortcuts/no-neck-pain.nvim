@@ -464,15 +464,18 @@ function state:scan_layout(scope)
         self:set_layout_windows(scope, { layout })
     elseif layout_type == "col" and vim.tbl_count(layout) == 2 then
         -- Column layout with potential leaf-only structure
-        local sub_layouts = layout[2]
-        local is_leaf_only = vim.iter(sub_layouts):all(function(sub)
-            return sub[1] == "leaf"
-        end)
+        local is_leaf_only = true
+        for _, sub in ipairs(layout[2]) do
+            if sub[1] ~= "leaf" then
+                is_leaf_only = false
+                break
+            end
+        end
 
         if is_leaf_only then
-            self:walk_layout(scope, { "row", sub_layouts }, true)
+            self:walk_layout(scope, { "row", layout[2] }, true)
         else
-            self:walk_layout(scope, sub_layouts, false)
+            self:walk_layout(scope, layout[2], false)
         end
     else
         -- Complex layout structure
