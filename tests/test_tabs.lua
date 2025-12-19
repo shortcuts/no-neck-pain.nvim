@@ -558,11 +558,6 @@ T["tabnew/tabclose"]["does not pick tab 1 for the first active tab"] = function(
                     fileTypePattern = "nvimtree",
                     open = "NvimTreeOpen",
                 },
-                TSPlayground = {
-                    close = "TSPlaygroundToggle",
-                    fileTypePattern = "tsplayground",
-                    open = "TSPlaygroundToggle",
-                },
                 neotest = {
                     close = "lua require('neotest').summary.close()",
                     fileTypePattern = "neotest",
