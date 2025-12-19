@@ -37,8 +37,8 @@ function log.notify(scope, level, verbose, str, ...)
         end
     end
 
-    vim.notify(
-        string.format("[no-neck-pain.nvim@%s] %s", scope, string.format(str, ...)),
+    vim.notify_once(
+        string.format("[nnp@%s] %s", scope, string.format(str, ...)),
         level,
         { title = "no-neck-pain.nvim" }
     )
