@@ -440,6 +440,12 @@ end
 T["aerial"] = MiniTest.new_set()
 
 T["aerial"]["keeps sides open"] = function()
+    if child.fn.has("nvim-0.11") == 0 then
+        MiniTest.skip("aerial doesn't support version below 11")
+
+        return
+    end
+
     child.restart({ "-u", "scripts/init_with_aerial.lua" })
 
     child.nnp()
