@@ -108,6 +108,9 @@ T["split"]["correctly starts nnp with previously opened splits"] = function()
     Helpers.expect.equality(child.get_wins_in_tab(1), { 1001, 1000 })
 
     child.nnp()
+    child.wait()
+
+    Helpers.expect.equality(child.get_wins_in_tab(1), { 1001, 1000 })
 
     Helpers.expect.buf_width_in_range(child, "1002", 28, 30)
     Helpers.expect.buf_width_in_range(child, "1003", 28, 30)
