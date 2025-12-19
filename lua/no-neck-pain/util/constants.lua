@@ -57,11 +57,6 @@ constants.INTEGRATIONS = {
         close = "UndotreeToggle",
         open = "UndotreeToggle",
     },
-    TSPlayground = {
-        fileTypePattern = "tsplayground",
-        close = "TSPlaygroundToggle",
-        open = "TSPlaygroundToggle",
-    },
     NvimDAPUI = {
         fileTypePattern = "dap",
         close = "lua require('dapui').close()",

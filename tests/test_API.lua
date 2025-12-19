@@ -155,10 +155,6 @@ T["setup"]["sets exposed methods and default options value"] = function()
                 position = "left",
                 reopen = true,
             },
-            TSPlayground = {
-                position = "right",
-                reopen = true,
-            },
             neotest = {
                 position = "right",
                 reopen = true,
@@ -308,10 +304,6 @@ T["setup"]["overrides default values"] = function()
             },
             NvimTree = {
                 position = "left",
-                reopen = true,
-            },
-            TSPlayground = {
-                position = "right",
                 reopen = true,
             },
             neotest = {
