@@ -1,4 +1,12 @@
 <a name="0.2.3"></a>
+## [2.5.3](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.5.2...v2.5.3) (2025-12-19)
+
+
+### Bug Fixes
+
+* replace TSPlayground with InspectTree ([#505](https://github.com/shortcuts/no-neck-pain.nvim/issues/505)) ([1c90a56](https://github.com/shortcuts/no-neck-pain.nvim/commit/1c90a5628e2609fdca876e6c376ee870620a719f))
+* **term:** close orphans tabs ([#504](https://github.com/shortcuts/no-neck-pain.nvim/issues/504)) ([d6f8c3f](https://github.com/shortcuts/no-neck-pain.nvim/commit/d6f8c3f1e364f44a3e9223074aa404c75ff3540b))
+
 ## [2.5.2](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.5.1...v2.5.2) (2025-11-14)
 
 
