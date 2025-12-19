@@ -1,3 +1,4 @@
+local log = require("no-neck-pain.util.log")
 local api = require("no-neck-pain.util.api")
 local constants = require("no-neck-pain.util.constants")
 local state = require("no-neck-pain.state")
@@ -19,7 +20,18 @@ function event.skip()
         return true
     end
 
-    return api.get_current_tab() ~= state.active_tab
+    if api.get_current_tab() ~= state.active_tab then
+        log.debug(
+            "event.skip",
+            "current tab: %d, active tab: %d",
+            api.get_current_tab(),
+            state.active_tab
+        )
+
+        return true
+    end
+
+    return false
 end
 
 --- determines if we should skip the enabling of the plugin:
