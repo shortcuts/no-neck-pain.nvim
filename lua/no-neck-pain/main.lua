@@ -228,14 +228,11 @@ function main.enable(scope)
         desc = "Keeps track of the state after entering new windows",
     })
 
-    vim.api.nvim_create_autocmd({ "QuitPre", "BufDelete", "TermClose" }, {
+    vim.api.nvim_create_autocmd({ "QuitPre", "BufDelete" }, {
         callback = function(p)
             vim.schedule(function()
                 local s = string.format("%s:%d", p.event, vim.api.nvim_get_current_win())
-                if
-                    not state:is_active_tab_registered()
-                    or (event.skip() and p.event ~= "TermClose")
-                then
+                if not state:is_active_tab_registered() or event.skip() then
                     return
                 end
 
