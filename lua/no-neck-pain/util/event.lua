@@ -9,15 +9,20 @@ local event = {}
 --- - the plugin is not enabled
 --- - the current window is a relative window
 --- - the event is triggered in a different tab
+---@param check_tab boolean: whether we should check if the current tab is the same as the state one.
 ---
 ---@private
-function event.skip()
+function event.skip(check_tab)
     if _G.NoNeckPain.state == nil or not _G.NoNeckPain.state.enabled then
         return true
     end
 
     if api.is_relative_window() then
         return true
+    end
+
+    if not check_tab then
+        return false
     end
 
     if api.get_current_tab() ~= state.active_tab then
