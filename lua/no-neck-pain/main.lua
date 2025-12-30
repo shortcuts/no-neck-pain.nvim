@@ -202,7 +202,7 @@ function main.enable(scope)
         callback = function(p)
             local s = string.format("%s:%d", p.event, vim.api.nvim_get_current_win())
             vim.schedule(function()
-                if not state:is_active_tab_registered() or event.skip(true) then
+                if not state:is_active_tab_registered() or event.skip() then
                     return
                 end
 
@@ -232,7 +232,7 @@ function main.enable(scope)
         callback = function(p)
             vim.schedule(function()
                 local s = string.format("%s:%d", p.event, vim.api.nvim_get_current_win())
-                if not state:is_active_tab_registered() or event.skip(p.event ~= "TermClose") then
+                if not state:is_active_tab_registered() then
                     return
                 end
 
