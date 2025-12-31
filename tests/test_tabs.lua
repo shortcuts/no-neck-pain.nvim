@@ -737,4 +737,58 @@ T["tabnew/tabclose"]["does not close nvim when quitting tab if some are left"] =
     Helpers.expect.state(child, "tabs[2]", vim.NIL)
 end
 
+T["tabnew/tabclose"]["closes terminal tab without affecting no-neck-pain on other tabs"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
+    child.nnp()
+
+    Helpers.expect.state(child, "active_tab", 1)
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+    Helpers.expect.state(child, "tabs[1]", {
+        id = 1,
+        redraw = false,
+        scratchpad_enabled = false,
+        wins = {
+            integrations = Co.INTEGRATIONS,
+            main = {
+                curr = 1000,
+                left = 1001,
+                right = 1002,
+            },
+            columns = 3,
+        },
+    })
+
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_list_tabpages()"), { 1 })
+
+    child.cmd("tabe term://")
+    child.wait()
+
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_list_tabpages()"), { 1, 2 })
+
+    -- Enter insert mode in terminal and run the command
+    child.cmd("exit")
+    child.wait()
+
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_list_tabpages()"), { 1 })
+
+    -- Back to tab1 with no-neck-pain intact
+    Helpers.expect.state(child, "tabs[1]", {
+        id = 1,
+        redraw = false,
+        scratchpad_enabled = false,
+        wins = {
+            integrations = Co.INTEGRATIONS,
+            main = {
+                curr = 1000,
+                left = 1001,
+                right = 1002,
+            },
+            columns = 3,
+        },
+    })
+
+    Helpers.expect.state(child, "tabs[2]", vim.NIL)
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_list_tabpages()"), { 1 })
+end
+
 return T

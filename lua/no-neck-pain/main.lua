@@ -232,7 +232,7 @@ function main.enable(scope)
         callback = function(p)
             vim.schedule(function()
                 local s = string.format("%s:%d", p.event, vim.api.nvim_get_current_win())
-                if not state:is_active_tab_registered() or event.skip() then
+                if not state:is_active_tab_registered() or api.is_relative_window() then
                     return
                 end
 
