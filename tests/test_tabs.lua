@@ -766,9 +766,7 @@ T["tabnew/tabclose"]["closes terminal tab without affecting no-neck-pain on othe
     Helpers.expect.equality(child.lua_get("vim.api.nvim_list_tabpages()"), { 1, 2 })
 
     -- Enter insert mode in terminal and run the command
-    child.cmd("startinsert")
-    child.wait()
-    child.api.nvim_input("<CR>")
+    child.cmd("exit")
     child.wait()
 
     Helpers.expect.equality(child.lua_get("vim.api.nvim_list_tabpages()"), { 1 })
