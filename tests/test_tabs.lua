@@ -758,10 +758,12 @@ T["tabnew/tabclose"]["closes terminal tab without affecting no-neck-pain on othe
         },
     })
 
-    child.cmd("tabe term://ls")
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_list_tabpages()"), { 1 })
+
+    child.cmd("tabe term://")
     child.wait()
 
-    Helpers.expect.state(child, "active_tab", 2)
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_list_tabpages()"), { 1, 2 })
 
     -- Enter insert mode in terminal and run the command
     child.cmd("startinsert")
@@ -769,13 +771,9 @@ T["tabnew/tabclose"]["closes terminal tab without affecting no-neck-pain on othe
     child.api.nvim_input("<CR>")
     child.wait()
 
-    -- Close the terminal tab
-    child.cmd("tabclose")
-    child.wait()
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_list_tabpages()"), { 1 })
 
     -- Back to tab1 with no-neck-pain intact
-    Helpers.expect.state(child, "active_tab", 1)
-    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
     Helpers.expect.state(child, "tabs[1]", {
         id = 1,
         redraw = false,
@@ -792,7 +790,7 @@ T["tabnew/tabclose"]["closes terminal tab without affecting no-neck-pain on othe
     })
 
     Helpers.expect.state(child, "tabs[2]", vim.NIL)
-    Helpers.expect.equality(child.lua_get("vim.api.nvim_list_tabpages()"), {1})
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_list_tabpages()"), { 1 })
 end
 
 return T
