@@ -102,9 +102,15 @@ function api.debounce(context, callback, timeout)
     local timer = vim.loop.new_timer()
     debouncer.timer = timer
     timer:start(timeout, 0, function()
+        -- Check if timer is still valid before processing
+        if timer:is_closing() then
+            return
+        end
+
         timer_stop_close(timer)
 
         if debouncer.executing then
+            -- Use a new timer for recursion instead of reusing the same one
             return api.debounce(context, callback, timeout)
         end
 
