@@ -210,8 +210,7 @@ function main.enable(scope)
 
                 if
                     not state.tabs[state.active_tab].redraw
-                    and (state:is_side_the_active_win("left") or state.is_side_the_active_win(
-                        state,
+                    and (state:is_side_the_active_win("left") or state:is_side_the_active_win(
                         "right"
                     ) or state:is_side_the_active_win("curr"))
                     and not init
@@ -382,7 +381,7 @@ function main.enable(scope)
                 local idx
 
                 for i = 1, #wins do
-                    if api.is_side_id(current_side, wins[i]) then
+                    if wins[i] and api.is_side_id(current_side, wins[i]) then
                         idx = api.find_next_side_idx(
                             i - 1,
                             -1,
@@ -392,7 +391,9 @@ function main.enable(scope)
                             state:get_previously_focused_win()
                         )
                         break
-                    elseif api.is_side_id(state:get_previously_focused_win(), wins[i]) then
+                    elseif
+                        wins[i] and api.is_side_id(state:get_previously_focused_win(), wins[i])
+                    then
                         idx = api.find_next_side_idx(
                             i + 1,
                             1,

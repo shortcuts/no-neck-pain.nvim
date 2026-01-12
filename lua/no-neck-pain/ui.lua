@@ -100,7 +100,8 @@ function ui.init_scratch_pad(side, id, cleanup)
 
     ui.init_side_options(side, id)
 
-    vim.cmd(string.format("edit %s", _G.NoNeckPain.config.buffers[side].scratchPad.pathToFile))
+    local path = vim.fn.fnameescape(_G.NoNeckPain.config.buffers[side].scratchPad.pathToFile)
+    vim.cmd(string.format("edit %s", path))
 
     api.set_buffer_option(0, "bufhidden", "")
     api.set_buffer_option(0, "buftype", "")

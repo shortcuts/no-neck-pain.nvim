@@ -168,23 +168,6 @@ T["setup"]["`common` options spreads it to `left` and `right` buffers"] = functi
         blend = 0.9,
         text = "#ff0000",
     })
-
-    -- TODO: enable this when mini.test accepts it
-    -- Helpers.expect.equality(
-    --     child.lua_get("vim.api.nvim_get_hl_by_name('NoNeckPain_background_tab_1_side_left', true)"),
-    --     {
-    --         background = 1,
-    --         foreground = 2,
-    --     }
-    -- )
-    --
-    -- Helpers.expect.equality(
-    --     child.lua_get("vim.api.nvim_get_hl_by_name('NoNeckPain_background_tab_1_side_right', true)"),
-    --     {
-    --         background = 1,
-    --         foreground = 2,
-    --     }
-    -- )
 end
 
 T["setup"]["(transparent) assert side buffers have the same colors as the main buffer"] = function()

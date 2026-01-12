@@ -139,7 +139,9 @@ function state:refresh_tabs(scope, skip_id)
 
     for _, tab in pairs(self.tabs) do
         if tab.id == skip_id or not vim.api.nvim_tabpage_is_valid(tab.id) then
-            self.tabs[tab.id] = nil
+            if self.tabs[tab.id] then
+                self.tabs[tab.id] = nil
+            end
         end
     end
 
