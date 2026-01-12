@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [2.5.4](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.5.3...v2.5.4) (2026-01-12)
+
+
+### Bug Fixes
+
+* kill orphan tabs ([#509](https://github.com/shortcuts/no-neck-pain.nvim/issues/509)) ([e5d1abf](https://github.com/shortcuts/no-neck-pain.nvim/commit/e5d1abf50010a1fb4285493202467aa982b459c2))
+
 ## [2.5.3](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.5.2...v2.5.3) (2025-12-19)
 
 
