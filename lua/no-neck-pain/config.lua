@@ -254,11 +254,14 @@ NoNeckPain.options = {
     },
     -- Supported integrations that might clash with `no-neck-pain.nvim`'s behavior.
     --
+    -- Built-in integrations (e.g. NvimTree, NeoTree, neotest, etc.) support both `position` and `reopen` options.
+    -- Custom integrations allow you to define simple integrations for any plugin by specifying only the filetype and position.
+    --
     -- The `position` is used when the plugin scans the layout in order to compute the width that should be added
     -- on each side. For example, if you were supposed to have a padding of 100 columns on each side, but an
     -- integration takes 42, only 58 will be added so your layout is still centered.
     --
-    -- If `reopen` is set to `false`, we won't account the width but close the integration when encountered.
+    -- If `reopen` is set to `false` on built-in integrations, we won't account the width but close the integration when encountered.
     ---@type table
     integrations = {
         -- @link https://github.com/nvim-tree/nvim-tree.lua
@@ -415,6 +418,65 @@ function NoNeckPain.defaults(options)
         NoNeckPain.options.width = tonumber(
             vim.api.nvim_get_option_value("colorcolumn", { scope = "global" })
         ) or 0
+    end
+
+    -- Validate and process custom integrations
+    if NoNeckPain.options.integrations ~= nil then
+        local custom_integrations = {}
+        local builtin_names = {
+            NvimTree = true,
+            NeoTree = true,
+            undotree = true,
+            neotest = true,
+            NvimDAPUI = true,
+            outline = true,
+            aerial = true,
+        }
+
+        for filetype, config in pairs(NoNeckPain.options.integrations) do
+            -- Skip special keys like dashboard and built-in integrations
+            local is_builtin = builtin_names[filetype] ~= nil
+            if
+                filetype ~= "dashboard"
+                and not is_builtin
+                and type(config) == "table"
+                and config.position ~= nil
+            then
+                -- Validate position is a string
+                assert(
+                    type(config.position) == "string",
+                    string.format(
+                        "`integrations.%s.position` must be a string, got %s",
+                        filetype,
+                        type(config.position)
+                    )
+                )
+
+                -- Validate position value
+                assert(
+                    config.position == "left"
+                        or config.position == "right"
+                        or config.position == "none",
+                    string.format(
+                        "`integrations.%s.position` must be 'left', 'right', or 'none', got '%s'",
+                        filetype,
+                        config.position
+                    )
+                )
+
+                -- Store custom integrations with lowercase filetype as key
+                local lowercase_filetype = string.lower(filetype)
+                custom_integrations[lowercase_filetype] = {
+                    position = config.position,
+                    filetype = lowercase_filetype,
+                }
+            end
+        end
+
+        -- Store custom integrations in config only if there are any
+        if vim.tbl_count(custom_integrations) > 0 then
+            NoNeckPain.options.custom_integrations = custom_integrations
+        end
     end
 
     if NoNeckPain.options.integrations.dashboard.enabled == true then

@@ -62,6 +62,13 @@ end
 ---@private
 function state:init_integrations()
     self.tabs[self.active_tab].wins.integrations = vim.deepcopy(constants.INTEGRATIONS)
+
+    -- Merge custom integrations, allowing them to override built-ins
+    if _G.NoNeckPain.config.custom_integrations ~= nil then
+        for filetype, custom in pairs(_G.NoNeckPain.config.custom_integrations) do
+            self.tabs[self.active_tab].wins.integrations[filetype] = vim.deepcopy(custom)
+        end
+    end
 end
 
 --- Sets the columns state of the current tab to its original value.
@@ -263,9 +270,23 @@ function state:is_supported_integration(scope, win)
     end
 
     local registered_integrations = tab ~= nil and tab.wins.integrations or constants.INTEGRATIONS
+    local lowercase_filetype = string.lower(filetype)
 
+    -- Check custom integrations first (exact match, case-insensitive)
+    if _G.NoNeckPain.config.custom_integrations ~= nil then
+        local custom = _G.NoNeckPain.config.custom_integrations[lowercase_filetype]
+        if custom ~= nil then
+            log.debug(scope, "win '%d' matches custom integration '%s'", win, filetype)
+            if tab ~= nil then
+                return true, lowercase_filetype, custom
+            end
+            return true, nil
+        end
+    end
+
+    -- Then check built-in integrations (prefix match)
     for name, integration in pairs(registered_integrations) do
-        if vim.startswith(string.lower(filetype), integration.fileTypePattern) then
+        if vim.startswith(lowercase_filetype, integration.fileTypePattern) then
             log.debug(scope, "win '%d' is an integration '%s'", win, filetype)
 
             if tab ~= nil then

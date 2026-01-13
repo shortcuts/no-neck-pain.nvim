@@ -249,83 +249,96 @@ require("no-neck-pain").setup({
         --- Options applied to the `right` buffer, options defined here overrides the `buffers` ones.
         ---@see NoNeckPain.bufferOptions `:h NoNeckPain.bufferOptions`
         right = NoNeckPain.bufferOptions,
-    },
-    -- Supported integrations that might clash with `no-neck-pain.nvim`'s behavior.
-    --
-    -- The `position` is used when the plugin scans the layout in order to compute the width that should be added
-    -- on each side. For example, if you were supposed to have a padding of 100 columns on each side, but an
-    -- integration takes 42, only 58 will be added so your layout is still centered.
-    --
-    -- If `reopen` is set to `false`, we won't account the width but close the integration when encountered.
-    ---@type table
-    integrations = {
-        -- @link https://github.com/nvim-tree/nvim-tree.lua
-        ---@type table
-        NvimTree = {
-            -- The position of the tree.
-            ---@type "left"|"right"
-            position = "left",
-            -- When `true`, if the tree was opened before enabling the plugin, we will reopen it.
-            ---@type boolean
-            reopen = true,
-        },
-        -- @link https://github.com/nvim-neo-tree/neo-tree.nvim
-        NeoTree = {
-            -- The position of the tree.
-            ---@type "left"|"right"
-            position = "left",
-            -- When `true`, if the tree was opened before enabling the plugin, we will reopen it.
-            reopen = true,
-        },
-        -- @link https://github.com/mbbill/undotree
-        undotree = {
-            -- The position of the tree.
-            ---@type "left"|"right"
-            position = "left",
-        },
-        -- @link https://github.com/nvim-neotest/neotest
-        neotest = {
-            -- The position of the tree.
-            ---@type "right"
-            position = "right",
-            -- When `true`, if the tree was opened before enabling the plugin, we will reopen it.
-            reopen = true,
-        },
-        -- @link https://github.com/rcarriga/nvim-dap-ui
-        NvimDAPUI = {
-            -- The position of the tree.
-            ---@type "none"
-            position = "none",
-            -- When `true`, if the tree was opened before enabling the plugin, we will reopen it.
-            reopen = true,
-        },
-        -- @link https://github.com/hedyhli/outline.nvim
-        outline = {
-            -- The position of the tree.
-            ---@type "left"|"right"
-            position = "right",
-            -- When `true`, if the tree was opened before enabling the plugin, we will reopen it.
-            reopen = true,
-        },
-        -- @link https://github.com/stevearc/aerial.nvim
-        aerial = {
-            -- The position of the tree.
-            ---@type "left"|"right"
-            position = "right",
-            -- When `true`, if the tree was opened before enabling the plugin, we will reopen it.
-            reopen = true,
-        },
-        -- this is a generic field to hint no-neck-pain that you use a dashboard plugin.
-        -- you can find the filetype list of natively supported dashboards here: https://github.com/shortcuts/no-neck-pain.nvim/blob/main/lua/no-neck-pain/util/constants.lua#L82-L85
-        -- if a dashboard that you use isn't supported, either set `dashboard.filetype` to the expected file type, or open a pull-request with the edited list.
-        dashboard = {
-            -- When `true`, debounce will be applied to the init method, leaving time for the dashboard to open.
-            enabled = false,
-            -- if a dashboard that you use isn't supported, you can use this field to set a matching filetype, also don't hesitate to open a pull-request with the edited list (DASHBOARDS) found in lua/no-neck-pain/util/constants.lua.
-            ---@type string[]|nil
-            filetypes = nil,
-        },
-    },
+     },
+     -- Supported integrations that might clash with `no-neck-pain.nvim`'s behavior.
+     --
+     -- Built-in integrations (e.g. NvimTree, NeoTree, neotest, etc.) support both `position` and `reopen` options.
+     -- Custom integrations allow you to define simple integrations for any plugin by specifying only the filetype and position.
+     --
+     -- The `position` is used when the plugin scans the layout in order to compute the width that should be added
+     -- on each side. For example, if you were supposed to have a padding of 100 columns on each side, but an
+     -- integration takes 42, only 58 will be added so your layout is still centered.
+     --
+     -- If `reopen` is set to `false` on built-in integrations, we won't account the width but close the integration when encountered.
+     ---@type table
+     integrations = {
+         -- Built-in integrations
+         -- @link https://github.com/nvim-tree/nvim-tree.lua
+         ---@type table
+         NvimTree = {
+             -- The position of the tree.
+             ---@type "left"|"right"
+             position = "left",
+             -- When `true`, if the tree was opened before enabling the plugin, we will reopen it.
+             ---@type boolean
+             reopen = true,
+         },
+         -- @link https://github.com/nvim-neo-tree/neo-tree.nvim
+         NeoTree = {
+             -- The position of the tree.
+             ---@type "left"|"right"
+             position = "left",
+             -- When `true`, if the tree was opened before enabling the plugin, we will reopen it.
+             reopen = true,
+         },
+         -- @link https://github.com/mbbill/undotree
+         undotree = {
+             -- The position of the tree.
+             ---@type "left"|"right"
+             position = "left",
+         },
+         -- @link https://github.com/nvim-neotest/neotest
+         neotest = {
+             -- The position of the tree.
+             ---@type "right"
+             position = "right",
+             -- When `true`, if the tree was opened before enabling the plugin, we will reopen it.
+             reopen = true,
+         },
+         -- @link https://github.com/rcarriga/nvim-dap-ui
+         NvimDAPUI = {
+             -- The position of the tree.
+             ---@type "none"
+             position = "none",
+             -- When `true`, if the tree was opened before enabling the plugin, we will reopen it.
+             reopen = true,
+         },
+         -- @link https://github.com/hedyhli/outline.nvim
+         outline = {
+             -- The position of the tree.
+             ---@type "left"|"right"
+             position = "right",
+             -- When `true`, if the tree was opened before enabling the plugin, we will reopen it.
+             reopen = true,
+         },
+         -- @link https://github.com/stevearc/aerial.nvim
+         aerial = {
+             -- The position of the tree.
+             ---@type "left"|"right"
+             position = "right",
+             -- When `true`, if the tree was opened before enabling the plugin, we will reopen it.
+             reopen = true,
+         },
+         -- Custom integrations: define simple integrations with just filetype and position
+         -- Example:
+         -- trouble = { position = "right" },
+         -- diffview = { position = "left" },
+         --
+         -- Supported position values: "left", "right", or "none"
+         -- Custom integration names are matched case-insensitively against buffer filetypes.
+         -- Custom integrations can override built-in integrations if using the same filetype.
+         --
+         -- this is a generic field to hint no-neck-pain that you use a dashboard plugin.
+         -- you can find the filetype list of natively supported dashboards here: https://github.com/shortcuts/no-neck-pain.nvim/blob/main/lua/no-neck-pain/util/constants.lua#L82-L85
+         -- if a dashboard that you use isn't supported, either set `dashboard.filetype` to the expected file type, or open a pull-request with the edited list.
+         dashboard = {
+             -- When `true`, debounce will be applied to the init method, leaving time for the dashboard to open.
+             enabled = false,
+             -- if a dashboard that you use isn't supported, you can use this field to set a matching filetype, also don't hesitate to open a pull-request with the edited list (DASHBOARDS) found in lua/no-neck-pain/util/constants.lua.
+             ---@type string[]|nil
+             filetypes = nil,
+         },
+     },
 })
 
 --- NoNeckPain's buffer `vim.wo` options.

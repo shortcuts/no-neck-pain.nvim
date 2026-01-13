@@ -6,6 +6,29 @@ local state = require("no-neck-pain.state")
 
 local ui = {}
 
+--- Gets the position of an integration by name.
+--- Checks custom integrations first, then built-in integrations.
+---
+---@param integration_name string: the name/filetype of the integration.
+---@return string?: the position ("left", "right", or "none"), or nil if not found.
+---@private
+function ui.get_integration_position(integration_name)
+    -- Check custom integrations first
+    if _G.NoNeckPain.config.custom_integrations ~= nil then
+        local custom = _G.NoNeckPain.config.custom_integrations[integration_name]
+        if custom ~= nil then
+            return custom.position
+        end
+    end
+
+    -- Check built-in integrations
+    if _G.NoNeckPain.config.integrations[integration_name] ~= nil then
+        return _G.NoNeckPain.config.integrations[integration_name].position
+    end
+
+    return nil
+end
+
 --- Initializes the given `side` with the options from the user given configuration.
 ---@param side "left"|"right"|"curr": the side of the window to initialize.
 ---@param id number: the id of the window.
@@ -223,7 +246,8 @@ function ui.get_side_width(side)
 
     -- remove columns of registered integrations
     for name, opts in pairs(state:get_integrations()) do
-        if opts.id ~= nil and side == _G.NoNeckPain.config.integrations[name].position then
+        local integration_position = ui.get_integration_position(name)
+        if opts.id ~= nil and integration_position ~= nil and side == integration_position then
             local integration_width = vim.api.nvim_win_get_width(opts.id)
 
             log.debug(scope, "%s opened with width %d", name, integration_width)

@@ -488,4 +488,112 @@ T["aerial"]["keeps sides open"] = function()
     })
 end
 
+T["custom integrations"] = MiniTest.new_set()
+
+T["custom integrations"]["accepts valid custom integrations"] = function()
+    child.lua([[require('no-neck-pain').setup({
+        integrations = {
+            trouble = { position = "left" },
+            diffview = { position = "right" },
+        }
+    })]])
+
+    Helpers.expect.config(child, "custom_integrations", {
+        trouble = {
+            position = "left",
+            filetype = "trouble",
+        },
+        diffview = {
+            position = "right",
+            filetype = "diffview",
+        },
+    })
+end
+
+T["custom integrations"]["normalizes filetype to lowercase"] = function()
+    child.lua([[require('no-neck-pain').setup({
+        integrations = {
+            Trouble = { position = "left" },
+            DiffView = { position = "right" },
+        }
+    })]])
+
+    Helpers.expect.config(child, "custom_integrations", {
+        trouble = {
+            position = "left",
+            filetype = "trouble",
+        },
+        diffview = {
+            position = "right",
+            filetype = "diffview",
+        },
+    })
+end
+
+T["custom integrations"]["rejects invalid position"] = function()
+    local err = child.lua([[
+        local ok = pcall(function()
+            require('no-neck-pain').setup({
+                integrations = {
+                    trouble = { position = "invalid" }
+                }
+            })
+        end)
+        return ok
+    ]])
+
+    Helpers.expect.equality(err, false)
+end
+
+T["custom integrations"]["rejects non-string position"] = function()
+    local err = child.lua([[
+        local ok = pcall(function()
+            require('no-neck-pain').setup({
+                integrations = {
+                    trouble = { position = 123 }
+                }
+            })
+        end)
+        return ok
+    ]])
+
+    Helpers.expect.equality(err, false)
+end
+
+T["custom integrations"]["accepts position 'none'"] = function()
+    child.lua([[require('no-neck-pain').setup({
+        integrations = {
+            trouble = { position = "none" }
+        }
+    })]])
+
+    Helpers.expect.config(child, "custom_integrations.trouble.position", "none")
+end
+
+T["custom integrations"]["overrides built-in integrations"] = function()
+    child.lua([[require('no-neck-pain').setup({
+        integrations = {
+            trouble = { position = "left" }
+        }
+    })]])
+
+    Helpers.expect.config(child, "custom_integrations.trouble", {
+        position = "left",
+        filetype = "trouble",
+    })
+end
+
+T["custom integrations"]["case-insensitive matching"] = function()
+    child.lua([[require('no-neck-pain').setup({
+        integrations = {
+            Trouble = { position = "left" }
+        }
+    })]])
+
+    Helpers.expect.config(child, "custom_integrations.trouble", {
+        position = "left",
+        filetype = "trouble",
+    })
+end
+
 return T
