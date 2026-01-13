@@ -249,14 +249,15 @@ require("no-neck-pain").setup({
         --- Options applied to the `right` buffer, options defined here overrides the `buffers` ones.
         ---@see NoNeckPain.bufferOptions `:h NoNeckPain.bufferOptions`
         right = NoNeckPain.bufferOptions,
-    },
+     },
     -- Supported integrations that might clash with `no-neck-pain.nvim`'s behavior.
+    --
+    -- The key of each integration must be the filetype of the integration window.
     --
     -- The `position` is used when the plugin scans the layout in order to compute the width that should be added
     -- on each side. For example, if you were supposed to have a padding of 100 columns on each side, but an
     -- integration takes 42, only 58 will be added so your layout is still centered.
     --
-    -- If `reopen` is set to `false`, we won't account the width but close the integration when encountered.
     ---@type table
     integrations = {
         -- @link https://github.com/nvim-tree/nvim-tree.lua
@@ -265,17 +266,12 @@ require("no-neck-pain").setup({
             -- The position of the tree.
             ---@type "left"|"right"
             position = "left",
-            -- When `true`, if the tree was opened before enabling the plugin, we will reopen it.
-            ---@type boolean
-            reopen = true,
         },
         -- @link https://github.com/nvim-neo-tree/neo-tree.nvim
-        NeoTree = {
+        ["neo-tree"] = {
             -- The position of the tree.
             ---@type "left"|"right"
             position = "left",
-            -- When `true`, if the tree was opened before enabling the plugin, we will reopen it.
-            reopen = true,
         },
         -- @link https://github.com/mbbill/undotree
         undotree = {
@@ -288,32 +284,24 @@ require("no-neck-pain").setup({
             -- The position of the tree.
             ---@type "right"
             position = "right",
-            -- When `true`, if the tree was opened before enabling the plugin, we will reopen it.
-            reopen = true,
         },
         -- @link https://github.com/rcarriga/nvim-dap-ui
-        NvimDAPUI = {
+        dap = {
             -- The position of the tree.
             ---@type "none"
             position = "none",
-            -- When `true`, if the tree was opened before enabling the plugin, we will reopen it.
-            reopen = true,
         },
         -- @link https://github.com/hedyhli/outline.nvim
         outline = {
             -- The position of the tree.
             ---@type "left"|"right"
             position = "right",
-            -- When `true`, if the tree was opened before enabling the plugin, we will reopen it.
-            reopen = true,
         },
         -- @link https://github.com/stevearc/aerial.nvim
         aerial = {
             -- The position of the tree.
             ---@type "left"|"right"
             position = "right",
-            -- When `true`, if the tree was opened before enabling the plugin, we will reopen it.
-            reopen = true,
         },
         -- this is a generic field to hint no-neck-pain that you use a dashboard plugin.
         -- you can find the filetype list of natively supported dashboards here: https://github.com/shortcuts/no-neck-pain.nvim/blob/main/lua/no-neck-pain/util/constants.lua#L82-L85
@@ -326,6 +314,7 @@ require("no-neck-pain").setup({
             filetypes = nil,
         },
     },
+,
 })
 
 --- NoNeckPain's buffer `vim.wo` options.

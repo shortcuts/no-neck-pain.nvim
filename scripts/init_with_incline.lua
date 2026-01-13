@@ -8,7 +8,6 @@ require("mini.test").setup()
 require("no-neck-pain").setup({
     width = 1,
     minSideBufferWidth = 0,
-    integrations = { NeoTree = { reopen = true } },
 })
 local helpers = require("incline.helpers")
 local devicons = require("nvim-web-devicons")

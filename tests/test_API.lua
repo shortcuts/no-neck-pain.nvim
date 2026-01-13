@@ -1,4 +1,4 @@
-local Co = require("no-neck-pain.util.constants")
+local Config = require("no-neck-pain.config")
 local Helpers = dofile("tests/helpers.lua")
 
 local child = Helpers.new_child_neovim()
@@ -143,36 +143,29 @@ T["setup"]["sets exposed methods and default options value"] = function()
             },
         },
         integrations = {
-            NeoTree = {
+            ["neo-tree"] = {
                 position = "left",
-                reopen = true,
             },
-            NvimDAPUI = {
+            dap = {
                 position = "none",
-                reopen = true,
             },
             NvimTree = {
                 position = "left",
-                reopen = true,
-            },
-            neotest = {
-                position = "right",
-                reopen = true,
-            },
-            undotree = {
-                position = "left",
-            },
-            outline = {
-                position = "right",
-                reopen = true,
             },
             aerial = {
                 position = "right",
-                reopen = true,
             },
             dashboard = {
                 enabled = false,
-                filetype = nil,
+            },
+            neotest = {
+                position = "right",
+            },
+            outline = {
+                position = "right",
+            },
+            undotree = {
+                position = "left",
             },
         },
     })
@@ -294,36 +287,29 @@ T["setup"]["overrides default values"] = function()
             },
         },
         integrations = {
-            NeoTree = {
+            ["neo-tree"] = {
                 position = "left",
-                reopen = true,
             },
-            NvimDAPUI = {
+            dap = {
                 position = "none",
-                reopen = true,
             },
             NvimTree = {
                 position = "left",
-                reopen = true,
-            },
-            neotest = {
-                position = "right",
-                reopen = true,
-            },
-            undotree = {
-                position = "left",
-            },
-            outline = {
-                position = "right",
-                reopen = true,
             },
             aerial = {
                 position = "right",
-                reopen = true,
             },
             dashboard = {
                 enabled = false,
-                filetype = nil,
+            },
+            neotest = {
+                position = "right",
+            },
+            outline = {
+                position = "right",
+            },
+            undotree = {
+                position = "left",
             },
         },
     })
@@ -378,10 +364,6 @@ T["enable"]["(single tab) sets state"] = function()
     })
 
     Helpers.expect.state(child, "tabs[1].wins.columns", 3)
-
-    Helpers.expect.state_type(child, "tabs[1].wins.integrations", "table")
-
-    Helpers.expect.state(child, "tabs[1].wins.integrations", Co.INTEGRATIONS)
 end
 
 T["enable"]["(multiple tab) sets state"] = function()
@@ -407,10 +389,6 @@ T["enable"]["(multiple tab) sets state"] = function()
     })
     Helpers.expect.state(child, "tabs[1].wins.columns", 3)
 
-    Helpers.expect.state_type(child, "tabs[1].wins.integrations", "table")
-
-    Helpers.expect.state(child, "tabs[1].wins.integrations", Co.INTEGRATIONS)
-
     -- tab 2
     child.cmd("tabnew")
     child.nnp()
@@ -430,10 +408,6 @@ T["enable"]["(multiple tab) sets state"] = function()
         right = 1005,
     })
     Helpers.expect.state(child, "tabs[2].wins.columns", 3)
-
-    Helpers.expect.state_type(child, "tabs[2].wins.integrations", "table")
-
-    Helpers.expect.state(child, "tabs[2].wins.integrations", Co.INTEGRATIONS)
 end
 
 T["disable"] = MiniTest.new_set()

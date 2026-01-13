@@ -1,5 +1,4 @@
 local api = require("no-neck-pain.util.api")
-local constants = require("no-neck-pain.util.constants")
 local log = require("no-neck-pain.util.log")
 
 ----- default values and toggles =======================================================
@@ -61,7 +60,13 @@ end
 ---
 ---@private
 function state:init_integrations()
-    self.tabs[self.active_tab].wins.integrations = vim.deepcopy(constants.INTEGRATIONS)
+    self.tabs[self.active_tab].wins.integrations = {}
+
+    -- normalize to lowercase
+    for name, opts in pairs(vim.deepcopy(_G.NoNeckPain.config.integrations)) do
+        local lower_name = string.lower(name)
+        self.tabs[self.active_tab].wins.integrations[lower_name] = opts
+    end
 end
 
 --- Sets the columns state of the current tab to its original value.
@@ -171,7 +176,7 @@ function state:set_tab(id)
                 left = nil,
                 right = nil,
             },
-            integrations = vim.deepcopy(constants.INTEGRATIONS),
+            integrations = vim.deepcopy(_G.NoNeckPain.config.integrations),
         },
     }
     self.active_tab = id
@@ -262,10 +267,16 @@ function state:is_supported_integration(scope, win)
         return true, integration_name, integration_info
     end
 
-    local registered_integrations = tab ~= nil and tab.wins.integrations or constants.INTEGRATIONS
+    if tab == nil then
+        log.debug(scope, "tab is nil, cannot compute integrations")
 
-    for name, integration in pairs(registered_integrations) do
-        if vim.startswith(string.lower(filetype), integration.fileTypePattern) then
+        return false, nil
+    end
+
+    local lowercase_filetype = string.lower(filetype)
+
+    for name, integration in pairs(tab.wins.integrations) do
+        if vim.startswith(lowercase_filetype, name) then
             log.debug(scope, "win '%d' is an integration '%s'", win, filetype)
 
             if tab ~= nil then
