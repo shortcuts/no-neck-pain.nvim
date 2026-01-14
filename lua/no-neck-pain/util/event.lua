@@ -64,12 +64,27 @@ function event.skip_enable(scope)
         return false
     end
 
+    vim.print(vim.bo.filetype)
+
+    local filetype = string.lower(vim.bo.filetype)
+
+    vim.print(filetype, constants.DASHBOARDS)
+
     -- dashboards delays the plugin enable step until next buffer entered
-    if vim.tbl_contains(constants.DASHBOARDS, vim.bo.filetype) then
-        return true
+    for _, ft in pairs(constants.DASHBOARDS) do
+        if string.find(filetype, ft) then
+            return true
+        end
     end
 
-    return state:is_supported_integration("event.skip_enable", 0)
+    vim.print(filetype, constants.INTEGRATIONS)
+    for _, ft in pairs(constants.INTEGRATIONS) do
+        if string.find(filetype, ft) then
+            return true
+        end
+    end
+
+    return false
 end
 
 return event

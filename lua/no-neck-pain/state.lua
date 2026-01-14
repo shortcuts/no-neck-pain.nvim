@@ -256,7 +256,6 @@ function state:is_supported_integration(scope, win)
         return false
     end
 
-    local tab = self:get_tab()
     local buffer = vim.api.nvim_win_get_buf(win)
     local filetype = vim.api.nvim_buf_get_option(buffer, "filetype")
 
@@ -267,23 +266,13 @@ function state:is_supported_integration(scope, win)
         return true, integration_name, integration_info
     end
 
-    if tab == nil then
-        log.debug(scope, "tab is nil, cannot compute integrations")
-
-        return false, nil
-    end
-
     local lowercase_filetype = string.lower(filetype)
 
-    for name, integration in pairs(tab.wins.integrations) do
-        if vim.startswith(lowercase_filetype, name) then
+    for name, integration in pairs(self:get_integrations()) do
+        if string.find(lowercase_filetype, name) then
             log.debug(scope, "win '%d' is an integration '%s'", win, filetype)
 
-            if tab ~= nil then
-                return true, name, integration
-            end
-
-            return true, nil
+            return true, name, integration
         end
     end
 

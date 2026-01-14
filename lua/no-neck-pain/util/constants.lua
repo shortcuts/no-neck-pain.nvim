@@ -38,4 +38,6 @@ constants.THEMES = {
 ---@private
 constants.DASHBOARDS = { "dashboard", "alpha", "starter", "snacks" }
 
+constants.INTEGRATIONS = {}
+
 return constants

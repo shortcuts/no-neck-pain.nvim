@@ -407,6 +407,12 @@ function NoNeckPain.defaults(options)
 
     if NoNeckPain.options.integrations ~= nil then
         for key, config in pairs(NoNeckPain.options.integrations) do
+            if key == "dashboard" and config.enabled == true and config.filetypes ~= nil then
+                for _, value in pairs(config.filetypes) do
+                    table.insert(constants.DASHBOARDS, string.lower(value))
+                end
+            end
+
             if key ~= "dashboard" and config.position ~= nil then
                 -- Validate position is a string
                 assert(
@@ -429,16 +435,8 @@ function NoNeckPain.defaults(options)
                         config.position
                     )
                 )
-            end
-        end
-    end
 
-    if NoNeckPain.options.integrations.dashboard.enabled == true then
-        NoNeckPain.options.autocmds.enableOnVimEnter = "safe"
-
-        if NoNeckPain.options.integrations.dashboard.filetypes ~= nil then
-            for _, value in pairs(NoNeckPain.options.integrations.dashboard.filetypes) do
-                table.insert(constants.DASHBOARDS, value)
+                table.insert(constants.INTEGRATIONS, string.lower(key))
             end
         end
     end
