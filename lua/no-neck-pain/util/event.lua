@@ -1,6 +1,5 @@
 local log = require("no-neck-pain.util.log")
 local api = require("no-neck-pain.util.api")
-local constants = require("no-neck-pain.util.constants")
 local state = require("no-neck-pain.state")
 
 local event = {}
@@ -47,40 +46,56 @@ end
 ---@private
 function event.skip_enable(scope)
     if state:is_active_tab_registered() then
+        log.debug(scope, "skip: is_active_tab_registered")
+
         return true
     end
 
     if api.is_relative_window() then
+        log.debug(scope, "skip: is_relative_window")
+
         return true
     end
 
     if state:is_active_tab_disabled() then
         if scope == "enable_on_tab_enter" then
+            log.debug(scope, "skip: is_active_tab_disabled,enable_on_tab_enter")
+
             return true
         end
+
+        log.debug(scope, "skip: is_active_tab_disabled,remove_active_tab_from_disabled")
 
         state:remove_active_tab_from_disabled()
 
         return false
     end
 
-    vim.print(vim.bo.filetype)
-
     local filetype = string.lower(vim.bo.filetype)
 
-    vim.print(filetype, constants.DASHBOARDS)
+    if _G.NoNeckPain.config.integrations ~= nil then
+        for key, config in pairs(_G.NoNeckPain.config.integrations) do
+            if key ~= "dashboard" then
+                log.debug(scope, "skip: find integration")
 
-    -- dashboards delays the plugin enable step until next buffer entered
-    for _, ft in pairs(constants.DASHBOARDS) do
-        if string.find(filetype, ft) then
-            return true
-        end
-    end
+                if string.find(filetype, string.lower(key)) then
+                    log.debug(scope, "%s is an integration", key)
 
-    vim.print(filetype, constants.INTEGRATIONS)
-    for _, ft in pairs(constants.INTEGRATIONS) do
-        if string.find(filetype, ft) then
-            return true
+                    return true
+                end
+            else
+                if config.filetypes ~= nil then
+                    log.debug(scope, "skip: find dashboard")
+
+                    for _, ft in pairs(_G.NoNeckPain.config.integrations.dashboard.filetypes) do
+                        if string.find(filetype, string.lower(ft)) then
+                            log.debug(scope, "%s is a dashboard", ft)
+
+                            return true
+                        end
+                    end
+                end
+            end
         end
     end
 

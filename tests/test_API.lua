@@ -157,6 +157,7 @@ T["setup"]["sets exposed methods and default options value"] = function()
             },
             dashboard = {
                 enabled = false,
+                filetypes = { "dashboard", "alpha", "starter", "snacks" },
             },
             neotest = {
                 position = "right",
@@ -301,6 +302,7 @@ T["setup"]["overrides default values"] = function()
             },
             dashboard = {
                 enabled = false,
+                filetypes = { "dashboard", "alpha", "starter", "snacks" },
             },
             neotest = {
                 position = "right",

@@ -33,11 +33,4 @@ constants.THEMES = {
     ["tokyonight-storm"] = "#1f2335",
 }
 
---- Dashboards filetypes that delays the plugin enable step until next buffer entered.
----
----@private
-constants.DASHBOARDS = { "dashboard", "alpha", "starter", "snacks" }
-
-constants.INTEGRATIONS = {}
-
 return constants

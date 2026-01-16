@@ -34,6 +34,7 @@ T["setup"]["sets default values"] = function()
         },
         dashboard = {
             enabled = false,
+            filetypes = { "dashboard", "alpha", "starter", "snacks" },
         },
         neotest = {
             position = "right",
@@ -71,7 +72,8 @@ T["setup"]["overrides default values and add new entries"] = function()
                  position = "left",
              },
              dashboard = {
-                 enabled = true
+                 enabled = true,
+                 filetypes = { "dashboard", "alpha", "starter", "snacks" }
              },
              FOOBAR = { 
                  position = "left"
@@ -105,6 +107,7 @@ T["setup"]["overrides default values and add new entries"] = function()
         },
         dashboard = {
             enabled = true,
+            filetypes = { "dashboard", "alpha", "starter", "snacks" },
         },
         foobar = {
             position = "left",
@@ -364,6 +367,7 @@ T["neo-tree"]["keeps sides open"] = function()
         },
         dashboard = {
             enabled = false,
+            filetypes = { "dashboard", "alpha", "starter", "snacks" },
         },
         ["neo-tree"] = {
             id = 1004,
@@ -405,6 +409,7 @@ T["neo-tree"]["keeps sides open"] = function()
         },
         dashboard = {
             enabled = false,
+            filetypes = { "dashboard", "alpha", "starter", "snacks" },
         },
         ["neo-tree"] = {
             id = 1004,
@@ -451,6 +456,7 @@ T["neo-tree"]["properly enables nnp with tree already opened"] = function()
         },
         dashboard = {
             enabled = false,
+            filetypes = { "dashboard", "alpha", "starter", "snacks" },
         },
         ["neo-tree"] = {
             id = 1002,

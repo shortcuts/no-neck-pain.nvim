@@ -27,7 +27,7 @@ local function get_integrations()
         },
         dashboard = {
             enabled = false,
-            filetypes = nil,
+            filetypes = { "dashboard", "alpha", "starter", "snacks" },
         },
     }
 end
