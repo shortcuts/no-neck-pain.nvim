@@ -395,8 +395,8 @@ T["enable"]["(multiple tab) sets state"] = function()
     child.cmd("tabnew")
     child.nnp()
 
-    Helpers.expect.state(child, "enabled", true)
     Helpers.expect.state(child, "active_tab", 2)
+    Helpers.expect.state(child, "enabled", true)
 
     Helpers.expect.state_type(child, "tabs", "table")
 

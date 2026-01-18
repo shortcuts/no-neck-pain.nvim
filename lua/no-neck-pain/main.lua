@@ -139,6 +139,8 @@ end
 ---@param scope string: internal identifier for logging purposes.
 ---@private
 function main.enable(scope)
+    state:set_active_tab(api.get_current_tab())
+
     if event.skip_enable(scope) then
         return
     end
@@ -146,8 +148,6 @@ function main.enable(scope)
     if _G.NoNeckPain.config.callbacks.preEnable ~= nil then
         _G.NoNeckPain.config.callbacks.preEnable(state)
     end
-
-    state:set_active_tab(api.get_current_tab())
 
     log.debug(scope, "calling enable for tab %d", state.active_tab)
 
@@ -163,10 +163,9 @@ function main.enable(scope)
 
     state:set_side_id(vim.api.nvim_get_current_win(), "curr")
     state:scan_layout(scope)
-    api.debounce(scope, function()
-        main.init(scope)
-        state:scan_layout(scope)
-    end, 1)
+    main.init(scope)
+    state:scan_layout(scope)
+    api.debounce(scope, main.init)
 
     vim.api.nvim_create_autocmd({ "VimResized" }, {
         callback = function(p)

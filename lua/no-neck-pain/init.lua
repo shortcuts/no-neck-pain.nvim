@@ -11,7 +11,7 @@ function NoNeckPain.toggle()
         _G.NoNeckPain.config = config.options
     end
 
-    main.toggle("public_api_toggle")
+    api.debounce("public_api_toggle", main.toggle)
 end
 
 --- Toggles the scratch_pad feature of the plugin.
@@ -123,7 +123,7 @@ function NoNeckPain.setup(opts)
         _G.NoNeckPain.config.autocmds.enableOnVimEnter ~= nil
         and _G.NoNeckPain.config.autocmds.enableOnVimEnter ~= false
     then
-        vim.api.nvim_create_autocmd({ "BufEnter" }, {
+        vim.api.nvim_create_autocmd({ "FileType", "BufEnter" }, {
             pattern = "*",
             callback = function()
                 local scope = string.format(
@@ -162,7 +162,7 @@ function NoNeckPain.setup(opts)
                         return log.debug(p.event, "plugin is disabled")
                     end
 
-                    NoNeckPain.enable("enable_on_tab_enter")
+                    NoNeckPain.enable(p.event)
                 end)
             end,
             group = "NoNeckPainAutocmd",
