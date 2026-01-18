@@ -58,8 +58,8 @@ function event.skip_enable(scope)
     end
 
     if state:is_active_tab_disabled() then
-        if scope == "enable_on_tab_enter" then
-            log.debug(scope, "skip: is_active_tab_disabled,enable_on_tab_enter")
+        if scope == "public_api_enable:TabEnter" then
+            log.debug(scope, "skip: is_active_tab_disabled,public_api_enable:TabEnter")
 
             return true
         end
