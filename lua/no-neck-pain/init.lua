@@ -11,7 +11,7 @@ function NoNeckPain.toggle()
         _G.NoNeckPain.config = config.options
     end
 
-    api.debounce("public_api_toggle", main.toggle)
+    main.toggle("public_api_toggle")
 end
 
 --- Toggles the scratch_pad feature of the plugin.
@@ -80,7 +80,7 @@ function NoNeckPain.enable(scope)
         _G.NoNeckPain.config = config.options
     end
 
-    api.debounce(string.format("public_api_enable:%s", scope), main.enable, 10)
+    main.enable(string.format("public_api_enable:%s", scope))
 end
 
 --- Disables the plugin, clear highlight groups and autocmds, closes side buffers and resets the internal state.
@@ -138,16 +138,15 @@ function NoNeckPain.setup(opts)
                         if _G.NoNeckPain.state ~= nil then
                             pcall(vim.api.nvim_del_augroup_by_name, "NoNeckPainVimEnterAutocmd")
                         end
-                    end)
+                    end, 5)
                 else
                     NoNeckPain.enable(scope)
 
-                    api.debounce(scope, function()
+                    api.debounce(string.format("%s:cleanup", scope), function()
                         if _G.NoNeckPain.state ~= nil then
                             pcall(vim.api.nvim_del_augroup_by_name, "NoNeckPainVimEnterAutocmd")
                         end
                     end)
-                    -- main.init(scope)
                 end
             end,
             group = "NoNeckPainVimEnterAutocmd",

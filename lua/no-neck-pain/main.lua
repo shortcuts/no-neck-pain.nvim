@@ -163,8 +163,10 @@ function main.enable(scope)
 
     state:set_side_id(vim.api.nvim_get_current_win(), "curr")
     state:scan_layout(scope)
-    main.init(scope)
-    state:scan_layout(scope)
+    api.debounce(scope, function()
+        main.init(scope)
+        state:scan_layout(scope)
+    end, 1)
 
     vim.api.nvim_create_autocmd({ "VimResized" }, {
         callback = function(p)
