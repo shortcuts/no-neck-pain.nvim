@@ -309,9 +309,9 @@ require("no-neck-pain").setup({
         dashboard = {
             -- When `true`, debounce will be applied to the init method, leaving time for the dashboard to open.
             enabled = false,
-            -- if a dashboard that you use isn't supported, you can use this field to set a matching filetype, also don't hesitate to open a pull-request with the edited list (DASHBOARDS) found in lua/no-neck-pain/util/constants.lua.
+            -- if a dashboard that you use isn't supported, you can use this field to set a matching filetype.
             ---@type string[]|nil
-            filetypes = nil,
+            filetypes = { "dashboard", "alpha", "starter", "snacks" },
         },
     },
 ,
