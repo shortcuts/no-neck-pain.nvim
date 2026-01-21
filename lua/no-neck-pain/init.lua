@@ -80,7 +80,7 @@ function NoNeckPain.enable(scope)
         _G.NoNeckPain.config = config.options
     end
 
-    api.debounce(scope or "public_api_enable", main.enable, 10)
+    main.enable(string.format("public_api_enable:%s", scope))
 end
 
 --- Disables the plugin, clear highlight groups and autocmds, closes side buffers and resets the internal state.
@@ -123,7 +123,7 @@ function NoNeckPain.setup(opts)
         _G.NoNeckPain.config.autocmds.enableOnVimEnter ~= nil
         and _G.NoNeckPain.config.autocmds.enableOnVimEnter ~= false
     then
-        vim.api.nvim_create_autocmd({ "BufEnter" }, {
+        vim.api.nvim_create_autocmd({ "FileType", "BufEnter" }, {
             pattern = "*",
             callback = function()
                 local scope = string.format(
@@ -134,20 +134,19 @@ function NoNeckPain.setup(opts)
 
                 if config.options.autocmds.enableOnVimEnter == "safe" then
                     api.debounce(scope, function()
-                        main.enable(scope)
+                        NoNeckPain.enable(scope)
                         if _G.NoNeckPain.state ~= nil then
                             pcall(vim.api.nvim_del_augroup_by_name, "NoNeckPainVimEnterAutocmd")
                         end
-                    end)
+                    end, 5)
                 else
-                    main.enable(scope)
+                    NoNeckPain.enable(scope)
 
-                    api.debounce(scope, function()
+                    api.debounce(string.format("%s:cleanup", scope), function()
                         if _G.NoNeckPain.state ~= nil then
                             pcall(vim.api.nvim_del_augroup_by_name, "NoNeckPainVimEnterAutocmd")
                         end
                     end)
-                    main.init(scope)
                 end
             end,
             group = "NoNeckPainVimEnterAutocmd",
@@ -163,7 +162,7 @@ function NoNeckPain.setup(opts)
                         return log.debug(p.event, "plugin is disabled")
                     end
 
-                    NoNeckPain.enable("enable_on_tab_enter")
+                    NoNeckPain.enable(p.event)
                 end)
             end,
             group = "NoNeckPainAutocmd",

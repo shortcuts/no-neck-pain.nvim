@@ -14,5 +14,4 @@ require("mini.test").setup()
 require("no-neck-pain").setup({
     width = 10,
     minSideBufferWidth = 0,
-    integrations = { neotest = { reopen = true } },
 })

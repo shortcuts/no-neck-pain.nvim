@@ -17,35 +17,30 @@ local T = MiniTest.new_set({
 T["setup"] = MiniTest.new_set()
 
 T["setup"]["sets default values"] = function()
-    child.lua([[require('no-neck-pain').setup()]])
+    child.nnp()
 
-    Helpers.expect.config(child, "integrations", {
-        NeoTree = {
+    Helpers.expect.state(child, "tabs[1].wins.integrations", {
+        ["neo-tree"] = {
             position = "left",
-            reopen = true,
         },
-        NvimDAPUI = {
+        dap = {
             position = "none",
-            reopen = true,
         },
-        NvimTree = {
+        nvimtree = {
             position = "left",
-            reopen = true,
         },
         aerial = {
             position = "right",
-            reopen = true,
         },
         dashboard = {
             enabled = false,
+            filetypes = { "dashboard", "alpha", "starter", "snacks" },
         },
         neotest = {
             position = "right",
-            reopen = true,
         },
         outline = {
             position = "right",
-            reopen = true,
         },
         undotree = {
             position = "left",
@@ -53,70 +48,69 @@ T["setup"]["sets default values"] = function()
     })
 end
 
-T["setup"]["overrides default values"] = function()
+T["setup"]["overrides default values and add new entries"] = function()
     child.lua([[require('no-neck-pain').setup({
-        integrations = {
-            NvimTree = {
-                position = "right",
-                reopen = false,
-            },
-            NeoTree = {
-                position = "right",
-                reopen = false,
-            },
-            NvimDAPUI = {
-                reopen = false,
-            },
-            undotree = {
-                position = "right",
-            },
-            neotest = {
-                reopen = false,
-            },
-            outline = {
-                reopen = false,
-                position = "left",
-            },
-            aerial = {
-                position = "left",
-                reopen = false,
-            },
-            dashboard = {
-                enabled = true
-            },
-        }
-    })]])
+         integrations = {
+             NvimTree = {
+                 position = "right",
+             },
+             ["neo-tree"] = {
+                 position = "right",
+             },
+             dap = {
+                 position = "right",
+             },
+             undotree = {
+                 position = "right",
+             },
+             neotest = {
+             },
+             outline = {
+                 position = "left",
+             },
+             aerial = {
+                 position = "left",
+             },
+             dashboard = {
+                 enabled = true,
+                 filetypes = { "dashboard", "alpha", "starter", "snacks" }
+             },
+             FOOBAR = { 
+                 position = "left"
+            }
+         }
+      })]])
+    child.cmd("NoNeckPain")
+    child.wait()
 
-    Helpers.expect.config(child, "integrations", {
-        NeoTree = {
+    Helpers.expect.state(child, "tabs[1].wins.integrations", {
+        ["neo-tree"] = {
             position = "right",
-            reopen = false,
         },
-        NvimDAPUI = {
-            position = "none",
-            reopen = false,
-        },
-        NvimTree = {
+        dap = {
             position = "right",
-            reopen = false,
+        },
+        nvimtree = {
+            position = "right",
         },
         neotest = {
             position = "right",
-            reopen = false,
         },
         undotree = {
             position = "right",
         },
         outline = {
             position = "left",
-            reopen = false,
         },
         aerial = {
             position = "left",
-            reopen = false,
         },
         dashboard = {
             enabled = true,
+            filetypes = { "dashboard", "alpha", "starter", "snacks" },
+        },
+        foobar = {
+            position = "left",
         },
     })
 end
@@ -271,10 +265,8 @@ T["neotest"]["keeps sides open"] = function()
     Helpers.expect.state(child, "tabs[1].wins.columns", 4)
 
     Helpers.expect.state(child, "tabs[1].wins.integrations.neotest", {
-        close = "lua require('neotest').summary.close()",
-        fileTypePattern = "neotest",
         id = 1003,
-        open = "lua require('neotest').summary.open()",
+        position = "right",
     })
 end
 
@@ -298,10 +290,8 @@ T["outline"]["keeps sides open"] = function()
     Helpers.expect.state(child, "tabs[1].wins.columns", 4)
 
     Helpers.expect.state(child, "tabs[1].wins.integrations.outline", {
-        close = "Outline",
-        fileTypePattern = "outline",
         id = 1004,
-        open = "Outline",
+        position = "right",
     })
 end
 
@@ -333,11 +323,9 @@ T["NvimTree"]["keeps sides open"] = function()
 
     Helpers.expect.state(child, "tabs[1].wins.columns", 4)
 
-    Helpers.expect.state(child, "tabs[1].wins.integrations.NvimTree", {
-        close = "NvimTreeClose",
-        fileTypePattern = "nvimtree",
+    Helpers.expect.state(child, "tabs[1].wins.integrations.nvimtree", {
         id = 1004,
-        open = "NvimTreeOpen",
+        position = "left",
     })
 end
 
@@ -370,11 +358,33 @@ T["neo-tree"]["keeps sides open"] = function()
 
     Helpers.expect.state(child, "tabs[1].wins.columns", 4)
 
-    Helpers.expect.state(child, "tabs[1].wins.integrations.NeoTree", {
-        close = "Neotree close",
-        fileTypePattern = "neo-tree",
-        id = 1004,
-        open = "Neotree reveal",
+    Helpers.expect.state(child, "tabs[1].wins.integrations", {
+        aerial = {
+            position = "right",
+        },
+        dap = {
+            position = "none",
+        },
+        dashboard = {
+            enabled = false,
+            filetypes = { "dashboard", "alpha", "starter", "snacks" },
+        },
+        ["neo-tree"] = {
+            id = 1004,
+            position = "left",
+        },
+        neotest = {
+            position = "right",
+        },
+        nvimtree = {
+            position = "left",
+        },
+        outline = {
+            position = "right",
+        },
+        undotree = {
+            position = "left",
+        },
     })
 
     child.nnp()
@@ -390,11 +400,33 @@ T["neo-tree"]["keeps sides open"] = function()
 
     Helpers.expect.state(child, "tabs[1].wins.columns", 4)
 
-    Helpers.expect.state(child, "tabs[1].wins.integrations.NeoTree", {
-        close = "Neotree close",
-        fileTypePattern = "neo-tree",
-        id = 1004,
-        open = "Neotree reveal",
+    Helpers.expect.state(child, "tabs[1].wins.integrations", {
+        aerial = {
+            position = "right",
+        },
+        dap = {
+            position = "none",
+        },
+        dashboard = {
+            enabled = false,
+            filetypes = { "dashboard", "alpha", "starter", "snacks" },
+        },
+        ["neo-tree"] = {
+            id = 1004,
+            position = "left",
+        },
+        neotest = {
+            position = "right",
+        },
+        nvimtree = {
+            position = "left",
+        },
+        outline = {
+            position = "right",
+        },
+        undotree = {
+            position = "left",
+        },
     })
 end
 
@@ -415,11 +447,33 @@ T["neo-tree"]["properly enables nnp with tree already opened"] = function()
 
     Helpers.expect.state(child, "enabled", true)
 
-    Helpers.expect.state(child, "tabs[1].wins.integrations.NeoTree", {
-        close = "Neotree close",
-        fileTypePattern = "neo-tree",
-        id = 1002,
-        open = "Neotree reveal",
+    Helpers.expect.state(child, "tabs[1].wins.integrations", {
+        aerial = {
+            position = "right",
+        },
+        dap = {
+            position = "none",
+        },
+        dashboard = {
+            enabled = false,
+            filetypes = { "dashboard", "alpha", "starter", "snacks" },
+        },
+        ["neo-tree"] = {
+            id = 1002,
+            position = "left",
+        },
+        neotest = {
+            position = "right",
+        },
+        nvimtree = {
+            position = "left",
+        },
+        outline = {
+            position = "right",
+        },
+        undotree = {
+            position = "left",
+        },
     })
 
     if child.fn.has("nvim-0.10") == 0 then
@@ -477,9 +531,7 @@ T["aerial"]["keeps sides open"] = function()
     child.wait()
 
     Helpers.expect.state(child, "tabs[1].wins.integrations.aerial", {
-        close = "AerialToggle",
-        fileTypePattern = "aerial",
-        open = "AerialToggle",
+        position = "right",
     })
     Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,

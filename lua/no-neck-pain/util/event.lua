@@ -1,6 +1,5 @@
 local log = require("no-neck-pain.util.log")
 local api = require("no-neck-pain.util.api")
-local constants = require("no-neck-pain.util.constants")
 local state = require("no-neck-pain.state")
 
 local event = {}
@@ -47,29 +46,60 @@ end
 ---@private
 function event.skip_enable(scope)
     if state:is_active_tab_registered() then
+        log.debug(scope, "skip: is_active_tab_registered")
+
         return true
     end
 
     if api.is_relative_window() then
+        log.debug(scope, "skip: is_relative_window")
+
         return true
     end
 
     if state:is_active_tab_disabled() then
-        if scope == "enable_on_tab_enter" then
+        if scope == "public_api_enable:TabEnter" then
+            log.debug(scope, "skip: is_active_tab_disabled,public_api_enable:TabEnter")
+
             return true
         end
+
+        log.debug(scope, "skip: is_active_tab_disabled,remove_active_tab_from_disabled")
 
         state:remove_active_tab_from_disabled()
 
         return false
     end
 
-    -- dashboards delays the plugin enable step until next buffer entered
-    if vim.tbl_contains(constants.DASHBOARDS, vim.bo.filetype) then
-        return true
+    local filetype = string.lower(vim.bo.filetype)
+
+    if _G.NoNeckPain.config.integrations ~= nil then
+        for key, config in pairs(_G.NoNeckPain.config.integrations) do
+            if key ~= "dashboard" then
+                log.debug(scope, "skip: find integration")
+
+                if string.find(filetype, string.lower(key)) then
+                    log.debug(scope, "%s is an integration", key)
+
+                    return true
+                end
+            else
+                if config.filetypes ~= nil then
+                    log.debug(scope, "skip: find dashboard")
+
+                    for _, ft in pairs(_G.NoNeckPain.config.integrations.dashboard.filetypes) do
+                        if string.find(filetype, string.lower(ft)) then
+                            log.debug(scope, "%s is a dashboard", ft)
+
+                            return true
+                        end
+                    end
+                end
+            end
+        end
     end
 
-    return state:is_supported_integration("event.skip_enable", 0)
+    return false
 end
 
 return event

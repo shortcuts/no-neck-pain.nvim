@@ -8,5 +8,4 @@ require("mini.test").setup()
 require("no-neck-pain").setup({
     width = 20,
     minSideBufferWidth = 0,
-    integrations = { NvimTree = { reopen = true } },
 })

@@ -169,7 +169,7 @@ function ui.create_side_buffers()
             local scope = string.format("ui.create_side_buffers:%s", side)
 
             if padding > _G.NoNeckPain.config.minSideBufferWidth then
-                state:resize_win(scope, state:get_side_id(side), padding)
+                state:resize_win(scope, side, padding)
             else
                 ui.close_win(scope, state:get_side_id(side), side)
                 state:set_side_id(nil, side)
@@ -223,7 +223,7 @@ function ui.get_side_width(side)
 
     -- remove columns of registered integrations
     for name, opts in pairs(state:get_integrations()) do
-        if opts.id ~= nil and side == _G.NoNeckPain.config.integrations[name].position then
+        if opts.id ~= nil and side == opts.position then
             local integration_width = vim.api.nvim_win_get_width(opts.id)
 
             log.debug(scope, "%s opened with width %d", name, integration_width)

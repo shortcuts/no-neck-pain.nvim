@@ -8,5 +8,4 @@ require("outline").setup()
 require("no-neck-pain").setup({
     width = 20,
     minSideBufferWidth = 0,
-    integrations = { outline = { reopen = true } },
 })
