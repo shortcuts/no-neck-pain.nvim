@@ -353,10 +353,12 @@ end
 --- Resizes a window if it's valid.
 ---
 ---@param scope string: the caller of the method.
----@param id number: the id of the window.
+---@param side "left"|"right"|"curr": the side of the window.
 ---@param width number: the width to apply to the window.
 ---@private
-function state:resize_win(scope, id, width)
+function state:resize_win(scope, side, width)
+    local id = self:get_side_id(side)
+
     log.debug(scope, "win %d with width %d", id, width)
 
     if id ~= nil and vim.api.nvim_win_is_valid(id) then

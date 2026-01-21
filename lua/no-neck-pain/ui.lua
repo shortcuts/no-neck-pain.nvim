@@ -169,7 +169,7 @@ function ui.create_side_buffers()
             local scope = string.format("ui.create_side_buffers:%s", side)
 
             if padding > _G.NoNeckPain.config.minSideBufferWidth then
-                state:resize_win(scope, state:get_side_id(side), padding)
+                state:resize_win(scope, side, padding)
             else
                 ui.close_win(scope, state:get_side_id(side), side)
                 state:set_side_id(nil, side)
