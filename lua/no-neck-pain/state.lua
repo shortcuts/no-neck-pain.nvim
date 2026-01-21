@@ -269,7 +269,7 @@ function state:is_supported_integration(scope, win)
     local lowercase_filetype = string.lower(filetype)
 
     for name, integration in pairs(self:get_integrations()) do
-        if string.find(lowercase_filetype, name) then
+        if name == lowercase_filetype or string.find(lowercase_filetype, name) then
             log.debug(scope, "win '%d' is an integration '%s'", win, filetype)
 
             return true, name, integration
