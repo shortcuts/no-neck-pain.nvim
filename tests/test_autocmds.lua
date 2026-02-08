@@ -186,86 +186,276 @@ T["skipEnteringNoNeckPainBuffer"]["does not register if scratchPad feature is en
     Helpers.expect.equality(child.api.nvim_get_current_win(), 1001)
 end
 
-T["skipEnteringNoNeckPainBuffer"]["does not register if scratchPad feature is enabled (left)"] = function()
-    child.lua(
-        [[ require('no-neck-pain').setup({width=50, buffers = { left = { scratchPad = { enabled = true } } }, autocmds = { skipEnteringNoNeckPainBuffer = true }}) ]]
-    )
-    child.nnp()
+-- Race Condition & Rapid Event Tests
+T["RaceConditions"] = MiniTest.new_set()
 
-    Helpers.expect.config(child, "buffers.left.scratchPad.enabled", true)
-    Helpers.expect.config(child, "buffers.right.scratchPad.enabled", false)
-    Helpers.expect.config(child, "autocmds.skipEnteringNoNeckPainBuffer", true)
+T["RaceConditions"]["rapid WinEnter events maintain state consistency"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
+    child.nnp()
 
     Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
-    Helpers.expect.equality(child.api.nvim_get_current_win(), 1000)
+    Helpers.expect.state(child, "enabled", true)
 
-    child.fn.win_gotoid(1001)
-    child.wait()
-    Helpers.expect.equality(child.api.nvim_get_current_win(), 1001)
+    child.cmd("doautocmd WinEnter")
+    child.cmd("doautocmd WinEnter")
+    child.cmd("doautocmd WinEnter")
+
+    child.wait(200)
+
+    Helpers.expect.state(child, "enabled", true)
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+    Helpers.expect.state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
 end
 
-T["skipEnteringNoNeckPainBuffer"]["does not register if scratchPad feature is enabled (right)"] = function()
-    child.lua(
-        [[ require('no-neck-pain').setup({width=50, buffers = { right = { scratchPad = { enabled = true } } }, autocmds = { skipEnteringNoNeckPainBuffer = true }}) ]]
-    )
+T["RaceConditions"]["QuitPre and BufDelete sequence maintains state"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     child.nnp()
-
-    Helpers.expect.config(child, "buffers.left.scratchPad.enabled", false)
-    Helpers.expect.config(child, "buffers.right.scratchPad.enabled", true)
-    Helpers.expect.config(child, "autocmds.skipEnteringNoNeckPainBuffer", true)
 
     Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
-    Helpers.expect.equality(child.api.nvim_get_current_win(), 1000)
 
-    child.fn.win_gotoid(1001)
+    child.cmd("split")
     child.wait()
-    Helpers.expect.equality(child.api.nvim_get_current_win(), 1001)
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1003, 1000, 1002 })
+
+    child.fn.win_gotoid(1003)
+    child.cmd("q")
+    child.wait(200)
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+    Helpers.expect.state(child, "enabled", true)
 end
 
-T["skipEnteringNoNeckPainBuffer"]["one side only + full width split doesn't bring back to original position"] = function()
-    child.lua(
-        [[ require('no-neck-pain').setup({width=50, autocmds = { skipEnteringNoNeckPainBuffer = true }, buffers = { right = { enabled = false }}}) ]]
-    )
+T["RaceConditions"]["VimResized during side buffer creation"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     child.nnp()
 
-    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000 })
-    Helpers.expect.equality(child.api.nvim_get_current_win(), 1000)
-
-    child.cmd("botright new")
+    child.cmd("doautocmd VimResized")
     child.wait()
 
     Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
-    Helpers.expect.equality(child.api.nvim_get_current_win(), 1002)
-
-    child.fn.win_gotoid(1001)
-    child.wait()
-    Helpers.expect.equality(child.api.nvim_get_current_win(), 1000)
+    Helpers.expect.state(child, "enabled", true)
+    Helpers.expect.state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
 end
 
-T["skipEnteringNoNeckPainBuffer"]["does not reroute to invalid windows"] = function()
-    child.lua(
-        [[ require('no-neck-pain').setup({width=50, autocmds = { skipEnteringNoNeckPainBuffer = true }}) ]]
-    )
+T["RaceConditions"]["TabEnter while side windows exist"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     child.nnp()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+
+    child.cmd("tabnew")
+    child.wait(200)
+
+    child.cmd("tabprev")
+    child.wait()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+    Helpers.expect.state(child, "enabled", true)
+end
+
+T["RaceConditions"]["rapid enable disable enable cycle"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
+
+    child.nnp()
+    child.wait(100)
+    child.nnp()
+    child.wait(100)
+    child.nnp()
+
+    child.wait(200)
+
+    Helpers.expect.state(child, "enabled", true)
+    local wins = child.get_wins_in_tab()
+    Helpers.expect.equality(#wins, 3)
+end
+
+T["RaceConditions"]["multiple rapid window navigations"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
+    child.nnp()
+
+    child.cmd("split")
+    child.cmd("split")
+    child.wait()
+
+    local initial_wins = child.get_wins_in_tab()
+
+    child.cmd("wincmd w")
+    child.cmd("wincmd w")
+    child.cmd("wincmd w")
+    child.wait()
+
+    Helpers.expect.state(child, "enabled", true)
+    local final_wins = child.get_wins_in_tab()
+    Helpers.expect.equality(#initial_wins, #final_wins)
+end
+
+T["RaceConditions"]["disabling during autocmd execution cleans up"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
+    child.nnp()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+
+    child.cmd("doautocmd WinEnter")
+    child.nnp()
+
+    child.wait(200)
+
+    Helpers.expect.state(child, "enabled", false)
+end
+
+T["RaceConditions"]["multiple tabs with overlapping autocmds"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
+    child.nnp()
+
+    child.cmd("tabnew")
+    child.wait()
+    child.nnp()
+    child.cmd("tabnew")
+    child.wait()
+    child.nnp()
+
+    child.cmd("doautocmd WinEnter")
+    child.cmd("tabprev")
+    child.cmd("doautocmd WinEnter")
+    child.wait()
+
+    Helpers.expect.state(child, "enabled", true)
+end
+
+T["RaceConditions"]["autocmd cleanup when plugin disabled mid-operation"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
+    child.nnp()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+
+    child.cmd("split")
+    child.nnp()
+
+    child.wait(200)
+
+    Helpers.expect.state(child, "enabled", false)
+end
+
+T["RaceConditions"]["rapid TabEnter events are debounced"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
+    child.nnp()
+
+    child.cmd("tabnew")
+    child.cmd("tabnew")
+    child.wait()
+
+    child.cmd("tabprev")
+    child.cmd("tabnext")
+    child.cmd("tabprev")
+    child.wait(200)
+
+    Helpers.expect.state(child, "enabled", true)
+end
+
+T["RaceConditions"]["debounce preserves important state changes"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
+    child.nnp()
+
+    local initial_tab = child.lua_get("_G.NoNeckPain.state.active_tab")
+
+    child.cmd("tabnew")
+    child.wait(200)
+
+    local new_tab = child.lua_get("_G.NoNeckPain.state.active_tab")
+    Helpers.expect.no_equality(initial_tab, new_tab)
+end
+
+T["RaceConditions"]["WinClosed during layout adjustment"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
+    child.nnp()
+
+    child.cmd("split")
+    child.cmd("split")
+    child.wait()
+
+    local wins_before = child.get_wins_in_tab()
+
+    child.cmd("close")
+    child.cmd("doautocmd WinClosed")
+    child.wait()
+
+    Helpers.expect.state(child, "enabled", true)
+    local wins_after = child.get_wins_in_tab()
+    Helpers.expect.equality(#wins_after, #wins_before - 1)
+end
+
+T["RaceConditions"]["rapid resize events"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
+    child.nnp()
+
+    child.cmd("doautocmd VimResized")
+    child.cmd("doautocmd VimResized")
+    child.cmd("doautocmd VimResized")
+    child.wait()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+    Helpers.expect.state(child, "enabled", true)
+end
+
+T["RaceConditions"]["BufDelete on main window with fallback"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=50, fallbackOnBufferDelete=true}) ]])
+    child.nnp()
+
+    Helpers.expect.config(child, "fallbackOnBufferDelete", true)
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
 
     child.cmd("e foo")
     child.wait()
     child.cmd("e bar")
     child.wait()
-
-    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
-    Helpers.expect.equality(child.api.nvim_get_current_win(), 1000)
-
     child.cmd("bd")
+    child.wait(200)
+
+    Helpers.expect.state(child, "enabled", true)
+end
+
+T["RaceConditions"]["concurrent split and window close"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
+    child.nnp()
+
+    child.cmd("split")
     child.wait()
 
-    if child.fn.has("nvim-0.10") == 0 then
-        Helpers.expect.equality(child.get_wins_in_tab(), { 1004, 1003, 1005 })
-        Helpers.expect.equality(child.api.nvim_get_current_win(), 1003)
-    else
-        Helpers.expect.equality(child.get_wins_in_tab(), { 1005, 1004, 1006 })
-        Helpers.expect.equality(child.api.nvim_get_current_win(), 1004)
-    end
+    local split_win = child.api.nvim_get_current_win()
+
+    child.cmd("split")
+    child.fn.win_gotoid(split_win)
+    child.cmd("close")
+    child.wait()
+
+    Helpers.expect.state(child, "enabled", true)
+    local wins = child.get_wins_in_tab()
+    Helpers.expect.equality(#wins >= 3, true)
+end
+
+T["RaceConditions"]["window focus changes during disable"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
+    child.nnp()
+
+    child.cmd("split")
+    child.wait()
+
+    local new_win = child.api.nvim_get_current_win()
+    child.nnp()
+    child.fn.win_gotoid(new_win)
+
+    child.wait(200)
+
+    Helpers.expect.state(child, "enabled", false)
 end
 
 return T

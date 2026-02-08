@@ -1,6 +1,6 @@
 .SUFFIXES:
 
-TESTFILES=options mappings API splits tabs integrations buffers colors autocmds scratchpad commands callbacks
+TESTFILES=options mappings API splits tabs integrations buffers colors autocmds scratchpad commands callbacks event state_edge_cases width_calculations config_validation
 
 all: documentation lint luals test
 

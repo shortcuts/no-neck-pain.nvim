@@ -540,4 +540,399 @@ T["aerial"]["keeps sides open"] = function()
     })
 end
 
+T["edge_cases"] = MiniTest.new_set()
+
+T["edge_cases"]["multiple integrations on same side (left)"] = function()
+    child.set_size(10, 300)
+    child.lua([[
+        require('no-neck-pain').setup({
+            width = 100,
+            integrations = {
+                NvimTree = { position = "left" },
+                undotree = { position = "left" }
+            }
+        })
+    ]])
+
+    child.nnp()
+    child.wait()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+    Helpers.expect.state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
+
+    -- Create first integration on left
+    child.cmd("topleft 30vnew")
+    child.wait()
+    child.bo.filetype = "NvimTree"
+    child.wait()
+    local nvimtree_win = child.get_current_win()
+
+    -- Move to main window, then create second integration
+    child.cmd("wincmd l")
+    child.wait()
+
+    child.cmd("topleft 25vnew")
+    child.wait()
+    child.bo.filetype = "undotree"
+    child.wait()
+    local undotree_win = child.get_current_win()
+
+    -- Move back to main window
+    child.cmd("wincmd l")
+    child.wait(50)
+
+    -- Verify first integration is tracked
+    Helpers.expect.state(child, "tabs[1].wins.integrations.nvimtree.id", nvimtree_win)
+
+    -- Verify second integration is tracked
+    Helpers.expect.state(child, "tabs[1].wins.integrations.undotree.id", undotree_win)
+
+    -- Verify both are on left side
+    Helpers.expect.state(child, "tabs[1].wins.integrations.nvimtree.position", "left")
+    Helpers.expect.state(child, "tabs[1].wins.integrations.undotree.position", "left")
+
+    -- Main window should still exist
+    local curr_id =
+        child.lua_get("_G.NoNeckPain.state.tabs[_G.NoNeckPain.state.active_tab].wins.main.curr")
+    Helpers.expect.no_equality(curr_id, vim.NIL)
+end
+
+T["edge_cases"]["integration appearing after NNP enabled"] = function()
+    child.set_size(10, 200)
+    child.lua([[
+        require('no-neck-pain').setup({
+            width = 80,
+            integrations = {
+                outline = { position = "right" }
+            }
+        })
+    ]])
+
+    child.nnp()
+    child.wait()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+    Helpers.expect.state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
+    Helpers.expect.state(child, "tabs[1].wins.integrations.outline", {
+        position = "right",
+    })
+
+    -- Create integration window after NNP is already enabled
+    child.cmd("botright 30vnew")
+    child.bo.filetype = "Outline"
+    local outline_win = child.get_current_win()
+
+    child.cmd("wincmd h")
+    child.wait()
+
+    -- Integration should be tracked after appearing
+    Helpers.expect.state(child, "tabs[1].wins.integrations.outline.id", outline_win)
+
+    -- Main window should remain intact
+    Helpers.expect.state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
+end
+
+T["edge_cases"]["integration window resize"] = function()
+    child.set_size(10, 300)
+    child.lua([[
+        require('no-neck-pain').setup({
+            width = 100,
+            integrations = {
+                NvimTree = { position = "left" }
+            }
+        })
+    ]])
+
+    child.nnp()
+    child.wait()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+
+    -- Create integration after enabling
+    child.cmd("topleft 30vnew")
+    child.bo.filetype = "NvimTree"
+    local nvimtree_win = child.get_current_win()
+
+    child.cmd("wincmd l")
+    child.wait()
+
+    -- Resize the integration window
+    child.lua([[vim.api.nvim_win_set_width(]] .. nvimtree_win .. [[, 50)]])
+    child.wait()
+
+    -- Integration should still be valid
+    local is_valid = child.lua_get("vim.api.nvim_win_is_valid(" .. nvimtree_win .. ")")
+    Helpers.expect.equality(is_valid, true)
+
+    -- Main window should still exist
+    local curr_id =
+        child.lua_get("_G.NoNeckPain.state.tabs[_G.NoNeckPain.state.active_tab].wins.main.curr")
+    Helpers.expect.no_equality(curr_id, vim.NIL)
+end
+
+T["edge_cases"]["integration closing and reopening"] = function()
+    child.set_size(10, 200)
+    child.lua([[
+        require('no-neck-pain').setup({
+            width = 80,
+            integrations = {
+                outline = { position = "right" }
+            }
+        })
+    ]])
+
+    child.nnp()
+    child.wait()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+    Helpers.expect.state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
+
+    -- Open integration
+    child.cmd("botright 25vnew")
+    child.bo.filetype = "Outline"
+    local outline_win1 = child.get_current_win()
+
+    child.cmd("wincmd h")
+    child.wait()
+
+    Helpers.expect.state(child, "tabs[1].wins.integrations.outline.id", outline_win1)
+
+    -- Close integration
+    child.lua([[vim.api.nvim_win_close(]] .. outline_win1 .. [[, true)]])
+    child.wait()
+
+    -- Integration should be reset to position only
+    Helpers.expect.state(child, "tabs[1].wins.integrations.outline", {
+        position = "right",
+    })
+
+    -- Reopen integration
+    child.cmd("botright 30vnew")
+    child.bo.filetype = "Outline"
+    local outline_win2 = child.get_current_win()
+
+    child.cmd("wincmd h")
+    child.wait()
+
+    -- New integration window should be tracked
+    Helpers.expect.state(child, "tabs[1].wins.integrations.outline.id", outline_win2)
+    Helpers.expect.no_equality(outline_win1, outline_win2)
+end
+
+T["edge_cases"]["unknown integration filetype (graceful handling)"] = function()
+    child.set_size(10, 200)
+    child.lua([[
+        require('no-neck-pain').setup({
+            width = 80
+        })
+    ]])
+
+    child.nnp()
+    child.wait()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+    Helpers.expect.state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
+
+    -- Create window with unknown filetype
+    child.cmd("topleft 30vnew")
+    child.bo.filetype = "unknownintegration123"
+    local unknown_win = child.get_current_win()
+
+    child.cmd("wincmd l")
+    child.wait()
+
+    -- Unknown window should not be registered as integration
+    local integrations =
+        child.lua_get("_G.NoNeckPain.state.tabs[_G.NoNeckPain.state.active_tab].wins.integrations")
+
+    -- Check that unknownintegration123 is NOT in integrations
+    local has_unknown = false
+    for name, _ in pairs(integrations) do
+        if name == "unknownintegration123" then
+            has_unknown = true
+            break
+        end
+    end
+    Helpers.expect.equality(has_unknown, false)
+
+    -- Unknown window should still be valid
+    local is_valid = child.lua_get("vim.api.nvim_win_is_valid(" .. unknown_win .. ")")
+    Helpers.expect.equality(is_valid, true)
+
+    -- Main window should still exist
+    Helpers.expect.state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
+end
+
+T["edge_cases"]["dashboard + enableOnVimEnter safe timing"] = function()
+    child.restart({ "-u", "scripts/minimal_init.lua" })
+
+    child.set_size(10, 200)
+
+    -- Set filetype to dashboard before enabling
+    child.bo.filetype = "dashboard"
+
+    child.lua([[
+        require('no-neck-pain').setup({
+            width = 80,
+            integrations = {
+                dashboard = {
+                    enabled = true,
+                    filetypes = { "dashboard", "alpha", "starter", "snacks" }
+                }
+            }
+        })
+    ]])
+
+    child.wait()
+
+    -- Open a real file (dashboard should not block NNP)
+    child.cmd("edit foo.txt")
+    child.wait()
+
+    -- Manually enable NNP after leaving dashboard
+    child.nnp()
+    child.wait()
+
+    -- Verify state is valid after leaving dashboard
+    Helpers.expect.state(child, "enabled", true)
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+
+    -- Dashboard integration should be configured
+    Helpers.expect.state(child, "tabs[1].wins.integrations.dashboard", {
+        enabled = true,
+        filetypes = { "dashboard", "alpha", "starter", "snacks" },
+    })
+end
+
+T["edge_cases"]["integration width subtraction with multiple integrations"] = function()
+    child.set_size(10, 400)
+    child.lua([[
+        require('no-neck-pain').setup({
+            width = 100,
+            minSideBufferWidth = 10,
+            integrations = {
+                NvimTree = { position = "left" },
+                outline = { position = "right" },
+                aerial = { position = "right" }
+            }
+        })
+    ]])
+
+    child.nnp()
+    child.wait()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+
+    -- Create left integration
+    child.cmd("topleft 40vnew")
+    child.bo.filetype = "NvimTree"
+    local nvimtree_win = child.get_current_win()
+
+    -- Create first right integration
+    child.cmd("botright 30vnew")
+    child.bo.filetype = "Outline"
+    local outline_win = child.get_current_win()
+
+    -- Create second right integration
+    child.cmd("botright 35vnew")
+    child.bo.filetype = "aerial"
+    local aerial_win = child.get_current_win()
+
+    -- Focus main window area
+    child.cmd("wincmd h")
+    child.cmd("wincmd h")
+    child.cmd("wincmd h")
+    child.wait()
+
+    -- All integrations should be tracked
+    Helpers.expect.state(child, "tabs[1].wins.integrations.nvimtree.id", nvimtree_win)
+    Helpers.expect.state(child, "tabs[1].wins.integrations.outline.id", outline_win)
+    Helpers.expect.state(child, "tabs[1].wins.integrations.aerial.id", aerial_win)
+
+    -- Main window should be valid
+    local curr_id =
+        child.lua_get("_G.NoNeckPain.state.tabs[_G.NoNeckPain.state.active_tab].wins.main.curr")
+    Helpers.expect.no_equality(curr_id, vim.NIL)
+end
+
+T["edge_cases"]["config override for integration position changes"] = function()
+    child.set_size(10, 200)
+    child.lua([[
+        require('no-neck-pain').setup({
+            width = 80,
+            integrations = {
+                outline = { position = "left" }
+            }
+        })
+    ]])
+
+    child.nnp()
+    child.wait()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+
+    -- Initial position should be left
+    Helpers.expect.state(child, "tabs[1].wins.integrations.outline", {
+        position = "left",
+    })
+
+    -- Disable NNP
+    child.nnp()
+    child.wait()
+
+    Helpers.expect.state(child, "enabled", false)
+
+    -- Reconfigure with different position
+    child.lua([[
+        require('no-neck-pain').setup({
+            width = 80,
+            integrations = {
+                outline = { position = "right" }
+            }
+        })
+    ]])
+
+    child.nnp()
+    child.wait()
+
+    -- Verify we have 3 windows (left, main, right)
+    local wins = child.get_wins_in_tab()
+    Helpers.expect.equality(#wins, 3)
+
+    -- Position should be updated to right
+    Helpers.expect.state(child, "tabs[1].wins.integrations.outline", {
+        position = "right",
+    })
+
+    -- Main window structure should be valid
+    local main = child.lua_get("_G.NoNeckPain.state.tabs[_G.NoNeckPain.state.active_tab].wins.main")
+    Helpers.expect.no_equality(main.curr, vim.NIL)
+    Helpers.expect.no_equality(main.left, vim.NIL)
+    Helpers.expect.no_equality(main.right, vim.NIL)
+end
+
 return T

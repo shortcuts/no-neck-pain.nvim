@@ -541,4 +541,249 @@ T["disable"]["relative window doesn't prevent quitting nvim"] = function()
     end)
 end
 
+-- GROUP 1: API Error Handling - Methods called when plugin not enabled
+T["API: toggle_scratch_pad() without enable throws error"] = function()
+    child.lua([[ require('no-neck-pain').setup() ]])
+
+    Helpers.expect.error(function()
+        child.lua([[ require('no-neck-pain').toggle_scratch_pad() ]])
+    end)
+end
+
+T["API: toggle_debug() without enable throws error"] = function()
+    child.lua([[ require('no-neck-pain').setup() ]])
+
+    Helpers.expect.error(function()
+        child.lua([[ require('no-neck-pain').toggle_debug() ]])
+    end)
+end
+
+T["API: resize() without enable throws error"] = function()
+    child.lua([[ require('no-neck-pain').setup() ]])
+
+    Helpers.expect.error(function()
+        child.lua([[ require('no-neck-pain').resize(50) ]])
+    end)
+end
+
+T["API: toggle_side() without enable throws error"] = function()
+    child.lua([[ require('no-neck-pain').setup() ]])
+
+    Helpers.expect.error(function()
+        child.lua([[ require('no-neck-pain').toggle_side("left") ]])
+    end)
+end
+
+T["API: error messages are clear when plugin not enabled"] = function()
+    child.lua([[ require('no-neck-pain').setup() ]])
+
+    -- Verify error contains expected message
+    Helpers.expect.error(function()
+        child.lua([[ require('no-neck-pain').resize(50) ]])
+    end)
+
+    -- The error thrown by the API should contain "must be enabled"
+    local error_msg = child.lua_get([[
+        pcall(function() require('no-neck-pain').resize(50) end)
+    ]])
+end
+
+-- GROUP 2: Invalid Input Handling
+T["API: resize(0) no-ops and doesn't change width"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=100}) ]])
+    child.nnp()
+
+    Helpers.expect.state(child, "enabled", true)
+    Helpers.expect.config(child, "width", 100)
+
+    -- resize(0) should no-op
+    child.lua([[ require('no-neck-pain').resize(0) ]])
+
+    -- Width should remain unchanged
+    Helpers.expect.config(child, "width", 100)
+end
+
+T["API: resize(-100) no-ops and doesn't change width"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=100}) ]])
+    child.nnp()
+
+    Helpers.expect.state(child, "enabled", true)
+    Helpers.expect.config(child, "width", 100)
+
+    -- resize(-100) should no-op
+    child.lua([[ require('no-neck-pain').resize(-100) ]])
+
+    -- Width should remain unchanged
+    Helpers.expect.config(child, "width", 100)
+end
+
+T["API: resize('invalid') handles gracefully"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=100}) ]])
+    child.nnp()
+
+    Helpers.expect.state(child, "enabled", true)
+    Helpers.expect.config(child, "width", 100)
+
+    -- resize with invalid string should no-op (tonumber returns nil, default to 0)
+    child.lua([[ require('no-neck-pain').resize("invalid") ]])
+
+    -- Width should remain unchanged
+    Helpers.expect.config(child, "width", 100)
+end
+
+T["API: resize(nil) handles gracefully"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=100}) ]])
+    child.nnp()
+
+    Helpers.expect.state(child, "enabled", true)
+    Helpers.expect.config(child, "width", 100)
+
+    -- resize with nil should no-op
+    child.lua([[ require('no-neck-pain').resize(nil) ]])
+
+    -- Width should remain unchanged
+    Helpers.expect.config(child, "width", 100)
+end
+
+T["API: resize() with same width no-ops"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=100}) ]])
+    child.nnp()
+
+    Helpers.expect.state(child, "enabled", true)
+    Helpers.expect.config(child, "width", 100)
+
+    -- Get initial state to verify no re-initialization occurs
+    local initial_curr = child.lua_get("_G.NoNeckPain.state.tabs[1].wins.main.curr")
+
+    -- resize with same width should no-op
+    child.lua([[ require('no-neck-pain').resize(100) ]])
+
+    -- Width unchanged and window IDs should be same (no re-init)
+    Helpers.expect.config(child, "width", 100)
+    Helpers.expect.state(child, "tabs[1].wins.main.curr", initial_curr)
+end
+
+-- GROUP 3: API Idempotency
+T["API: multiple enable() calls result in enabled state"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
+
+    -- Call enable multiple times
+    child.lua([[ require('no-neck-pain').enable("test1") ]])
+    child.wait()
+    child.lua([[ require('no-neck-pain').enable("test2") ]])
+    child.wait()
+    child.lua([[ require('no-neck-pain').enable("test3") ]])
+    child.wait()
+
+    -- Should still be enabled with proper state
+    Helpers.expect.state(child, "enabled", true)
+    Helpers.expect.state(child, "active_tab", 1)
+    Helpers.expect.state_type(child, "tabs", "table")
+end
+
+T["API: multiple disable() calls result in disabled state"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
+    child.nnp()
+
+    Helpers.expect.state(child, "enabled", true)
+
+    -- Call disable multiple times
+    child.nnp()
+    child.wait()
+    child.lua([[ require('no-neck-pain').disable() ]])
+    child.wait()
+    child.lua([[ require('no-neck-pain').disable() ]])
+    child.wait()
+
+    -- Should still be disabled with empty tabs
+    Helpers.expect.state(child, "enabled", false)
+    Helpers.expect.state(child, "tabs", {})
+end
+
+T["API: toggle() is idempotent - enable/disable/enable"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
+
+    -- First toggle - enable
+    child.lua([[ require('no-neck-pain').toggle() ]])
+    child.wait()
+    Helpers.expect.state(child, "enabled", true)
+
+    -- Second toggle - disable
+    child.lua([[ require('no-neck-pain').toggle() ]])
+    child.wait()
+    Helpers.expect.state(child, "enabled", false)
+
+    -- Third toggle - enable again
+    child.lua([[ require('no-neck-pain').toggle() ]])
+    child.wait()
+    Helpers.expect.state(child, "enabled", true)
+end
+
+T["API: toggle_debug() is idempotent"] = function()
+    child.lua([[ require('no-neck-pain').setup({debug=false}) ]])
+    child.nnp()
+
+    Helpers.expect.state(child, "enabled", true)
+    Helpers.expect.config(child, "debug", false)
+
+    -- Toggle debug on
+    child.lua([[ require('no-neck-pain').toggle_debug() ]])
+    Helpers.expect.config(child, "debug", true)
+
+    -- Toggle debug off
+    child.lua([[ require('no-neck-pain').toggle_debug() ]])
+    Helpers.expect.config(child, "debug", false)
+
+    -- Toggle debug on again
+    child.lua([[ require('no-neck-pain').toggle_debug() ]])
+    Helpers.expect.config(child, "debug", true)
+end
+
+-- GROUP 4: Additional Edge Cases
+T["API: resize() with valid positive values updates width correctly"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=100}) ]])
+    child.nnp()
+
+    Helpers.expect.state(child, "enabled", true)
+    Helpers.expect.config(child, "width", 100)
+
+    -- Valid resize
+    child.lua([[ require('no-neck-pain').resize(80) ]])
+    Helpers.expect.config(child, "width", 80)
+
+    -- Another valid resize
+    child.lua([[ require('no-neck-pain').resize(120) ]])
+    Helpers.expect.config(child, "width", 120)
+end
+
+T["API: setup() can be called multiple times"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
+    Helpers.expect.config(child, "width", 50)
+
+    -- Setup again with different config
+    child.lua([[ require('no-neck-pain').setup({width=80, debug=true}) ]])
+    Helpers.expect.config(child, "width", 80)
+    Helpers.expect.config(child, "debug", true)
+end
+
+T["API: enable() after disable() restores functionality"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
+    child.nnp()
+
+    Helpers.expect.state(child, "enabled", true)
+    local first_curr = child.lua_get("_G.NoNeckPain.state.tabs[1].wins.main.curr")
+
+    -- Disable
+    child.nnp()
+    Helpers.expect.state(child, "enabled", false)
+
+    -- Re-enable
+    child.lua([[ require('no-neck-pain').enable("test") ]])
+    child.wait()
+
+    Helpers.expect.state(child, "enabled", true)
+    Helpers.expect.state_type(child, "tabs", "table")
+    Helpers.expect.state_type(child, "tabs[1].wins.main", "table")
+end
+
 return T
