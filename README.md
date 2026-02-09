@@ -510,9 +510,8 @@ This section provides structured information about the codebase to help AI assis
 - `colors.lua` - Color/theme management for side buffers
 
 **Utilities** (`lua/no-neck-pain/util/`):
-- `state_access.lua` - Safe state access patterns
 - `api.lua` - Debouncing and API utilities
-- `helpers.lua` - Common helper functions
+- `helpers.lua` - Common helper functions and safe state/config access
 - `constants.lua` - Plugin constants (supported integrations, filetypes)
 - `log.lua` - Debug logging
 
@@ -533,32 +532,11 @@ This section provides structured information about the codebase to help AI assis
 
 ### ⚙️ Configuration Structure
 
-The plugin uses a deeply nested configuration object:
-
-```lua
-{
-  debug = boolean,
-  width = integer | "textwidth" | "colorcolumn",
-  minSideBufferWidth = integer,
-  autocmds = { enableOnVimEnter, enableOnTabEnter, ... },
-  mappings = { enabled, toggle, widthUp, widthDown, ... },
-  callbacks = { preEnable, postEnable, preDisable, postDisable },
-  buffers = {
-    setNames = boolean,
-    scratchPad = { enabled, pathToFile, ... },
-    colors = { background, blend, text },
-    bo = { vim.bo options },
-    wo = { vim.wo options },
-    left = { enabled, colors, bo, wo, scratchPad },
-    right = { enabled, colors, bo, wo, scratchPad }
-  },
-  integrations = { NvimTree, ["neo-tree"], dashboard, ... }
-}
-```
+The plugin uses a deeply nested configuration object, see `lua/no-neck-pain/config.lua`
 
 ### 🔄 Common Patterns
 
-1. **State Access**: Always use `require("no-neck-pain.util.state_access")` for state manipulation
+1. **State and Config Access**: Always use `require("no-neck-pain.util.helpers")` for state manipulation
    - `get_config_field(key)` - Read config values
    - `merge_config(partial)` - Update config
    - `get_tab()` - Get current tab state
@@ -574,16 +552,10 @@ The plugin uses a deeply nested configuration object:
 
 ### 🧪 Testing
 
-- Test framework: `busted` (Lua testing library)
+- Test framework: `MiniTest`
 - Run tests: `make test`
 - Test pattern: Each feature has dedicated `test_*.lua` file
 - Helpers: `tests/helpers.lua` provides utilities for test setup/teardown
-
-### 📚 Documentation
-
-- Inline help: `:h NoNeckPain.options`, `:h NoNeckPain.bufferOptions`
-- Wiki: [github.com/shortcuts/no-neck-pain.nvim/wiki](https://github.com/shortcuts/no-neck-pain.nvim/wiki)
-- Showcase: Examples of configurations and use cases
 
 <!-- SECTION: CONTRIBUTING -->
 ## ⌨ Contributing

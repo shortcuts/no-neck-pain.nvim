@@ -1,0 +1,2 @@
+- Use @README.md as reference for the codebase
+- Always run `make lint`, `make test` and `make documentation` before assuming your changes are valid
