@@ -47,7 +47,7 @@ T["State Access: get_config() returns same as _G.NoNeckPain.config"] = function(
 
     -- Get config via direct access and state_access API
     local direct_config = child.lua_get("_G.NoNeckPain.config")
-    local api_config = child.lua_get("require('no-neck-pain.util.state_access').get_config()")
+    local api_config = child.lua_get("require('no-neck-pain.util.helpers').get_config()")
 
     -- Both should be tables and equal
     Helpers.expect.equality(type(direct_config), "table")
@@ -63,13 +63,11 @@ T["State Access: get_state() returns same as _G.NoNeckPain.state"] = function()
 
     -- Get state via direct access and state_access API - compare enabled flag
     local direct_enabled = child.lua_get("_G.NoNeckPain.state.enabled")
-    local api_enabled =
-        child.lua_get("require('no-neck-pain.util.state_access').get_state().enabled")
+    local api_enabled = child.lua_get("require('no-neck-pain.util.helpers').get_state().enabled")
 
     -- Compare active_tab
     local direct_tab = child.lua_get("_G.NoNeckPain.state.active_tab")
-    local api_tab =
-        child.lua_get("require('no-neck-pain.util.state_access').get_state().active_tab")
+    local api_tab = child.lua_get("require('no-neck-pain.util.helpers').get_state().active_tab")
 
     -- Verify consistency
     Helpers.expect.equality(direct_enabled, api_enabled)
@@ -78,13 +76,13 @@ end
 
 T["State Access: get_config() returns nil when not initialized"] = function()
     -- Don't call setup, check that get_config returns nil
-    local result = child.lua_get("require('no-neck-pain.util.state_access').get_config()")
+    local result = child.lua_get("require('no-neck-pain.util.helpers').get_config()")
     Helpers.expect.equality(result, vim.NIL)
 end
 
 T["State Access: get_state() returns nil when not initialized"] = function()
     -- Don't call setup or enable, check that get_state returns nil
-    local result = child.lua_get("require('no-neck-pain.util.state_access').get_state()")
+    local result = child.lua_get("require('no-neck-pain.util.helpers').get_state()")
     Helpers.expect.equality(result, vim.NIL)
 end
 
@@ -97,13 +95,10 @@ T["State Access: get_config_field() retrieves nested config values"] = function(
     }) ]])
 
     -- Test various fields
-    local width =
-        child.lua_get("require('no-neck-pain.util.state_access').get_config_field('width')")
-    local minSideBufferWidth = child.lua_get(
-        "require('no-neck-pain.util.state_access').get_config_field('minSideBufferWidth')"
-    )
-    local debug =
-        child.lua_get("require('no-neck-pain.util.state_access').get_config_field('debug')")
+    local width = child.lua_get("require('no-neck-pain.util.helpers').get_config_field('width')")
+    local minSideBufferWidth =
+        child.lua_get("require('no-neck-pain.util.helpers').get_config_field('minSideBufferWidth')")
+    local debug = child.lua_get("require('no-neck-pain.util.helpers').get_config_field('debug')")
 
     Helpers.expect.equality(width, 120)
     Helpers.expect.equality(minSideBufferWidth, 15)
@@ -116,10 +111,9 @@ T["State Access: get_state_field() retrieves nested state values"] = function()
     child.nnp()
 
     -- Test various state fields
-    local enabled =
-        child.lua_get("require('no-neck-pain.util.state_access').get_state_field('enabled')")
+    local enabled = child.lua_get("require('no-neck-pain.util.helpers').get_state_field('enabled')")
     local active_tab =
-        child.lua_get("require('no-neck-pain.util.state_access').get_state_field('active_tab')")
+        child.lua_get("require('no-neck-pain.util.helpers').get_state_field('active_tab')")
 
     Helpers.expect.equality(enabled, true)
     Helpers.expect.equality(type(active_tab), "number")
@@ -130,9 +124,8 @@ T["State Access: get_config_field() returns nil for non-existent field"] = funct
     child.lua([[ require('no-neck-pain').setup({width=100}) ]])
 
     -- Try to get non-existent field
-    local result = child.lua_get(
-        "require('no-neck-pain.util.state_access').get_config_field('nonexistent_field')"
-    )
+    local result =
+        child.lua_get("require('no-neck-pain.util.helpers').get_config_field('nonexistent_field')")
     Helpers.expect.equality(result, vim.NIL)
 end
 
@@ -142,9 +135,8 @@ T["State Access: get_state_field() returns nil for non-existent field"] = functi
     child.nnp()
 
     -- Try to get non-existent field
-    local result = child.lua_get(
-        "require('no-neck-pain.util.state_access').get_state_field('nonexistent_field')"
-    )
+    local result =
+        child.lua_get("require('no-neck-pain.util.helpers').get_state_field('nonexistent_field')")
     Helpers.expect.equality(result, vim.NIL)
 end
 
@@ -158,7 +150,7 @@ T["State Access: set_config() updates _G.NoNeckPain.config"] = function()
 
     -- Update config via set_config
     child.lua([[
-        local state_access = require('no-neck-pain.util.state_access')
+        local state_access = require('no-neck-pain.util.helpers')
         local config = state_access.get_config()
         config.width = 150
         state_access.set_config(config)
@@ -176,7 +168,7 @@ T["State Access: set_state() updates _G.NoNeckPain.state"] = function()
 
     -- Update state via set_state
     child.lua([[
-        local state_access = require('no-neck-pain.util.state_access')
+        local state_access = require('no-neck-pain.util.helpers')
         local state = state_access.get_state()
         state.enabled = false
         state_access.set_state(state)
@@ -191,7 +183,7 @@ T["State Access: set_config() accepts valid config update"] = function()
     child.lua([[ require('no-neck-pain').setup({width=100}) ]])
 
     child.lua([[ 
-        local sa = require('no-neck-pain.util.state_access')
+        local sa = require('no-neck-pain.util.helpers')
         local cfg = sa.get_config()
         cfg.width = 120
         _G.test_result = sa.set_config(cfg)
@@ -209,7 +201,7 @@ T["State Access: set_config() accepts string width"] = function()
 
     -- Set config with string width (textwidth, colorcolumn)
     local success =
-        child.lua_get("require('no-neck-pain.util.state_access').set_config({width='textwidth'})")
+        child.lua_get("require('no-neck-pain.util.helpers').set_config({width='textwidth'})")
 
     Helpers.expect.equality(success, true)
 end
@@ -219,7 +211,7 @@ T["State Access: set_state() accepts valid state update"] = function()
     child.nnp()
 
     child.lua([[ 
-        local sa = require('no-neck-pain.util.state_access')
+        local sa = require('no-neck-pain.util.helpers')
         local st = sa.get_state()
         st.enabled = false
         _G.test_result = sa.set_state(st)
@@ -235,7 +227,7 @@ T["State Access: set_config() rejects invalid operations and updates are idempot
     child.lua([[ require('no-neck-pain').setup({width=100}) ]])
 
     child.lua([[ 
-        local sa = require('no-neck-pain.util.state_access')
+        local sa = require('no-neck-pain.util.helpers')
         local cfg = sa.get_config()
         cfg.width = 125
         sa.set_config(cfg)
@@ -260,7 +252,7 @@ T["State Access: merge_config() deep merges config updates"] = function()
 
     -- Merge partial updates
     child.lua([[
-        require('no-neck-pain.util.state_access').merge_config({width = 120, debug = true})
+        require('no-neck-pain.util.helpers').merge_config({width = 120, debug = true})
     ]])
 
     -- Verify merged values
@@ -414,7 +406,7 @@ T["Regression: Config round-trip (set then get)"] = function()
 
     -- Round-trip: set new config and read it back
     child.lua([[
-        local state_access = require('no-neck-pain.util.state_access')
+        local state_access = require('no-neck-pain.util.helpers')
         local config = state_access.get_config()
         config.width = 175
         state_access.set_config(config)
@@ -422,7 +414,7 @@ T["Regression: Config round-trip (set then get)"] = function()
 
     -- Verify via both API and direct access
     local api_width =
-        child.lua_get("require('no-neck-pain.util.state_access').get_config_field('width')")
+        child.lua_get("require('no-neck-pain.util.helpers').get_config_field('width')")
     local direct_width = child.lua_get("_G.NoNeckPain.config.width")
 
     Helpers.expect.equality(api_width, 175)
@@ -441,7 +433,7 @@ T["Regression: State round-trip (set then get)"] = function()
 
     -- Round-trip: disable via set_state
     child.lua([[
-        local state_access = require('no-neck-pain.util.state_access')
+        local state_access = require('no-neck-pain.util.helpers')
         local state = state_access.get_state()
         state.enabled = false
         state_access.set_state(state)
@@ -449,7 +441,7 @@ T["Regression: State round-trip (set then get)"] = function()
 
     -- Verify via both API and direct access
     local api_enabled =
-        child.lua_get("require('no-neck-pain.util.state_access').get_state_field('enabled')")
+        child.lua_get("require('no-neck-pain.util.helpers').get_state_field('enabled')")
     local direct_enabled = child.lua_get("_G.NoNeckPain.state.enabled")
 
     Helpers.expect.equality(api_enabled, false)
@@ -463,7 +455,7 @@ T["Regression: Multiple successive config updates"] = function()
 
     -- Multiple updates
     child.lua([[
-        local state_access = require('no-neck-pain.util.state_access')
+        local state_access = require('no-neck-pain.util.helpers')
         
         -- Update 1
         local config = state_access.get_config()

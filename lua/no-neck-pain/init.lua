@@ -2,60 +2,50 @@ local main = require("no-neck-pain.main")
 local log = require("no-neck-pain.util.log")
 local api = require("no-neck-pain.util.api")
 local config = require("no-neck-pain.config")
+local helpers = require("no-neck-pain.util.helpers")
 
 local NoNeckPain = {}
 
 --- Toggle the plugin by calling the `enable`/`disable` methods respectively.
 function NoNeckPain.toggle()
-    if _G.NoNeckPain.config == nil then
-        _G.NoNeckPain.config = config.options
-    end
+    helpers.ensure_config_loaded(config)
 
     api.debounce("public_api_toggle", main.toggle)
 end
 
 --- Toggles the scratch_pad feature of the plugin.
 function NoNeckPain.toggle_scratch_pad()
-    if _G.NoNeckPain.state == nil or not _G.NoNeckPain.state.enabled then
-        error("no-neck-pain.nvim must be enabled, run `NoNeckPain` first.")
-    end
+    helpers.ensure_plugin_enabled()
 
-    if _G.NoNeckPain.config == nil then
-        _G.NoNeckPain.config = config.options
-    end
+    helpers.ensure_config_loaded(config)
 
     main.toggle_scratch_pad()
 end
 
 --- Toggles the debug mode of the plugin.
 function NoNeckPain.toggle_debug()
-    if _G.NoNeckPain.state == nil or not _G.NoNeckPain.state.enabled then
-        error("no-neck-pain.nvim must be enabled, run `NoNeckPain` first.")
-    end
+    helpers.ensure_plugin_enabled()
 
-    if _G.NoNeckPain.config == nil then
-        _G.NoNeckPain.config = config.options
-    end
+    helpers.ensure_config_loaded(config)
 
-    _G.NoNeckPain.config.debug = not _G.NoNeckPain.config.debug
+    local current_debug = helpers.get_config_field("debug")
+    helpers.merge_config({ debug = not current_debug })
 end
 
 --- Sets the config `width` to the given `width` value and resizes the NoNeckPain windows.
 ---
 ---@param width number: any positive integer superior to 0.
 function NoNeckPain.resize(width)
-    if _G.NoNeckPain.state == nil or not _G.NoNeckPain.state.enabled then
-        error("no-neck-pain.nvim must be enabled, run `NoNeckPain` first.")
-    end
+    helpers.ensure_plugin_enabled()
 
     width = tonumber(width) or 0
 
-    if _G.NoNeckPain.config.width == width then
+    if helpers.get_config_field("width") == width then
         return
     end
 
     if width > 0 then
-        _G.NoNeckPain.config = vim.tbl_deep_extend("keep", { width = width }, _G.NoNeckPain.config)
+        helpers.merge_config({ width = width })
     end
 
     main.init("public_api_resize")
@@ -65,9 +55,7 @@ end
 ---
 ---@param side "left" | "right": the side to toggle.
 function NoNeckPain.toggle_side(side)
-    if _G.NoNeckPain.state == nil or not _G.NoNeckPain.state.enabled then
-        error("no-neck-pain.nvim must be enabled, run `NoNeckPain` first.")
-    end
+    helpers.ensure_plugin_enabled()
 
     api.debounce("public_api_toggle_side", function(scope)
         main.toggle_side(scope, side)
@@ -76,9 +64,7 @@ end
 
 --- Initializes the plugin, sets event listeners and internal state.
 function NoNeckPain.enable(scope)
-    if _G.NoNeckPain.config == nil then
-        _G.NoNeckPain.config = config.options
-    end
+    helpers.ensure_config_loaded(config)
 
     main.enable(string.format("public_api_enable:%s", scope))
 end
@@ -90,27 +76,27 @@ end
 
 -- setup NoNeckPain options and merge them with user provided ones.
 function NoNeckPain.setup(opts)
-    _G.NoNeckPain.config = config.setup(opts)
+    helpers.set_config(config.setup(opts))
 
     if
-        _G.NoNeckPain.config.autocmds.enableOnVimEnter
-        or _G.NoNeckPain.config.autocmds.enableOnTabEnter
-        or _G.NoNeckPain.config.autocmds.reloadOnColorSchemeChange
+        helpers.get_config_field("autocmds").enableOnVimEnter
+        or helpers.get_config_field("autocmds").enableOnTabEnter
+        or helpers.get_config_field("autocmds").reloadOnColorSchemeChange
     then
         vim.api.nvim_create_augroup("NoNeckPainAutocmd", { clear = true })
         vim.api.nvim_create_augroup("NoNeckPainVimEnterAutocmd", { clear = true })
     end
 
-    if _G.NoNeckPain.config.autocmds.reloadOnColorSchemeChange then
+    if helpers.get_config_field("autocmds").reloadOnColorSchemeChange then
         vim.api.nvim_create_autocmd({ "ColorScheme" }, {
             pattern = "*",
             callback = function(p)
                 vim.schedule(function()
-                    if _G.NoNeckPain.state == nil or not _G.NoNeckPain.state.enabled then
+                    if helpers.get_state() == nil or not helpers.get_state_field("enabled") then
                         return
                     end
 
-                    _G.NoNeckPain.config = config.defaults(opts)
+                    helpers.set_config(config.defaults(opts))
                     main.init(p.event)
                 end)
             end,
@@ -120,8 +106,8 @@ function NoNeckPain.setup(opts)
     end
 
     if
-        _G.NoNeckPain.config.autocmds.enableOnVimEnter ~= nil
-        and _G.NoNeckPain.config.autocmds.enableOnVimEnter ~= false
+        helpers.get_config_field("autocmds").enableOnVimEnter ~= nil
+        and helpers.get_config_field("autocmds").enableOnVimEnter ~= false
     then
         vim.api.nvim_create_autocmd({ "FileType", "BufEnter" }, {
             pattern = "*",
@@ -135,7 +121,7 @@ function NoNeckPain.setup(opts)
                 if config.options.autocmds.enableOnVimEnter == "safe" then
                     api.debounce(scope, function()
                         NoNeckPain.enable(scope)
-                        if _G.NoNeckPain.state ~= nil then
+                        if helpers.get_state() ~= nil then
                             pcall(vim.api.nvim_del_augroup_by_name, "NoNeckPainVimEnterAutocmd")
                         end
                     end, 5)
@@ -143,7 +129,7 @@ function NoNeckPain.setup(opts)
                     NoNeckPain.enable(scope)
 
                     api.debounce(string.format("%s:cleanup", scope), function()
-                        if _G.NoNeckPain.state ~= nil then
+                        if helpers.get_state() ~= nil then
                             pcall(vim.api.nvim_del_augroup_by_name, "NoNeckPainVimEnterAutocmd")
                         end
                     end)
@@ -154,11 +140,11 @@ function NoNeckPain.setup(opts)
         })
     end
 
-    if _G.NoNeckPain.config.autocmds.enableOnTabEnter then
+    if helpers.get_config_field("autocmds").enableOnTabEnter then
         vim.api.nvim_create_autocmd({ "TabEnter" }, {
             callback = function(p)
                 vim.schedule(function()
-                    if _G.NoNeckPain.state == nil or not _G.NoNeckPain.state.enabled then
+                    if helpers.get_state() == nil or not helpers.get_state_field("enabled") then
                         return log.debug(p.event, "plugin is disabled")
                     end
 

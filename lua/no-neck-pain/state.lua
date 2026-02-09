@@ -1,5 +1,6 @@
 local api = require("no-neck-pain.util.api")
 local log = require("no-neck-pain.util.log")
+local helpers = require("no-neck-pain.util.helpers")
 
 ----- default values and toggles =======================================================
 ---@private
@@ -63,7 +64,7 @@ function state:init_integrations()
     self.tabs[self.active_tab].wins.integrations = {}
 
     -- normalize to lowercase
-    for name, opts in pairs(vim.deepcopy(_G.NoNeckPain.config.integrations)) do
+    for name, opts in pairs(vim.deepcopy(helpers.get_config_field("integrations"))) do
         local lower_name = string.lower(name)
         self.tabs[self.active_tab].wins.integrations[lower_name] = opts
     end
@@ -80,7 +81,7 @@ end
 ---
 ---@private
 function state:save()
-    _G.NoNeckPain.state = self
+    helpers.set_state(self)
 end
 
 --- Sets the global state as enabled.
@@ -176,7 +177,7 @@ function state:set_tab(id)
                 left = nil,
                 right = nil,
             },
-            integrations = vim.deepcopy(_G.NoNeckPain.config.integrations),
+            integrations = vim.deepcopy(helpers.get_config_field("integrations")),
         },
     }
     self.active_tab = id
@@ -288,7 +289,11 @@ end
 ---@return boolean
 ---@private
 function state:is_side_enabled(side)
-    return _G.NoNeckPain.config.buffers[side].enabled
+    local buffers = helpers.get_config_field("buffers")
+    if buffers == nil or buffers[side] == nil then
+        return false
+    end
+    return buffers[side].enabled
 end
 
 --- Whether the side window is registered and a valid window.

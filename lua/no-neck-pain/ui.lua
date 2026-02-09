@@ -3,6 +3,7 @@ local colors = require("no-neck-pain.colors")
 local constants = require("no-neck-pain.util.constants")
 local log = require("no-neck-pain.util.log")
 local state = require("no-neck-pain.state")
+local helpers = require("no-neck-pain.util.helpers")
 
 local ui = {}
 
@@ -13,13 +14,13 @@ local ui = {}
 function ui.init_side_options(side, id)
     local bufid = vim.api.nvim_win_get_buf(id)
 
-    for opt, val in pairs(_G.NoNeckPain.config.buffers[side].bo) do
+    for opt, val in pairs(helpers.get_config_field("buffers")[side].bo) do
         if not (state:get_scratch_pad() and opt == "filetype") then
             api.set_buffer_option(bufid, opt, val)
         end
     end
 
-    for opt, val in pairs(_G.NoNeckPain.config.buffers[side].wo) do
+    for opt, val in pairs(helpers.get_config_field("buffers")[side].wo) do
         api.set_window_option(id, opt, val)
     end
 end
@@ -82,7 +83,7 @@ end
 ---@param cleanup boolean?: cleanup the given buffer
 ---@private
 function ui.init_scratch_pad(side, id, cleanup)
-    if not _G.NoNeckPain.config.buffers[side].enabled then
+    if not helpers.get_config_field("buffers")[side].enabled then
         return
     end
 
@@ -95,12 +96,12 @@ function ui.init_scratch_pad(side, id, cleanup)
     log.debug(
         string.format("ui.init_scratch_pad:%s", side),
         "enabled with location %s",
-        _G.NoNeckPain.config.buffers[side].scratchPad.pathToFile
+        helpers.get_config_field("buffers")[side].scratchPad.pathToFile
     )
 
     ui.init_side_options(side, id)
 
-    local path = vim.fn.fnameescape(_G.NoNeckPain.config.buffers[side].scratchPad.pathToFile)
+    local path = vim.fn.fnameescape(helpers.get_config_field("buffers")[side].scratchPad.pathToFile)
     vim.cmd(string.format("edit %s", path))
 
     api.set_buffer_option(0, "bufhidden", "")
@@ -112,7 +113,7 @@ function ui.init_scratch_pad(side, id, cleanup)
     -- users might want to use a filetype that isn't supported by neovim, we should let them
     -- if they've defined it on the configuration side.
     if vim.api.nvim_buf_get_option(0, "filetype") == "" then
-        local filetype = _G.NoNeckPain.config.buffers[side].bo.filetype
+        local filetype = helpers.get_config_field("buffers")[side].bo.filetype
         if filetype == "" or filetype == "no-neck-pain" then
             filetype = "norg"
         end
@@ -135,14 +136,14 @@ function ui.create_side_buffers()
 
     for _, side in pairs(constants.SIDES) do
         if
-            wins[side].padding > _G.NoNeckPain.config.minSideBufferWidth
+            wins[side].padding > helpers.get_config_field("minSideBufferWidth")
             and not state:is_side_enabled_and_valid(side)
         then
             vim.cmd(wins[side].cmd)
 
             state:set_side_id(vim.api.nvim_get_current_win(), side)
 
-            if _G.NoNeckPain.config.buffers.set_names then
+            if helpers.get_config_field("buffers").set_names then
                 local exist = vim.fn.bufnr("no-neck-pain-" .. side)
 
                 if exist ~= -1 then
@@ -152,7 +153,7 @@ function ui.create_side_buffers()
                 vim.api.nvim_buf_set_name(0, "no-neck-pain-" .. side)
             end
 
-            if _G.NoNeckPain.config.buffers[side].scratchPad.enabled then
+            if helpers.get_config_field("buffers")[side].scratchPad.enabled then
                 state:set_scratch_pad(true)
                 ui.init_scratch_pad(side, state:get_side_id(side))
             else
@@ -168,7 +169,7 @@ function ui.create_side_buffers()
             local padding = wins[side].padding or ui.get_side_width(side)
             local scope = string.format("ui.create_side_buffers:%s", side)
 
-            if padding > _G.NoNeckPain.config.minSideBufferWidth then
+            if padding > helpers.get_config_field("minSideBufferWidth") then
                 state:resize_win(scope, side, padding)
             else
                 ui.close_win(scope, state:get_side_id(side), side)
@@ -200,11 +201,11 @@ function ui.get_side_width(side)
 
     -- if the available screen size is lower than the config width,
     -- we don't have to create side buffers.
-    if _G.NoNeckPain.config.width >= vim.o.columns then
+    if helpers.get_config_field("width") >= vim.o.columns then
         log.debug(
             scope,
             "defined width in config is bigger than the current ui %d/%d",
-            _G.NoNeckPain.config.width,
+            helpers.get_config_field("width"),
             width
         )
 
@@ -242,7 +243,7 @@ function ui.get_side_width(side)
     )
 
     while columns > 0 do
-        width = width - _G.NoNeckPain.config.width
+        width = width - helpers.get_config_field("width")
         columns = columns - 1
     end
 
@@ -250,7 +251,7 @@ function ui.get_side_width(side)
 
     local final = math.floor(width / 2)
 
-    if final <= _G.NoNeckPain.config.minSideBufferWidth or final < 0 then
+    if final <= helpers.get_config_field("minSideBufferWidth") or final < 0 then
         log.debug(scope, "no space left to create side buffer")
 
         return 0

@@ -21,8 +21,11 @@ end
 ---@param ... any: the arguments of the formatted string.
 ---@private
 function log.notify(scope, level, verbose, str, ...)
-    if not verbose and _G.NoNeckPain.config ~= nil and not _G.NoNeckPain.config.debug then
-        return
+    if not verbose then
+        local helpers = require("no-neck-pain.util.helpers")
+        if not helpers.get_config_field("debug") then
+            return
+        end
     end
 
     if string.len(scope) > longest_scope then

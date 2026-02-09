@@ -1,4 +1,5 @@
 local log = require("no-neck-pain.util.log")
+local helpers = require("no-neck-pain.util.helpers")
 
 local api = { debouncers = {} }
 
@@ -48,7 +49,7 @@ end
 ---@param val string|number|boolean: the opt value.
 ---@private
 function api.set_buffer_option(id, opt, val)
-    if _G.NoNeckPain.config.has_nvim9 then
+    if helpers.get_config_field("has_nvim9") then
         vim.api.nvim_set_option_value(opt, val, { buf = id })
     else
         vim.api.nvim_buf_set_option(id, opt, val)
@@ -62,7 +63,7 @@ end
 ---@param val string|number: the opt value.
 ---@private
 function api.set_window_option(id, opt, val)
-    if _G.NoNeckPain.config.has_nvim9 then
+    if helpers.get_config_field("has_nvim9") then
         vim.api.nvim_set_option_value(opt, val, { win = id, scope = "local" })
     else
         vim.api.nvim_win_set_option(id, opt, val)

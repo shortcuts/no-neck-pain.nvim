@@ -4,6 +4,7 @@ local log = require("no-neck-pain.util.log")
 local event = require("no-neck-pain.util.event")
 local state = require("no-neck-pain.state")
 local ui = require("no-neck-pain.ui")
+local helpers = require("no-neck-pain.util.helpers")
 
 local main = {}
 
@@ -58,13 +59,15 @@ function main.toggle_side(scope, side)
         return state:save()
     end
 
-    _G.NoNeckPain.config = vim.tbl_deep_extend(
-        "keep",
-        { buffers = { [side] = { enabled = not _G.NoNeckPain.config.buffers[side].enabled } } },
-        _G.NoNeckPain.config
-    )
+    helpers.set_config(vim.tbl_deep_extend("keep", {
+        buffers = {
+            [side] = {
+                enabled = not helpers.get_config_field("buffers")[side].enabled,
+            },
+        },
+    }, helpers.get_config()))
 
-    if not _G.NoNeckPain.config.buffers[side].enabled then
+    if not helpers.get_config_field("buffers")[side].enabled then
         ui.close_win(scope, state:get_side_id(side), side)
         state:set_side_id(nil, side)
     end
@@ -72,10 +75,12 @@ function main.toggle_side(scope, side)
     if
         not (state:is_side_enabled_and_valid("left") or state:is_side_enabled_and_valid("right"))
     then
-        _G.NoNeckPain.config = vim.tbl_deep_extend(
-            "keep",
-            { buffers = { left = { enabled = true }, right = { enabled = true } } },
-            _G.NoNeckPain.config
+        helpers.set_config(
+            vim.tbl_deep_extend(
+                "keep",
+                { buffers = { left = { enabled = true }, right = { enabled = true } } },
+                helpers.get_config()
+            )
         )
 
         return main.disable(scope)
@@ -145,8 +150,8 @@ function main.enable(scope)
         return
     end
 
-    if _G.NoNeckPain.config.callbacks.preEnable ~= nil then
-        _G.NoNeckPain.config.callbacks.preEnable(state)
+    if helpers.get_config_field("callbacks").preEnable ~= nil then
+        helpers.get_config_field("callbacks").preEnable(state)
     end
 
     log.debug(scope, "calling enable for tab %d", state.active_tab)
@@ -171,8 +176,8 @@ function main.enable(scope)
         callback = function(p)
             vim.schedule(function()
                 if
-                    _G.NoNeckPain.state == nil
-                    or not _G.NoNeckPain.state.enabled
+                    helpers.get_state() == nil
+                    or not helpers.get_state_field("enabled")
                     or not state:is_active_tab_registered()
                 then
                     return
@@ -246,7 +251,10 @@ function main.enable(scope)
                 local refresh = state:scan_layout(s)
 
                 if not vim.api.nvim_win_is_valid(state:get_side_id("curr")) then
-                    if p.event == "BufDelete" and _G.NoNeckPain.config.fallbackOnBufferDelete then
+                    if
+                        p.event == "BufDelete"
+                        and helpers.get_config_field("fallbackOnBufferDelete")
+                    then
                         local win = vim.api.nvim_get_current_win()
 
                         log.debug(
@@ -351,7 +359,7 @@ function main.enable(scope)
                     return log.debug(p.event, "skip")
                 end
 
-                if not _G.NoNeckPain.config.autocmds.skipEnteringNoNeckPainBuffer then
+                if not helpers.get_config_field("autocmds").skipEnteringNoNeckPainBuffer then
                     state:set_previously_focused_win(vim.api.nvim_get_current_win())
                     return
                 end
@@ -428,16 +436,16 @@ function main.enable(scope)
 
     state:save()
 
-    if _G.NoNeckPain.config.callbacks.postEnable ~= nil then
-        _G.NoNeckPain.config.callbacks.postEnable(state)
+    if helpers.get_config_field("callbacks").postEnable ~= nil then
+        helpers.get_config_field("callbacks").postEnable(state)
     end
 end
 
 --- Disables the plugin for the given tab, clear highlight groups and autocmds, closes side buffers and resets the internal state.
 ---@private
 function main.disable(scope)
-    if _G.NoNeckPain.config.callbacks.preDisable ~= nil then
-        _G.NoNeckPain.config.callbacks.preDisable(state)
+    if helpers.get_config_field("callbacks").preDisable ~= nil then
+        helpers.get_config_field("callbacks").preDisable(state)
     end
 
     local active_tab = state.active_tab
@@ -472,19 +480,19 @@ function main.disable(scope)
             end
         end
 
-        pcall(vim.api.nvim_del_augroup_by_name, api.get_augroup_name(active_tab))
-        pcall(vim.api.nvim_del_augroup_by_name, "NoNeckPainVimEnterAutocmd")
+        helpers.safe_delete_augroup(api.get_augroup_name(active_tab))
+        helpers.safe_delete_augroup("NoNeckPainVimEnterAutocmd")
 
         return vim.cmd("quitall!")
     end
 
-    pcall(vim.api.nvim_del_augroup_by_name, api.get_augroup_name(active_tab))
+    helpers.safe_delete_augroup(api.get_augroup_name(active_tab))
 
     local sides = { left = state:get_side_id("left"), right = state:get_side_id("right") }
     local curr_id = state:get_side_id("curr")
 
     if state:refresh_tabs(scope, active_tab) == 0 then
-        pcall(vim.api.nvim_del_augroup_by_name, "NoNeckPainVimEnterAutocmd")
+        helpers.safe_delete_augroup("NoNeckPainVimEnterAutocmd")
 
         log.debug(scope, "no more active tabs left, reinitializing state")
 
@@ -502,7 +510,7 @@ function main.disable(scope)
     if curr_id ~= nil and vim.api.nvim_win_is_valid(curr_id) then
         vim.api.nvim_set_current_win(curr_id)
 
-        if _G.NoNeckPain.config.killAllBuffersOnDisable then
+        if helpers.get_config_field("killAllBuffersOnDisable") then
             vim.cmd("only")
         end
     end
@@ -511,8 +519,8 @@ function main.disable(scope)
 
     state:save()
 
-    if _G.NoNeckPain.config.callbacks.postDisable ~= nil then
-        _G.NoNeckPain.config.callbacks.postDisable(state)
+    if helpers.get_config_field("callbacks").postDisable ~= nil then
+        helpers.get_config_field("callbacks").postDisable(state)
     end
 end
 

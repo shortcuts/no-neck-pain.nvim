@@ -1,3 +1,14 @@
+---
+title: no-neck-pain.nvim
+description: Dead simple plugin to center the currently focused buffer to the middle of the screen
+category: neovim-plugin
+plugin_type: ui-enhancement
+keywords: [neovim, buffer, centering, zen-mode, focus, distraction-free]
+version: ">=2.0.0"
+requires: neovim >= 0.9
+repository: shortcuts/no-neck-pain.nvim
+---
+
 <p align="center">
   <h1 align="center">☕ no-neck-pain.nvim</h2>
 </p>
@@ -16,6 +27,7 @@ _[Alternative GIF showcase video for mobile users](https://github.com/shortcuts/
 
 </div>
 
+<!-- SECTION: FEATURES -->
 ## ⚡️ Features
 
 _Creates evenly sized empty buffers on each side of your focused buffer, which acts as padding for your window._
@@ -33,6 +45,7 @@ _Creates evenly sized empty buffers on each side of your focused buffer, which a
 
 > Want to see it in action? Take a look at [the showcase section](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase)
 
+<!-- SECTION: INSTALLATION -->
 ## 📋 Installation
 
 <div align="center">
@@ -113,10 +126,12 @@ plugins.no-neck-pain.enable = true;
 </table>
 </div>
 
+<!-- SECTION: GETTING_STARTED -->
 ## ☄ Getting started
 
 No configuration/setup steps needed! Sit back, relax and call `:NoNeckPain`.
 
+<!-- SECTION: CONFIGURATION -->
 ## ⚙ Configuration
 
 > **Note**:
@@ -455,6 +470,7 @@ NoNeckPain.bufferOptions = {
 
 </details>
 
+<!-- SECTION: COMMANDS -->
 ## 🧰 Commands
 
 |   Command   |         Description        |
@@ -467,6 +483,7 @@ NoNeckPain.bufferOptions = {
 |`:NoNeckPainWidthDown`| Decreases the config `width` by 5 and resizes the no-neck-pain windows. |
 |`:NoNeckPainScratchPad`| Uses the side buffers as a persistent scratchpad so you can take notes easily. |
 
+<!-- SECTION: BREAKING_CHANGES -->
 ## 🏗 breaking changes
 
 ### v1.0.0
@@ -477,6 +494,98 @@ See [the release description](https://github.com/shortcuts/no-neck-pain.nvim/pul
 
 See [the release description](https://github.com/shortcuts/no-neck-pain.nvim/pull/384) for the full list of breaking changes.
 
+<!-- SECTION: AI_ASSISTANTS -->
+## 🤖 For AI Assistants
+
+This section provides structured information about the codebase to help AI assistants understand and work with the plugin effectively.
+
+### 📁 Codebase Structure
+
+**Core Modules** (`lua/no-neck-pain/`):
+- `init.lua` - Public API entry point, exports main commands (`toggle()`, `resize()`, etc.)
+- `main.lua` - Core plugin logic, orchestrates enable/disable/toggle operations
+- `state.lua` - Global state management (plugin enabled, tabs, windows)
+- `config.lua` - Configuration validation and defaults
+- `ui.lua` - Window/buffer creation and manipulation
+- `colors.lua` - Color/theme management for side buffers
+
+**Utilities** (`lua/no-neck-pain/util/`):
+- `state_access.lua` - Safe state access patterns
+- `api.lua` - Debouncing and API utilities
+- `helpers.lua` - Common helper functions
+- `constants.lua` - Plugin constants (supported integrations, filetypes)
+- `log.lua` - Debug logging
+
+**Tests** (`tests/`):
+- `test_*.lua` - Feature-specific test suites
+- `helpers.lua` - Test utilities and fixtures
+
+### 🔑 Key Entry Points
+
+1. **Plugin initialization**: `lua/no-neck-pain/init.lua`
+   - Exports: `NoNeckPain.toggle()`, `NoNeckPain.resize()`, `NoNeckPain.toggle_scratch_pad()`
+   
+2. **Core logic**: `lua/no-neck-pain/main.lua`
+   - Contains enable/disable/toggle implementations
+   
+3. **State management**: `lua/no-neck-pain/state.lua`
+   - Global state accessible via `require("no-neck-pain.util.state_access")`
+
+### ⚙️ Configuration Structure
+
+The plugin uses a deeply nested configuration object:
+
+```lua
+{
+  debug = boolean,
+  width = integer | "textwidth" | "colorcolumn",
+  minSideBufferWidth = integer,
+  autocmds = { enableOnVimEnter, enableOnTabEnter, ... },
+  mappings = { enabled, toggle, widthUp, widthDown, ... },
+  callbacks = { preEnable, postEnable, preDisable, postDisable },
+  buffers = {
+    setNames = boolean,
+    scratchPad = { enabled, pathToFile, ... },
+    colors = { background, blend, text },
+    bo = { vim.bo options },
+    wo = { vim.wo options },
+    left = { enabled, colors, bo, wo, scratchPad },
+    right = { enabled, colors, bo, wo, scratchPad }
+  },
+  integrations = { NvimTree, ["neo-tree"], dashboard, ... }
+}
+```
+
+### 🔄 Common Patterns
+
+1. **State Access**: Always use `require("no-neck-pain.util.state_access")` for state manipulation
+   - `get_config_field(key)` - Read config values
+   - `merge_config(partial)` - Update config
+   - `get_tab()` - Get current tab state
+
+2. **Event Handling**: Plugin responds to autocmds (VimEnter, TabEnter, ColorScheme, etc.)
+
+3. **Side Buffer Management**: Creates "padding" buffers on left/right sides
+   - Named `no-neck-pain-left` and `no-neck-pain-right` when `setNames = true`
+   - Filetype: `no-neck-pain` (or custom via `buffers.bo.filetype`)
+
+4. **Integration Support**: Detects file trees (NvimTree, neo-tree) and dashboards
+   - Adjusts width calculations to account for sidebar positions
+
+### 🧪 Testing
+
+- Test framework: `busted` (Lua testing library)
+- Run tests: `make test`
+- Test pattern: Each feature has dedicated `test_*.lua` file
+- Helpers: `tests/helpers.lua` provides utilities for test setup/teardown
+
+### 📚 Documentation
+
+- Inline help: `:h NoNeckPain.options`, `:h NoNeckPain.bufferOptions`
+- Wiki: [github.com/shortcuts/no-neck-pain.nvim/wiki](https://github.com/shortcuts/no-neck-pain.nvim/wiki)
+- Showcase: Examples of configurations and use cases
+
+<!-- SECTION: CONTRIBUTING -->
 ## ⌨ Contributing
 
 PRs and issues are always welcome. Make sure to provide as much context as possible when opening one.

@@ -1,6 +1,7 @@
 local log = require("no-neck-pain.util.log")
 local api = require("no-neck-pain.util.api")
 local state = require("no-neck-pain.state")
+local helpers = require("no-neck-pain.util.helpers")
 
 local event = {}
 
@@ -11,7 +12,8 @@ local event = {}
 ---
 ---@private
 function event.skip()
-    if _G.NoNeckPain.state == nil or not _G.NoNeckPain.state.enabled then
+    local plugin_state = helpers.get_state()
+    if plugin_state == nil or not plugin_state.enabled then
         return true
     end
 
@@ -73,8 +75,9 @@ function event.skip_enable(scope)
 
     local filetype = string.lower(vim.bo.filetype)
 
-    if _G.NoNeckPain.config.integrations ~= nil then
-        for key, config in pairs(_G.NoNeckPain.config.integrations) do
+    local integrations = helpers.get_config_field("integrations")
+    if integrations ~= nil then
+        for key, config in pairs(integrations) do
             if key ~= "dashboard" then
                 log.debug(scope, "skip: find integration")
 
@@ -87,11 +90,14 @@ function event.skip_enable(scope)
                 if config.filetypes ~= nil then
                     log.debug(scope, "skip: find dashboard")
 
-                    for _, ft in pairs(_G.NoNeckPain.config.integrations.dashboard.filetypes) do
-                        if string.find(filetype, string.lower(ft)) then
-                            log.debug(scope, "%s is a dashboard", ft)
+                    local dashboard_filetypes = helpers.get_config_field("integrations")
+                    if dashboard_filetypes ~= nil and dashboard_filetypes.dashboard ~= nil then
+                        for _, ft in pairs(dashboard_filetypes.dashboard.filetypes) do
+                            if string.find(filetype, string.lower(ft)) then
+                                log.debug(scope, "%s is a dashboard", ft)
 
-                            return true
+                                return true
+                            end
                         end
                     end
                 end

@@ -1,6 +1,7 @@
 local constants = require("no-neck-pain.util.constants")
 local log = require("no-neck-pain.util.log")
 local state = require("no-neck-pain.state")
+local helpers = require("no-neck-pain.util.helpers")
 
 local colors = {}
 
@@ -132,28 +133,33 @@ function colors.init(win, side)
     vim.api.nvim_set_hl(id, background_group, {})
     vim.api.nvim_set_hl(id, text_group, {})
 
+    local config = helpers.get_config_field("buffers")
+    if config == nil then
+        return log.debug("colors.init", "config not initialized")
+    end
+
     if
-        _G.NoNeckPain.config.buffers[side].colors.background == nil
-        and _G.NoNeckPain.config.buffers[side].colors.text == nil
-        and _G.NoNeckPain.config.buffers[side].colors.blend == 0
+        config[side].colors.background == nil
+        and config[side].colors.text == nil
+        and config[side].colors.blend == 0
     then
         return log.debug("colors.init", "skipping color initialization for side %s", side)
     end
 
     vim.api.nvim_set_hl(id, background_group, {
-        fg = _G.NoNeckPain.config.buffers[side].colors.background,
-        bg = _G.NoNeckPain.config.buffers[side].colors.background,
+        fg = config[side].colors.background,
+        bg = config[side].colors.background,
     })
     vim.api.nvim_set_hl(id, text_group, {
-        fg = _G.NoNeckPain.config.buffers[side].colors.text,
-        bg = _G.NoNeckPain.config.buffers[side].colors.background,
+        fg = config[side].colors.text,
+        bg = config[side].colors.background,
     })
 
     -- link nnp and neovim hl groups
     local groups = { Normal = text_group, NormalNC = text_group }
 
     -- we only set those for non transparent backgrouns to prevent white lines.
-    if _G.NoNeckPain.config.buffers[side].colors.background ~= "NONE" then
+    if config[side].colors.background ~= "NONE" then
         groups = vim.tbl_extend("keep", groups, {
             WinSeparator = background_group,
             VertSplit = background_group,
