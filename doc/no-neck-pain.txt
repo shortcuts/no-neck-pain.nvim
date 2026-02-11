@@ -417,23 +417,9 @@ Usage ~
 Utility helpers module for no-neck-pain.nvim
 
 This module provides helper functions for common patterns used throughout
-the plugin, including config initialization, plugin state validation,
-and augroup cleanup.
+the plugin, including state and config access, validation, and augroup cleanup.
 
 "no-neck-pain.util.helpers"
-
-
-==============================================================================
-------------------------------------------------------------------------------
-State Access Module
-Provides encapsulated access to the plugin's global config and state objects.
-
-This module serves as the single point of access for reading and writing
-the plugin's configuration and state, ensuring consistent validation and
-nil-safety across the codebase.
-
-@module no-neck-pain.util.state_access
-@author shortcuts
 
 
  vim:tw=78:ts=8:noet:ft=help:norl:

@@ -134,7 +134,7 @@ function ui.create_side_buffers()
         right = { cmd = "botright vnew", padding = ui.get_side_width("right") },
     }
 
-    for _, side in pairs(constants.SIDES) do
+    for _, side in ipairs(constants.SIDES) do
         if
             wins[side].padding > helpers.get_config_field("minSideBufferWidth")
             and not state:is_side_enabled_and_valid(side)
@@ -164,7 +164,7 @@ function ui.create_side_buffers()
         end
     end
 
-    for _, side in pairs(constants.SIDES) do
+    for _, side in ipairs(constants.SIDES) do
         if state:is_side_enabled_and_valid(side) then
             local padding = wins[side].padding or ui.get_side_width(side)
             local scope = string.format("ui.create_side_buffers:%s", side)
