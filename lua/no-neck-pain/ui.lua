@@ -130,8 +130,8 @@ end
 ---@private
 function ui.create_side_buffers()
     local wins = {
-        left = { cmd = "topleft vnew", padding = ui.get_side_width("left") },
-        right = { cmd = "botright vnew", padding = ui.get_side_width("right") },
+        left = { anchor = "NW", padding = ui.get_side_width("left") },
+        right = { anchor = "SE", padding = ui.get_side_width("right") },
     }
 
     for _, side in ipairs(constants.SIDES) do
@@ -139,9 +139,7 @@ function ui.create_side_buffers()
             wins[side].padding > helpers.get_config_field("minSideBufferWidth")
             and not state:is_side_enabled_and_valid(side)
         then
-            vim.cmd(wins[side].cmd)
-
-            state:set_side_id(vim.api.nvim_get_current_win(), side)
+            local bufid = vim.api.nvim_create_buf(false, false)
 
             if helpers.get_config_field("buffers").set_names then
                 local exist = vim.fn.bufnr("no-neck-pain-" .. side)
@@ -150,8 +148,18 @@ function ui.create_side_buffers()
                     vim.api.nvim_buf_delete(exist, { force = true })
                 end
 
-                vim.api.nvim_buf_set_name(0, "no-neck-pain-" .. side)
+                vim.api.nvim_buf_set_name(bufid, "no-neck-pain-" .. side)
             end
+
+            state:set_side_id(
+                vim.api.nvim_open_win(bufid, false, {
+                    vertical = true,
+                    split = side,
+                    anchor = wins[side].anchor,
+                    width = wins[side].padding,
+                }),
+                side
+            )
 
             if helpers.get_config_field("buffers")[side].scratchPad.enabled then
                 state:set_scratch_pad(true)
@@ -169,9 +177,7 @@ function ui.create_side_buffers()
             local padding = wins[side].padding or ui.get_side_width(side)
             local scope = string.format("ui.create_side_buffers:%s", side)
 
-            if padding > helpers.get_config_field("minSideBufferWidth") then
-                state:resize_win(scope, side, padding)
-            else
+            if padding < helpers.get_config_field("minSideBufferWidth") then
                 ui.close_win(scope, state:get_side_id(side), side)
                 state:set_side_id(nil, side)
             end

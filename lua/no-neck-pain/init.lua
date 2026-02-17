@@ -109,7 +109,7 @@ function NoNeckPain.setup(opts)
         helpers.get_config_field("autocmds").enableOnVimEnter ~= nil
         and helpers.get_config_field("autocmds").enableOnVimEnter ~= false
     then
-        vim.api.nvim_create_autocmd({ "FileType", "BufEnter" }, {
+        vim.api.nvim_create_autocmd({ "BufRead" }, {
             pattern = "*",
             callback = function()
                 local scope = string.format(
