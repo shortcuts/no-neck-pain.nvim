@@ -167,10 +167,9 @@ function main.enable(scope)
     vim.api.nvim_create_augroup(augroup_name, { clear = true })
 
     state:set_side_id(vim.api.nvim_get_current_win(), "curr")
-    api.debounce(scope, function()
-        main.init(scope)
-        state:scan_layout(scope)
-    end, 1)
+    main.init(scope)
+    state:scan_layout(scope)
+    main.init(scope)
 
     vim.api.nvim_create_autocmd({ "VimResized" }, {
         callback = function(p)
@@ -351,7 +350,7 @@ function main.enable(scope)
         desc = "keeps track of the state after closing windows and deleting buffers",
     })
 
-    vim.api.nvim_create_autocmd({ "WinEnter" }, {
+    vim.api.nvim_create_autocmd({ "VimEnter", "WinEnter" }, {
         callback = function(p)
             vim.schedule(function()
                 p.event = string.format("%s:skip_entering", p.event)
