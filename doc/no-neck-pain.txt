@@ -249,10 +249,10 @@ Default values:
           enableOnTabEnter = false,
           -- When `true`, reloads the plugin configuration after a colorscheme change.
           ---@type boolean
-          reloadOnColorSchemeChange = false,
-          -- When `true`, entering one of no-neck-pain side buffer will automatically skip it and go to the next available buffer.
+          reloadOnColorSchemeChange = true,
+          -- When `true`, entering one of no-neck-pain side buffer will automatically skip it and go to the next available buffer. This setting is omitted when scratch pad is enabled.
           ---@type boolean
-          skipEnteringNoNeckPainBuffer = false,
+          skipEnteringNoNeckPainBuffer = true,
       },
       -- Creates mappings for you to easily interact with the exposed commands.
       ---@type table
