@@ -54,8 +54,8 @@ T["setup"]["sets exposed methods and default options value"] = function()
         autocmds = {
             enableOnVimEnter = false,
             enableOnTabEnter = false,
-            reloadOnColorSchemeChange = false,
-            skipEnteringNoNeckPainBuffer = false,
+            reloadOnColorSchemeChange = true,
+            skipEnteringNoNeckPainBuffer = true,
         },
         mappings = {
             enabled = false,

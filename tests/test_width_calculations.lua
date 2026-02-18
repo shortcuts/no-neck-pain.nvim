@@ -401,14 +401,10 @@ T["Width Property: Side widths never below minSideBufferWidth when created"] = f
 end
 
 T["Width Property: Resizing to below threshold removes side buffers"] = function()
-    -- Property: if terminal resizes such that side buffers would be below minSideBufferWidth,
-    -- they should be removed
     child.set_size(10, 200)
     child.lua([[ require('no-neck-pain').setup({width=100, minSideBufferWidth=20}) ]])
     child.nnp()
 
-    -- Initial state: should have side buffers
-    -- (200-100)/2 = 50 >= 20 ✓
     local left_id =
         child.lua_get("_G.NoNeckPain.state.tabs[_G.NoNeckPain.state.active_tab].wins.main.left")
     local right_id =
@@ -417,12 +413,10 @@ T["Width Property: Resizing to below threshold removes side buffers"] = function
     Helpers.expect.no_equality(left_id, vim.NIL)
     Helpers.expect.no_equality(right_id, vim.NIL)
 
-    -- Resize to threshold - 1
-    -- (135-100)/2 = 17.5 < 20 ✗
     child.cmd("set columns=135")
+    child.cmd("doautocmd VimResized")
     child.wait(200)
 
-    -- Side buffers should be removed
     left_id =
         child.lua_get("_G.NoNeckPain.state.tabs[_G.NoNeckPain.state.active_tab].wins.main.left")
     right_id =

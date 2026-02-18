@@ -28,7 +28,9 @@ end
 
 T["auto command"]["starts the plugin on VimEnter"] = function()
     child.restart({ "-u", "scripts/init_auto_open.lua" })
-    child.wait()
+    -- Open a file to trigger BufRead event which enables the plugin
+    child.cmd("e test.lua")
+    child.wait(100)
 
     Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
     Helpers.expect.state(child, "enabled", true)
@@ -36,10 +38,11 @@ end
 
 T["auto command"]["disabling clears VimEnter autocmd"] = function()
     child.restart({ "-u", "scripts/init_auto_open.lua" })
+    child.cmd("e test.lua")
+    child.wait(100)
     child.nnp()
     child.wait()
 
-    -- errors because it doesn't exist
     Helpers.expect.error(function()
         child.api.nvim_get_autocmds({ group = "NoNeckPainVimEnterAutocmd" })
     end)
@@ -182,7 +185,7 @@ T["skipEnteringNoNeckPainBuffer"]["does not register if scratchPad feature is en
     Helpers.expect.equality(child.api.nvim_get_current_win(), 1000)
 
     child.fn.win_gotoid(1001)
-    child.wait()
+    child.wait(200)
     Helpers.expect.equality(child.api.nvim_get_current_win(), 1001)
 end
 

@@ -167,7 +167,8 @@ T["TabEnter"] = MiniTest.new_set()
 
 T["TabEnter"]["starts the plugin on new tab"] = function()
     child.restart({ "-u", "scripts/init_auto_open.lua" })
-    child.wait()
+    child.cmd("e test.lua")
+    child.wait(100)
 
     Helpers.expect.state(child, "enabled", true)
 
@@ -178,7 +179,8 @@ T["TabEnter"]["starts the plugin on new tab"] = function()
 
     -- tab 2
     child.cmd("tabnew")
-    child.wait()
+    child.cmd("e test2.lua")
+    child.wait(100)
 
     Helpers.expect.state(child, "active_tab", 2)
 
@@ -187,7 +189,8 @@ end
 
 T["TabEnter"]["does not re-enable if the user disables it"] = function()
     child.restart({ "-u", "scripts/init_auto_open.lua" })
-    child.wait()
+    child.cmd("e test.lua")
+    child.wait(100)
 
     Helpers.expect.state(child, "enabled", true)
 
@@ -198,7 +201,8 @@ T["TabEnter"]["does not re-enable if the user disables it"] = function()
 
     -- tab 2
     child.cmd("tabnew")
-    child.wait()
+    child.cmd("e test2.lua")
+    child.wait(100)
     Helpers.expect.state(child, "active_tab", 2)
 
     Helpers.expect.equality(child.get_wins_in_tab(), { 1004, 1003, 1005 })
@@ -223,7 +227,8 @@ end
 
 T["TabEnter"]["allows re-enabling a tab manually disabled"] = function()
     child.restart({ "-u", "scripts/init_auto_open.lua" })
-    child.wait()
+    child.cmd("e test.lua")
+    child.wait(100)
 
     Helpers.expect.state(child, "enabled", true)
 
@@ -234,7 +239,8 @@ T["TabEnter"]["allows re-enabling a tab manually disabled"] = function()
 
     -- tab 2
     child.cmd("tabnew")
-    child.wait()
+    child.cmd("e test2.lua")
+    child.wait(100)
     Helpers.expect.state(child, "active_tab", 2)
 
     Helpers.expect.equality(child.get_wins_in_tab(), { 1004, 1003, 1005 })
@@ -268,13 +274,15 @@ T["tabnew/tabclose"] = MiniTest.new_set()
 
 T["tabnew/tabclose"]["opening and closing tabs does not throw any error"] = function()
     child.restart({ "-u", "scripts/init_auto_open.lua" })
-    child.wait()
+    child.cmd("e test.lua")
+    child.wait(100)
 
     Helpers.expect.state(child, "enabled", true)
     Helpers.expect.state(child, "active_tab", 1)
 
     child.cmd("tabnew")
-    child.wait()
+    child.cmd("e test2.lua")
+    child.wait(100)
     Helpers.expect.state(child, "active_tab", 2)
 
     child.cmd("tabclose")
@@ -282,9 +290,11 @@ T["tabnew/tabclose"]["opening and closing tabs does not throw any error"] = func
     Helpers.expect.state(child, "active_tab", 1)
 
     child.cmd("tabnew")
-    child.wait()
+    child.cmd("e test3.lua")
+    child.wait(100)
     child.cmd("tabnew")
-    child.wait()
+    child.cmd("e test4.lua")
+    child.wait(100)
     Helpers.expect.state(child, "active_tab", 4)
 
     child.cmd("tabclose")
@@ -298,7 +308,8 @@ end
 
 T["tabnew/tabclose"]["doesn't keep closed tabs in state"] = function()
     child.restart({ "-u", "scripts/init_auto_open.lua" })
-    child.wait()
+    child.cmd("e test.lua")
+    child.wait(100)
 
     Helpers.expect.state(child, "enabled", true)
     Helpers.expect.state(child, "active_tab", 1)
@@ -320,7 +331,8 @@ T["tabnew/tabclose"]["doesn't keep closed tabs in state"] = function()
     })
 
     child.cmd("tabnew")
-    child.wait()
+    child.cmd("e test2.lua")
+    child.wait(100)
     Helpers.expect.state(child, "tabs", {
         {
             id = 1,
@@ -374,7 +386,8 @@ end
 
 T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
     child.restart({ "-u", "scripts/init_auto_open.lua" })
-    child.wait()
+    child.cmd("e test.lua")
+    child.wait(100)
 
     child.cmd("badd 1")
     Helpers.expect.state(child, "enabled", true)
@@ -397,7 +410,8 @@ T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
     })
 
     child.cmd("tabnew")
-    child.wait()
+    child.cmd("e test2.lua")
+    child.wait(100)
     child.cmd("badd 2")
     child.wait()
     Helpers.expect.state(child, "enabled", true)

@@ -173,7 +173,8 @@ end
 
 T["checkhealth"]["auto opens side buffers"] = function()
     child.restart({ "-u", "scripts/init_auto_open.lua" })
-    child.wait()
+    child.cmd("e test.lua")
+    child.wait(100)
 
     Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
     Helpers.expect.state(child, "tabs[1].wins.main", {

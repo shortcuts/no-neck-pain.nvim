@@ -112,7 +112,8 @@ end
 T["setup"]["does not throw on invalid windows"] = function()
     child.restart({ "-u", "scripts/init_auto_open.lua" })
     child.set_size(80, 80)
-    child.wait()
+    child.cmd("e test.lua")
+    child.wait(100)
 
     Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
     Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1000, left = 1001, right = 1002 })
@@ -125,7 +126,8 @@ T["setup"]["does not throw on invalid windows"] = function()
     Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1000, left = 1001, right = 1002 })
 
     child.restart({ "-u", "scripts/init_auto_open.lua" })
-    child.wait()
+    child.cmd("e test.lua")
+    child.wait(100)
 
     Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
 

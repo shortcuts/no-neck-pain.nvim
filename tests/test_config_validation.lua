@@ -144,7 +144,7 @@ T["Config Merge: nested table partial update preserves other fields"] = function
 
     Helpers.expect.config(child, "autocmds.enableOnVimEnter", true)
     Helpers.expect.config(child, "autocmds.enableOnTabEnter", false) -- default
-    Helpers.expect.config(child, "autocmds.reloadOnColorSchemeChange", false) -- default
+    Helpers.expect.config(child, "autocmds.reloadOnColorSchemeChange", true) -- default
 end
 
 T["Config Merge: deep nested buffer options are merged correctly"] = function()
