@@ -58,7 +58,7 @@ T["Width Boundary: At minSideBufferWidth threshold (exactly)"] = function()
     -- Test when side buffer width would be exactly at minimum threshold
     -- width=100, columns=120, minSideBufferWidth=10
     -- (120-100)/2 = 10 (exactly at threshold)
-    -- Implementation uses <= so threshold is NOT included (must be > threshold)
+    -- With corrected operators: threshold is INCLUDED (padding >= minSideBufferWidth)
     child.set_size(10, 120)
     child.lua([[ require('no-neck-pain').setup({width=100, minSideBufferWidth=10}) ]])
     child.nnp()
@@ -68,9 +68,13 @@ T["Width Boundary: At minSideBufferWidth threshold (exactly)"] = function()
     local right_id =
         child.lua_get("_G.NoNeckPain.state.tabs[_G.NoNeckPain.state.active_tab].wins.main.right")
 
-    -- Should NOT create side buffers (threshold check uses <=, not <)
-    Helpers.expect.equality(left_id, vim.NIL)
-    Helpers.expect.equality(right_id, vim.NIL)
+    -- Should CREATE side buffers (threshold check uses >=, not >)
+    Helpers.expect.no_equality(left_id, vim.NIL)
+    Helpers.expect.no_equality(right_id, vim.NIL)
+
+    -- Verify widths are around 10
+    Helpers.expect.buf_width_in_range(child, left_id, 9, 11)
+    Helpers.expect.buf_width_in_range(child, right_id, 9, 11)
 end
 
 T["Width Boundary: Below minSideBufferWidth threshold"] = function()
@@ -422,6 +426,7 @@ T["Width Property: Resizing to below threshold removes side buffers"] = function
     right_id =
         child.lua_get("_G.NoNeckPain.state.tabs[_G.NoNeckPain.state.active_tab].wins.main.right")
 
+    -- Both sides should be removed when padding drops below minSideBufferWidth
     Helpers.expect.equality(left_id, vim.NIL)
     Helpers.expect.equality(right_id, vim.NIL)
 end
