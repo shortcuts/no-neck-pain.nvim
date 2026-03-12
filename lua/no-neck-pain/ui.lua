@@ -99,25 +99,39 @@ function ui.init_scratch_pad(side, id, cleanup)
         helpers.get_config_field("buffers")[side].scratchPad.pathToFile
     )
 
-    ui.init_side_options(side, id)
+    -- Switch to the side window before editing the buffer
+    local curr_win = vim.api.nvim_get_current_win()
+    vim.api.nvim_set_current_win(id)
 
-    local path = vim.fn.fnameescape(helpers.get_config_field("buffers")[side].scratchPad.pathToFile)
+    local path = helpers.get_config_field("buffers")[side].scratchPad.pathToFile
+    if path == nil or path == "" then
+        path = vim.fn.getcwd() .. "/" .. "no-neck-pain-" .. side .. ".norg"
+    end
+    path = vim.fn.expand(path)
+    path = vim.fn.fnameescape(path)
     vim.cmd(string.format("edit %s", path))
 
-    api.set_buffer_option(0, "bufhidden", "")
-    api.set_buffer_option(0, "buftype", "")
-    api.set_buffer_option(0, "buflisted", false)
-    api.set_buffer_option(0, "autoread", true)
+    -- Restore the previous window
+    if vim.api.nvim_win_is_valid(curr_win) then
+        vim.api.nvim_set_current_win(curr_win)
+    end
+
+    local buf_id = vim.api.nvim_win_get_buf(id)
+
+    api.set_buffer_option(buf_id, "bufhidden", "")
+    api.set_buffer_option(buf_id, "buftype", "")
+    api.set_buffer_option(buf_id, "buflisted", false)
+    api.set_buffer_option(buf_id, "autoread", true)
     api.set_window_option(id, "conceallevel", 2)
 
     -- users might want to use a filetype that isn't supported by neovim, we should let them
     -- if they've defined it on the configuration side.
-    if vim.api.nvim_buf_get_option(0, "filetype") == "" then
+    if vim.api.nvim_buf_get_option(buf_id, "filetype") == "" then
         local filetype = helpers.get_config_field("buffers")[side].bo.filetype
         if filetype == "" or filetype == "no-neck-pain" then
             filetype = "norg"
         end
-        api.set_buffer_option(0, "filetype", filetype)
+        api.set_buffer_option(buf_id, "filetype", filetype)
     end
 
     vim.o.autowriteall = true
@@ -176,11 +190,19 @@ function ui.create_side_buffers()
         if state:is_side_enabled_and_valid(side) then
             local padding = wins[side].padding
             local scope = string.format("ui.create_side_buffers:%s", side)
+            local minWidth = helpers.get_config_field("minSideBufferWidth")
 
-            if padding < helpers.get_config_field("minSideBufferWidth") then
+            log.debug(scope, "Checking side: padding=%s, minWidth=%s, should_close=%s", padding, minWidth, tostring(padding < minWidth))
+
+            if padding < minWidth then
                 ui.close_win(scope, state:get_side_id(side), side)
                 state:set_side_id(nil, side)
+                log.debug(scope, "Closed side window")
+            else
+                log.debug(scope, "Keeping side window (padding >= minWidth)")
             end
+        else
+            log.debug(scope, "Side not enabled or valid, skipping")
         end
     end
 end

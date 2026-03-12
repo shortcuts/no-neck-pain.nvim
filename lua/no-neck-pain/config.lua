@@ -355,6 +355,8 @@ local function parse_deprecated_scratchPad(side, options, fileType)
     if options.pathToFile == "" then
         if options.location ~= nil then
             options.pathToFile = options.location
+        else
+            options.pathToFile = vim.fn.getcwd()
         end
 
         if options.pathToFile ~= "" and string.sub(options.pathToFile, -1) ~= "/" then
