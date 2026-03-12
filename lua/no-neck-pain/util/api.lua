@@ -102,6 +102,9 @@ function api.debounce(context, callback, timeout)
 
     local timer = vim.loop.new_timer()
     debouncer.timer = timer
+    -- Flag to track if a reschedule is needed while callback is executing
+    debouncer.reschedule = false
+
     timer:start(timeout, 0, function()
         -- Check if timer is still valid before processing
         if timer:is_closing() then
@@ -111,8 +114,9 @@ function api.debounce(context, callback, timeout)
         timer_stop_close(timer)
 
         if debouncer.executing then
-            -- Use a new timer for recursion instead of reusing the same one
-            return api.debounce(context, callback, timeout)
+            -- Mark for reschedule instead of recursing
+            debouncer.reschedule = true
+            return
         end
 
         debouncer.executing = true
@@ -121,8 +125,12 @@ function api.debounce(context, callback, timeout)
             callback(context)
             debouncer.executing = false
 
-            -- no other timer waiting
-            if debouncer.timer == timer then
+            -- Check if we need to reschedule
+            if debouncer.reschedule then
+                debouncer.reschedule = false
+                api.debounce(context, callback, timeout)
+            elseif debouncer.timer == timer then
+                -- no other timer waiting
                 api.debouncers[context] = nil
             end
         end)

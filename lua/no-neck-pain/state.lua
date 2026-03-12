@@ -170,6 +170,7 @@ function state:set_tab(id)
     self.tabs[id] = {
         id = id,
         scratchpad_enabled = false,
+        redraw = false,
         wins = {
             columns = 0,
             main = {
@@ -217,6 +218,9 @@ end
 ---@return table: the integration infos.
 ---@private
 function state:get_integrations()
+    if not (self:has_tabs() and self.tabs[self.active_tab] ~= nil) then
+        return {}
+    end
     return self.tabs[self.active_tab].wins.integrations
 end
 
@@ -326,6 +330,9 @@ end
 ---@return number
 ---@private
 function state:get_side_id(side)
+    if not (self:has_tabs() and self.tabs[self.active_tab] ~= nil) then
+        return nil
+    end
     return self.tabs[self.active_tab].wins.main[side]
 end
 
@@ -335,6 +342,9 @@ end
 ---@param side "left"|"right"|"curr": the side of the window.
 ---@private
 function state:set_side_id(id, side)
+    if not (self:has_tabs() and self.tabs[self.active_tab] ~= nil) then
+        return
+    end
     self.tabs[self.active_tab].wins.main[side] = id
 end
 
@@ -378,6 +388,9 @@ end
 ---@return table: the columns window IDs.
 ---@private
 function state:get_columns()
+    if not (self:has_tabs() and self.tabs[self.active_tab] ~= nil) then
+        return 0
+    end
     return self.tabs[self.active_tab].wins.columns
 end
 
@@ -386,6 +399,9 @@ end
 ---@return boolean
 ---@private
 function state:consume_redraw()
+    if not (self:has_tabs() and self.tabs[self.active_tab] ~= nil) then
+        return false
+    end
     local redraw = self.tabs[self.active_tab].redraw
 
     self.tabs[self.active_tab].redraw = false
@@ -545,6 +561,9 @@ end
 ---@param bool boolean: the value of the scratch_pad.
 ---@private
 function state:set_scratch_pad(bool)
+    if not (self:has_tabs() and self.tabs[self.active_tab] ~= nil) then
+        return
+    end
     self.tabs[self.active_tab].scratchpad_enabled = bool
 end
 
@@ -553,6 +572,9 @@ end
 ---@return boolean: the value of the scratch_pad.
 ---@private
 function state:get_scratch_pad()
+    if not (self:has_tabs() and self.tabs[self.active_tab] ~= nil) then
+        return false
+    end
     return self.tabs[self.active_tab].scratchpad_enabled
 end
 
