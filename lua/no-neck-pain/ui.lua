@@ -192,7 +192,13 @@ function ui.create_side_buffers()
             local scope = string.format("ui.create_side_buffers:%s", side)
             local minWidth = helpers.get_config_field("minSideBufferWidth")
 
-            log.debug(scope, "Checking side: padding=%s, minWidth=%s, should_close=%s", padding, minWidth, tostring(padding < minWidth))
+            log.debug(
+                scope,
+                "Checking side: padding=%s, minWidth=%s, should_close=%s",
+                padding,
+                minWidth,
+                tostring(padding < minWidth)
+            )
 
             if padding < minWidth then
                 ui.close_win(scope, state:get_side_id(side), side)
