@@ -271,17 +271,24 @@ function main.enable(scope)
                             api.is_side_id(state:get_side_id("left"), win)
                             or api.is_side_id(state:get_side_id("right"), win)
                             or api.is_relative_window(win)
-                        then
-                            vim.cmd("rightbelow vertical split")
+                         then
+                             vim.cmd("rightbelow vertical split")
 
-                            local new_win = vim.api.nvim_get_current_win()
+                             local new_win = vim.api.nvim_get_current_win()
 
-                            log.debug(
-                                s,
-                                "currently on a side %d, new win is %d, resetting window options",
-                                win,
-                                new_win
-                            )
+                             if not vim.api.nvim_win_is_valid(new_win) then
+                                 return log.debug(
+                                     s,
+                                     "split failed to create a new window, aborting"
+                                 )
+                             end
+
+                             log.debug(
+                                 s,
+                                 "currently on a side %d, new win is %d, resetting window options",
+                                 win,
+                                 new_win
+                             )
 
                             for opt, val in pairs(state.initial_window_opts) do
                                 api.set_window_option(new_win, opt, val)
