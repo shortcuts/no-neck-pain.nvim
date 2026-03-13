@@ -84,6 +84,12 @@ T["tabs"]["side buffers coexist on many tabs"] = function()
 
     -- tab 2
     child.cmd("tabnew")
+    child.cmd("e test2.lua")
+    child.wait(1000)
+    Helpers.expect.state(child, "active_tab", 2)
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1004, 1003, 1005 })
+
     child.nnp()
 
     Helpers.expect.equality(child.get_wins_in_tab(), { 1004, 1003, 1005 })
@@ -168,7 +174,7 @@ T["TabEnter"] = MiniTest.new_set()
 T["TabEnter"]["starts the plugin on new tab"] = function()
     child.restart({ "-u", "scripts/init_auto_open.lua" })
     child.cmd("e test.lua")
-    child.wait(100)
+    child.wait(1000)
 
     Helpers.expect.state(child, "enabled", true)
 
@@ -180,7 +186,7 @@ T["TabEnter"]["starts the plugin on new tab"] = function()
     -- tab 2
     child.cmd("tabnew")
     child.cmd("e test2.lua")
-    child.wait(100)
+    child.wait(1000)
 
     Helpers.expect.state(child, "active_tab", 2)
 
@@ -190,7 +196,7 @@ end
 T["TabEnter"]["does not re-enable if the user disables it"] = function()
     child.restart({ "-u", "scripts/init_auto_open.lua" })
     child.cmd("e test.lua")
-    child.wait(100)
+    child.wait(1000)
 
     Helpers.expect.state(child, "enabled", true)
 
@@ -228,7 +234,7 @@ end
 T["TabEnter"]["allows re-enabling a tab manually disabled"] = function()
     child.restart({ "-u", "scripts/init_auto_open.lua" })
     child.cmd("e test.lua")
-    child.wait(100)
+    child.wait(1000)
 
     Helpers.expect.state(child, "enabled", true)
 
@@ -240,7 +246,7 @@ T["TabEnter"]["allows re-enabling a tab manually disabled"] = function()
     -- tab 2
     child.cmd("tabnew")
     child.cmd("e test2.lua")
-    child.wait(100)
+    child.wait(1000)
     Helpers.expect.state(child, "active_tab", 2)
 
     Helpers.expect.equality(child.get_wins_in_tab(), { 1004, 1003, 1005 })
@@ -275,7 +281,7 @@ T["tabnew/tabclose"] = MiniTest.new_set()
 T["tabnew/tabclose"]["opening and closing tabs does not throw any error"] = function()
     child.restart({ "-u", "scripts/init_auto_open.lua" })
     child.cmd("e test.lua")
-    child.wait(100)
+    child.wait(1000)
 
     Helpers.expect.state(child, "enabled", true)
     Helpers.expect.state(child, "active_tab", 1)

@@ -138,6 +138,19 @@ Helpers.new_child_neovim = function()
         child.wait()
     end
 
+    child.wait_for_plugin_enabled = function(timeout)
+        timeout = timeout or 2000
+        local start_time = vim.loop.now()
+        while vim.loop.now() - start_time < timeout do
+            local is_enabled = child.lua_get("_G.NoNeckPain ~= nil and _G.NoNeckPain.state ~= nil and _G.NoNeckPain.state.enabled")
+            if is_enabled then
+                return true
+            end
+            child.wait(50)
+        end
+        return false
+    end
+
     child.get_wins_in_tab = function(tab)
         tab = tab or "_G.NoNeckPain.state.active_tab"
 
