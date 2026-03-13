@@ -210,6 +210,9 @@ function main.enable(scope)
         callback = function(p)
             local s = string.format("%s:%d", p.event, vim.api.nvim_get_current_win())
             vim.schedule(function()
+                -- Update active tab first (TabEnter debounce might not have run yet)
+                state:set_active_tab(api.get_current_tab())
+
                 -- Auto-register new tabs when plugin is enabled
                 if state.enabled and not state:is_active_tab_registered() then
                     state:set_tab(state.active_tab)
