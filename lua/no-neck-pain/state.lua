@@ -458,9 +458,12 @@ function state:walk_layout(scope, tree, has_col_parent)
             local leafs = tree[idx + 1]
             -- if on a row we were on a col, then it means one iteam of the row must be of the same width as a col one
             if has_col_parent and vim.tbl_count(leafs) > 1 then
-                table.remove(leafs, 1)
+                local leafs_copy = vim.list_extend({}, leafs)
+                table.remove(leafs_copy, 1)
+                self:set_layout_windows(scope, leafs_copy)
+            else
+                self:set_layout_windows(scope, leafs)
             end
-            self:set_layout_windows(scope, leafs)
             self:walk_layout(scope, tree[idx + 1], false)
         elseif leaf == "col" then
             self:walk_layout(scope, tree[idx + 1], true)
