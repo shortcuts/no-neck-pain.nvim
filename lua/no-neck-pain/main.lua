@@ -210,6 +210,11 @@ function main.enable(scope)
         callback = function(p)
             local s = string.format("%s:%d", p.event, vim.api.nvim_get_current_win())
             vim.schedule(function()
+                -- Auto-register new tabs when plugin is enabled
+                if state.enabled and not state:is_active_tab_registered() then
+                    state:set_tab(state.active_tab)
+                end
+
                 if not state:is_active_tab_registered() or event.skip() then
                     return
                 end
