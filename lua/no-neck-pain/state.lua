@@ -501,7 +501,7 @@ function state:scan_layout(scope)
         end
 
         if is_leaf_only then
-            self:walk_layout(scope, { "row", layout[2] }, true)
+            self:set_layout_windows(scope, layout[2])
         else
             self:walk_layout(scope, layout[2], false)
         end
