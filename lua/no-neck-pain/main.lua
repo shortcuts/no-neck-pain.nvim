@@ -35,14 +35,17 @@ function main.toggle_scratch_pad()
     -- map over both sides and let the init method either setup or cleanup the side buffers
     for _, side in pairs(constants.SIDES) do
         local id = state:get_side_id(side)
-        if id ~= nil then
+        if id ~= nil and vim.api.nvim_win_is_valid(id) then
             vim.api.nvim_set_current_win(id)
             ui.init_scratch_pad(side, id, current_state)
         end
     end
 
     -- restore focus
-    vim.api.nvim_set_current_win(state:get_previously_focused_win())
+    local prev_win = state:get_previously_focused_win()
+    if prev_win ~= nil and vim.api.nvim_win_is_valid(prev_win) then
+        vim.api.nvim_set_current_win(prev_win)
+    end
 
     state:save()
 end
