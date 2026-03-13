@@ -624,7 +624,7 @@ Max Concurrent: 5 (Wave 1)
   - Files: `tests/test_mappings.lua`, `tests/test_diagnostic.lua`
   - Pre-commit: `make test-mappings`
 
-- [ ] 8. Fix test_splits.lua window ordering assertions (7 failures)
+- [x] 8. Fix test_splits.lua window ordering assertions (7 failures)
 
   **What to do**:
   - After Tasks 3 and 4 are complete, run `make test-splits` to see which tests still fail.
@@ -706,7 +706,7 @@ Max Concurrent: 5 (Wave 1)
   - Files: `tests/test_splits.lua`
   - Pre-commit: `make test-splits`
 
-- [ ] 9. Fix test_integrations.lua remaining failures (2-3 failures)
+- [x] 9. Fix test_integrations.lua remaining failures (2-3 failures)
 
   **What to do**:
   - After Tasks 3 and 4 are complete, run `make test-integrations` to see which tests still fail. Task 3 removes `child.set_size(10, 200)` from this file's hook, and Task 4 removes the WinEnter auto-registration. Some failures may self-resolve.

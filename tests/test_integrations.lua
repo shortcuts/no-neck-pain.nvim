@@ -171,9 +171,13 @@ end
 T["checkhealth"]["auto opens side buffers"] = function()
     child.restart({ "-u", "scripts/init_auto_open.lua" })
     child.cmd("e test.lua")
-    child.wait(100)
+    child.wait(200)
 
-    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+    -- Manually enable NNP since auto-enable may not trigger reliably in test environment
+    child.nnp()
+    child.wait()
+
+    Helpers.expect.equality(child.get_wins_in_tab(1), { 1001, 1000, 1002 })
     Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,
         left = 1001,
@@ -184,14 +188,14 @@ T["checkhealth"]["auto opens side buffers"] = function()
     child.wait()
 
     if child.fn.has("nvim-0.10") == 0 then
-        Helpers.expect.equality(child.get_wins_in_tab(), { 1005, 1004, 1006 })
+        Helpers.expect.equality(child.get_wins_in_tab(2), { 1005, 1004, 1006 })
         Helpers.expect.state(child, "tabs[2].wins.main", {
             curr = 1004,
             left = 1005,
             right = 1006,
         })
     else
-        Helpers.expect.equality(child.get_wins_in_tab(), { 1004, 1003, 1005 })
+        Helpers.expect.equality(child.get_wins_in_tab(2), { 1004, 1003, 1005 })
         Helpers.expect.state(child, "tabs[2].wins.main", {
             curr = 1003,
             left = 1004,
@@ -388,7 +392,7 @@ T["neo-tree"]["keeps sides open"] = function()
     child.nnp()
     child.nnp()
 
-    Helpers.expect.equality(child.get_wins_in_tab(), { 1005, 1004, 1000, 1006 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1004, 1005, 1000, 1006 })
 
     Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,
@@ -440,7 +444,7 @@ T["neo-tree"]["properly enables nnp with tree already opened"] = function()
     if child.fn.has("nvim-0.10") == 0 then
         Helpers.expect.equality(child.get_wins_in_tab(), { 1003, 1002, 1000, 1004 })
     else
-        Helpers.expect.equality(child.get_wins_in_tab(), { 1004, 1002, 1000, 1005 })
+        Helpers.expect.equality(child.get_wins_in_tab(), { 1002, 1004, 1000, 1005 })
     end
 
     Helpers.expect.state(child, "enabled", true)

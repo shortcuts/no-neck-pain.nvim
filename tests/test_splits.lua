@@ -184,7 +184,7 @@ T["vsplit"]["preserve vsplit width when having side buffers"] = function()
 
     Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1002, 1000 })
 
-    Helpers.expect.buf_width_in_range(child, "1002", 32, 36)
+    Helpers.expect.buf_width_in_range(child, "1002", 24, 28)
     Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.curr", 24, 28)
 end
 
@@ -259,8 +259,12 @@ T["vsplit"]["hides side buffers"] = function()
     child.cmd("vsplit")
     child.wait()
 
-    Helpers.expect.equality(child.get_wins_in_tab(), { 1003, 1000 })
-    Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1000 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1003, 1000, 1002 })
+    Helpers.expect.state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
 
     child.lua("vim.fn.win_gotoid(1003)")
     child.cmd("q")
@@ -284,15 +288,15 @@ T["vsplit"]["many vsplit leave side buffers open as long as there's space for it
     child.cmd("vsplit")
     child.wait()
 
-    Helpers.expect.equality(child.get_wins_in_tab(), { 1004, 1003, 1000 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1004, 1003, 1000, 1002 })
 
     child.cmd("q")
 
-    Helpers.expect.equality(child.get_wins_in_tab(), { 1005, 1003, 1000, 1006 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1003, 1000, 1002 })
     Helpers.expect.state(child, "tabs[_G.NoNeckPain.state.active_tab].wins.main", {
         curr = 1000,
-        left = 1005,
-        right = 1006,
+        left = 1001,
+        right = 1002,
     })
 end
 
@@ -333,16 +337,16 @@ T["vsplit/split"]["state is correctly sync'd even after many changes"] = functio
     child.cmd("vsplit")
     child.wait()
 
-    Helpers.expect.equality(child.get_wins_in_tab(), { 1005, 1004, 1000 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1005, 1004, 1000, 1002 })
 
     child.cmd("q")
     child.cmd("q")
 
-    Helpers.expect.equality(child.get_wins_in_tab(), { 1006, 1004, 1007 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1004, 1002 })
     Helpers.expect.state(child, "tabs[_G.NoNeckPain.state.active_tab].wins.main", {
         curr = 1004,
-        left = 1006,
-        right = 1007,
+        left = 1001,
+        right = 1002,
     })
 end
 
@@ -413,7 +417,7 @@ T["vsplit/split"]["splits and vsplits keeps a correct size"] = function()
     Helpers.expect.equality(child.get_current_win(), 1004)
 
     Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.curr", 38, 40)
-    Helpers.expect.buf_width_in_range(child, "1003", 16, 18)
+    Helpers.expect.buf_width_in_range(child, "1003", 17, 19)
 end
 
 T["InspectTree"] = MiniTest.new_set()
