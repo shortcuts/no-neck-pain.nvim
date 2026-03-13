@@ -103,10 +103,24 @@ function ui.init_scratch_pad(side, id, cleanup)
     local curr_win = vim.api.nvim_get_current_win()
     vim.api.nvim_set_current_win(id)
 
-    local path = helpers.get_config_field("buffers")[side].scratchPad.pathToFile
+    local scratchpad_config = helpers.get_config_field("buffers")[side].scratchPad
+    local path = scratchpad_config.pathToFile
+
+    -- Handle empty/nil pathToFile by constructing default path
     if path == nil or path == "" then
-        path = vim.fn.getcwd() .. "/" .. "no-neck-pain-" .. side .. ".norg"
+        local location = scratchpad_config.location
+        local fileName = scratchpad_config.fileName
+
+        -- Check if deprecated location field is populated
+        if location and location ~= "" then
+            path = location .. "/" .. fileName .. "-" .. side .. ".norg"
+        else
+            -- Default: use current working directory
+            path = vim.fn.getcwd() .. "/" .. "no-neck-pain-" .. side .. ".norg"
+        end
     end
+
+    -- Expand ~ and environment variables
     path = vim.fn.expand(path)
     path = vim.fn.fnameescape(path)
     vim.cmd(string.format("edit %s", path))

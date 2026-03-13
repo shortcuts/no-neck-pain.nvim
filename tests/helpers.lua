@@ -142,7 +142,9 @@ Helpers.new_child_neovim = function()
         timeout = timeout or 2000
         local start_time = vim.loop.now()
         while vim.loop.now() - start_time < timeout do
-            local is_enabled = child.lua_get("_G.NoNeckPain ~= nil and _G.NoNeckPain.state ~= nil and _G.NoNeckPain.state.enabled")
+            local is_enabled = child.lua_get(
+                "_G.NoNeckPain ~= nil and _G.NoNeckPain.state ~= nil and _G.NoNeckPain.state.enabled"
+            )
             if is_enabled then
                 return true
             end
