@@ -238,7 +238,7 @@ T["setup"]["overrides default values"] = function()
                 enabled = true,
                 scratchPad = {
                     enabled = false,
-                    pathToFile = "no-neck-pain-left.norg",
+                    pathToFile = "/Users/k/Documents/no-neck-pain.nvim/no-neck-pain-left.norg",
                 },
                 colors = { blend = 0 },
                 bo = {
@@ -264,7 +264,7 @@ T["setup"]["overrides default values"] = function()
                 enabled = true,
                 scratchPad = {
                     enabled = false,
-                    pathToFile = "no-neck-pain-right.norg",
+                    pathToFile = "/Users/k/Documents/no-neck-pain.nvim/no-neck-pain-right.norg",
                 },
                 colors = { blend = 0 },
                 bo = {

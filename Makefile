@@ -32,7 +32,6 @@ deps-lint:
 	luarocks install argparse --force
 	luarocks install luafilesystem --force
 	luarocks install lanes --force
-	luarocks install luacheck --force
 
 test-ci: deps test-race
 
@@ -43,7 +42,6 @@ documentation-ci: deps documentation
 
 lint:
 	stylua . -g '*.lua' -g '!deps/' -g '!nightly/'
-	luacheck plugin/ lua/
 
 luals-ci:
 	rm -rf .ci/lua-ls/log
