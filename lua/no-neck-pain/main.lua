@@ -502,11 +502,15 @@ function main.disable(scope)
 
         log.debug(scope, "no more active tabs left, reinitializing state")
 
+        -- SAFE: state:init() resets tabs but preserves namespaces, so they're still available
+        -- for state:remove_namespace() calls below which need self.namespaces intact
         state:init()
     end
 
     for side, id in pairs(sides) do
         if vim.api.nvim_win_is_valid(id) then
+            -- Safe to use self.namespaces here even after state:init() call above
+            -- because init() only resets self.tabs and self.active_tab, not self.namespaces
             state:remove_namespace(vim.api.nvim_win_get_buf(id), side)
             ui.close_win(scope, id, side)
         end
