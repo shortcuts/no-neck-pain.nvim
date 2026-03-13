@@ -166,6 +166,7 @@ function ui.create_side_buffers()
         if
             wins[side].padding >= helpers.get_config_field("minSideBufferWidth")
             and not state:is_side_enabled_and_valid(side)
+            and wins[side].padding > 0
         then
             local bufid = vim.api.nvim_create_buf(false, false)
 
@@ -201,9 +202,9 @@ function ui.create_side_buffers()
     end
 
     for _, side in ipairs(constants.SIDES) do
+        local scope = string.format("ui.create_side_buffers:%s", side)
         if state:is_side_enabled_and_valid(side) then
             local padding = wins[side].padding
-            local scope = string.format("ui.create_side_buffers:%s", side)
             local minWidth = helpers.get_config_field("minSideBufferWidth")
 
             log.debug(
