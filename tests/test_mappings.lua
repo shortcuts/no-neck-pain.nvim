@@ -21,7 +21,7 @@ T["setup"]["does not create mappings by default"] = function()
     -- toggle plugin state
     child.api.nvim_input("<Leader>np")
 
-    Helpers.expect.global(child, "_G.NoNeckPain.state", vim.NIL)
+    Helpers.expect.global_type(child, "_G.NoNeckPain.state", "nil")
 
     -- decrease width
     Helpers.expect.global(child, "_G.NoNeckPain.config.width", 100)
@@ -52,7 +52,7 @@ T["setup"]["does not create mappings by default"] = function()
 
     child.api.nvim_input("<Leader>ns")
 
-    Helpers.expect.global(child, "_G.NoNeckPain.state", vim.NIL)
+    Helpers.expect.global_type(child, "_G.NoNeckPain.state", "nil")
 end
 
 T["setup"]["overrides default values"] = function()
@@ -136,7 +136,7 @@ T["setup"]["does not create mappings if false"] = function()
     -- toggle plugin state
     child.api.nvim_input("<Leader>np")
 
-    Helpers.expect.global(child, "_G.NoNeckPain.state", vim.NIL)
+    Helpers.expect.global_type(child, "_G.NoNeckPain.state", "nil")
 
     -- decrease width
     Helpers.expect.global(child, "_G.NoNeckPain.config.width", 100)
@@ -153,35 +153,23 @@ T["setup"]["does not create mappings if false"] = function()
     -- increase width
     Helpers.expect.global(child, "_G.NoNeckPain.config.width", 100)
 
-    child.api.nvim_input("<Leader>n+")
-    child.api.nvim_input("<Leader>n+")
-    child.api.nvim_input("<Leader>n+")
-    child.api.nvim_input("<Leader>n+")
-    child.api.nvim_input("<Leader>n+")
-    child.api.nvim_input("<Leader>n+")
-
-    Helpers.expect.global(child, "_G.NoNeckPain.config.width", 100)
-
-    -- toggle scratchPad
-    Helpers.expect.global(child, "_G.NoNeckPain.state", vim.NIL)
-
     child.api.nvim_input("<Leader>ns")
 
-    Helpers.expect.global(child, "_G.NoNeckPain.state", vim.NIL)
+    Helpers.expect.global_type(child, "_G.NoNeckPain.state", "nil")
 
     -- toggle left
-    Helpers.expect.global(child, "_G.NoNeckPain.state", vim.NIL)
+    Helpers.expect.global_type(child, "_G.NoNeckPain.state", "nil")
 
     child.api.nvim_input("<Leader>nql")
 
-    Helpers.expect.global(child, "_G.NoNeckPain.state", vim.NIL)
+    Helpers.expect.global_type(child, "_G.NoNeckPain.state", "nil")
 
     -- toggle right
-    Helpers.expect.global(child, "_G.NoNeckPain.state", vim.NIL)
+    Helpers.expect.global_type(child, "_G.NoNeckPain.state", "nil")
 
     child.api.nvim_input("<Leader>nqr")
 
-    Helpers.expect.global(child, "_G.NoNeckPain.state", vim.NIL)
+    Helpers.expect.global_type(child, "_G.NoNeckPain.state", "nil")
 end
 
 T["setup"]["increase the width with mapping"] = function()

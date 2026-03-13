@@ -353,20 +353,20 @@ local function parse_deprecated_scratchPad(side, options, fileType)
 
     -- handle the deprecation to `fileName` and `location`
     if options.pathToFile == "" then
-        if options.location ~= nil then
-            options.pathToFile = options.location
-        else
-            options.pathToFile = vim.fn.getcwd()
-        end
-
-        if options.pathToFile ~= "" and string.sub(options.pathToFile, -1) ~= "/" then
-            options.pathToFile = options.pathToFile .. "/"
-        end
-
         fileType = fileType or "norg"
 
-        options.pathToFile =
-            string.format("%s%s-%s.%s", options.pathToFile, options.fileName, side, fileType)
+        if options.location ~= nil and options.location ~= "" then
+            -- User provided a deprecated location: use it as a directory
+            local location = options.location
+            if string.sub(location, -1) ~= "/" then
+                location = location .. "/"
+            end
+            options.pathToFile =
+                string.format("%s%s-%s.%s", location, options.fileName, side, fileType)
+        else
+            -- Default: use just the filename (relative), will expand at runtime
+            options.pathToFile = string.format("%s-%s.%s", options.fileName, side, fileType)
+        end
     end
 
     return options

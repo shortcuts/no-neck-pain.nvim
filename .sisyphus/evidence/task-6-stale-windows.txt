@@ -1,0 +1,93 @@
+# Task 6: Stale Window ID Checks — Verification Report
+
+## Status: COMPLETE ✅
+
+### Changes Applied
+
+#### 1. toggle_scratch_pad() — Window Validity Guards
+
+**File**: `lua/no-neck-pain/main.lua`
+**Lines**: 38-48 (function toggle_scratch_pad)
+
+**Change 1** (Line 38):
+- Before: `if id ~= nil then`
+- After: `if id ~= nil and vim.api.nvim_win_is_valid(id) then`
+- Reason: Prevent crash when side window ID is stale (exists but not valid)
+
+**Change 2** (Lines 45-48):
+- Before: `vim.api.nvim_set_current_win(state:get_previously_focused_win())`
+- After:
+  ```lua
+  local prev_win = state:get_previously_focused_win()
+  if prev_win ~= nil and vim.api.nvim_win_is_valid(prev_win) then
+      vim.api.nvim_set_current_win(prev_win)
+  end
+  ```
+- Reason: Prevent crash when previously focused window is stale
+
+### Verification Checklist
+
+✅ **Line 38**: Window validity check added to side window access
+✅ **Lines 45-48**: Previously focused window validity check added
+✅ **Syntax**: No Lua syntax errors (tested with nvim --headless)
+✅ **Commit**: Changes committed as "fix(main): add window validity checks in toggle_scratch_pad()"
+
+### Code Review
+
+#### Lines 25-51 (toggle_scratch_pad function) — AFTER changes:
+```lua
+function main.toggle_scratch_pad()
+    if not state:is_active_tab_registered() then
+        return
+    end
+
+    local current_state = state.tabs[state.active_tab].scratchpad_enabled
+    state:set_scratch_pad(not current_state)
+
+    -- map over both sides and let the init method either setup or cleanup the side buffers
+    for _, side in pairs(constants.SIDES) do
+        local id = state:get_side_id(side)
+        if id ~= nil and vim.api.nvim_win_is_valid(id) then  -- ✅ VALIDITY CHECK
+            vim.api.nvim_set_current_win(id)
+            ui.init_scratch_pad(side, id, current_state)
+        end
+    end
+
+    -- restore focus
+    local prev_win = state:get_previously_focused_win()
+    if prev_win ~= nil and vim.api.nvim_win_is_valid(prev_win) then  -- ✅ VALIDITY CHECK
+        vim.api.nvim_set_current_win(prev_win)
+    end
+
+    state:save()
+end
+```
+
+### Context from Plan Review
+
+From v3-audit-fixes.md lines 571-572:
+- ✅ Line 39 (now 38): "missing win validity check in toggle_scratch_pad()" — FIXED
+- ✅ Line 45: "missing win validity check on line 45" — FIXED
+
+### Other Checks Performed (Already Complete)
+
+✅ **Line 126-136** (main.init): Already has proper validity checks
+✅ **Lines 280-282** (main.disable): Already has split result validity check
+✅ **Lines 505-510** (main.disable): Already has proper namespace cleanup and validity checks
+✅ **Lines 513-514** (main.disable): Already checks curr_id validity before use
+
+### Summary
+
+All window validity checks required by Task 6 are now in place:
+1. toggle_scratch_pad() side window validity → FIXED
+2. toggle_scratch_pad() previously focused window validity → FIXED
+3. main.init() window checks → ALREADY CORRECT
+4. main.disable() split result validation → ALREADY CORRECT
+5. main.disable() cleanup sequence → ALREADY CORRECT
+
+No crashes will occur from stale window IDs in toggle_scratch_pad().
+
+**Acceptance Criteria Met**:
+- ✅ Window validity checks added to toggle_scratch_pad()
+- ✅ No unsafe vim.api.nvim_set_current_win() calls without validity check
+- ✅ Commit applied and verified

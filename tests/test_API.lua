@@ -6,7 +6,6 @@ local T = MiniTest.new_set({
     hooks = {
         pre_case = function()
             child.restart({ "-u", "scripts/minimal_init.lua" })
-            child.set_size(10, 200)
         end,
         post_once = child.stop,
     },
@@ -239,7 +238,7 @@ T["Setup: overrides default values"] = function()
                 enabled = true,
                 scratchPad = {
                     enabled = false,
-                    pathToFile = "/Users/k/Documents/no-neck-pain.nvim/no-neck-pain-left.norg",
+                    pathToFile = "no-neck-pain-left.norg",
                 },
                 colors = { blend = 0 },
                 bo = {
@@ -265,7 +264,7 @@ T["Setup: overrides default values"] = function()
                 enabled = true,
                 scratchPad = {
                     enabled = false,
-                    pathToFile = "/Users/k/Documents/no-neck-pain.nvim/no-neck-pain-right.norg",
+                    pathToFile = "no-neck-pain-right.norg",
                 },
                 colors = { blend = 0 },
                 bo = {

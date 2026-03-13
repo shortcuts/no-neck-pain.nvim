@@ -1,0 +1,55 @@
+Task 4: Scratchpad pathToFile Resolution
+==========================================
+
+OBJECTIVE:
+Fix empty scratchpad pathToFile handling in ui.lua by adding fallback path construction
+with backward compatibility support for deprecated fileName/location fields.
+
+IMPLEMENTATION:
+File: lua/no-neck-pain/ui.lua (lines 106-126)
+- Added fallback path construction when pathToFile is empty or nil
+- Check for legacy fileName/location fields (backward compatibility)
+- If location is set, construct: location/fileName-{side}.norg
+- Otherwise use default: getcwd()/no-neck-pain-{side}.norg
+- Call vim.fn.expand() on final path to resolve ~ and env vars
+
+CODE CHANGES:
+- Lines 106-107: Store scratchpad_config in variable
+- Lines 109-121: Add conditional fallback path construction
+- Line 124: Call vim.fn.expand() on the final path
+
+VERIFICATION RESULTS:
+✅ make test-scratchpad execution:
+   - Total test cases: 8
+   - Passed: 7 (including all 6 originally-failing)
+   - Failed: 1 (unrelated to pathToFile fix)
+   
+✅ Tests Fixed (6 previously-failing):
+   1. setup: overrides default values - PASS
+   2. setup: converts deprecate options to pathToFile - PASS
+   3. scratchPad: default to 'norg' fileType - PASS
+   4. scratchPad: override of filetype is reflected to the buffer - PASS
+   5. scratchPad: side buffer can have their own definition - PASS
+   6. scratchPad: side buffer definition overrides global one - PASS
+
+✅ Additional Tests (not originally failing):
+   7. scratchPad: forwards the given filetype to the scratchPad - PASS
+   8. scratchPad: toggling the scratchPad sets the buffer/window options - FAIL (pre-existing, not in scope)
+
+✅ Lint Check:
+   - stylua: PASS (no formatting issues)
+   - luacheck: SKIP (optional CI dependency)
+
+BACKWARD COMPATIBILITY:
+- Deprecated fileName/location fields are checked before using default
+- pathToFile takes precedence if already set
+- Falls back to deprecated fields if pathToFile is empty
+- Falls back to getcwd() if both pathToFile and location are empty
+
+ACCEPTANCE CRITERIA MET:
+✅ Fallback path constructed when pathToFile empty/nil
+✅ vim.fn.expand() called on final path
+✅ All 6 previously-failing tests now pass
+✅ Backward compatibility maintained
+✅ No new test failures introduced
+✅ Code formatting compliant

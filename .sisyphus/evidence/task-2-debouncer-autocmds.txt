@@ -1,0 +1,32 @@
+nvim --version | head -n 1 && echo ''
+NVIM v0.11.5
+
+nvim --headless --noplugin -u ./scripts/minimal_init.lua \
+		-c "lua MiniTest.run_file('tests/test_autocmds.lua', { execute = { reporter = MiniTest.gen_reporter.stdout({ group_depth = 2 }) } })"
+[1mTotal number of cases:[0m 23
+[1mTotal number of groups:[0m 3
+
+tests/test_autocmds.lua | auto command: [1;32mo[0m[1;31mx[0m[1;31mx[0m[1;32mo[0m
+tests/test_autocmds.lua | skipEnteringNoNeckPainBuffer: [1;32mo[0m[1;32mo[0m[1;31mx[0m
+tests/test_autocmds.lua | RaceConditions: [1;32mo[0m[1;32mo[0m[1;32mo[0m[1;32mo[0m[1;32mo[0m[1;32mo[0m[1;32mo[0m[1;32mo[0m[1;32mo[0m[1;32mo[0m[1;32mo[0m[1;32mo[0m[1;32mo[0m[1;32mo[0m[1;32mo[0m[1;32mo[0m
+
+[1mFails (3) and Notes (0)[0m
+[1;31mFAIL[0m in tests/test_autocmds.lua | auto command | starts the plugin on VimEnter: Error executing lua: [string "<nvim>"]:1: attempt to index field 'state' (a nil value)
+  stack traceback:
+  	[string "<nvim>"]:1: in main chunk
+  Traceback:
+    tests/test_autocmds.lua:35
+
+[1;31mFAIL[0m in tests/test_autocmds.lua | auto command | disabling clears VimEnter autocmd:
+  [1mFailed expectation for error.[0m
+  Observed no error
+  Traceback:
+    tests/test_autocmds.lua:46
+
+[1;31mFAIL[0m in tests/test_autocmds.lua | skipEnteringNoNeckPainBuffer | does not register if scratchPad feature is enabled (global):
+  [1mFailed expectation for equality.[0m
+  Left:  1000
+  Right: 1001
+  Traceback:
+    tests/test_autocmds.lua:189
+

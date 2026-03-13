@@ -160,8 +160,4 @@ end
 
 _G.NoNeckPain = NoNeckPain
 
-if _G.NoNeckPain.state == nil then
-    state:save()
-end
-
 return _G.NoNeckPain

@@ -7,7 +7,6 @@ local T = MiniTest.new_set({
     hooks = {
         pre_case = function()
             child.restart({ "-u", "scripts/minimal_init.lua" })
-            child.set_size(10, 200)
         end,
         post_once = child.stop,
     },

@@ -213,11 +213,6 @@ function main.enable(scope)
                 -- Update active tab first (TabEnter debounce might not have run yet)
                 state:set_active_tab(api.get_current_tab())
 
-                -- Auto-register new tabs when plugin is enabled
-                if state.enabled and not state:is_active_tab_registered() then
-                    state:set_tab(state.active_tab)
-                end
-
                 if not state:is_active_tab_registered() or event.skip() then
                     return
                 end
