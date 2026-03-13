@@ -4,40 +4,37 @@ local child = Helpers.new_child_neovim()
 
 local T = MiniTest.new_set({
     hooks = {
-        -- This will be executed before every (even nested) case
         pre_case = function()
-            -- Restart child process with custom 'init.lua' script
             child.restart({ "-u", "scripts/minimal_init.lua" })
+            child.set_size(10, 200)
         end,
-        -- This will be executed one after all tests from this set are finished
         post_once = child.stop,
     },
 })
 
+-- =============================================================================
 -- GROUP 1: Invalid Input Handling
+-- =============================================================================
+
 T["Config Validation: negative width value is rejected"] = function()
-    -- Negative width should be caught by assertion in defaults()
     Helpers.expect.error(function()
         child.lua([[ require('no-neck-pain').setup({width = -50}) ]])
     end)
 end
 
 T["Config Validation: zero width value is rejected"] = function()
-    -- Zero width should be caught by assertion in defaults()
     Helpers.expect.error(function()
         child.lua([[ require('no-neck-pain').setup({width = 0}) ]])
     end)
 end
 
 T["Config Validation: negative minSideBufferWidth is rejected"] = function()
-    -- Negative minSideBufferWidth should be caught by assertion
     Helpers.expect.error(function()
         child.lua([[ require('no-neck-pain').setup({minSideBufferWidth = -5}) ]])
     end)
 end
 
 T["Config Validation: blend values out of range are rejected"] = function()
-    -- Test blend > 1 is rejected with error when colors are parsed
     Helpers.expect.error(function()
         child.lua([[
             require('no-neck-pain').setup({
@@ -48,7 +45,6 @@ T["Config Validation: blend values out of range are rejected"] = function()
         ]])
     end)
 
-    -- Test blend < -1 is rejected with error when colors are parsed
     Helpers.expect.error(function()
         child.lua([[
             require('no-neck-pain').setup({
@@ -61,7 +57,6 @@ T["Config Validation: blend values out of range are rejected"] = function()
 end
 
 T["Config Validation: invalid hex color is rejected"] = function()
-    -- Invalid hex color should throw an error
     Helpers.expect.error(function()
         child.lua(
             [[ require('no-neck-pain').setup({buffers = {colors = {background = "#ZZZZZ"}}}) ]]
@@ -70,7 +65,6 @@ T["Config Validation: invalid hex color is rejected"] = function()
 end
 
 T["Config Validation: invalid integration position is rejected"] = function()
-    -- Invalid position value should be caught by assertion
     Helpers.expect.error(function()
         child.lua([[
             require('no-neck-pain').setup({
@@ -83,7 +77,6 @@ T["Config Validation: invalid integration position is rejected"] = function()
 end
 
 T["Config Validation: non-string integration position is rejected"] = function()
-    -- Non-string position should be caught by type assertion
     Helpers.expect.error(function()
         child.lua([[
             require('no-neck-pain').setup({
@@ -96,7 +89,6 @@ T["Config Validation: non-string integration position is rejected"] = function()
 end
 
 T["Config Validation: invalid mapping type is rejected"] = function()
-    -- Mapping should be string or table with specific structure
     Helpers.expect.error(function()
         child.lua([[
             require('no-neck-pain').setup({
@@ -110,7 +102,6 @@ T["Config Validation: invalid mapping type is rejected"] = function()
 end
 
 T["Config Validation: widthUp mapping table without required fields is rejected"] = function()
-    -- widthUp as table must have mapping and value fields
     Helpers.expect.error(function()
         child.lua([[
             require('no-neck-pain').setup({
@@ -123,19 +114,20 @@ T["Config Validation: widthUp mapping table without required fields is rejected"
     end)
 end
 
+-- =============================================================================
 -- GROUP 2: Deep Merge & Partial Updates
+-- =============================================================================
+
 T["Config Merge: partial config preserves defaults"] = function()
-    -- Only override specific fields, others should remain default
     child.lua([[ require('no-neck-pain').setup({width = 120}) ]])
 
     Helpers.expect.config(child, "width", 120)
-    Helpers.expect.config(child, "minSideBufferWidth", 10) -- default
-    Helpers.expect.config(child, "debug", false) -- default
-    Helpers.expect.config(child, "fallbackOnBufferDelete", true) -- default
+    Helpers.expect.config(child, "minSideBufferWidth", 10)
+    Helpers.expect.config(child, "debug", false)
+    Helpers.expect.config(child, "fallbackOnBufferDelete", true)
 end
 
 T["Config Merge: nested table partial update preserves other fields"] = function()
-    -- Only override one autocmd option, others should remain default
     child.lua([[
         require('no-neck-pain').setup({
             autocmds = { enableOnVimEnter = true }
@@ -143,12 +135,11 @@ T["Config Merge: nested table partial update preserves other fields"] = function
     ]])
 
     Helpers.expect.config(child, "autocmds.enableOnVimEnter", true)
-    Helpers.expect.config(child, "autocmds.enableOnTabEnter", false) -- default
-    Helpers.expect.config(child, "autocmds.reloadOnColorSchemeChange", true) -- default
+    Helpers.expect.config(child, "autocmds.enableOnTabEnter", false)
+    Helpers.expect.config(child, "autocmds.reloadOnColorSchemeChange", true)
 end
 
 T["Config Merge: deep nested buffer options are merged correctly"] = function()
-    -- Override only left buffer color, right should use defaults
     child.lua([[
         require('no-neck-pain').setup({
             buffers = {
@@ -165,7 +156,6 @@ T["Config Merge: deep nested buffer options are merged correctly"] = function()
 end
 
 T["Config Merge: buffer-specific options override common buffer options"] = function()
-    -- Set common buffer color, then override for left side only
     child.lua([[
         require('no-neck-pain').setup({
             buffers = {
@@ -177,12 +167,11 @@ T["Config Merge: buffer-specific options override common buffer options"] = func
         })
     ]])
 
-    Helpers.expect.config(child, "buffers.left.colors.blend", -0.5) -- overridden
-    Helpers.expect.config(child, "buffers.right.colors.blend", 0.5) -- from common
+    Helpers.expect.config(child, "buffers.left.colors.blend", -0.5)
+    Helpers.expect.config(child, "buffers.right.colors.blend", 0.5)
 end
 
 T["Config Merge: vim.wo options are deep merged"] = function()
-    -- Override only one wo option, others should remain default
     child.lua([[
         require('no-neck-pain').setup({
             buffers = {
@@ -192,12 +181,11 @@ T["Config Merge: vim.wo options are deep merged"] = function()
     ]])
 
     Helpers.expect.config(child, "buffers.left.wo.cursorline", true)
-    Helpers.expect.config(child, "buffers.left.wo.number", false) -- default
-    Helpers.expect.config(child, "buffers.left.wo.wrap", true) -- default
+    Helpers.expect.config(child, "buffers.left.wo.number", false)
+    Helpers.expect.config(child, "buffers.left.wo.wrap", true)
 end
 
 T["Config Merge: vim.bo options are deep merged"] = function()
-    -- Override only filetype, other bo options should remain default
     child.lua([[
         require('no-neck-pain').setup({
             buffers = {
@@ -207,13 +195,15 @@ T["Config Merge: vim.bo options are deep merged"] = function()
     ]])
 
     Helpers.expect.config(child, "buffers.left.bo.filetype", "markdown")
-    Helpers.expect.config(child, "buffers.left.bo.buftype", "nofile") -- default
-    Helpers.expect.config(child, "buffers.left.bo.swapfile", false) -- default
+    Helpers.expect.config(child, "buffers.left.bo.buftype", "nofile")
+    Helpers.expect.config(child, "buffers.left.bo.swapfile", false)
 end
 
+-- =============================================================================
 -- GROUP 3: Deprecated Option Handling
+-- =============================================================================
+
 T["Deprecated: scratchPad.fileName maps to pathToFile"] = function()
-    -- Using deprecated fileName should still work and map to pathToFile
     child.lua([[
         require('no-neck-pain').setup({
             buffers = {
@@ -228,17 +218,14 @@ T["Deprecated: scratchPad.fileName maps to pathToFile"] = function()
         })
     ]])
 
-    -- Should construct pathToFile from fileName
     local pathToFile = child.lua_get("_G.NoNeckPain.config.buffers.left.scratchPad.pathToFile")
     Helpers.expect.match(pathToFile, "my%-notes%-left%.norg")
 
-    -- Deprecated fields should be cleaned up
     Helpers.expect.config(child, "buffers.left.scratchPad.fileName", vim.NIL)
     Helpers.expect.config(child, "buffers.left.scratchPad.location", vim.NIL)
 end
 
 T["Deprecated: scratchPad.location maps to pathToFile"] = function()
-    -- Using deprecated location should construct pathToFile
     child.lua([[
         require('no-neck-pain').setup({
             buffers = {
@@ -254,20 +241,17 @@ T["Deprecated: scratchPad.location maps to pathToFile"] = function()
         })
     ]])
 
-    -- Should construct pathToFile from location + fileName
     Helpers.expect.config(
         child,
         "buffers.left.scratchPad.pathToFile",
         "/tmp/notes/scratch-left.txt"
     )
 
-    -- Deprecated fields should be cleaned up
     Helpers.expect.config(child, "buffers.left.scratchPad.fileName", vim.NIL)
     Helpers.expect.config(child, "buffers.left.scratchPad.location", vim.NIL)
 end
 
 T["Deprecated: root level deprecated options trigger warnings"] = function()
-    -- Deprecated root options should trigger warning but not crash
     child.lua([[
         require('no-neck-pain').setup({
             enableOnVimEnter = true,
@@ -275,12 +259,10 @@ T["Deprecated: root level deprecated options trigger warnings"] = function()
         })
     ]])
 
-    -- Should still initialize despite deprecated options
     Helpers.expect.global_type(child, "_G.NoNeckPain.config", "table")
 end
 
 T["Deprecated: buffer backgroundColor maps to colors.background"] = function()
-    -- Deprecated backgroundColor in buffers should work
     child.lua([[
         require('no-neck-pain').setup({
             buffers = {
@@ -291,13 +273,14 @@ T["Deprecated: buffer backgroundColor maps to colors.background"] = function()
         })
     ]])
 
-    -- Should still create config (warning may be shown)
     Helpers.expect.global_type(child, "_G.NoNeckPain.config", "table")
 end
 
+-- =============================================================================
 -- GROUP 4: Config Lifecycle
+-- =============================================================================
+
 T["Config Lifecycle: setup() is idempotent"] = function()
-    -- Calling setup multiple times should work
     child.lua([[ require('no-neck-pain').setup({width = 80}) ]])
     Helpers.expect.config(child, "width", 80)
 
@@ -308,16 +291,14 @@ T["Config Lifecycle: setup() is idempotent"] = function()
     Helpers.expect.config(child, "width", 120)
 end
 
-T["Config Lifecycle: width as 'textwidth' uses vim option"] = function()
-    -- Set vim's textwidth and use it in config
+T["Config Lifecycle: width as textwidth uses vim option"] = function()
     child.cmd("set textwidth=88")
     child.lua([[ require('no-neck-pain').setup({width = "textwidth"}) ]])
 
     Helpers.expect.config(child, "width", 88)
 end
 
-T["Config Lifecycle: width as 'colorcolumn' uses vim option"] = function()
-    -- Set vim's colorcolumn and use it in config
+T["Config Lifecycle: width as colorcolumn uses vim option"] = function()
     child.cmd("set colorcolumn=120")
     child.lua([[ require('no-neck-pain').setup({width = "colorcolumn"}) ]])
 
@@ -325,7 +306,6 @@ T["Config Lifecycle: width as 'colorcolumn' uses vim option"] = function()
 end
 
 T["Config Lifecycle: all integration types are recognized"] = function()
-    -- Setup with all known integration types
     child.lua([[
         require('no-neck-pain').setup({
             integrations = {
@@ -352,10 +332,8 @@ T["Config Lifecycle: all integration types are recognized"] = function()
 end
 
 T["Config Lifecycle: config with callbacks is valid"] = function()
-    -- Callbacks should be stored in config
     child.lua([[
         local function test_callback(state)
-            -- dummy callback
         end
         require('no-neck-pain').setup({
             callbacks = {
@@ -374,7 +352,6 @@ T["Config Lifecycle: config with callbacks is valid"] = function()
 end
 
 T["Config Lifecycle: mappings are created when enabled"] = function()
-    -- Enable mappings and verify they are registered
     child.lua([[
         require('no-neck-pain').setup({
             mappings = {
@@ -389,13 +366,11 @@ T["Config Lifecycle: mappings are created when enabled"] = function()
         })
     ]])
 
-    -- Verify mappings exist (they should not throw errors when accessed)
     local has_toggle = child.lua_get([[vim.fn.maparg("<Leader>np", "n") ~= ""]])
     Helpers.expect.equality(has_toggle, true)
 end
 
 T["Config Lifecycle: mappings are not created when disabled"] = function()
-    -- Disable mappings and verify they are not registered
     child.lua([[
         require('no-neck-pain').setup({
             mappings = {
@@ -404,13 +379,11 @@ T["Config Lifecycle: mappings are not created when disabled"] = function()
         })
     ]])
 
-    -- Verify mappings don't exist
     local has_toggle = child.lua_get([[vim.fn.maparg("<Leader>np", "n") ~= ""]])
     Helpers.expect.equality(has_toggle, false)
 end
 
 T["Config Lifecycle: scratchPad common options are cleaned up"] = function()
-    -- After setup, common scratchPad should be removed from config
     child.lua([[
         require('no-neck-pain').setup({
             buffers = {
@@ -422,12 +395,10 @@ T["Config Lifecycle: scratchPad common options are cleaned up"] = function()
         })
     ]])
 
-    -- buffers.scratchPad should be removed after processing
     Helpers.expect.config(child, "buffers.scratchPad", vim.NIL)
 end
 
 T["Config Lifecycle: dashboard filetypes can be customized"] = function()
-    -- Custom dashboard filetypes should be stored
     child.lua([[
         require('no-neck-pain').setup({
             integrations = {
@@ -444,9 +415,11 @@ T["Config Lifecycle: dashboard filetypes can be customized"] = function()
     Helpers.expect.equality(vim.tbl_contains(filetypes, "custom"), true)
 end
 
--- Additional edge cases
+-- =============================================================================
+-- GROUP 5: Additional Edge Cases
+-- =============================================================================
+
 T["Config Validation: empty config uses all defaults"] = function()
-    -- Empty config should use all default values
     child.lua([[ require('no-neck-pain').setup({}) ]])
 
     Helpers.expect.config(child, "width", 100)
@@ -458,7 +431,6 @@ T["Config Validation: empty config uses all defaults"] = function()
 end
 
 T["Config Validation: nil values in nested tables are handled"] = function()
-    -- Explicitly setting nil should be handled gracefully
     child.lua([[
         require('no-neck-pain').setup({
             buffers = {
@@ -475,7 +447,6 @@ T["Config Validation: nil values in nested tables are handled"] = function()
 end
 
 T["Config Validation: buffer setNames option works"] = function()
-    -- setNames should be stored correctly
     child.lua([[
         require('no-neck-pain').setup({
             buffers = {
@@ -488,7 +459,6 @@ T["Config Validation: buffer setNames option works"] = function()
 end
 
 T["Config Validation: side buffer can be disabled individually"] = function()
-    -- Test disabling left buffer
     child.lua([[
         require('no-neck-pain').setup({
             buffers = {
@@ -498,11 +468,10 @@ T["Config Validation: side buffer can be disabled individually"] = function()
     ]])
 
     Helpers.expect.config(child, "buffers.left.enabled", false)
-    Helpers.expect.config(child, "buffers.right.enabled", true) -- right still enabled
+    Helpers.expect.config(child, "buffers.right.enabled", true)
 end
 
-T["Config Validation: autocmds.enableOnVimEnter accepts 'safe' value"] = function()
-    -- enableOnVimEnter can be boolean or "safe"
+T["Config Validation: autocmds.enableOnVimEnter accepts safe value"] = function()
     child.lua([[
         require('no-neck-pain').setup({
             autocmds = {
@@ -515,7 +484,6 @@ T["Config Validation: autocmds.enableOnVimEnter accepts 'safe' value"] = functio
 end
 
 T["Config Validation: widthUp and widthDown accept table format"] = function()
-    -- Test table format with custom value
     child.lua([[
         require('no-neck-pain').setup({
             mappings = {

@@ -6,18 +6,17 @@ local T = MiniTest.new_set({
     hooks = {
         pre_case = function()
             child.restart({ "-u", "scripts/minimal_init.lua" })
+            child.set_size(10, 200)
         end,
         post_once = child.stop,
     },
 })
 
--- ========================================================================
--- Group 1: event.skip() basic functionality
--- ========================================================================
+-- =============================================================================
+-- GROUP 1: skip() Basic Functionality
+-- =============================================================================
 
-T["skip()"] = MiniTest.new_set()
-
-T["skip()"]["returns true when plugin is not enabled"] = function()
+T["skip(): returns true when plugin is not enabled"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
 
     Helpers.expect.global_type(child, "_G.NoNeckPain.state", "nil")
@@ -27,7 +26,7 @@ T["skip()"]["returns true when plugin is not enabled"] = function()
     Helpers.expect.equality(result, true)
 end
 
-T["skip()"]["returns false when plugin is enabled and window is normal"] = function()
+T["skip(): returns false when plugin is enabled and window is normal"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     child.nnp()
     child.wait()
@@ -42,7 +41,7 @@ T["skip()"]["returns false when plugin is enabled and window is normal"] = funct
     Helpers.expect.equality(result, false)
 end
 
-T["skip()"]["returns true when current window is relative (floating)"] = function()
+T["skip(): returns true when current window is relative (floating)"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     child.nnp()
     child.wait()
@@ -61,7 +60,7 @@ T["skip()"]["returns true when current window is relative (floating)"] = functio
     Helpers.expect.equality(result, true)
 end
 
-T["skip()"]["returns true when current tab is not active tab"] = function()
+T["skip(): returns true when current tab is not active tab"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     child.nnp()
     child.wait()
@@ -85,7 +84,7 @@ T["skip()"]["returns true when current tab is not active tab"] = function()
     Helpers.expect.equality(result, true)
 end
 
-T["skip()"]["handles multiple rapid consecutive calls"] = function()
+T["skip(): handles multiple rapid consecutive calls"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     child.nnp()
     child.wait()
@@ -103,13 +102,11 @@ T["skip()"]["handles multiple rapid consecutive calls"] = function()
     Helpers.expect.state(child, "enabled", true)
 end
 
--- ========================================================================
--- Group 2: event.skip_enable() dashboard and integration detection
--- ========================================================================
+-- =============================================================================
+-- GROUP 2: skip_enable() Dashboard and Integration Detection
+-- =============================================================================
 
-T["skip_enable()"] = MiniTest.new_set()
-
-T["skip_enable()"]["returns true when tab is already registered"] = function()
+T["skip_enable(): returns true when tab is already registered"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     child.nnp()
     child.wait()
@@ -121,7 +118,7 @@ T["skip_enable()"]["returns true when tab is already registered"] = function()
     Helpers.expect.equality(result, true)
 end
 
-T["skip_enable()"]["returns true when current window is relative"] = function()
+T["skip_enable(): returns true when current window is relative"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
 
     child.api.nvim_open_win(
@@ -147,7 +144,7 @@ T["skip_enable()"]["returns true when current window is relative"] = function()
     Helpers.expect.equality(result, true)
 end
 
-T["skip_enable()"]["returns false for normal buffer with no integrations"] = function()
+T["skip_enable(): returns false for normal buffer with no integrations"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
 
     child.cmd("edit test.txt")
@@ -170,7 +167,7 @@ T["skip_enable()"]["returns false for normal buffer with no integrations"] = fun
     Helpers.expect.equality(result, false)
 end
 
-T["skip_enable()"]["detects alpha-nvim dashboard"] = function()
+T["skip_enable(): detects alpha-nvim dashboard"] = function()
     child.lua([[ require('no-neck-pain').setup({
         width = 50,
         integrations = {
@@ -201,7 +198,7 @@ T["skip_enable()"]["detects alpha-nvim dashboard"] = function()
     Helpers.expect.equality(result, true)
 end
 
-T["skip_enable()"]["detects dashboard-nvim dashboard"] = function()
+T["skip_enable(): detects dashboard-nvim dashboard"] = function()
     child.lua([[ require('no-neck-pain').setup({
         width = 50,
         integrations = {
@@ -232,7 +229,7 @@ T["skip_enable()"]["detects dashboard-nvim dashboard"] = function()
     Helpers.expect.equality(result, true)
 end
 
-T["skip_enable()"]["detects snacks-nvim dashboard"] = function()
+T["skip_enable(): detects snacks-nvim dashboard"] = function()
     child.lua([[ require('no-neck-pain').setup({
         width = 50,
         integrations = {
@@ -263,7 +260,7 @@ T["skip_enable()"]["detects snacks-nvim dashboard"] = function()
     Helpers.expect.equality(result, true)
 end
 
-T["skip_enable()"]["detects NvimTree integration"] = function()
+T["skip_enable(): detects NvimTree integration"] = function()
     child.lua([[ require('no-neck-pain').setup({
         width = 50,
         integrations = {
@@ -292,7 +289,7 @@ T["skip_enable()"]["detects NvimTree integration"] = function()
     Helpers.expect.equality(result, true)
 end
 
-T["skip_enable()"]["detects neo-tree integration"] = function()
+T["skip_enable(): detects neo-tree integration"] = function()
     child.lua([[ require('no-neck-pain').setup({
         width = 50,
         integrations = {
@@ -321,7 +318,7 @@ T["skip_enable()"]["detects neo-tree integration"] = function()
     Helpers.expect.equality(result, true)
 end
 
-T["skip_enable()"]["is case insensitive for filetype matching"] = function()
+T["skip_enable(): is case insensitive for filetype matching"] = function()
     child.lua([[ require('no-neck-pain').setup({
         width = 50,
         integrations = {
@@ -350,7 +347,7 @@ T["skip_enable()"]["is case insensitive for filetype matching"] = function()
     Helpers.expect.equality(result, true)
 end
 
-T["skip_enable()"]["handles disabled tab state correctly (TabEnter scope)"] = function()
+T["skip_enable(): handles disabled tab state correctly (TabEnter scope)"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     child.nnp()
     child.wait()
@@ -367,7 +364,7 @@ T["skip_enable()"]["handles disabled tab state correctly (TabEnter scope)"] = fu
     Helpers.expect.equality(result, true)
 end
 
-T["skip_enable()"]["handles disabled tab state correctly (non-TabEnter scope)"] = function()
+T["skip_enable(): handles disabled tab state correctly (non-TabEnter scope)"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     child.nnp()
     child.wait()
@@ -383,13 +380,11 @@ T["skip_enable()"]["handles disabled tab state correctly (non-TabEnter scope)"] 
     Helpers.expect.equality(result, false)
 end
 
--- ========================================================================
--- Group 3: Edge cases and stress tests
--- ========================================================================
+-- =============================================================================
+-- GROUP 3: Edge Cases and Stress Tests
+-- =============================================================================
 
-T["edge cases"] = MiniTest.new_set()
-
-T["edge cases"]["skip() with deleted window does not error"] = function()
+T["Edge Cases: skip() with deleted window does not error"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     child.nnp()
     child.wait()
@@ -408,7 +403,7 @@ T["edge cases"]["skip() with deleted window does not error"] = function()
     Helpers.expect.equality(result, false)
 end
 
-T["edge cases"]["skip_enable() with nil filetype"] = function()
+T["Edge Cases: skip_enable() with nil filetype"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
 
     child.cmd("enew")
@@ -432,7 +427,7 @@ T["edge cases"]["skip_enable() with nil filetype"] = function()
     Helpers.expect.equality(result, false)
 end
 
-T["edge cases"]["skip_enable() with unknown filetype"] = function()
+T["Edge Cases: skip_enable() with unknown filetype"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
 
     child.cmd("edit test.xyz")
@@ -456,7 +451,7 @@ T["edge cases"]["skip_enable() with unknown filetype"] = function()
     Helpers.expect.equality(result, false)
 end
 
-T["edge cases"]["rapid skip() calls with window switching"] = function()
+T["Edge Cases: rapid skip() calls with window switching"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     child.nnp()
     child.wait()
@@ -476,7 +471,7 @@ T["edge cases"]["rapid skip() calls with window switching"] = function()
     Helpers.expect.state(child, "enabled", true)
 end
 
-T["edge cases"]["skip_enable() with multiple integrations configured"] = function()
+T["Edge Cases: skip_enable() with multiple integrations configured"] = function()
     child.lua([[ require('no-neck-pain').setup({
         width = 50,
         integrations = {
@@ -510,7 +505,7 @@ T["edge cases"]["skip_enable() with multiple integrations configured"] = functio
     Helpers.expect.equality(result, true)
 end
 
-T["edge cases"]["skip_enable() respects custom dashboard filetypes"] = function()
+T["Edge Cases: skip_enable() respects custom dashboard filetypes"] = function()
     child.lua([[ require('no-neck-pain').setup({
         width = 50,
         integrations = {
@@ -541,7 +536,7 @@ T["edge cases"]["skip_enable() respects custom dashboard filetypes"] = function(
     Helpers.expect.equality(result, true)
 end
 
-T["edge cases"]["skip_enable() with no integrations configured"] = function()
+T["Edge Cases: skip_enable() with no integrations configured"] = function()
     child.lua([[ require('no-neck-pain').setup({
         width = 50,
         integrations = nil
@@ -568,7 +563,7 @@ T["edge cases"]["skip_enable() with no integrations configured"] = function()
     Helpers.expect.equality(result, false)
 end
 
-T["edge cases"]["skip() remains correct after multiple enable/disable cycles"] = function()
+T["Edge Cases: skip() remains correct after multiple enable/disable cycles"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
 
     for i = 1, 5 do
@@ -588,7 +583,7 @@ T["edge cases"]["skip() remains correct after multiple enable/disable cycles"] =
     end
 end
 
-T["edge cases"]["skip_enable() partial filetype match works correctly"] = function()
+T["Edge Cases: skip_enable() partial filetype match works correctly"] = function()
     child.lua([[ require('no-neck-pain').setup({
         width = 50,
         integrations = {
@@ -617,7 +612,7 @@ T["edge cases"]["skip_enable() partial filetype match works correctly"] = functi
     Helpers.expect.equality(result, true)
 end
 
-T["edge cases"]["multiple events in sequence (WinEnter -> WinClosed -> TabEnter)"] = function()
+T["Edge Cases: multiple events in sequence (WinEnter -> WinClosed -> TabEnter)"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     child.nnp()
     child.wait()

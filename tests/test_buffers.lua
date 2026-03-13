@@ -5,19 +5,19 @@ local child = Helpers.new_child_neovim()
 
 local T = MiniTest.new_set({
     hooks = {
-        -- This will be executed before every (even nested) case
         pre_case = function()
-            -- Restart child process with custom 'init.lua' script
             child.restart({ "-u", "scripts/minimal_init.lua" })
+            child.set_size(10, 200)
         end,
-        -- This will be executed one after all tests from this set are finished
         post_once = child.stop,
     },
 })
 
-T["setup"] = MiniTest.new_set()
+-- =============================================================================
+-- GROUP 1: Setup Tests
+-- =============================================================================
 
-T["setup"]["sets default filetypes"] = function()
+T["Setup: sets default filetypes"] = function()
     child.lua([[require('no-neck-pain').setup({width=30})]])
     child.nnp()
 
@@ -34,7 +34,7 @@ T["setup"]["sets default filetypes"] = function()
     )
 end
 
-T["setup"]["overrides default values"] = function()
+T["Setup: overrides default values"] = function()
     child.lua([[require('no-neck-pain').setup({
         buffers = {
             setNames = true,
@@ -148,7 +148,7 @@ T["setup"]["overrides default values"] = function()
     end
 end
 
-T["setup"]["`left` or `right` buffer options overrides `common` ones"] = function()
+T["Setup: left or right buffer options overrides common ones"] = function()
     child.lua([[require('no-neck-pain').setup({
         buffers = {
             bo = {
@@ -186,7 +186,7 @@ T["setup"]["`left` or `right` buffer options overrides `common` ones"] = functio
     Helpers.expect.config(child, "buffers.right.wo.number", true)
 end
 
-T["setup"]["`common` options spreads it to `left` and `right` buffers"] = function()
+T["Setup: common options spreads it to left and right buffers"] = function()
     child.lua([[require('no-neck-pain').setup({
         buffers = {
             bo = {
@@ -208,24 +208,25 @@ T["setup"]["`common` options spreads it to `left` and `right` buffers"] = functi
     Helpers.expect.config(child, "buffers.right.bo.filetype", "TEST")
 end
 
-T["curr"] = MiniTest.new_set()
+-- =============================================================================
+-- GROUP 2: Current Window Tests
+-- =============================================================================
 
-T["curr"]["have the default width"] = function()
+T["Curr: have the default width"] = function()
     child.lua([[ require('no-neck-pain').setup() ]])
     child.nnp()
 
-    -- need to know why the child isn't precise enough
     Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 80)
 end
 
-T["curr"]["have the width from the config"] = function()
+T["Curr: have the width from the config"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     child.nnp()
 
     Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.curr", 46, 48)
 end
 
-T["curr"]["closing `curr` window without any other window quits Neovim"] = function()
+T["Curr: closing curr window without any other window quits Neovim"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     child.nnp()
 
@@ -234,24 +235,23 @@ T["curr"]["closing `curr` window without any other window quits Neovim"] = funct
 
     child.cmd("q")
 
-    -- neovim is closed, so it errors
     Helpers.expect.error(function()
         child.get_wins_in_tab()
     end)
 end
 
-T["left/right"] = MiniTest.new_set()
+-- =============================================================================
+-- GROUP 3: Left/Right Side Buffer Tests
+-- =============================================================================
 
-T["left/right"]["setNames doesn't throw when re-creating side buffers"] = function()
+T["Left/Right: setNames doesn't throw when re-creating side buffers"] = function()
     child.lua([[require('no-neck-pain').setup({width=50, buffers={setNames=true}})]])
 
-    -- enable
     child.nnp()
 
     Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.left", 13, 15)
     Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.right", 13, 15)
 
-    -- toggle
     child.nnp()
     child.nnp()
 
@@ -259,7 +259,7 @@ T["left/right"]["setNames doesn't throw when re-creating side buffers"] = functi
     Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.right", 13, 15)
 end
 
-T["left/right"]["have the same width"] = function()
+T["Left/Right: have the same width"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     child.nnp()
 
@@ -267,7 +267,7 @@ T["left/right"]["have the same width"] = function()
     Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.right", 13, 15)
 end
 
-T["left/right"]["only creates a `left` buffer when `right.enabled` is `false`"] = function()
+T["Left/Right: only creates a left buffer when right.enabled is false"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50,buffers={right={enabled=false}}}) ]])
     child.nnp()
 
@@ -279,7 +279,7 @@ T["left/right"]["only creates a `left` buffer when `right.enabled` is `false`"] 
     Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 15)
 end
 
-T["left/right"]["only creates a `right` buffer when `left.enabled` is `false`"] = function()
+T["Left/Right: only creates a right buffer when left.enabled is false"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50,buffers={left={enabled=false}}}) ]])
     child.nnp()
 
@@ -291,7 +291,7 @@ T["left/right"]["only creates a `right` buffer when `left.enabled` is `false`"] 
     Helpers.expect.buf_width(child, "tabs[1].wins.main.right", 15)
 end
 
-T["left/right"]["closing the `left` buffer disables NNP"] = function()
+T["Left/Right: closing the left buffer disables NNP"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     child.nnp()
 
@@ -308,7 +308,7 @@ T["left/right"]["closing the `left` buffer disables NNP"] = function()
     Helpers.expect.equality(child.get_wins_in_tab(), { 1000 })
 end
 
-T["left/right"]["closing the `right` buffer disables NNP"] = function()
+T["Left/Right: closing the right buffer disables NNP"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     child.nnp()
 
@@ -325,9 +325,11 @@ T["left/right"]["closing the `right` buffer disables NNP"] = function()
     Helpers.expect.equality(child.get_wins_in_tab(), { 1000 })
 end
 
-T["boundary"] = MiniTest.new_set()
+-- =============================================================================
+-- GROUP 4: Boundary Tests
+-- =============================================================================
 
-T["boundary"]["side buffers when terminal width exactly equals config width"] = function()
+T["Boundary: side buffers when terminal width exactly equals config width"] = function()
     child.set_size(24, 100)
     child.lua([[ require('no-neck-pain').setup({width=100}) ]])
     child.nnp()
@@ -338,7 +340,7 @@ T["boundary"]["side buffers when terminal width exactly equals config width"] = 
     })
 end
 
-T["boundary"]["side buffer with very long colorcolumn value"] = function()
+T["Boundary: side buffer with very long colorcolumn value"] = function()
     child.lua([[require('no-neck-pain').setup({
         width=50,
         buffers={
@@ -360,7 +362,7 @@ T["boundary"]["side buffer with very long colorcolumn value"] = function()
     end
 end
 
-T["boundary"]["side buffer with empty filetype string"] = function()
+T["Boundary: side buffer with empty filetype string"] = function()
     child.lua([[require('no-neck-pain').setup({
         width=50,
         buffers={
@@ -382,7 +384,7 @@ T["boundary"]["side buffer with empty filetype string"] = function()
     Helpers.expect.equality(right_ft, "")
 end
 
-T["boundary"]["minSideBufferWidth with only 1 column available per side"] = function()
+T["Boundary: minSideBufferWidth with only 1 column available per side"] = function()
     child.set_size(24, 102)
     child.lua([[ require('no-neck-pain').setup({width=98, minSideBufferWidth=1}) ]])
     child.nnp()
@@ -392,7 +394,7 @@ T["boundary"]["minSideBufferWidth with only 1 column available per side"] = func
     Helpers.expect.state_type(child, "tabs[1].wins.main.right", "number")
 end
 
-T["boundary"]["minSideBufferWidth prevents creation when below threshold"] = function()
+T["Boundary: minSideBufferWidth prevents creation when below threshold"] = function()
     child.set_size(24, 110)
     child.lua([[ require('no-neck-pain').setup({width=100, minSideBufferWidth=10}) ]])
     child.nnp()
@@ -403,9 +405,11 @@ T["boundary"]["minSideBufferWidth prevents creation when below threshold"] = fun
     })
 end
 
-T["property-based"] = MiniTest.new_set()
+-- =============================================================================
+-- GROUP 5: Property-Based Tests
+-- =============================================================================
 
-T["property-based"]["side buffer options work across different width configs"] = function()
+T["Property-Based: side buffer options work across different width configs"] = function()
     local configs = Helpers.generate_width_configs(40, 90, 5)
 
     for _, config in ipairs(configs) do
@@ -448,7 +452,7 @@ T["property-based"]["side buffer options work across different width configs"] =
     end
 end
 
-T["property-based"]["state consistency maintained with property-based configs"] = function()
+T["Property-Based: state consistency maintained with property-based configs"] = function()
     local configs = Helpers.generate_width_configs(50, 100, 3)
 
     for _, config in ipairs(configs) do
@@ -472,9 +476,11 @@ T["property-based"]["state consistency maintained with property-based configs"] 
     end
 end
 
-T["edge-cases"] = MiniTest.new_set()
+-- =============================================================================
+-- GROUP 6: Edge Cases
+-- =============================================================================
 
-T["edge-cases"]["side buffers with all window options disabled"] = function()
+T["Edge-Cases: side buffers with all window options disabled"] = function()
     child.lua([[require('no-neck-pain').setup({
         width=50,
         buffers={
@@ -530,7 +536,7 @@ T["edge-cases"]["side buffers with all window options disabled"] = function()
     )
 end
 
-T["edge-cases"]["side buffers with all buffer options modified"] = function()
+T["Edge-Cases: side buffers with all buffer options modified"] = function()
     child.lua([[require('no-neck-pain').setup({
         width=50,
         buffers={
@@ -570,7 +576,7 @@ T["edge-cases"]["side buffers with all buffer options modified"] = function()
     )
 end
 
-T["edge-cases"]["rapid resize operations preserve buffer state"] = function()
+T["Edge-Cases: rapid resize operations preserve buffer state"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     child.nnp()
 
@@ -591,7 +597,7 @@ T["edge-cases"]["rapid resize operations preserve buffer state"] = function()
     Helpers.assert_state_consistency(child)
 end
 
-T["edge-cases"]["zero-width colorcolumn edge case"] = function()
+T["Edge-Cases: zero-width colorcolumn edge case"] = function()
     child.lua([[require('no-neck-pain').setup({
         width=50,
         buffers={

@@ -5,19 +5,19 @@ local child = Helpers.new_child_neovim()
 
 local T = MiniTest.new_set({
     hooks = {
-        -- This will be executed before every (even nested) case
         pre_case = function()
-            -- Restart child process with custom 'init.lua' script
             child.restart({ "-u", "scripts/minimal_init.lua" })
+            child.set_size(10, 200)
         end,
-        -- This will be executed one after all tests from this set are finished
         post_once = child.stop,
     },
 })
 
-T["setup"] = MiniTest.new_set()
+-- =============================================================================
+-- GROUP 1: Setup Tests
+-- =============================================================================
 
-T["setup"]["overrides default values"] = function()
+T["Setup: overrides default values"] = function()
     child.cmd([[
         highlight Normal guibg=black guifg=white
         set background=dark
@@ -33,14 +33,14 @@ T["setup"]["overrides default values"] = function()
                 colors = {
                     background = "catppuccin-frappe",
                     blend = 0.2,
-            	    text = "#7480c2",
+                    text = "#7480c2",
                 },
             },
             right = {
                 colors = {
                     background = "catppuccin-frappe",
                     blend = 0.2,
-            	    text = "#7480c2",
+                    text = "#7480c2",
                 },
             },
         },
@@ -61,7 +61,7 @@ T["setup"]["overrides default values"] = function()
     end
 end
 
-T["setup"]["`left` or `right` buffer options overrides `common` ones"] = function()
+T["Setup: left or right buffer options overrides common ones"] = function()
     child.cmd([[
         highlight Normal guibg=black guifg=white
         set background=dark
@@ -109,7 +109,7 @@ T["setup"]["`left` or `right` buffer options overrides `common` ones"] = functio
     })
 end
 
-T["setup"]["does not throw on invalid windows"] = function()
+T["Setup: does not throw on invalid windows"] = function()
     child.restart({ "-u", "scripts/init_auto_open.lua" })
     child.set_size(80, 80)
     child.cmd("e test.lua")
@@ -138,7 +138,7 @@ T["setup"]["does not throw on invalid windows"] = function()
     Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1000, left = 1001, right = 1002 })
 end
 
-T["setup"]["`common` options spreads it to `left` and `right` buffers"] = function()
+T["Setup: common options spreads it to left and right buffers"] = function()
     child.cmd([[colorscheme peachpuff]])
     child.lua([[
         require('no-neck-pain').setup({ buffers = {
@@ -172,7 +172,7 @@ T["setup"]["`common` options spreads it to `left` and `right` buffers"] = functi
     })
 end
 
-T["setup"]["(transparent) assert side buffers have the same colors as the main buffer"] = function()
+T["Setup: transparent assert side buffers have the same colors as the main buffer"] = function()
     child.cmd([[
         highlight Normal guibg=none
         highlight NonText guibg=none
@@ -196,7 +196,7 @@ T["setup"]["(transparent) assert side buffers have the same colors as the main b
     Helpers.expect.equality(currbg, rightbg)
 end
 
-T["setup"]["(normal) assert side buffers have the same colors as the main buffer"] = function()
+T["Setup: normal assert side buffers have the same colors as the main buffer"] = function()
     child.cmd([[colorscheme blue]])
     child.lua([[ require('no-neck-pain').setup() ]])
     child.nnp()
@@ -214,7 +214,7 @@ T["setup"]["(normal) assert side buffers have the same colors as the main buffer
     Helpers.expect.equality(currbg, rightbg)
 end
 
-T["setup"]["colors.background overrides a nil background when defined"] = function()
+T["Setup: colors.background overrides a nil background when defined"] = function()
     child.lua([[require('no-neck-pain').setup({buffers={colors={background="#abcabc"}}})]])
 
     Helpers.expect.config(child, "buffers.colors", {
@@ -233,9 +233,11 @@ T["setup"]["colors.background overrides a nil background when defined"] = functi
     })
 end
 
-T["color"] = MiniTest.new_set()
+-- =============================================================================
+-- GROUP 2: Color Tests
+-- =============================================================================
 
-T["color"]["map integration name to a value"] = function()
+T["Color: map integration name to a value"] = function()
     for integration, value in pairs(Co.THEMES) do
         child.lua(string.format(
             [[ require('no-neck-pain').setup({
@@ -258,7 +260,7 @@ T["color"]["map integration name to a value"] = function()
     end
 end
 
-T["color"]["buffers: throws with wrong background value"] = function()
+T["Color: buffers throws with wrong background value"] = function()
     Helpers.expect.error(function()
         child.lua([[
         require('no-neck-pain').setup({
@@ -272,7 +274,7 @@ T["color"]["buffers: throws with wrong background value"] = function()
     end)
 end
 
-T["color"]["refreshes the stored color when changing colorscheme"] = function()
+T["Color: refreshes the stored color when changing colorscheme"] = function()
     child.cmd([[
         highlight Normal guibg=none
         highlight NonText guibg=none

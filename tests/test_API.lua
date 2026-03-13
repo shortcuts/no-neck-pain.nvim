@@ -1,31 +1,32 @@
-local Config = require("no-neck-pain.config")
 local Helpers = dofile("tests/helpers.lua")
 
 local child = Helpers.new_child_neovim()
 
 local T = MiniTest.new_set({
     hooks = {
-        -- This will be executed before every (even nested) case
         pre_case = function()
-            -- Restart child process with custom 'init.lua' script
             child.restart({ "-u", "scripts/minimal_init.lua" })
+            child.set_size(10, 200)
         end,
-        -- This will be executed one after all tests from this set are finished
         post_once = child.stop,
     },
 })
 
-T["install"] = MiniTest.new_set()
+-- =============================================================================
+-- GROUP 1: Install Tests
+-- =============================================================================
 
-T["install"]["sets global loaded variable"] = function()
+T["Install: sets global loaded variable"] = function()
     child.wait()
     Helpers.expect.global(child, "_G.NoNeckPain", vim.NIL)
     Helpers.expect.global_type(child, "_G.NoNeckPainLoaded", "boolean")
 end
 
-T["setup"] = MiniTest.new_set()
+-- =============================================================================
+-- GROUP 2: Setup Tests
+-- =============================================================================
 
-T["setup"]["sets exposed methods and default options value"] = function()
+T["Setup: sets exposed methods and default options value"] = function()
     child.lua([[require('no-neck-pain').setup()]])
 
     Helpers.expect.global_type(child, "_G.NoNeckPain", "table")
@@ -172,7 +173,7 @@ T["setup"]["sets exposed methods and default options value"] = function()
     })
 end
 
-T["setup"]["overrides default values"] = function()
+T["Setup: overrides default values"] = function()
     child.lua([[require('no-neck-pain').setup({
         width = 42,
         minSideBufferWidth = 0,
@@ -317,7 +318,7 @@ T["setup"]["overrides default values"] = function()
     })
 end
 
-T["setup"]["width - defaults to the `textwidth` when specified"] = function()
+T["Setup: width defaults to the textwidth when specified"] = function()
     child.cmd("set textwidth=30")
     child.lua([[require('no-neck-pain').setup({
         width = "textwidth"
@@ -326,7 +327,7 @@ T["setup"]["width - defaults to the `textwidth` when specified"] = function()
     Helpers.expect.config(child, "width", 30)
 end
 
-T["setup"]["width - defaults to the `textwidth` when specified"] = function()
+T["Setup: width defaults to the colorcolumn when specified"] = function()
     child.cmd("set colorcolumn=65")
     child.lua([[require('no-neck-pain').setup({
         width = "colorcolumn"
@@ -335,15 +336,17 @@ T["setup"]["width - defaults to the `textwidth` when specified"] = function()
     Helpers.expect.config(child, "width", 65)
 end
 
-T["setup"]["width - throws with non-supported string"] = function()
+T["Setup: width throws with non-supported string"] = function()
     Helpers.expect.error(function()
         child.lua([[require('no-neck-pain').setup({ width = "foo" })]])
     end)
 end
 
-T["enable"] = MiniTest.new_set()
+-- =============================================================================
+-- GROUP 3: Enable Tests
+-- =============================================================================
 
-T["enable"]["(single tab) sets state"] = function()
+T["Enable: single tab sets state"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     child.nnp()
 
@@ -368,7 +371,7 @@ T["enable"]["(single tab) sets state"] = function()
     Helpers.expect.state(child, "tabs[1].wins.columns", 3)
 end
 
-T["enable"]["(multiple tab) sets state"] = function()
+T["Enable: multiple tab sets state"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     child.nnp()
 
@@ -412,9 +415,11 @@ T["enable"]["(multiple tab) sets state"] = function()
     Helpers.expect.state(child, "tabs[2].wins.columns", 3)
 end
 
-T["disable"] = MiniTest.new_set()
+-- =============================================================================
+-- GROUP 4: Disable Tests
+-- =============================================================================
 
-T["disable"]["(single tab) resets state"] = function()
+T["Disable: single tab resets state"] = function()
     child.nnp()
 
     Helpers.expect.global_type(child, "_G.NoNeckPain.state", "table")
@@ -434,7 +439,7 @@ T["disable"]["(single tab) resets state"] = function()
     Helpers.expect.state(child, "tabs", {})
 end
 
-T["disable"]["(multiple tab) resets state"] = function()
+T["Disable: multiple tab resets state"] = function()
     child.nnp()
 
     Helpers.expect.global_type(child, "_G.NoNeckPain.state", "table")
@@ -472,7 +477,7 @@ T["disable"]["(multiple tab) resets state"] = function()
     Helpers.expect.state(child, "tabs", {})
 end
 
-T["disable"]["(no file) does not close the window if unsaved buffer"] = function()
+T["Disable: no file does not close the window if unsaved buffer"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     child.nnp()
 
@@ -495,7 +500,7 @@ T["disable"]["(no file) does not close the window if unsaved buffer"] = function
     Helpers.expect.equality(child.is_running(), true)
 end
 
-T["disable"]["(on file) does not close the window if unsaved buffer"] = function()
+T["Disable: on file does not close the window if unsaved buffer"] = function()
     child.restart({ "-u", "scripts/minimal_init.lua", "lua/no-neck-pain/main.lua" })
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     child.nnp()
@@ -519,7 +524,7 @@ T["disable"]["(on file) does not close the window if unsaved buffer"] = function
     Helpers.expect.equality(child.is_running(), true)
 end
 
-T["disable"]["relative window doesn't prevent quitting nvim"] = function()
+T["Disable: relative window doesn't prevent quitting nvim"] = function()
     child.restart({ "-u", "scripts/init_with_incline.lua" })
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     child.nnp()
@@ -541,7 +546,10 @@ T["disable"]["relative window doesn't prevent quitting nvim"] = function()
     end)
 end
 
--- GROUP 1: API Error Handling - Methods called when plugin not enabled
+-- =============================================================================
+-- GROUP 5: API Error Handling - Methods called when plugin not enabled
+-- =============================================================================
+
 T["API: toggle_scratch_pad() without enable throws error"] = function()
     child.lua([[ require('no-neck-pain').setup() ]])
 
@@ -588,7 +596,10 @@ T["API: error messages are clear when plugin not enabled"] = function()
     ]])
 end
 
--- GROUP 2: Invalid Input Handling
+-- =============================================================================
+-- GROUP 6: Invalid Input Handling
+-- =============================================================================
+
 T["API: resize(0) no-ops and doesn't change width"] = function()
     child.lua([[ require('no-neck-pain').setup({width=100}) ]])
     child.nnp()
@@ -663,7 +674,10 @@ T["API: resize() with same width no-ops"] = function()
     Helpers.expect.state(child, "tabs[1].wins.main.curr", initial_curr)
 end
 
--- GROUP 3: API Idempotency
+-- =============================================================================
+-- GROUP 7: API Idempotency
+-- =============================================================================
+
 T["API: multiple enable() calls result in enabled state"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
 
@@ -739,7 +753,10 @@ T["API: toggle_debug() is idempotent"] = function()
     Helpers.expect.config(child, "debug", true)
 end
 
--- GROUP 4: Additional Edge Cases
+-- =============================================================================
+-- GROUP 8: Additional Edge Cases
+-- =============================================================================
+
 T["API: resize() with valid positive values updates width correctly"] = function()
     child.lua([[ require('no-neck-pain').setup({width=100}) ]])
     child.nnp()
