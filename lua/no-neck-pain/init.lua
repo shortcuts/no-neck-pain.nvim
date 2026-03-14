@@ -160,9 +160,4 @@ end
 
 _G.NoNeckPain = NoNeckPain
 
--- Initialize state once on module load (safe re-guard)
-if _G.NoNeckPain.state == nil then
-    state:save()
-end
-
 return _G.NoNeckPain
