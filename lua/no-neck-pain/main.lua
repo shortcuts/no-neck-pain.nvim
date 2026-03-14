@@ -219,6 +219,40 @@ function main.enable(scope)
 
                 local init = state:scan_layout(s)
 
+                -- Validate that stored window IDs are still valid after layout change
+                local valid_wins = vim.api.nvim_tabpage_list_wins(state.active_tab)
+                local valid_win_set = {}
+                for _, win_id in ipairs(valid_wins) do
+                    valid_win_set[win_id] = true
+                end
+
+                -- Check if main window is still valid
+                local curr_id = state:get_side_id("curr")
+                if curr_id and not valid_win_set[curr_id] then
+                    log.debug(s, "clearing invalid main window %d", curr_id)
+                    state:set_side_id(nil, "curr")
+                    -- Reassign to the first available non-side window
+                    local unregistered = state:get_unregistered_wins(s)
+                    if #unregistered > 0 then
+                        state:set_side_id(unregistered[1], "curr")
+                        log.debug(s, "reassigned main window to %d", unregistered[1])
+                    end
+                end
+
+                -- Check if left window is still valid
+                local left_id = state:get_side_id("left")
+                if left_id and not valid_win_set[left_id] then
+                    log.debug(s, "clearing invalid left side window %d", left_id)
+                    state:set_side_id(nil, "left")
+                end
+
+                -- Check if right window is still valid
+                local right_id = state:get_side_id("right")
+                if right_id and not valid_win_set[right_id] then
+                    log.debug(s, "clearing invalid right side window %d", right_id)
+                    state:set_side_id(nil, "right")
+                end
+
                 if
                     not state.tabs[state.active_tab].redraw
                     and (state:is_side_the_active_win("left") or state:is_side_the_active_win(
