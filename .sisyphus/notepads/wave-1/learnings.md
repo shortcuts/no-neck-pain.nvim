@@ -114,3 +114,65 @@ Window ordering in Neovim can change based on positioning commands (`<C-W>H`, `<
 ### Verification Complete
 
 All original 8 failures in `test_splits.lua` have been resolved (3 were fixed in Wave 1 Tasks 3-4, and 5 were fixed in this task). The plugin's window positioning behavior is now fully tested and stable.
+
+## Task 10: Scratchpad Test Assertion Fix
+
+### Root Cause
+
+Test failure at `tests/test_scratchpad.lua:269` - "toggling scratchPad sets buffer/window options":
+- **Expected**: `buflisted = false`
+- **Actual**: `buflisted = true`
+
+The test used `child.fn.win_gotoid(window_id)` followed by `vim.api.nvim_buf_get_option(0, 'buflisted')` to check the buffer option. This pattern relies on window switching working correctly in the headless test environment, which proved unreliable.
+
+### Root Cause Analysis
+
+1. **Plugin code is correct**: Configuration defaults have `buflisted = false`, buffer options are applied via `init_side_options()`, and `api.set_buffer_option()` correctly sets each option
+2. **Test pattern mismatch**: The failing test used `win_gotoid()` + buffer 0, but other passing tests in the same file (lines 128-129, 172-173, 181-182) use direct `vim.api.nvim_win_get_buf(window_id)` approach
+3. **Headless environment**: Window switching via `win_gotoid()` may not work reliably in test harness
+
+### Solution
+
+Updated test assertions from:
+```lua
+child.fn.win_gotoid(1001)
+Helpers.expect.equality(child.lua_get("vim.api.nvim_buf_get_option(0, 'buflisted')"), false)
+```
+
+To (direct buffer access):
+```lua
+Helpers.expect.equality(
+    child.lua_get("vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(1001), 'buflisted')"),
+    false
+)
+```
+
+**Rationale**:
+- Removes dependency on `win_gotoid()` working in headless environment
+- Uses the same pattern as passing tests in the same file
+- More direct: gets buffer ID from window ID, then checks option
+- No changes to plugin source code
+
+### Changes Made
+
+**File: `tests/test_scratchpad.lua`** (lines 266-289)
+- Replaced 4 buffer option assertions with direct `vim.api.nvim_win_get_buf()` approach
+- Maintained all test logic and timing (still checks before and after text input)
+- Minimal change: only assertion format updated
+
+### Test Results
+
+```
+Total number of cases: 8
+Total number of groups: 2
+Fails (0) and Notes (0)
+```
+
+✅ **All 8 scratchpad tests passing** with 0 failures (previously 1 failure)
+
+### Pattern Learned
+
+In test assertions for buffer options:
+- **Avoid**: `win_gotoid(id)` then accessing buffer 0 (unreliable in headless mode)
+- **Prefer**: Direct `vim.api.nvim_win_get_buf(window_id)` to get buffer ID, then check option
+- This pattern is consistent across the test suite and works reliably in headless Neovim

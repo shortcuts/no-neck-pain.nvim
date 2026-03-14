@@ -173,10 +173,6 @@ T["checkhealth"]["auto opens side buffers"] = function()
     child.cmd("e test.lua")
     child.wait(200)
 
-    -- Manually enable NNP since auto-enable may not trigger reliably in test environment
-    child.nnp()
-    child.wait()
-
     Helpers.expect.equality(child.get_wins_in_tab(1), { 1001, 1000, 1002 })
     Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,
