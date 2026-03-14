@@ -230,28 +230,40 @@ function main.enable(scope)
                 local curr_id = state:get_side_id("curr")
                 if curr_id and not valid_win_set[curr_id] then
                     log.debug(s, "clearing invalid main window %d", curr_id)
-                    state:set_side_id(nil, "curr")
-                    -- Reassign to the first available non-side window
+                    -- Try to find a replacement window
                     local unregistered = state:get_unregistered_wins(s)
                     if #unregistered > 0 then
                         state:set_side_id(unregistered[1], "curr")
                         log.debug(s, "reassigned main window to %d", unregistered[1])
+                    elseif state:get_previously_focused_win() and vim.api.nvim_win_is_valid(state:get_previously_focused_win()) then
+                        state:set_side_id(state:get_previously_focused_win(), "curr")
+                        log.debug(s, "reassigned main window to previously focused %d", state:get_previously_focused_win())
                     end
                 end
 
                 -- Check if left window is still valid
                 local left_id = state:get_side_id("left")
+                local left_was_cleared = false
+                local left_id_to_close = nil
                 if left_id and not valid_win_set[left_id] then
                     log.debug(s, "clearing invalid left side window %d", left_id)
+                    left_id_to_close = left_id
                     state:set_side_id(nil, "left")
+                    left_was_cleared = true
                 end
 
                 -- Check if right window is still valid
                 local right_id = state:get_side_id("right")
+                local right_was_cleared = false
+                local right_id_to_close = nil
                 if right_id and not valid_win_set[right_id] then
                     log.debug(s, "clearing invalid right side window %d", right_id)
+                    right_id_to_close = right_id
                     state:set_side_id(nil, "right")
+                    right_was_cleared = true
                 end
+
+                local side_window_was_cleared = left_was_cleared or right_was_cleared
 
                 if
                     not state.tabs[state.active_tab].redraw
@@ -263,7 +275,12 @@ function main.enable(scope)
                     return
                 end
 
-                if init then
+                if side_window_was_cleared and p.event == "WinClosed" then
+                    log.debug(s, "a side window was closed, disabling plugin")
+                    api.debounce(s, function()
+                        main.disable()
+                    end)
+                elseif init then
                     api.debounce(s, main.init)
                 end
             end)

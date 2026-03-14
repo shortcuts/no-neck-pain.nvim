@@ -61,6 +61,9 @@ end
 ---
 ---@private
 function state:init_integrations()
+    if not (self:has_tabs() and self.tabs[self.active_tab]) then
+        return
+    end
     self.tabs[self.active_tab].wins.integrations = {}
 
     -- normalize to lowercase
@@ -74,6 +77,9 @@ end
 ---
 ---@private
 function state:init_columns()
+    if not (self:has_tabs() and self.tabs[self.active_tab]) then
+        return
+    end
     self.tabs[self.active_tab].wins.columns = 0
 end
 
@@ -416,6 +422,9 @@ end
 ---@param wins table: the layout windows.
 ---@private
 function state:set_layout_windows(scope, wins)
+    if not (self:has_tabs() and self.tabs[self.active_tab]) then
+        return
+    end
     for _, win in ipairs(wins) do
         local id = win[2]
         if win[1] == "leaf" and not api.is_relative_window(id) then
