@@ -301,8 +301,11 @@ T["Left/Right: closing the left buffer disables NNP"] = function()
         right = 1002,
     })
 
-    child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.tabs[1].wins.main.left)")
-    child.cmd("q")
+    child.lua([[
+        vim.api.nvim_win_close(_G.NoNeckPain.state.tabs[1].wins.main.left, true)
+        vim.fn.win_gotoid(_G.NoNeckPain.state.tabs[1].wins.main.curr)
+    ]])
+    child.wait()
 
     Helpers.expect.equality(child.get_wins_in_tab(), { 1000 })
 end
@@ -318,8 +321,11 @@ T["Left/Right: closing the right buffer disables NNP"] = function()
         right = 1002,
     })
 
-    child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.tabs[1].wins.main.right)")
-    child.cmd("q")
+    child.lua([[
+        vim.api.nvim_win_close(_G.NoNeckPain.state.tabs[1].wins.main.right, true)
+        vim.fn.win_gotoid(_G.NoNeckPain.state.tabs[1].wins.main.curr)
+    ]])
+    child.wait()
 
     Helpers.expect.equality(child.get_wins_in_tab(), { 1000 })
 end

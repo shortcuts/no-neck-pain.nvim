@@ -153,3 +153,136 @@ This pattern is more robust than navigating and relying on "current buffer" stat
 - Other test code might change focus or windows
 - Cross-process Lua calls have ambiguous context
 
+
+# Task 14: State Edge Cases Window Recovery - BLOCKER
+
+**Task ID**: Task 14 (v3-audit-fixes plan)
+**Timestamp**: 2026-03-14
+**Status**: ATTEMPTED - 2 failures fixed, but 5 new failures introduced. REVERTED.
+
+## Problem Statement
+
+Tests test_state_edge_cases.lua:455 and :478 expect main window to remain valid after closing a side window:
+- Test closes a side window with `child.cmd("close")`
+- Test then checks if `wins.main.curr` is still valid
+- Currently returning `false` (invalid) when should return `true` (valid)
+
+## Attempted Solution 1: Update curr in scan_layout()
+
+Added `state:update_main_window_tracking()` function to update `wins.main.curr` after `scan_layout()` completes.
+
+**Result**: Tests hung - infinite loop or deadlock in event handlers. Reverted.
+
+**Root cause**: Calling `vim.api` functions during event handlers (WinClosed, WinEnter) creates feedback loops. The state update triggers another event, causing re-entrancy issues.
+
+## Attempted Solution 2: Update curr in WinClosed event handler (conditional)
+
+Moved the fix to the WinClosed callback in main.lua with conditional logic:
+```lua
+if p.event == "WinClosed" then
+    if not vim.api.nvim_win_is_valid(state:get_side_id("curr")) then
+        local focused_win = vim.api.nvim_get_current_win()
+        if vim.api.nvim_win_is_valid(focused_win) and not api.is_relative_window(focused_win) then
+            if current_win ~= state:get_side_id("left") and current_win ~= state:get_side_id("right") then
+                state:set_side_id(focused_win, "curr")
+            end
+        end
+    end
+end
+```
+
+**Result**: Target tests fixed ✅, but 2 additional failures introduced in test_options.lua fallbackOnBufferDelete tests. Net: 5→7 failures. Reverted.
+
+**Root cause**: Logic still incorrect - the condition checks aren't preventing updates when they should.
+
+## Core Issue
+
+The problem runs deeper than window state tracking. When a side window closes:
+1. The focused window might change to another side window
+2. Or the focused window might be the main window
+3. We need to know which one it is
+
+Currently there's no reliable way to distinguish "the window I'm focusing on is the main window" vs "the window I'm focusing on is a side window".
+
+## Why It's Hard
+
+- Window IDs are generic - can't tell a side window from a main window by ID alone
+- State might be stale by the time WinClosed fires
+- The layout might have changed in unexpected ways during the event
+
+## Alternative Approaches (Untested)
+
+1. **Store additional metadata**: Tag windows in buffer options so we can identify them later
+2. **Use layout scanning only**: Trust `scan_layout()` to properly reconstruct the layout, without trying to update curr manually
+3. **Fix test, not source**: The test might be testing an invalid expectation - perhaps curr SHOULD be nil after a side window closes in certain cases
+4. **Check fallbackOnBufferDelete logic**: The option `fallbackOnBufferDelete` might already have logic to handle this case
+
+## Recommendation
+
+Before attempting again:
+1. Review how `fallbackOnBufferDelete` currently works (config option that "fallbacks on newly focused window")
+2. Check if the test expectation is correct (should curr survive a side window close?)
+3. Consider if the fix belongs in scan_layout() after all, but with different event timing
+4. Look at what happens in the passing state_edge_cases tests to understand the pattern
+
+## Current Status
+
+- Target tests: 455, 478 still FAILING
+- Attempted fixes: REVERTED (caused regressions)
+- Blocked by: Lack of reliable way to track window identity during event handlers
+- 5 total remaining failures, down from original 31
+
+
+# Task 15: test_buffers.lua Channel Errors Investigation
+
+**Task ID**: Task 15 (v3-audit-fixes plan)
+**Timestamp**: 2026-03-14
+**Status**: IN PROGRESS - investigating "Invalid channel" errors
+
+## Problem Statement
+
+Tests test_buffers.lua:307 and :324 fail with "Invalid channel" errors when attempting to close side buffers:
+
+```lua
+child.lua([[
+    vim.api.nvim_win_close(_G.NoNeckPain.state.tabs[1].wins.main.left, false)
+]])
+child.wait()
+```
+
+Error message: `Invalid channel: 140` and `Invalid channel: 142`
+
+## Test Purpose
+
+The tests verify that when a side buffer is manually closed with `vim.api.nvim_win_close()`:
+1. The `WinClosed` event fires
+2. `scan_layout()` detects the layout change
+3. Plugin detects the missing side buffer and disables itself
+4. Final state: only the main window remains (window 1000)
+
+## Key Observation
+
+The integration test `test_integrations.lua:683` ("integration closing and reopening") uses **identical code**:
+```lua
+child.lua([[vim.api.nvim_win_close(]] .. outline_win1 .. [[, true)]])
+child.wait()
+```
+
+And it **PASSES** ✅
+
+**Critical difference**: Integration test uses `force=true`, buffer test uses `force=false`.
+
+## Hypothesis
+
+The "Invalid channel" error might be caused by:
+1. Using `force=false` in headless test environment causing exception
+2. The exception breaks the communication channel with the test framework
+3. Subsequent operations (child.wait(), assertions) fail with channel error
+
+## Next Steps
+
+1. **Change force parameter**: Try changing `force=false` to `force=true` in both failing tests
+2. **Verify behavior**: The semantic meaning is unchanged - both trigger the WinClosed event
+3. **Monitor for regressions**: Ensure no side effects from force=true
+
+
