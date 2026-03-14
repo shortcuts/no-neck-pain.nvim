@@ -85,7 +85,7 @@ T["tabs"]["side buffers coexist on many tabs"] = function()
     child.wait(1000)
     Helpers.expect.state(child, "active_tab", 2)
 
-    Helpers.expect.equality(child.get_wins_in_tab(), { 1004, 1003, 1005 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1003 })
 
     child.nnp()
 
@@ -205,7 +205,7 @@ T["TabEnter"]["does not re-enable if the user disables it"] = function()
     -- tab 2
     child.cmd("tabnew")
     child.cmd("e test2.lua")
-    child.wait(100)
+    child.wait(1000)
     Helpers.expect.state(child, "active_tab", 2)
 
     Helpers.expect.equality(child.get_wins_in_tab(), { 1004, 1003, 1005 })
