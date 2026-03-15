@@ -11,11 +11,9 @@ local T = MiniTest.new_set({
     },
 })
 
--- =============================================================================
--- GROUP 1: split
--- =============================================================================
+T["split"] = MiniTest.new_set()
 
-T["split: only one side buffer, closing help doesn't close NNP"] = function()
+T["split"]["only one side buffer, closing help doesn't close NNP"] = function()
     child.lua([[ require('no-neck-pain').setup({width=20, buffers={right={enabled=false}}}) ]])
     child.nnp()
 
@@ -34,7 +32,7 @@ T["split: only one side buffer, closing help doesn't close NNP"] = function()
     Helpers.expect.state(child, "enabled", true)
 end
 
-T["split: closing `curr` makes `split` the new `curr`"] = function()
+T["split"]["closing `curr` makes `split` the new `curr`"] = function()
     child.lua([[ require('no-neck-pain').setup({width=20}) ]])
     child.nnp()
 
@@ -54,7 +52,7 @@ T["split: closing `curr` makes `split` the new `curr`"] = function()
     Helpers.expect.equality(child.get_current_win(), 1003)
 end
 
-T["split: keeps side buffers"] = function()
+T["split"]["keeps side buffers"] = function()
     child.lua([[ require('no-neck-pain').setup({width=20}) ]])
     child.nnp()
 
@@ -75,7 +73,7 @@ T["split: keeps side buffers"] = function()
     Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.right", 28, 30)
 end
 
-T["split: keeps correct focus"] = function()
+T["split"]["keeps correct focus"] = function()
     child.lua([[ require('no-neck-pain').setup({width=20}) ]])
     child.nnp()
 
@@ -100,7 +98,7 @@ T["split: keeps correct focus"] = function()
     Helpers.expect.equality(child.get_current_win(), 1000)
 end
 
-T["split: correctly starts nnp with previously opened splits"] = function()
+T["split"]["correctly starts nnp with previously opened splits"] = function()
     child.lua([[ require('no-neck-pain').setup({width=20}) ]])
 
     child.cmd("split")
@@ -120,7 +118,7 @@ T["split: correctly starts nnp with previously opened splits"] = function()
     Helpers.expect.equality(child.get_wins_in_tab(), { 1002, 1001, 1003, 1000 })
 end
 
-T["split: correctly starts nnp with previously opened splits (only one side)"] = function()
+T["split"]["correctly starts nnp with previously opened splits (only one side)"] = function()
     child.lua([[ require('no-neck-pain').setup({width=20, buffers={right={enabled=false}}}) ]])
 
     child.cmd("split")
@@ -131,11 +129,9 @@ T["split: correctly starts nnp with previously opened splits (only one side)"] =
     Helpers.expect.equality(child.get_wins_in_tab(), { 1002, 1001, 1000 })
 end
 
--- =============================================================================
--- GROUP 2: vsplit
--- =============================================================================
+T["vsplit"] = MiniTest.new_set()
 
-T["vsplit: does not create side buffers when there's not enough space"] = function()
+T["vsplit"]["does not create side buffers when there's not enough space"] = function()
     child.cmd("vsplit")
     child.cmd("vsplit")
     child.cmd("vsplit")
@@ -148,7 +144,7 @@ T["vsplit: does not create side buffers when there's not enough space"] = functi
     Helpers.expect.equality(child.get_wins_in_tab(), { 1003, 1002, 1001, 1000 })
 end
 
-T["vsplit: correctly size splits when opening helper with side buffers open"] = function()
+T["vsplit"]["correctly size splits when opening helper with side buffers open"] = function()
     child.lua([[ require('no-neck-pain').setup({width=20}) ]])
     child.nnp()
 
@@ -167,7 +163,7 @@ T["vsplit: correctly size splits when opening helper with side buffers open"] = 
     Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.curr", 18, 20)
 end
 
-T["vsplit: correctly position side buffers when there's enough space"] = function()
+T["vsplit"]["correctly position side buffers when there's enough space"] = function()
     child.cmd("vsplit")
 
     Helpers.expect.equality(child.get_wins_in_tab(1), { 1001, 1000 })
@@ -178,7 +174,7 @@ T["vsplit: correctly position side buffers when there's enough space"] = functio
     Helpers.expect.equality(child.get_wins_in_tab(), { 1002, 1001, 1003, 1000 })
 end
 
-T["vsplit: preserve vsplit width when having side buffers"] = function()
+T["vsplit"]["preserve vsplit width when having side buffers"] = function()
     child.lua([[ require('no-neck-pain').setup({width=20,buffers={right={enabled=false}}}) ]])
     child.nnp()
 
@@ -192,7 +188,7 @@ T["vsplit: preserve vsplit width when having side buffers"] = function()
     Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.curr", 24, 28)
 end
 
-T["vsplit: closing `curr` makes `split` the new `curr`"] = function()
+T["vsplit"]["closing `curr` makes `split` the new `curr`"] = function()
     child.lua([[ require('no-neck-pain').setup({width=20}) ]])
     child.nnp()
 
@@ -219,7 +215,7 @@ T["vsplit: closing `curr` makes `split` the new `curr`"] = function()
     Helpers.expect.equality(child.get_current_win(), 1003)
 end
 
-T["vsplit: (#425) closing `curr` with only one side buffer and not enough spaces properly resets the state"] = function()
+T["vsplit"]["(#425) closing `curr` with only one side buffer and not enough spaces properly resets the state"] = function()
     child.lua([[ require('no-neck-pain').setup({width=55,buffers={right={enabled=false}}}) ]])
     child.nnp()
 
@@ -249,7 +245,7 @@ T["vsplit: (#425) closing `curr` with only one side buffer and not enough spaces
     Helpers.expect.equality(child.get_current_win(), 1002)
 end
 
-T["vsplit: hides side buffers"] = function()
+T["vsplit"]["hides side buffers"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50,minSideBufferWidth=0}) ]])
     child.nnp()
 
@@ -282,7 +278,7 @@ T["vsplit: hides side buffers"] = function()
     Helpers.expect.state(child, "tabs[1].wins.splits", vim.NIL)
 end
 
-T["vsplit: many vsplit leave side buffers open as long as there's space for it"] = function()
+T["vsplit"]["many vsplit leave side buffers open as long as there's space for it"] = function()
     child.lua([[ require('no-neck-pain').setup({width=20}) ]])
     child.nnp()
 
@@ -304,7 +300,7 @@ T["vsplit: many vsplit leave side buffers open as long as there's space for it"]
     })
 end
 
-T["vsplit: keeps correct focus"] = function()
+T["vsplit"]["keeps correct focus"] = function()
     child.lua([[ require('no-neck-pain').setup({width=10}) ]])
     child.nnp()
 
@@ -319,11 +315,9 @@ T["vsplit: keeps correct focus"] = function()
     Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1004, 1003, 1000, 1002 })
 end
 
--- =============================================================================
--- GROUP 3: vsplit/split
--- =============================================================================
+T["vsplit/split"] = MiniTest.new_set()
 
-T["vsplit/split: state is correctly sync'd even after many changes"] = function()
+T["vsplit/split"]["state is correctly sync'd even after many changes"] = function()
     child.lua([[ require('no-neck-pain').setup({width=20}) ]])
 
     Helpers.expect.equality(child.get_wins_in_tab(1), { 1000 })
@@ -356,7 +350,7 @@ T["vsplit/split: state is correctly sync'd even after many changes"] = function(
     })
 end
 
-T["vsplit/split: closing side buffers because of splits restores focus"] = function()
+T["vsplit/split"]["closing side buffers because of splits restores focus"] = function()
     child.lua([[ require('no-neck-pain').setup({width=20}) ]])
     child.nnp()
 
@@ -379,7 +373,7 @@ T["vsplit/split: closing side buffers because of splits restores focus"] = funct
     Helpers.expect.equality(child.get_current_win(), 1000)
 end
 
-T["vsplit/split: closing help page doens't break layout"] = function()
+T["vsplit/split"]["closing help page doens't break layout"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     child.nnp()
 
@@ -402,7 +396,7 @@ T["vsplit/split: closing help page doens't break layout"] = function()
     Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.curr", 26, 48)
 end
 
-T["vsplit/split: splits and vsplits keeps a correct size"] = function()
+T["vsplit/split"]["splits and vsplits keeps a correct size"] = function()
     child.lua([[ require('no-neck-pain').setup({width=20}) ]])
     child.nnp()
 
@@ -426,11 +420,9 @@ T["vsplit/split: splits and vsplits keeps a correct size"] = function()
     Helpers.expect.buf_width_in_range(child, "1003", 17, 19)
 end
 
--- =============================================================================
--- GROUP 4: InspectTree
--- =============================================================================
+T["InspectTree"] = MiniTest.new_set()
 
-T["InspectTree: keeps sides open"] = function()
+T["InspectTree"]["keeps sides open"] = function()
     child.lua([[ require('no-neck-pain').setup({width=10}) ]])
     child.nnp()
 
