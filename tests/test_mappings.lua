@@ -11,9 +11,11 @@ local T = MiniTest.new_set({
     },
 })
 
-T["setup"] = MiniTest.new_set()
+-- =============================================================================
+-- GROUP: Setup
+-- =============================================================================
 
-T["setup"]["does not create mappings by default"] = function()
+T["Setup: does not create mappings by default"] = function()
     child.lua([[require('no-neck-pain').setup()]])
 
     Helpers.expect.config(child, "mappings.enabled", false)
@@ -55,7 +57,7 @@ T["setup"]["does not create mappings by default"] = function()
     Helpers.expect.global_type(child, "_G.NoNeckPain.state", "nil")
 end
 
-T["setup"]["overrides default values"] = function()
+T["Setup: overrides default values"] = function()
     child.lua([[require('no-neck-pain').setup({
         mappings = {
             enabled = true,
@@ -81,7 +83,7 @@ T["setup"]["overrides default values"] = function()
     })
 end
 
-T["setup"]["allow widthUp and widthDown to be configurable"] = function()
+T["Setup: allow widthUp and widthDown to be configurable"] = function()
     child.lua([[require('no-neck-pain').setup({
         mappings = {
             enabled = true,
@@ -108,7 +110,7 @@ T["setup"]["allow widthUp and widthDown to be configurable"] = function()
     })
 end
 
-T["setup"]["does not create mappings if false"] = function()
+T["Setup: does not create mappings if false"] = function()
     child.lua([[require('no-neck-pain').setup({
         mappings = {
             enabled = true,
@@ -172,7 +174,7 @@ T["setup"]["does not create mappings if false"] = function()
     Helpers.expect.global_type(child, "_G.NoNeckPain.state", "nil")
 end
 
-T["setup"]["increase the width with mapping"] = function()
+T["Setup: increase the width with mapping"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50,mappings={enabled=true,widthUp="nn"}}) ]])
     child.nnp()
 
@@ -187,7 +189,7 @@ T["setup"]["increase the width with mapping"] = function()
     Helpers.expect.global(child, "_G.NoNeckPain.config.width", 70)
 end
 
-T["setup"]["increase the width with custom mapping and value"] = function()
+T["Setup: increase the width with custom mapping and value"] = function()
     child.lua(
         [[ require('no-neck-pain').setup({width=50,mappings={enabled=true,widthUp={mapping="nn", value=10}}}) ]]
     )
@@ -204,7 +206,7 @@ T["setup"]["increase the width with custom mapping and value"] = function()
     Helpers.expect.global(child, "_G.NoNeckPain.config.width", 90)
 end
 
-T["setup"]["throws with wrong widthUp configuration"] = function()
+T["Setup: throws with wrong widthUp configuration"] = function()
     Helpers.expect.error(function()
         child.lua([[ require('no-neck-pain').setup({
                     mappings = {
@@ -216,7 +218,7 @@ T["setup"]["throws with wrong widthUp configuration"] = function()
     end)
 end
 
-T["setup"]["throws with wrong widthDown configuration"] = function()
+T["Setup: throws with wrong widthDown configuration"] = function()
     Helpers.expect.error(function()
         child.lua([[ require('no-neck-pain').setup({
                     mappings = {
@@ -228,7 +230,7 @@ T["setup"]["throws with wrong widthDown configuration"] = function()
     end)
 end
 
-T["setup"]["decrease the width with mapping"] = function()
+T["Setup: decrease the width with mapping"] = function()
     child.lua(
         [[ require('no-neck-pain').setup({width=50,mappings={enabled=true,widthDown="nn"}}) ]]
     )
@@ -245,7 +247,7 @@ T["setup"]["decrease the width with mapping"] = function()
     Helpers.expect.global(child, "_G.NoNeckPain.config.width", 30)
 end
 
-T["setup"]["decrease the width with custom mapping and value"] = function()
+T["Setup: decrease the width with custom mapping and value"] = function()
     child.lua(
         [[ require('no-neck-pain').setup({width=50,mappings={enabled=true,widthDown={mapping="nn",value=7}}}) ]]
     )
@@ -262,7 +264,7 @@ T["setup"]["decrease the width with custom mapping and value"] = function()
     Helpers.expect.global(child, "_G.NoNeckPain.config.width", 22)
 end
 
-T["setup"]["toggles scratchPad"] = function()
+T["Setup: toggles scratchPad"] = function()
     child.lua(
         [[ require('no-neck-pain').setup({width=50,mappings={enabled=true,scratchPad="ns"}}) ]]
     )
@@ -280,7 +282,7 @@ T["setup"]["toggles scratchPad"] = function()
     Helpers.expect.global(child, "_G.NoNeckPain.state.tabs[1].scratchpad_enabled", true)
 end
 
-T["setup"]["toggle sides and disable if none"] = function()
+T["Setup: toggle sides and disable if none"] = function()
     child.lua(
         [[ require('no-neck-pain').setup({width=50,mappings={enabled=true,toggleLeftSide="nl",toggleRightSide="nr"}}) ]]
     )
