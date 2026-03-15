@@ -333,7 +333,7 @@ end
 --- Returns the ID of the given `side`.
 ---
 ---@param side "left"|"right"|"curr": the side of the window.
----@return number
+---@return number?
 ---@private
 function state:get_side_id(side)
     if not (self:has_tabs() and self.tabs[self.active_tab] ~= nil) then
@@ -391,11 +391,11 @@ end
 
 --- Gets the columns count in the current layout.
 ---
----@return table: the columns window IDs.
+---@return table?: the columns window IDs.
 ---@private
 function state:get_columns()
     if not (self:has_tabs() and self.tabs[self.active_tab] ~= nil) then
-        return 0
+        return nil
     end
     return self.tabs[self.active_tab].wins.columns
 end
