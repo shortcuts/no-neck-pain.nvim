@@ -11,9 +11,11 @@ local T = MiniTest.new_set({
     },
 })
 
-T["log.notify()"] = MiniTest.new_set()
+-- =============================================================================
+-- GROUP 1: log.notify() Tests
+-- =============================================================================
 
-T["log.notify()"]["verbose=true prints regardless of debug=false"] = function()
+T["log.notify(): verbose=true prints regardless of debug=false"] = function()
     child.lua([[ require('no-neck-pain').setup({debug=false}) ]])
 
     child.lua([[
@@ -33,7 +35,7 @@ T["log.notify()"]["verbose=true prints regardless of debug=false"] = function()
     Helpers.expect.equality(count, 1)
 end
 
-T["log.notify()"]["verbose=false respects debug=true"] = function()
+T["log.notify(): verbose=false respects debug=true"] = function()
     child.lua([[ require('no-neck-pain').setup({debug=true}) ]])
 
     child.lua([[
@@ -52,7 +54,7 @@ T["log.notify()"]["verbose=false respects debug=true"] = function()
     Helpers.expect.equality(count, 1)
 end
 
-T["log.notify()"]["verbose=false skips when debug=false"] = function()
+T["log.notify(): verbose=false skips when debug=false"] = function()
     child.lua([[ require('no-neck-pain').setup({debug=false}) ]])
 
     child.lua([[
@@ -71,7 +73,7 @@ T["log.notify()"]["verbose=false skips when debug=false"] = function()
     Helpers.expect.equality(count, 0)
 end
 
-T["log.notify()"]["formats string with arguments"] = function()
+T["log.notify(): formats string with arguments"] = function()
     child.lua([[ require('no-neck-pain').setup({debug=false}) ]])
 
     child.lua([[
@@ -91,7 +93,7 @@ T["log.notify()"]["formats string with arguments"] = function()
     Helpers.expect.equality(contains_42, true)
 end
 
-T["log.notify()"]["includes correct log level"] = function()
+T["log.notify(): includes correct log level"] = function()
     child.lua([[ require('no-neck-pain').setup({debug=false}) ]])
 
     child.lua([[
@@ -113,7 +115,7 @@ T["log.notify()"]["includes correct log level"] = function()
     Helpers.expect.equality(level, error_level)
 end
 
-T["log.notify()"]["includes title in opts"] = function()
+T["log.notify(): includes title in opts"] = function()
     child.lua([[ require('no-neck-pain').setup({debug=false}) ]])
 
     child.lua([[
@@ -132,7 +134,7 @@ T["log.notify()"]["includes title in opts"] = function()
     Helpers.expect.equality(title, "no-neck-pain.nvim")
 end
 
-T["log.notify()"]["pads scope names for alignment"] = function()
+T["log.notify(): pads scope names for alignment"] = function()
     child.lua([[ require('no-neck-pain').setup({debug=false}) ]])
 
     child.lua([[
@@ -152,9 +154,11 @@ T["log.notify()"]["pads scope names for alignment"] = function()
     Helpers.expect.equality(count, 2)
 end
 
-T["log.debug()"] = MiniTest.new_set()
+-- =============================================================================
+-- GROUP 2: log.debug() Tests
+-- =============================================================================
 
-T["log.debug()"]["prints with debug=true"] = function()
+T["log.debug(): prints with debug=true"] = function()
     child.lua([[ require('no-neck-pain').setup({debug=true}) ]])
 
     child.lua([[
@@ -173,7 +177,7 @@ T["log.debug()"]["prints with debug=true"] = function()
     Helpers.expect.equality(count, 1)
 end
 
-T["log.debug()"]["skips with debug=false"] = function()
+T["log.debug(): skips with debug=false"] = function()
     child.lua([[ require('no-neck-pain').setup({debug=false}) ]])
 
     child.lua([[
@@ -192,7 +196,7 @@ T["log.debug()"]["skips with debug=false"] = function()
     Helpers.expect.equality(count, 0)
 end
 
-T["log.debug()"]["uses DEBUG level"] = function()
+T["log.debug(): uses DEBUG level"] = function()
     child.lua([[ require('no-neck-pain').setup({debug=true}) ]])
 
     child.lua([[
@@ -212,7 +216,7 @@ T["log.debug()"]["uses DEBUG level"] = function()
     Helpers.expect.equality(level, debug_level)
 end
 
-T["log.debug()"]["formats message correctly"] = function()
+T["log.debug(): formats message correctly"] = function()
     child.lua([[ require('no-neck-pain').setup({debug=true}) ]])
 
     child.lua([[
@@ -231,9 +235,11 @@ T["log.debug()"]["formats message correctly"] = function()
     Helpers.expect.equality(msg:find("99") ~= nil, true)
 end
 
-T["log.warn_deprecation()"] = MiniTest.new_set()
+-- =============================================================================
+-- GROUP 3: log.warn_deprecation() Tests
+-- =============================================================================
 
-T["log.warn_deprecation()"]["detects enableOnVimEnter deprecation"] = function()
+T["log.warn_deprecation(): detects enableOnVimEnter deprecation"] = function()
     child.lua([[ require('no-neck-pain').setup({debug=false}) ]])
 
     child.lua([[
@@ -259,7 +265,7 @@ T["log.warn_deprecation()"]["detects enableOnVimEnter deprecation"] = function()
     Helpers.expect.equality(has_deprecation, true)
 end
 
-T["log.warn_deprecation()"]["detects toggleMapping deprecation"] = function()
+T["log.warn_deprecation(): detects toggleMapping deprecation"] = function()
     child.lua([[ require('no-neck-pain').setup({debug=false}) ]])
 
     child.lua([[
@@ -282,7 +288,7 @@ T["log.warn_deprecation()"]["detects toggleMapping deprecation"] = function()
     Helpers.expect.equality(count > 1, true)
 end
 
-T["log.warn_deprecation()"]["detects backgroundColor deprecation"] = function()
+T["log.warn_deprecation(): detects backgroundColor deprecation"] = function()
     child.lua([[ require('no-neck-pain').setup({debug=false}) ]])
 
     child.lua([[
@@ -308,7 +314,7 @@ T["log.warn_deprecation()"]["detects backgroundColor deprecation"] = function()
     Helpers.expect.equality(count > 1, true)
 end
 
-T["log.warn_deprecation()"]["detects textColor deprecation in left buffer"] = function()
+T["log.warn_deprecation(): detects textColor deprecation in left buffer"] = function()
     child.lua([[ require('no-neck-pain').setup({debug=false}) ]])
 
     child.lua([[
@@ -333,7 +339,7 @@ T["log.warn_deprecation()"]["detects textColor deprecation in left buffer"] = fu
     Helpers.expect.equality(count > 1, true)
 end
 
-T["log.warn_deprecation()"]["detects blend deprecation in right buffer"] = function()
+T["log.warn_deprecation(): detects blend deprecation in right buffer"] = function()
     child.lua([[ require('no-neck-pain').setup({debug=false}) ]])
 
     child.lua([[
@@ -358,7 +364,7 @@ T["log.warn_deprecation()"]["detects blend deprecation in right buffer"] = funct
     Helpers.expect.equality(count > 1, true)
 end
 
-T["log.warn_deprecation()"]["shows help message when deprecation found"] = function()
+T["log.warn_deprecation(): shows help message when deprecation found"] = function()
     child.lua([[ require('no-neck-pain').setup({debug=false}) ]])
 
     child.lua([[
@@ -385,7 +391,7 @@ T["log.warn_deprecation()"]["shows help message when deprecation found"] = funct
     Helpers.expect.equality(has_help, true)
 end
 
-T["log.warn_deprecation()"]["does nothing for no deprecated options"] = function()
+T["log.warn_deprecation(): does nothing for no deprecated options"] = function()
     child.lua([[ require('no-neck-pain').setup({debug=false}) ]])
 
     child.lua([[
@@ -408,7 +414,7 @@ T["log.warn_deprecation()"]["does nothing for no deprecated options"] = function
     Helpers.expect.equality(count, 0)
 end
 
-T["log.warn_deprecation()"]["handles multiple deprecated options"] = function()
+T["log.warn_deprecation(): handles multiple deprecated options"] = function()
     child.lua([[ require('no-neck-pain').setup({debug=false}) ]])
 
     child.lua([[
@@ -432,9 +438,11 @@ T["log.warn_deprecation()"]["handles multiple deprecated options"] = function()
     Helpers.expect.equality(count > 2, true)
 end
 
-T["edge cases"] = MiniTest.new_set()
+-- =============================================================================
+-- GROUP 4: edge cases Tests
+-- =============================================================================
 
-T["edge cases"]["handles empty message string"] = function()
+T["edge cases: handles empty message string"] = function()
     child.lua([[ require('no-neck-pain').setup({debug=false}) ]])
 
     child.lua([[
@@ -453,7 +461,7 @@ T["edge cases"]["handles empty message string"] = function()
     Helpers.expect.equality(count, 1)
 end
 
-T["edge cases"]["handles very long scope names"] = function()
+T["edge cases: handles very long scope names"] = function()
     child.lua([[ require('no-neck-pain').setup({debug=false}) ]])
 
     child.lua([[
@@ -473,7 +481,7 @@ T["edge cases"]["handles very long scope names"] = function()
     Helpers.expect.equality(count, 1)
 end
 
-T["edge cases"]["handles special characters in message"] = function()
+T["edge cases: handles special characters in message"] = function()
     child.lua([[ require('no-neck-pain').setup({debug=false}) ]])
 
     child.lua([[
@@ -492,7 +500,7 @@ T["edge cases"]["handles special characters in message"] = function()
     Helpers.expect.equality(count, 1)
 end
 
-T["edge cases"]["handles many format arguments"] = function()
+T["edge cases: handles many format arguments"] = function()
     child.lua([[ require('no-neck-pain').setup({debug=false}) ]])
 
     child.lua([[
@@ -511,7 +519,7 @@ T["edge cases"]["handles many format arguments"] = function()
     Helpers.expect.equality(count, 1)
 end
 
-T["edge cases"]["consecutive debug calls persist state"] = function()
+T["edge cases: consecutive debug calls persist state"] = function()
     child.lua([[ require('no-neck-pain').setup({debug=true}) ]])
 
     child.lua([[
@@ -532,7 +540,7 @@ T["edge cases"]["consecutive debug calls persist state"] = function()
     Helpers.expect.equality(count, 3)
 end
 
-T["edge cases"]["all vim log levels work"] = function()
+T["edge cases: all vim log levels work"] = function()
     child.lua([[ require('no-neck-pain').setup({debug=false}) ]])
 
     child.lua([[
@@ -555,7 +563,7 @@ T["edge cases"]["all vim log levels work"] = function()
     Helpers.expect.equality(count, 5)
 end
 
-T["edge cases"]["deprecated options with nil values are skipped"] = function()
+T["edge cases: deprecated options with nil values are skipped"] = function()
     child.lua([[ require('no-neck-pain').setup({debug=false}) ]])
 
     child.lua([[
