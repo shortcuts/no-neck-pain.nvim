@@ -11,9 +11,11 @@ local T = MiniTest.new_set({
     },
 })
 
-T["setup"] = MiniTest.new_set()
+-- =============================================================================
+-- GROUP 1: setup Tests
+-- =============================================================================
 
-T["setup"]["overrides default values"] = function()
+T["setup: overrides default values"] = function()
     child.lua([[require('no-neck-pain').setup({
         buffers = {
             scratchPad = {
@@ -34,7 +36,7 @@ T["setup"]["overrides default values"] = function()
     })
 end
 
-T["setup"]["converts deprecate options to pathToFile"] = function()
+T["setup: converts deprecate options to pathToFile"] = function()
     child.lua([[require('no-neck-pain').setup({
         buffers = {
             scratchPad = {
@@ -56,9 +58,11 @@ T["setup"]["converts deprecate options to pathToFile"] = function()
     })
 end
 
-T["scratchPad"] = MiniTest.new_set()
+-- =============================================================================
+-- GROUP 2: scratchPad Tests
+-- =============================================================================
 
-T["scratchPad"]["default to `norg` fileType"] = function()
+T["scratchPad: default to `norg` fileType"] = function()
     child.lua([[require('no-neck-pain').setup({
         width = 50,
         buffers = {
@@ -93,7 +97,7 @@ T["scratchPad"]["default to `norg` fileType"] = function()
     )
 end
 
-T["scratchPad"]["override of filetype is reflected to the buffer"] = function()
+T["scratchPad: override of filetype is reflected to the buffer"] = function()
     child.lua([[require('no-neck-pain').setup({
         width = 50,
         buffers = {
@@ -139,7 +143,7 @@ T["scratchPad"]["override of filetype is reflected to the buffer"] = function()
     )
 end
 
-T["scratchPad"]["side buffer can have their own definition"] = function()
+T["scratchPad: side buffer can have their own definition"] = function()
     child.lua([[require('no-neck-pain').setup({
         width = 50,
         buffers = {
@@ -183,7 +187,7 @@ T["scratchPad"]["side buffer can have their own definition"] = function()
     )
 end
 
-T["scratchPad"]["side buffer definition overrides global one"] = function()
+T["scratchPad: side buffer definition overrides global one"] = function()
     child.lua([[require('no-neck-pain').setup({
         width = 50,
         buffers = {
@@ -226,7 +230,7 @@ T["scratchPad"]["side buffer definition overrides global one"] = function()
     )
 end
 
-T["scratchPad"]["forwards the given filetype to the scratchPad"] = function()
+T["scratchPad: forwards the given filetype to the scratchPad"] = function()
     child.lua([[require('no-neck-pain').setup({
         width = 50,
         buffers = {
@@ -255,7 +259,7 @@ T["scratchPad"]["forwards the given filetype to the scratchPad"] = function()
     Helpers.expect.equality(child.lua_get("vim.api.nvim_buf_get_option(0, 'buftype')"), "")
 end
 
-T["scratchPad"]["toggling the scratchPad sets the buffer/window options"] = function()
+T["scratchPad: toggling the scratchPad sets the buffer/window options"] = function()
     child.lua([[require('no-neck-pain').setup({
         width = 50,
         buffers = { scratchPad = { enabled = false }, },
