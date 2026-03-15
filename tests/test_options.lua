@@ -11,9 +11,11 @@ local T = MiniTest.new_set({
     },
 })
 
-T["minSideBufferWidth"] = MiniTest.new_set()
+-- =============================================================================
+-- GROUP 1: minSideBufferWidth Tests
+-- =============================================================================
 
-T["minSideBufferWidth"]["closes side buffer respecting the given value"] = function()
+T["minSideBufferWidth: closes side buffer respecting the given value"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     child.nnp()
 
@@ -31,9 +33,11 @@ T["minSideBufferWidth"]["closes side buffer respecting the given value"] = funct
     Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1000 })
 end
 
-T["killAllBuffersOnDisable"] = MiniTest.new_set()
+-- =============================================================================
+-- GROUP 2: killAllBuffersOnDisable & fallbackOnBufferDelete Tests
+-- =============================================================================
 
-T["killAllBuffersOnDisable"]["closes every windows when disabling the plugin"] = function()
+T["killAllBuffersOnDisable: closes every windows when disabling the plugin"] = function()
     child.lua([[ require('no-neck-pain').setup({width=20,killAllBuffersOnDisable=true}) ]])
     child.nnp()
 
@@ -52,9 +56,7 @@ T["killAllBuffersOnDisable"]["closes every windows when disabling the plugin"] =
     Helpers.expect.equality(child.get_wins_in_tab(), { 1000 })
 end
 
-T["fallbackOnBufferDelete"] = MiniTest.new_set()
-
-T["fallbackOnBufferDelete"]["invoking :bd keeps nnp enabled"] = function()
+T["fallbackOnBufferDelete: invoking :bd keeps nnp enabled"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50,fallbackOnBufferDelete=true}) ]])
 
     Helpers.expect.config(child, "fallbackOnBufferDelete", true)
@@ -73,7 +75,7 @@ T["fallbackOnBufferDelete"]["invoking :bd keeps nnp enabled"] = function()
     end
 end
 
-T["fallbackOnBufferDelete"]["still allows nvim to quit"] = function()
+T["fallbackOnBufferDelete: still allows nvim to quit"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50,fallbackOnBufferDelete=true}) ]])
     child.nnp()
 
@@ -87,7 +89,7 @@ T["fallbackOnBufferDelete"]["still allows nvim to quit"] = function()
     end)
 end
 
-T["fallbackOnBufferDelete"]["invoking :bd properly resets window options"] = function()
+T["fallbackOnBufferDelete: invoking :bd properly resets window options"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50,fallbackOnBufferDelete=true}) ]])
 
     Helpers.expect.config(child, "fallbackOnBufferDelete", true)
