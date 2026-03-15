@@ -15,7 +15,7 @@ T["check if auto-enable works"] = function()
 
     local has_state = child.lua_get("_G.NoNeckPain ~= nil and _G.NoNeckPain.state ~= nil")
     MiniTest.expect.equality(has_state, true)
-    
+
     local is_enabled = child.lua_get("_G.NoNeckPain.state.enabled")
     MiniTest.expect.equality(is_enabled, true)
 end

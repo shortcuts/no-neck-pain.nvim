@@ -235,31 +235,32 @@ function main.enable(scope)
                     if #unregistered > 0 then
                         state:set_side_id(unregistered[1], "curr")
                         log.debug(s, "reassigned main window to %d", unregistered[1])
-                    elseif state:get_previously_focused_win() and vim.api.nvim_win_is_valid(state:get_previously_focused_win()) then
+                    elseif
+                        state:get_previously_focused_win()
+                        and vim.api.nvim_win_is_valid(state:get_previously_focused_win())
+                    then
                         state:set_side_id(state:get_previously_focused_win(), "curr")
-                        log.debug(s, "reassigned main window to previously focused %d", state:get_previously_focused_win())
+                        log.debug(
+                            s,
+                            "reassigned main window to previously focused %d",
+                            state:get_previously_focused_win()
+                        )
                     end
                 end
 
                 -- Check if left window is still valid
                 local left_id = state:get_side_id("left")
                 local left_was_cleared = false
-                local left_id_to_close = nil
                 if left_id and not valid_win_set[left_id] then
-                    log.debug(s, "clearing invalid left side window %d", left_id)
-                    left_id_to_close = left_id
-                    state:set_side_id(nil, "left")
+                    log.debug(s, "left side window %d is no longer valid", left_id)
                     left_was_cleared = true
                 end
 
                 -- Check if right window is still valid
                 local right_id = state:get_side_id("right")
                 local right_was_cleared = false
-                local right_id_to_close = nil
                 if right_id and not valid_win_set[right_id] then
-                    log.debug(s, "clearing invalid right side window %d", right_id)
-                    right_id_to_close = right_id
-                    state:set_side_id(nil, "right")
+                    log.debug(s, "right side window %d is no longer valid", right_id)
                     right_was_cleared = true
                 end
 
@@ -502,9 +503,7 @@ function main.enable(scope)
                 local state_ref = helpers.get_state()
                 -- If plugin was enabled before session, reinit side buffers with new layout
                 if state_ref and state_ref.enabled and state_ref:is_active_tab_registered() then
-                    -- Clear stale side window IDs that are no longer valid after session restore
-                    state_ref:set_side_id(nil, "left")
-                    state_ref:set_side_id(nil, "right")
+                    -- Preserve old side window IDs in state for auto-restore after session
                     state_ref:scan_layout("SessionLoadPost")
                     main.init("SessionLoadPost")
                 end

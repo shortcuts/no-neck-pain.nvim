@@ -808,4 +808,3 @@ T["tabnew/tabclose: closes terminal tab without affecting no-neck-pain on other 
 end
 
 return T
-

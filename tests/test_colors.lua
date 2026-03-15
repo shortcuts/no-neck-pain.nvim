@@ -134,7 +134,7 @@ T["Setup: does not throw on invalid windows"] = function()
     child.wait()
 
     Helpers.expect.equality(child.get_wins_in_tab(), { 1000, 1003, 1004, 1005 })
-    Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1000 })
+    Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1000, left = 1001, right = 1002 })
 end
 
 T["Setup: common options spreads it to left and right buffers"] = function()
