@@ -496,6 +496,24 @@ function main.enable(scope)
         desc = "Keeps track of the last focused win, and re-route if necessary",
     })
 
+    vim.api.nvim_create_autocmd({ "SessionLoadPost" }, {
+        callback = function()
+            vim.schedule(function()
+                local state_ref = helpers.get_state()
+                -- If plugin was enabled before session, reinit side buffers with new layout
+                if state_ref and state_ref.enabled and state_ref:is_active_tab_registered() then
+                    -- Clear stale side window IDs that are no longer valid after session restore
+                    state_ref:set_side_id(nil, "left")
+                    state_ref:set_side_id(nil, "right")
+                    state_ref:scan_layout("SessionLoadPost")
+                    main.init("SessionLoadPost")
+                end
+            end)
+        end,
+        group = augroup_name,
+        desc = "Re-initialize side buffers after session restore",
+    })
+
     state:save()
 
     if helpers.get_config_field("callbacks").postEnable ~= nil then
