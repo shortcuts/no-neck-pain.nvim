@@ -11,11 +11,9 @@ local T = MiniTest.new_set({
     },
 })
 
--- =============================================================================
--- GROUP 1: Setup Tests
--- =============================================================================
+T["setup"] = MiniTest.new_set()
 
-T["Setup: sets default values"] = function()
+T["setup"]["sets default values"] = function()
     child.nnp()
 
     Helpers.expect.state(child, "tabs[1].wins.integrations", {
@@ -47,7 +45,7 @@ T["Setup: sets default values"] = function()
     })
 end
 
-T["Setup: overrides default values and add new entries"] = function()
+T["setup"]["overrides default values and add new entries"] = function()
     child.lua([[require('no-neck-pain').setup({
          integrations = {
              NvimTree = {
@@ -114,11 +112,9 @@ T["Setup: overrides default values and add new entries"] = function()
     })
 end
 
--- =============================================================================
--- GROUP 2: Checkhealth Tests
--- =============================================================================
+T["checkhealth"] = MiniTest.new_set()
 
-T["Checkhealth: state is in sync"] = function()
+T["checkhealth"]["state is in sync"] = function()
     child.lua([[ require('no-neck-pain').setup({width=20}) ]])
     child.nnp()
     child.wait()
@@ -172,7 +168,7 @@ T["Checkhealth: state is in sync"] = function()
     })
 end
 
-T["Checkhealth: auto opens side buffers"] = function()
+T["checkhealth"]["auto opens side buffers"] = function()
     child.restart({ "-u", "scripts/init_auto_open.lua" })
     child.cmd("e test.lua")
     child.wait(200)
@@ -216,11 +212,9 @@ T["Checkhealth: auto opens side buffers"] = function()
     })
 end
 
--- =============================================================================
--- GROUP 3: Nvimdapui Tests
--- =============================================================================
+T["nvimdapui"] = MiniTest.new_set()
 
-T["Nvimdapui: keeps sides open"] = function()
+T["nvimdapui"]["keeps sides open"] = function()
     child.restart({ "-u", "scripts/init_with_nvimdapui.lua" })
 
     child.nnp()
@@ -250,11 +244,9 @@ T["Nvimdapui: keeps sides open"] = function()
     Helpers.expect.state(child, "tabs[1].wins.columns", 5)
 end
 
--- =============================================================================
--- GROUP 4: Neotest Tests
--- =============================================================================
+T["neotest"] = MiniTest.new_set()
 
-T["Neotest: keeps sides open"] = function()
+T["neotest"]["keeps sides open"] = function()
     child.restart({ "-u", "scripts/init_with_neotest.lua", "lua/no-neck-pain/main.lua" })
 
     child.nnp()
@@ -276,11 +268,9 @@ T["Neotest: keeps sides open"] = function()
     })
 end
 
--- =============================================================================
--- GROUP 5: Outline Tests
--- =============================================================================
+T["outline"] = MiniTest.new_set()
 
-T["Outline: keeps sides open"] = function()
+T["outline"]["keeps sides open"] = function()
     child.restart({ "-u", "scripts/init_with_outline.lua", "lua/no-neck-pain/main.lua" })
 
     child.nnp()
@@ -303,11 +293,9 @@ T["Outline: keeps sides open"] = function()
     })
 end
 
--- =============================================================================
--- GROUP 6: NvimTree Tests
--- =============================================================================
+T["NvimTree"] = MiniTest.new_set()
 
-T["NvimTree: keeps sides open"] = function()
+T["NvimTree"]["keeps sides open"] = function()
     child.restart({ "-u", "scripts/init_with_nvimtree.lua", "foo" })
 
     child.nnp()
@@ -339,11 +327,9 @@ T["NvimTree: keeps sides open"] = function()
     })
 end
 
--- =============================================================================
--- GROUP 7: Neo-tree Tests
--- =============================================================================
+T["neo-tree"] = MiniTest.new_set()
 
-T["Neo-tree: keeps sides open"] = function()
+T["neo-tree"]["keeps sides open"] = function()
     child.restart({ "-u", "scripts/init_with_neotree.lua", "foo" })
 
     child.nnp()
@@ -442,7 +428,7 @@ T["Neo-tree: keeps sides open"] = function()
     })
 end
 
-T["Neo-tree: properly enables nnp with tree already opened"] = function()
+T["neo-tree"]["properly enables nnp with tree already opened"] = function()
     child.restart({ "-u", "scripts/init_with_neotree.lua", "." })
 
     Helpers.expect.equality(child.get_wins_in_tab(1), { 1002, 1000 })
@@ -503,11 +489,9 @@ T["Neo-tree: properly enables nnp with tree already opened"] = function()
     end
 end
 
--- =============================================================================
--- GROUP 8: Aerial Tests
--- =============================================================================
+T["aerial"] = MiniTest.new_set()
 
-T["Aerial: keeps sides open"] = function()
+T["aerial"]["keeps sides open"] = function()
     if child.fn.has("nvim-0.11") == 0 then
         MiniTest.skip("aerial doesn't support version below 11")
 
@@ -554,11 +538,9 @@ T["Aerial: keeps sides open"] = function()
     })
 end
 
--- =============================================================================
--- GROUP 9: Edge Cases Tests
--- =============================================================================
+T["edge_cases"] = MiniTest.new_set()
 
-T["Edge Cases: multiple integrations on same side (left)"] = function()
+T["edge_cases"]["multiple integrations on same side (left)"] = function()
     child.set_size(10, 300)
     child.lua([[
         require('no-neck-pain').setup({
@@ -617,7 +599,7 @@ T["Edge Cases: multiple integrations on same side (left)"] = function()
     Helpers.expect.no_equality(curr_id, vim.NIL)
 end
 
-T["Edge Cases: integration appearing after NNP enabled"] = function()
+T["edge_cases"]["integration appearing after NNP enabled"] = function()
     child.set_size(10, 200)
     child.lua([[
         require('no-neck-pain').setup({
@@ -660,7 +642,7 @@ T["Edge Cases: integration appearing after NNP enabled"] = function()
     })
 end
 
-T["Edge Cases: integration window resize"] = function()
+T["edge_cases"]["integration window resize"] = function()
     child.set_size(10, 300)
     child.lua([[
         require('no-neck-pain').setup({
@@ -698,7 +680,7 @@ T["Edge Cases: integration window resize"] = function()
     Helpers.expect.no_equality(curr_id, vim.NIL)
 end
 
-T["Edge Cases: integration closing and reopening"] = function()
+T["edge_cases"]["integration closing and reopening"] = function()
     child.set_size(10, 200)
     child.lua([[
         require('no-neck-pain').setup({
@@ -751,7 +733,7 @@ T["Edge Cases: integration closing and reopening"] = function()
     Helpers.expect.no_equality(outline_win1, outline_win2)
 end
 
-T["Edge Cases: unknown integration filetype (graceful handling)"] = function()
+T["edge_cases"]["unknown integration filetype (graceful handling)"] = function()
     child.set_size(10, 200)
     child.lua([[
         require('no-neck-pain').setup({
@@ -803,7 +785,7 @@ T["Edge Cases: unknown integration filetype (graceful handling)"] = function()
     })
 end
 
-T["Edge Cases: dashboard + enableOnVimEnter safe timing"] = function()
+T["edge_cases"]["dashboard + enableOnVimEnter safe timing"] = function()
     child.restart({ "-u", "scripts/minimal_init.lua" })
 
     child.set_size(10, 200)
@@ -844,7 +826,7 @@ T["Edge Cases: dashboard + enableOnVimEnter safe timing"] = function()
     })
 end
 
-T["Edge Cases: integration width subtraction with multiple integrations"] = function()
+T["edge_cases"]["integration width subtraction with multiple integrations"] = function()
     child.set_size(10, 400)
     child.lua([[
         require('no-neck-pain').setup({
@@ -895,7 +877,7 @@ T["Edge Cases: integration width subtraction with multiple integrations"] = func
     Helpers.expect.no_equality(curr_id, vim.NIL)
 end
 
-T["Edge Cases: config override for integration position changes"] = function()
+T["edge_cases"]["config override for integration position changes"] = function()
     child.set_size(10, 200)
     child.lua([[
         require('no-neck-pain').setup({
