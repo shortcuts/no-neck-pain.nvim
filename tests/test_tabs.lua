@@ -41,9 +41,11 @@ local T = MiniTest.new_set({
     },
 })
 
-T["tabs"] = MiniTest.new_set()
+-- =============================================================================
+-- GROUP 1: tabs
+-- =============================================================================
 
-T["tabs"]["keeps the active tab in state"] = function()
+T["tabs: keeps the active tab in state"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     child.nnp()
 
@@ -55,7 +57,7 @@ T["tabs"]["keeps the active tab in state"] = function()
     Helpers.expect.state(child, "active_tab", 2)
 end
 
-T["tabs"]["new tab doesn't have side buffers"] = function()
+T["tabs: new tab doesn't have side buffers"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     child.nnp()
 
@@ -68,7 +70,7 @@ T["tabs"]["new tab doesn't have side buffers"] = function()
     Helpers.expect.equality(child.get_wins_in_tab(), { 1003 })
 end
 
-T["tabs"]["side buffers coexist on many tabs"] = function()
+T["tabs: side buffers coexist on many tabs"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     child.nnp()
 
@@ -109,7 +111,7 @@ T["tabs"]["side buffers coexist on many tabs"] = function()
     Helpers.expect.equality(child.get_wins_in_tab(3), { 1007, 1006, 1008 })
 end
 
-T["tabs"]["previous tab kept side buffers if enabled"] = function()
+T["tabs: previous tab kept side buffers if enabled"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     child.nnp()
 
@@ -131,7 +133,7 @@ T["tabs"]["previous tab kept side buffers if enabled"] = function()
     Helpers.expect.state(child, "active_tab", 1)
 end
 
-T["tabs"]["does not throw when resizing and tab isn't registered"] = function()
+T["tabs: does not throw when resizing and tab isn't registered"] = function()
     child.restart({
         "-u",
         "scripts/minimal_init.lua",
@@ -166,9 +168,11 @@ T["tabs"]["does not throw when resizing and tab isn't registered"] = function()
     Helpers.expect.state(child, "active_tab", 1)
 end
 
-T["TabEnter"] = MiniTest.new_set()
+-- =============================================================================
+-- GROUP 2: TabEnter
+-- =============================================================================
 
-T["TabEnter"]["starts the plugin on new tab"] = function()
+T["TabEnter: starts the plugin on new tab"] = function()
     child.restart({ "-u", "scripts/init_auto_open.lua" })
     child.cmd("e test.lua")
     child.wait(1000)
@@ -190,7 +194,7 @@ T["TabEnter"]["starts the plugin on new tab"] = function()
     Helpers.expect.equality(child.get_wins_in_tab(), { 1004, 1003, 1005 })
 end
 
-T["TabEnter"]["does not re-enable if the user disables it"] = function()
+T["TabEnter: does not re-enable if the user disables it"] = function()
     child.restart({ "-u", "scripts/init_auto_open.lua" })
     child.cmd("e test.lua")
     child.wait(1000)
@@ -228,7 +232,7 @@ T["TabEnter"]["does not re-enable if the user disables it"] = function()
     Helpers.expect.equality(child.get_wins_in_tab(), { 1003 })
 end
 
-T["TabEnter"]["allows re-enabling a tab manually disabled"] = function()
+T["TabEnter: allows re-enabling a tab manually disabled"] = function()
     child.restart({ "-u", "scripts/init_auto_open.lua" })
     child.cmd("e test.lua")
     child.wait(1000)
@@ -273,9 +277,11 @@ T["TabEnter"]["allows re-enabling a tab manually disabled"] = function()
     Helpers.expect.equality(child.get_wins_in_tab(), { 1006, 1003, 1007 })
 end
 
-T["tabnew/tabclose"] = MiniTest.new_set()
+-- =============================================================================
+-- GROUP 3: tabnew/tabclose
+-- =============================================================================
 
-T["tabnew/tabclose"]["opening and closing tabs does not throw any error"] = function()
+T["tabnew/tabclose: opening and closing tabs does not throw any error"] = function()
     child.restart({ "-u", "scripts/init_auto_open.lua" })
     child.cmd("e test.lua")
     child.wait(1000)
@@ -309,7 +315,7 @@ T["tabnew/tabclose"]["opening and closing tabs does not throw any error"] = func
     Helpers.expect.state(child, "active_tab", 1)
 end
 
-T["tabnew/tabclose"]["doesn't keep closed tabs in state"] = function()
+T["tabnew/tabclose: doesn't keep closed tabs in state"] = function()
     child.restart({ "-u", "scripts/init_auto_open.lua" })
     child.cmd("e test.lua")
     child.wait(100)
@@ -387,7 +393,7 @@ T["tabnew/tabclose"]["doesn't keep closed tabs in state"] = function()
     })
 end
 
-T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
+T["tabnew/tabclose: keeps state synchronized between tabs"] = function()
     child.restart({ "-u", "scripts/init_auto_open.lua" })
     child.cmd("e test.lua")
     child.wait(100)
@@ -539,7 +545,7 @@ T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
     Helpers.expect.state(child, "active_tab", 2)
 end
 
-T["tabnew/tabclose"]["does not pick tab 1 for the first active tab"] = function()
+T["tabnew/tabclose: does not pick tab 1 for the first active tab"] = function()
     child.lua([[require('no-neck-pain').setup({width=50})]])
     Helpers.expect.global_type(child, "_G.NoNeckPain.config", "table")
     Helpers.expect.global_type(child, "_G.NoNeckPain.state", "nil")
@@ -613,7 +619,7 @@ T["tabnew/tabclose"]["does not pick tab 1 for the first active tab"] = function(
     })
 end
 
-T["tabnew/tabclose"]["keep state synchronized on second tab"] = function()
+T["tabnew/tabclose: keep state synchronized on second tab"] = function()
     child.lua([[require('no-neck-pain').setup({width=50})]])
     Helpers.expect.global_type(child, "_G.NoNeckPain.config", "table")
     Helpers.expect.global_type(child, "_G.NoNeckPain.state", "nil")
@@ -682,7 +688,7 @@ T["tabnew/tabclose"]["keep state synchronized on second tab"] = function()
     Helpers.expect.state(child, "tabs", {})
 end
 
-T["tabnew/tabclose"]["does not close nvim when quitting tab if some are left"] = function()
+T["tabnew/tabclose: does not close nvim when quitting tab if some are left"] = function()
     child.lua([[require('no-neck-pain').setup({width=50})]])
 
     Helpers.expect.equality(child.api.nvim_get_current_tabpage(), 1)
@@ -747,7 +753,7 @@ T["tabnew/tabclose"]["does not close nvim when quitting tab if some are left"] =
     Helpers.expect.state(child, "tabs[2]", vim.NIL)
 end
 
-T["tabnew/tabclose"]["closes terminal tab without affecting no-neck-pain on other tabs"] = function()
+T["tabnew/tabclose: closes terminal tab without affecting no-neck-pain on other tabs"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     child.nnp()
 
@@ -802,3 +808,4 @@ T["tabnew/tabclose"]["closes terminal tab without affecting no-neck-pain on othe
 end
 
 return T
+
