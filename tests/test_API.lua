@@ -162,6 +162,9 @@ T["Setup: sets exposed methods and default options value"] = function()
             neotest = {
                 position = "right",
             },
+            oil = {
+                position = "none",
+            },
             outline = {
                 position = "right",
             },
@@ -306,6 +309,9 @@ T["Setup: overrides default values"] = function()
             },
             neotest = {
                 position = "right",
+            },
+            oil = {
+                position = "none",
             },
             outline = {
                 position = "right",

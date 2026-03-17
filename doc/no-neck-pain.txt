@@ -369,6 +369,12 @@ Default values:
               ---@type "left"|"right"
               position = "right",
           },
+          -- @link https://github.com/stevearc/oil.nvim
+          oil = {
+              -- The position of the tree.
+              ---@type "none"
+              position = "none",
+          },
           -- this is a generic field to hint no-neck-pain that you use a dashboard plugin.
           -- you can find the filetype list of natively supported dashboards here: https://github.com/shortcuts/no-neck-pain.nvim/blob/main/lua/no-neck-pain/util/constants.lua#L82-L85
           -- if a dashboard that you use isn't supported, either set `dashboard.filetype` to the expected file type, or open a pull-request with the edited list.

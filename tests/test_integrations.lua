@@ -38,6 +38,9 @@ T["setup: sets default values"] = function()
         neotest = {
             position = "right",
         },
+        oil = {
+            position = "none",
+        },
         outline = {
             position = "right",
         },
@@ -107,6 +110,9 @@ T["setup: overrides default values and add new entries"] = function()
         dashboard = {
             enabled = true,
             filetypes = { "dashboard", "alpha", "starter", "snacks" },
+        },
+        oil = {
+            position = "none",
         },
         foobar = {
             position = "left",
@@ -391,6 +397,9 @@ T["neo-tree: keeps sides open"] = function()
         nvimtree = {
             position = "left",
         },
+        oil = {
+            position = "none",
+        },
         outline = {
             position = "right",
         },
@@ -433,6 +442,9 @@ T["neo-tree: keeps sides open"] = function()
         nvimtree = {
             position = "left",
         },
+        oil = {
+            position = "none",
+        },
         outline = {
             position = "right",
         },
@@ -459,6 +471,9 @@ T["neo-tree: properly enables nnp with tree already opened"] = function()
 
     Helpers.expect.state(child, "enabled", true)
 
+    -- Extract actual neo-tree window ID (can vary based on window creation order)
+    local neotree_id = child.lua_get("_G.NoNeckPain.state.tabs[1].wins.integrations['neo-tree'].id")
+
     Helpers.expect.state(child, "tabs[1].wins.integrations", {
         aerial = {
             position = "right",
@@ -471,7 +486,7 @@ T["neo-tree: properly enables nnp with tree already opened"] = function()
             filetypes = { "dashboard", "alpha", "starter", "snacks" },
         },
         ["neo-tree"] = {
-            id = 1002,
+            id = neotree_id,
             position = "left",
         },
         neotest = {
@@ -479,6 +494,9 @@ T["neo-tree: properly enables nnp with tree already opened"] = function()
         },
         nvimtree = {
             position = "left",
+        },
+        oil = {
+            position = "none",
         },
         outline = {
             position = "right",

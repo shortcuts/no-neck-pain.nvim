@@ -25,6 +25,9 @@ local function get_integrations()
         aerial = {
             position = "right",
         },
+        oil = {
+            position = "none",
+        },
         dashboard = {
             enabled = false,
             filetypes = { "dashboard", "alpha", "starter", "snacks" },

@@ -110,7 +110,7 @@ function NoNeckPain.setup(opts)
         helpers.get_config_field("autocmds").enableOnVimEnter ~= nil
         and helpers.get_config_field("autocmds").enableOnVimEnter ~= false
     then
-        vim.api.nvim_create_autocmd({ "BufRead" }, {
+        vim.api.nvim_create_autocmd({ "BufEnter" }, {
             pattern = "*",
             callback = function()
                 local scope = string.format(
@@ -138,6 +138,84 @@ function NoNeckPain.setup(opts)
             end,
             group = "NoNeckPainVimEnterAutocmd",
             desc = "Triggers until it finds the correct moment/buffer to enable the plugin.",
+        })
+
+        -- FileType safety net: handles deferred filetype resolution
+        vim.api.nvim_create_autocmd({ "FileType" }, {
+            pattern = "*",
+            callback = function()
+                local filetype = string.lower(vim.bo.filetype)
+                local state = helpers.get_state()
+
+                -- Disable path: if enabled and filetype is integration
+                if state ~= nil and filetype ~= "" then
+                    local integrations = helpers.get_config_field("integrations")
+                    if integrations ~= nil then
+                        for key, integration_config in pairs(integrations) do
+                            local is_integration = false
+
+                            if key == "dashboard" then
+                                if integration_config.filetypes ~= nil then
+                                    for _, ftype in ipairs(integration_config.filetypes) do
+                                        if filetype == string.lower(ftype) then
+                                            is_integration = true
+                                            break
+                                        end
+                                    end
+                                end
+                            else
+                                if string.find(filetype, string.lower(key)) then
+                                    is_integration = true
+                                end
+                            end
+
+                            if is_integration then
+                                NoNeckPain.disable()
+                                pcall(vim.api.nvim_del_augroup_by_name, "NoNeckPainVimEnterAutocmd")
+                                return
+                            end
+                        end
+                    end
+                end
+
+                -- Enable path: if not yet enabled and filetype is not integration
+                if state == nil and filetype ~= "" then
+                    local integrations = helpers.get_config_field("integrations")
+                    local is_integration = false
+
+                    if integrations ~= nil then
+                        for key, integration_config in pairs(integrations) do
+                            if key == "dashboard" then
+                                if integration_config.filetypes ~= nil then
+                                    for _, ftype in ipairs(integration_config.filetypes) do
+                                        if filetype == string.lower(ftype) then
+                                            is_integration = true
+                                            break
+                                        end
+                                    end
+                                end
+                            else
+                                if string.find(filetype, string.lower(key)) then
+                                    is_integration = true
+                                    break
+                                end
+                            end
+                        end
+                    end
+
+                    if not is_integration then
+                        local scope = string.format(
+                            "enable_on_filetype:%s:%s",
+                            config.options.integrations.dashboard.enabled,
+                            config.options.autocmds.enableOnVimEnter
+                        )
+                        NoNeckPain.enable(scope)
+                        pcall(vim.api.nvim_del_augroup_by_name, "NoNeckPainVimEnterAutocmd")
+                    end
+                end
+            end,
+            group = "NoNeckPainVimEnterAutocmd",
+            desc = "Safety net for deferred filetype resolution.",
         })
     end
 
