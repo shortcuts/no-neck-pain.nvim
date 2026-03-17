@@ -204,7 +204,7 @@ function ui.create_side_buffers()
     for _, side in ipairs(constants.SIDES) do
         local scope = string.format("ui.create_side_buffers:%s", side)
         if state:is_side_enabled_and_valid(side) then
-            local padding = wins[side].padding
+            local padding = ui.get_side_width(side)
             local minWidth = helpers.get_config_field("minSideBufferWidth")
 
             log.debug(

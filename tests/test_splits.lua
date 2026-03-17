@@ -426,6 +426,35 @@ T["vsplit/split: splits and vsplits keeps a correct size"] = function()
     Helpers.expect.buf_width_in_range(child, "1003", 17, 19)
 end
 
+T["vsplit/split: side buffer widths restore after split then vsplit then close"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=20}) ]])
+    child.nnp()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+
+    -- Verify initial state with both side buffers
+    Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.left", 28, 35)
+    Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.right", 28, 35)
+
+    child.cmd("split")
+    child.cmd("vsplit")
+    child.wait()
+
+    -- After split and vsplit, side buffers should be smaller due to more columns
+    Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.left", 15, 25)
+    Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.right", 15, 25)
+
+    -- Close vsplit and split - verify main window is still centered
+    child.cmd("q")
+    child.cmd("q")
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+
+    -- After closing splits, side buffers should remain valid and proportional
+    Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.left", 10, 35)
+    Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.right", 10, 35)
+end
+
 -- =============================================================================
 -- InspectTree
 -- =============================================================================
