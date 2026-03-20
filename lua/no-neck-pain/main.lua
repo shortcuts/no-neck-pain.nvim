@@ -217,10 +217,12 @@ function main.enable(scope)
                     return
                 end
 
+                local pre_win_count = #vim.api.nvim_tabpage_list_wins(state.active_tab)
                 local init = state:scan_layout(s)
 
                 -- Validate that stored window IDs are still valid after layout change
                 local valid_wins = vim.api.nvim_tabpage_list_wins(state.active_tab)
+                local post_win_count = #valid_wins
                 local valid_win_set = {}
                 for _, win_id in ipairs(valid_wins) do
                     valid_win_set[win_id] = true
@@ -272,6 +274,7 @@ function main.enable(scope)
                         "right"
                     ) or state:is_side_the_active_win("curr"))
                     and not init
+                    and pre_win_count == post_win_count
                 then
                     return
                 end
@@ -282,6 +285,13 @@ function main.enable(scope)
                         main.disable()
                     end)
                 elseif init then
+                    api.debounce(s, main.init)
+                elseif
+                    p.event == "WinClosed"
+                    and not init
+                    and pre_win_count ~= post_win_count
+                    and not side_window_was_cleared
+                then
                     api.debounce(s, main.init)
                 end
             end)
