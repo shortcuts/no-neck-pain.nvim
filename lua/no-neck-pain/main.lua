@@ -293,6 +293,13 @@ function main.enable(scope)
                     and not side_window_was_cleared
                 then
                     api.debounce(s, main.init)
+                elseif
+                    p.event == "WinEnter"
+                    and not init
+                    and pre_win_count ~= post_win_count
+                    and not side_window_was_cleared
+                then
+                    api.debounce(s, main.init)
                 end
             end)
         end,
