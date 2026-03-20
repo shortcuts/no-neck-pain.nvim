@@ -162,6 +162,8 @@ function ui.create_side_buffers()
         right = { anchor = "SE", padding = ui.get_side_width("right") },
     }
 
+    local created_in_first_loop = {}
+
     for _, side in ipairs(constants.SIDES) do
         if
             wins[side].padding >= helpers.get_config_field("minSideBufferWidth")
@@ -198,6 +200,7 @@ function ui.create_side_buffers()
             end
 
             colors.init(state:get_side_id(side), side)
+            created_in_first_loop[side] = true
         end
     end
 
@@ -221,6 +224,12 @@ function ui.create_side_buffers()
                 log.debug(scope, "Closed side window")
             else
                 log.debug(scope, "Keeping side window (padding >= minWidth)")
+                if not created_in_first_loop[side] then
+                    local current_width = vim.api.nvim_win_get_width(state:get_side_id(side))
+                    if math.abs(current_width - padding) > 1 then
+                        state:resize_win(scope, side, padding)
+                    end
+                end
             end
         else
             log.debug(scope, "Side not enabled or valid, skipping")
