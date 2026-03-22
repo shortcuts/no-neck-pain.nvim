@@ -10,7 +10,7 @@ local main = {}
 
 -- Toggle the plugin by calling the `enable`/`disable` methods respectively.
 --
----@param scope string: internal identifier for logging purposes.
+---@param scope string: debug/trace identifier for logging (not execution scope) - used in debug output only
 ---@private
 function main.toggle(scope)
     if state:has_tabs() and state:is_active_tab_registered() then
@@ -52,7 +52,7 @@ end
 
 --- Toggles the config `${side}.enabled` and re-inits the plugin.
 ---
----@param scope string: internal identifier for logging purposes.
+---@param scope string: debug/trace identifier for logging (not execution scope) - used in debug output only
 ---@param side "left" | "right": the side to toggle.
 ---@private
 function main.toggle_side(scope, side)
@@ -75,9 +75,7 @@ function main.toggle_side(scope, side)
         state:set_side_id(nil, side)
     end
 
-    if
-        not (state:is_side_enabled_and_valid("left") or state:is_side_enabled_and_valid("right"))
-    then
+    if not (state:is_side_valid("left") or state:is_side_valid("right")) then
         helpers.set_config(
             vim.tbl_deep_extend(
                 "keep",
@@ -95,7 +93,7 @@ function main.toggle_side(scope, side)
 end
 
 --- Creates side buffers and set the tab state, focuses the `curr` window if required.
----@param scope string: internal identifier for logging purposes.
+---@param scope string: debug/trace identifier for logging (not execution scope) - used in debug output only
 ---@private
 function main.init(scope)
     if not state:is_active_tab_registered() then
@@ -108,6 +106,7 @@ function main.init(scope)
         state.active_tab,
         state:get_side_id("curr")
     )
+    -- scope is a debug identifier (e.g., "VimEnter", "WinEnter:1001") passed through for tracing, not execution control
 
     if state:consume_redraw() then
         ui.move_sides(string.format("%s:consume_redraw", scope))
@@ -116,7 +115,7 @@ function main.init(scope)
     ui.create_side_buffers()
 
     if
-        (state:is_side_the_active_win("left") or state:is_side_the_active_win("right"))
+        (state:is_side_focused("left") or state:is_side_focused("right"))
         and state:get_previously_focused_win() ~= vim.api.nvim_get_current_win()
     then
         log.debug(
@@ -144,7 +143,7 @@ end
 
 --- Initializes the plugin, sets event listeners and internal state.
 ---
----@param scope string: internal identifier for logging purposes.
+---@param scope string: debug/trace identifier for logging (not execution scope) - used in debug output only
 ---@private
 function main.enable(scope)
     state:set_active_tab(api.get_current_tab())
@@ -206,6 +205,85 @@ function main.enable(scope)
         desc = "Keeps track of the currently active tab and the tab state",
     })
 
+    -- Helper: Validates side window IDs after layout change
+    -- Returns flags indicating which side windows are still valid
+    local function validate_side_windows(scope, valid_win_set)
+        -- Check if main window is still valid
+        local curr_id = state:get_side_id("curr")
+        if curr_id and not valid_win_set[curr_id] then
+            log.debug(scope, "clearing invalid main window %d", curr_id)
+            -- Try to find a replacement window
+            local unregistered = state:get_unregistered_wins(scope)
+            if #unregistered > 0 then
+                state:set_side_id(unregistered[1], "curr")
+                log.debug(scope, "reassigned main window to %d", unregistered[1])
+            elseif
+                state:get_previously_focused_win()
+                and vim.api.nvim_win_is_valid(state:get_previously_focused_win())
+            then
+                state:set_side_id(state:get_previously_focused_win(), "curr")
+                log.debug(
+                    scope,
+                    "reassigned main window to previously focused %d",
+                    state:get_previously_focused_win()
+                )
+            end
+        end
+
+        -- Check if left window is still valid
+        local left_id = state:get_side_id("left")
+        local left_was_cleared = false
+        if left_id and not valid_win_set[left_id] then
+            log.debug(scope, "left side window %d is no longer valid", left_id)
+            left_was_cleared = true
+        end
+
+        -- Check if right window is still valid
+        local right_id = state:get_side_id("right")
+        local right_was_cleared = false
+        if right_id and not valid_win_set[right_id] then
+            log.debug(scope, "right side window %d is no longer valid", right_id)
+            right_was_cleared = true
+        end
+
+        return left_was_cleared, right_was_cleared
+    end
+
+    -- Helper: Determines if layout reinitialization is needed
+    -- Returns the action to take: "disable", "init", or nil
+    local function should_reinit(
+        event_name,
+        init,
+        pre_count,
+        post_count,
+        left_cleared,
+        right_cleared
+    )
+        local side_window_was_cleared = left_cleared or right_cleared
+
+        if side_window_was_cleared and event_name == "WinClosed" then
+            return "disable"
+        elseif init then
+            return "init"
+        elseif
+            event_name == "WinClosed"
+            and not init
+            and pre_count ~= post_count
+            and not side_window_was_cleared
+        then
+            return "init"
+        elseif
+            event_name == "WinEnter"
+            and not init
+            and pre_count ~= post_count
+            and not side_window_was_cleared
+        then
+            return "init"
+        end
+
+        return nil
+    end
+
     vim.api.nvim_create_autocmd({ "WinEnter", "WinClosed" }, {
         callback = function(p)
             local s = string.format("%s:%d", p.event, vim.api.nvim_get_current_win())
@@ -228,77 +306,36 @@ function main.enable(scope)
                     valid_win_set[win_id] = true
                 end
 
-                -- Check if main window is still valid
-                local curr_id = state:get_side_id("curr")
-                if curr_id and not valid_win_set[curr_id] then
-                    log.debug(s, "clearing invalid main window %d", curr_id)
-                    -- Try to find a replacement window
-                    local unregistered = state:get_unregistered_wins(s)
-                    if #unregistered > 0 then
-                        state:set_side_id(unregistered[1], "curr")
-                        log.debug(s, "reassigned main window to %d", unregistered[1])
-                    elseif
-                        state:get_previously_focused_win()
-                        and vim.api.nvim_win_is_valid(state:get_previously_focused_win())
-                    then
-                        state:set_side_id(state:get_previously_focused_win(), "curr")
-                        log.debug(
-                            s,
-                            "reassigned main window to previously focused %d",
-                            state:get_previously_focused_win()
-                        )
-                    end
-                end
+                local left_cleared, right_cleared = validate_side_windows(s, valid_win_set)
 
-                -- Check if left window is still valid
-                local left_id = state:get_side_id("left")
-                local left_was_cleared = false
-                if left_id and not valid_win_set[left_id] then
-                    log.debug(s, "left side window %d is no longer valid", left_id)
-                    left_was_cleared = true
-                end
-
-                -- Check if right window is still valid
-                local right_id = state:get_side_id("right")
-                local right_was_cleared = false
-                if right_id and not valid_win_set[right_id] then
-                    log.debug(s, "right side window %d is no longer valid", right_id)
-                    right_was_cleared = true
-                end
-
-                local side_window_was_cleared = left_was_cleared or right_was_cleared
-
+                -- Early exit if no changes and active window is a side buffer
                 if
                     not state.tabs[state.active_tab].redraw
-                    and (state:is_side_the_active_win("left") or state:is_side_the_active_win(
-                        "right"
-                    ) or state:is_side_the_active_win("curr"))
+                    and (state:is_side_focused("left") or state:is_side_focused("right") or state:is_side_focused(
+                        "curr"
+                    ))
                     and not init
                     and pre_win_count == post_win_count
                 then
                     return
                 end
 
-                if side_window_was_cleared and p.event == "WinClosed" then
+                -- Determine action based on layout state
+                local action = should_reinit(
+                    p.event,
+                    init,
+                    pre_win_count,
+                    post_win_count,
+                    left_cleared,
+                    right_cleared
+                )
+
+                if action == "disable" then
                     log.debug(s, "a side window was closed, disabling plugin")
                     api.debounce(s, function()
-                        main.disable()
+                        main.disable(s)
                     end)
-                elseif init then
-                    api.debounce(s, main.init)
-                elseif
-                    p.event == "WinClosed"
-                    and not init
-                    and pre_win_count ~= post_win_count
-                    and not side_window_was_cleared
-                then
-                    api.debounce(s, main.init)
-                elseif
-                    p.event == "WinEnter"
-                    and not init
-                    and pre_win_count ~= post_win_count
-                    and not side_window_was_cleared
-                then
+                elseif action == "init" then
                     api.debounce(s, main.init)
                 end
             end)
@@ -339,10 +376,9 @@ function main.enable(scope)
 
                         local opened_buffers = api.get_opened_buffers()
 
-                        -- if we are currently on a side window,
-                        -- side window options to the newly opened window
-                        -- which will override the user's default window options
-                        -- we then need to reset it to the initial value we stored at startup
+                        -- if we are currently on a side window, splitting here would leak
+                        -- side window options to the newly opened window, which would override
+                        -- the user's default window options, so we reset them to their initial value
                         if
                             api.is_side_id(state:get_side_id("left"), win)
                             or api.is_side_id(state:get_side_id("right"), win)
@@ -400,8 +436,8 @@ function main.enable(scope)
 
                 if
                     p.event == "QuitPre"
-                    and not state:is_side_enabled_and_valid("left")
-                    and not state:is_side_enabled_and_valid("right")
+                    and not state:is_side_valid("left")
+                    and not state:is_side_valid("right")
                 then
                     log.debug(s, "closed a vsplit when no side buffers were present")
 
@@ -409,11 +445,8 @@ function main.enable(scope)
                 end
 
                 if
-                    (state:is_side_enabled("left") and not state:is_side_enabled_and_valid("left"))
-                    or (
-                        state:is_side_enabled("right")
-                        and not state:is_side_enabled_and_valid("right")
-                    )
+                    (state:is_side_enabled("left") and not state:is_side_valid("left"))
+                    or (state:is_side_enabled("right") and not state:is_side_valid("right"))
                 then
                     log.debug(s, "one of the NNP side has been closed")
 
@@ -538,6 +571,7 @@ function main.enable(scope)
 end
 
 --- Disables the plugin for the given tab, clear highlight groups and autocmds, closes side buffers and resets the internal state.
+---@param scope string: debug/trace identifier for logging (not execution scope) - used in debug output only
 ---@private
 function main.disable(scope)
     if helpers.get_config_field("callbacks").preDisable ~= nil then
