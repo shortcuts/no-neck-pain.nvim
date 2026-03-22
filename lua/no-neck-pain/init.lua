@@ -149,67 +149,16 @@ function NoNeckPain.setup(opts)
 
                 -- Disable path: if enabled and filetype is integration
                 if state ~= nil and filetype ~= "" then
-                    local integrations = helpers.get_config_field("integrations")
-                    if integrations ~= nil then
-                        for key, integration_config in pairs(integrations) do
-                            local is_integration = false
-
-                            if key == "dashboard" then
-                                if integration_config.filetypes ~= nil then
-                                    for _, ftype in ipairs(integration_config.filetypes) do
-                                        if filetype == string.lower(ftype) then
-                                            is_integration = true
-                                            break
-                                        end
-                                    end
-                                end
-                            else
-                                if
-                                    string.find(filetype, string.lower(key))
-                                    and integration_config.position ~= "none"
-                                then
-                                    is_integration = true
-                                end
-                            end
-
-                            if is_integration then
-                                NoNeckPain.disable()
-                                pcall(vim.api.nvim_del_augroup_by_name, "NoNeckPainVimEnterAutocmd")
-                                return
-                            end
-                        end
+                    if helpers.is_filetype_integration(filetype) then
+                        NoNeckPain.disable()
+                        pcall(vim.api.nvim_del_augroup_by_name, "NoNeckPainVimEnterAutocmd")
+                        return
                     end
                 end
 
                 -- Enable path: if not yet enabled and filetype is not integration
                 if state == nil and filetype ~= "" then
-                    local integrations = helpers.get_config_field("integrations")
-                    local is_integration = false
-
-                    if integrations ~= nil then
-                        for key, integration_config in pairs(integrations) do
-                            if key == "dashboard" then
-                                if integration_config.filetypes ~= nil then
-                                    for _, ftype in ipairs(integration_config.filetypes) do
-                                        if filetype == string.lower(ftype) then
-                                            is_integration = true
-                                            break
-                                        end
-                                    end
-                                end
-                            else
-                                if
-                                    string.find(filetype, string.lower(key))
-                                    and integration_config.position ~= "none"
-                                then
-                                    is_integration = true
-                                    break
-                                end
-                            end
-                        end
-                    end
-
-                    if not is_integration then
+                    if not helpers.is_filetype_integration(filetype) then
                         local scope = string.format(
                             "enable_on_filetype:%s:%s",
                             config.options.integrations.dashboard.enabled,

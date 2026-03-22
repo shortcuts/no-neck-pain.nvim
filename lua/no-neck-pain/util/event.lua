@@ -75,34 +75,9 @@ function event.skip_enable(scope)
 
     local filetype = string.lower(vim.bo.filetype)
 
-    local integrations = helpers.get_config_field("integrations")
-    if integrations ~= nil then
-        for key, config in pairs(integrations) do
-            if key ~= "dashboard" then
-                log.debug(scope, "skip: find integration")
-
-                if string.find(filetype, string.lower(key)) and config.position ~= "none" then
-                    log.debug(scope, "%s is an integration", key)
-
-                    return true
-                end
-            else
-                if config.filetypes ~= nil then
-                    log.debug(scope, "skip: find dashboard")
-
-                    local dashboard_filetypes = helpers.get_config_field("integrations")
-                    if dashboard_filetypes ~= nil and dashboard_filetypes.dashboard ~= nil then
-                        for _, ft in pairs(dashboard_filetypes.dashboard.filetypes) do
-                            if string.find(filetype, string.lower(ft)) then
-                                log.debug(scope, "%s is a dashboard", ft)
-
-                                return true
-                            end
-                        end
-                    end
-                end
-            end
-        end
+    if helpers.is_filetype_integration(filetype) then
+        log.debug(scope, "skip: filetype is an integration")
+        return true
     end
 
     return false

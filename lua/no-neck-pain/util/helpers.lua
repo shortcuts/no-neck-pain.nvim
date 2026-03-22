@@ -198,4 +198,47 @@ function helpers.safe_delete_augroup(name)
     pcall(vim.api.nvim_del_augroup_by_name, name)
 end
 
+--- Checks if a given filetype matches any configured integration.
+---
+--- Iterates through the integrations config to determine if the filetype is:
+--- - A dashboard filetype (from the dashboard integration array)
+--- - A regular integration (string match on the key)
+---
+--- Returns false for integrations with position "none" (they don't affect layout).
+---
+--- @param filetype string The filetype to check (typically from vim.bo.filetype)
+--- @return boolean True if filetype matches an integration, false otherwise
+---@private
+function helpers.is_filetype_integration(filetype)
+    if filetype == "" or filetype == nil then
+        return false
+    end
+
+    local integrations = helpers.get_config_field("integrations")
+    if integrations == nil then
+        return false
+    end
+
+    for key, integration_config in pairs(integrations) do
+        if key == "dashboard" then
+            if integration_config.filetypes ~= nil then
+                for _, ftype in ipairs(integration_config.filetypes) do
+                    if filetype == string.lower(ftype) then
+                        return true
+                    end
+                end
+            end
+        else
+            if
+                string.find(filetype, string.lower(key))
+                and integration_config.position ~= "none"
+            then
+                return true
+            end
+        end
+    end
+
+    return false
+end
+
 return helpers
