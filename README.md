@@ -220,23 +220,10 @@ require("no-neck-pain").setup({
         -- When `false`, the mapping is not created.
         ---@type string
         scratchPad = "<Leader>ns",
-    },
-    --- Allows you to provide custom code to run before (pre) and after (post) no-neck-pain steps (e.g. enabling).
-    --- See |NoNeckPain.callbacks|
-    ---@type table
-    callbacks = {
-        -- Runs right before centering the buffer
-        ---@type fun(state: { enabled: boolean, active_tab: number, tabs: number[], disabled_tabs: number[], previously_focused_win: number })|nil
-        preEnable = nil,
-        -- Runs right after the buffer is centered
-        ---@type fun(state: { enabled: boolean, active_tab: number, tabs: number[], disabled_tabs: number[], previously_focused_win: number })|nil
-        postEnable = nil,
-        -- Runs right before toggling NoNeckPain off
-        ---@type fun(state: { enabled: boolean, active_tab: number, tabs: number[], disabled_tabs: number[], previously_focused_win: number })|nil
-        preDisable = nil,
-        -- Runs right after NoNeckPain has been turned off
-        ---@type fun(state: { enabled: boolean, active_tab: number, tabs: number[], disabled_tabs: number[], previously_focused_win: number })|nil
-        postDisable = nil,
+        -- Sets a global mapping to Neovim, which allows you to toggle the debug mode.
+        -- When `false`, the mapping is not created.
+        ---@type string
+        debug = "<Leader>nd",
     },
     --- Common options that are set to both side buffers.
     --- See |NoNeckPain.bufferOptions| for option scoped to the `left` and/or `right` buffer.
@@ -248,23 +235,106 @@ require("no-neck-pain").setup({
         -- Leverages the side buffers as notepads, which work like any Neovim buffer and automatically saves its content at the given `location`.
         -- note: quitting an unsaved scratchPad buffer is non-blocking, and the content is still saved.
         --- see |NoNeckPain.bufferOptionsScratchPad|
-        scratchPad = NoNeckPain.bufferOptionsScratchPad,
+        scratchPad = {
+            -- When `true`, automatically sets the following options to the side buffers:
+            -- - `autowriteall`
+            -- - `autoread`.
+            ---@type boolean
+            enabled = false,
+            -- The name of the generated file. See `location` for more information.
+            -- /!\ deprecated /!\ use `pathToFile` instead.
+            ---@type string
+            ---@example: `no-neck-pain-left.norg`
+            ---@deprecated: use `pathToFile` instead.
+            fileName = "no-neck-pain",
+            -- By default, files are saved at the same location as the current Neovim session.
+            -- note: filetype is defaulted to `norg` (https://github.com/nvim-neorg/neorg), but can be changed in `buffers.bo.filetype` or |NoNeckPain.bufferOptions| for option scoped to the `left` and/or `right` buffer.
+            -- /!\ deprecated /!\ use `pathToFile` instead.
+            ---@type string?
+            ---@example: `no-neck-pain-left.norg`
+            ---@deprecated: use `pathToFile` instead.
+            location = nil,
+            -- The path to the file to save the scratchPad content to and load it in the buffer.
+            ---@type string?
+            ---@example: `~/notes.norg`
+            pathToFile = "",
+        },
         -- colors to apply to both side buffers, for buffer scopped options @see |NoNeckPain.bufferOptions|
         --- see |NoNeckPain.bufferOptionsColors|
-        colors = NoNeckPain.bufferOptionsColors,
+        colors = {
+            -- Hexadecimal color code to override the current background color of the buffer. (e.g. #24273A)
+            -- Transparent backgrounds are supported by default.
+            -- popular theme are supported by their name:
+            -- - catppuccin-frappe
+            -- - catppuccin-frappe-dark
+            -- - catppuccin-latte
+            -- - catppuccin-latte-dark
+            -- - catppuccin-macchiato
+            -- - catppuccin-macchiato-dark
+            -- - catppuccin-mocha
+            -- - catppuccin-mocha-dark
+            -- - github-nvim-theme-dark
+            -- - github-nvim-theme-dimmed
+            -- - github-nvim-theme-light
+            -- - rose-pine
+            -- - rose-pine-dawn
+            -- - rose-pine-moon
+            -- - tokyonight-day
+            -- - tokyonight-moon
+            -- - tokyonight-night
+            -- - tokyonight-storm
+            ---@type string?
+            background = nil,
+            -- Brighten (positive) or darken (negative) the side buffers background color. Accepted values are [-1..1].
+            ---@type integer
+            blend = 0,
+            -- Hexadecimal color code to override the current text color of the buffer. (e.g. #7480c2)
+            ---@type string?
+            text = nil,
+        },
         -- Vim buffer-scoped options: any `vim.bo` options is accepted here.
         ---@see NoNeckPain.bufferOptionsBo `:h NoNeckPain.bufferOptionsBo`
-        bo = NoNeckPain.bufferOptionsBo,
+        bo = {
+            ---@type string
+            filetype = "no-neck-pain",
+            ---@type string
+            buftype = "nofile",
+            ---@type string
+            bufhidden = "hide",
+            ---@type boolean
+            buflisted = false,
+            ---@type boolean
+            swapfile = false,
+        },
         -- Vim window-scoped options: any `vim.wo` options is accepted here.
         ---@see NoNeckPain.bufferOptionsWo `:h NoNeckPain.bufferOptionsWo`
-        wo = NoNeckPain.bufferOptionsWo,
+        wo = {
+            ---@type boolean
+            cursorline = false,
+            ---@type boolean
+            cursorcolumn = false,
+            ---@type string
+            colorcolumn = "0",
+            ---@type boolean
+            number = false,
+            ---@type boolean
+            relativenumber = false,
+            ---@type boolean
+            foldenable = false,
+            ---@type boolean
+            list = false,
+            ---@type boolean
+            wrap = true,
+            ---@type boolean
+            linebreak = true,
+        },
         --- Options applied to the `left` buffer, options defined here overrides the `buffers` ones.
         ---@see NoNeckPain.bufferOptions `:h NoNeckPain.bufferOptions`
         left = NoNeckPain.bufferOptions,
         --- Options applied to the `right` buffer, options defined here overrides the `buffers` ones.
         ---@see NoNeckPain.bufferOptions `:h NoNeckPain.bufferOptions`
         right = NoNeckPain.bufferOptions,
-     },
+    },
     -- Supported integrations that might clash with `no-neck-pain.nvim`'s behavior.
     --
     -- The key of each integration must be the filetype of the integration window.
@@ -318,6 +388,12 @@ require("no-neck-pain").setup({
             ---@type "left"|"right"
             position = "right",
         },
+        -- @link https://github.com/stevearc/oil.nvim
+        oil = {
+            -- The position of the tree.
+            ---@type "none"
+            position = "none",
+        },
         -- this is a generic field to hint no-neck-pain that you use a dashboard plugin.
         -- you can find the filetype list of natively supported dashboards here: https://github.com/shortcuts/no-neck-pain.nvim/blob/main/lua/no-neck-pain/util/constants.lua#L82-L85
         -- if a dashboard that you use isn't supported, either set `dashboard.filetype` to the expected file type, or open a pull-request with the edited list.
@@ -329,7 +405,23 @@ require("no-neck-pain").setup({
             filetypes = { "dashboard", "alpha", "starter", "snacks" },
         },
     },
-,
+    --- Allows you to provide custom code to run before (pre) and after (post) no-neck-pain steps (e.g. enabling).
+    --- See |NoNeckPain.callbacks|
+    ---@type table
+    callbacks = {
+        -- Runs right before centering the buffer
+        ---@type fun(state: { enabled: boolean, active_tab: number, tabs: number[], disabled_tabs: number[], previously_focused_win: number })|nil
+        preEnable = nil,
+        -- Runs right after the buffer is centered
+        ---@type fun(state: { enabled: boolean, active_tab: number, tabs: number[], disabled_tabs: number[], previously_focused_win: number })|nil
+        postEnable = nil,
+        -- Runs right before toggling NoNeckPain off
+        ---@type fun(state: { enabled: boolean, active_tab: number, tabs: number[], disabled_tabs: number[], previously_focused_win: number })|nil
+        preDisable = nil,
+        -- Runs right after NoNeckPain has been turned off
+        ---@type fun(state: { enabled: boolean, active_tab: number, tabs: number[], disabled_tabs: number[], previously_focused_win: number })|nil
+        postDisable = nil,
+    },
 })
 
 --- NoNeckPain's buffer `vim.wo` options.
