@@ -164,7 +164,10 @@ function NoNeckPain.setup(opts)
                                     end
                                 end
                             else
-                                if string.find(filetype, string.lower(key)) then
+                                if
+                                    string.find(filetype, string.lower(key))
+                                    and integration_config.position ~= "none"
+                                then
                                     is_integration = true
                                 end
                             end
@@ -195,7 +198,10 @@ function NoNeckPain.setup(opts)
                                     end
                                 end
                             else
-                                if string.find(filetype, string.lower(key)) then
+                                if
+                                    string.find(filetype, string.lower(key))
+                                    and integration_config.position ~= "none"
+                                then
                                     is_integration = true
                                     break
                                 end

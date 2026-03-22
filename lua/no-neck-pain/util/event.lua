@@ -81,7 +81,7 @@ function event.skip_enable(scope)
             if key ~= "dashboard" then
                 log.debug(scope, "skip: find integration")
 
-                if string.find(filetype, string.lower(key)) then
+                if string.find(filetype, string.lower(key)) and config.position ~= "none" then
                     log.debug(scope, "%s is an integration", key)
 
                     return true
