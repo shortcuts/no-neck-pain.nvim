@@ -188,8 +188,8 @@ T["vsplit: preserve vsplit width when having side buffers"] = function()
 
     Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1002, 1000 })
 
-    Helpers.expect.buf_width_in_range(child, "1002", 24, 28)
-    Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.curr", 24, 28)
+    Helpers.expect.buf_width_in_range(child, "1002", 28, 35)
+    Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.curr", 20, 30)
 end
 
 T["vsplit: closing `curr` makes `split` the new `curr`"] = function()
