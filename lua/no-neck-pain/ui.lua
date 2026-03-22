@@ -9,7 +9,7 @@ local ui = {}
 
 --- Initializes the given `side` with the options from the user given configuration.
 ---@param side "left"|"right"|"curr": the side of the window to initialize.
----@param id number: the id of the window.
+---@param id number?: the id of the window.
 ---@private
 function ui.init_side_options(side, id)
     local bufid = vim.api.nvim_win_get_buf(id)
@@ -65,7 +65,7 @@ end
 --- Closes a window if it's valid.
 ---
 ---@param scope string: the scope from where this function is called.
----@param id number: the id of the window.
+---@param id number?: the id of the window.
 ---@param side "left"|"right": the side of the window being closed, used for logging only.
 ---@private
 function ui.close_win(scope, id, side)
@@ -79,7 +79,7 @@ end
 --- Sets options to the side buffers to toggle the scratch_pad.
 ---
 ---@param side "left"|"right": the side of the window being resized, used for logging only.
----@param id number: the side window Idebug.
+---@param id number?: the side window id.
 ---@param cleanup boolean?: cleanup the given buffer
 ---@private
 function ui.init_scratch_pad(side, id, cleanup)

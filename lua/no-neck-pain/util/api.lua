@@ -179,8 +179,8 @@ end
 ---@param start_idx number: the idx to start from in `wins`.
 ---@param step -1|1: the walk direction in `wins`, from `start_idx`.
 ---@param wins table: the table of wins ids to walk in.
----@param current_side number: the `left` or `right` side id.
----@param other_side number: the `left` or `right` side id.
+---@param current_side number?: the `left` or `right` side id.
+---@param other_side number?: the `left` or `right` side id.
 ---@param previously_focused number: the previously focused window.
 ---@return number?
 ---@private
