@@ -1,3 +1,9 @@
+--- Vim API utilities and debouncing helpers
+---
+--- Provides debouncing, window utilities, and Vim API wrappers for common operations.
+---
+---@module "no-neck-pain.util.api"
+
 local log = require("no-neck-pain.util.log")
 local helpers = require("no-neck-pain.util.helpers")
 
@@ -84,7 +90,12 @@ end
 --- Invocation will be rescheduled while a callback is being executed.
 --- Caller must ensure that callback performs the same or functionally equivalent actions.
 ---
----@param context string: identifies the callback to debounce.
+--- Usage patterns:
+--- - Direct reference (no args needed): api.debounce("context", main.toggle)
+--- - Wrapper (args needed): api.debounce("context", function(scope) main.init(scope) end)
+--- - Custom timeout: api.debounce("context", callback, 5)
+---
+---@param context string: logging context identifier (e.g., "public_api_toggle", "WinEnter:1001") - for debug tracing, not execution control
 ---@param callback function: to execute on completion.
 ---@param timeout number?: ms to wait for before execution.
 ---@private
@@ -121,6 +132,7 @@ function api.debounce(context, callback, timeout)
 
         debouncer.executing = true
         vim.schedule(function()
+            -- context is passed to log.debug for trace/debug output only
             log.debug(context, ">> debouncer triggered")
             callback(context)
             debouncer.executing = false

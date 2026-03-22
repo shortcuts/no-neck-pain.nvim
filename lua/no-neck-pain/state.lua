@@ -1,3 +1,9 @@
+--- Global state management for the plugin
+---
+--- Tracks tabs, windows, integrations, and layout state across editor sessions.
+---
+---@module "no-neck-pain.state"
+
 local api = require("no-neck-pain.util.api")
 local log = require("no-neck-pain.util.log")
 local helpers = require("no-neck-pain.util.helpers")
@@ -293,6 +299,11 @@ end
 ----- side buffers =======================================================
 ---@private
 
+--- Side window state queries:
+--- - is_side_enabled: checks if enabled in config
+--- - is_side_valid: checks if window is created and valid
+--- - is_side_focused: checks if window is currently focused
+
 --- Whether the side is enabled in the config or not.
 ---
 ---@param side "left"|"right"|"curr": the side of the window.
@@ -311,7 +322,7 @@ end
 ---@param side "left"|"right"|"curr": the side of the window.
 ---@return boolean
 ---@private
-function state:is_side_enabled_and_valid(side)
+function state:is_side_valid(side)
     if side ~= "curr" and not self:is_side_enabled(side) then
         return false
     end
@@ -321,12 +332,12 @@ function state:is_side_enabled_and_valid(side)
     return id ~= nil and vim.api.nvim_win_is_valid(id)
 end
 
---- Whether the side window is the currently active one or not.
+--- Whether the side window is the currently focused one or not.
 ---
 ---@param side "left"|"right"|"curr": the side of the window.
 ---@return boolean
 ---@private
-function state:is_side_the_active_win(side)
+function state:is_side_focused(side)
     return vim.api.nvim_get_current_win() == self:get_side_id(side)
 end
 

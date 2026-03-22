@@ -1,3 +1,9 @@
+--- Event handling and skip logic for autocmds
+---
+--- Determines when to skip events and when the plugin should be enabled based on context.
+---
+---@module "no-neck-pain.util.event"
+
 local log = require("no-neck-pain.util.log")
 local api = require("no-neck-pain.util.api")
 local state = require("no-neck-pain.state")
