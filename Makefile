@@ -42,6 +42,7 @@ documentation-ci: deps documentation
 
 lint:
 	stylua . -g '*.lua' -g '!deps/' -g '!nightly/'
+	make luals
 
 luals-ci:
 	rm -rf .ci/lua-ls/log

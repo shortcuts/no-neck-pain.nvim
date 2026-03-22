@@ -420,6 +420,39 @@ Usage ~
 
 ==============================================================================
 ------------------------------------------------------------------------------
+Global state management for the plugin
+
+Tracks tabs, windows, integrations, and layout state across editor sessions.
+
+"no-neck-pain.state"
+
+------------------------------------------------------------------------------
+Side window state queries:
+- is_side_enabled: checks if enabled in config
+- is_side_valid: checks if window is created and valid
+- is_side_focused: checks if window is currently focused
+
+
+==============================================================================
+------------------------------------------------------------------------------
+Vim API utilities and debouncing helpers
+
+Provides debouncing, window utilities, and Vim API wrappers for common operations.
+
+"no-neck-pain.util.api"
+
+
+==============================================================================
+------------------------------------------------------------------------------
+Event handling and skip logic for autocmds
+
+Determines when to skip events and when the plugin should be enabled based on context.
+
+"no-neck-pain.util.event"
+
+
+==============================================================================
+------------------------------------------------------------------------------
 Utility helpers module for no-neck-pain.nvim
 
 This module provides helper functions for common patterns used throughout

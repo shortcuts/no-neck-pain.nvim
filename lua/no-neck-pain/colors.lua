@@ -138,11 +138,11 @@ function colors.init(win, side)
         return log.debug("colors.init", "config not initialized")
     end
 
-    if
-        config[side].colors.background == nil
-        and config[side].colors.text == nil
-        and config[side].colors.blend == 0
-    then
+    local has_custom_colors = config[side].colors.background ~= nil
+        or config[side].colors.text ~= nil
+        or config[side].colors.blend ~= 0
+
+    if not has_custom_colors then
         return log.debug("colors.init", "skipping color initialization for side %s", side)
     end
 

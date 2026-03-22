@@ -12,6 +12,9 @@ local ui = {}
 ---@param id number?: the id of the window.
 ---@private
 function ui.init_side_options(side, id)
+    if id == nil then
+        return
+    end
     local bufid = vim.api.nvim_win_get_buf(id)
 
     for opt, val in pairs(helpers.get_config_field("buffers")[side].bo) do
@@ -83,6 +86,9 @@ end
 ---@param cleanup boolean?: cleanup the given buffer
 ---@private
 function ui.init_scratch_pad(side, id, cleanup)
+    if id == nil then
+        return
+    end
     if not helpers.get_config_field("buffers")[side].enabled then
         return
     end
@@ -167,7 +173,7 @@ function ui.create_side_buffers()
     for _, side in ipairs(constants.SIDES) do
         if
             wins[side].padding >= helpers.get_config_field("minSideBufferWidth")
-            and not state:is_side_enabled_and_valid(side)
+            and not state:is_side_valid(side)
             and wins[side].padding > 0
         then
             local bufid = vim.api.nvim_create_buf(false, false)
@@ -206,7 +212,7 @@ function ui.create_side_buffers()
 
     for _, side in ipairs(constants.SIDES) do
         local scope = string.format("ui.create_side_buffers:%s", side)
-        if state:is_side_enabled_and_valid(side) then
+        if state:is_side_valid(side) then
             local padding = ui.get_side_width(side)
             local minWidth = helpers.get_config_field("minSideBufferWidth")
 
@@ -275,7 +281,7 @@ function ui.get_side_width(side)
     log.debug(scope, "%d width available, %d vsplit columns", width, columns)
 
     for _, _side in pairs(constants.SIDES) do
-        if state:is_side_enabled_and_valid(_side) then
+        if state:is_side_valid(_side) then
             columns = columns - 1
         end
     end
