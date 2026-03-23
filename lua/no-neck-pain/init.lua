@@ -189,6 +189,32 @@ function NoNeckPain.setup(opts)
             desc = "Enables the plugin when entering a new tab.",
         })
     end
+
+    vim.api.nvim_create_autocmd({ "SourceCmd" }, {
+        callback = function(p)
+            if string.match(p.file or "", "%.vim$") then
+                main.signal_session_restore_start()
+                vim.cmd("source " .. p.file)
+            end
+        end,
+        group = "NoNeckPainAutocmd",
+        desc = "Detect session restore from :source command",
+    })
+
+    vim.api.nvim_create_autocmd({ "SessionLoadPost" }, {
+        callback = function(p)
+            vim.schedule(function()
+                main.signal_session_restore_complete()
+                local state_ref = helpers.get_state()
+                if state_ref and state_ref:is_active_tab_registered() then
+                    state_ref:scan_layout("SessionLoadPost")
+                    main.init("SessionLoadPost")
+                end
+            end)
+        end,
+        group = "NoNeckPainAutocmd",
+        desc = "Restore plugin state after session load",
+    })
 end
 
 _G.NoNeckPain = NoNeckPain

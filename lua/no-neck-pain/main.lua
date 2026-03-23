@@ -8,6 +8,16 @@ local helpers = require("no-neck-pain.util.helpers")
 
 local main = {}
 
+local session_restore_in_progress = false
+
+function main.signal_session_restore_start()
+    session_restore_in_progress = true
+end
+
+function main.signal_session_restore_complete()
+    session_restore_in_progress = false
+end
+
 -- Toggle the plugin by calling the `enable`/`disable` methods respectively.
 --
 ---@param scope string: debug/trace identifier for logging (not execution scope) - used in debug output only
@@ -626,9 +636,9 @@ function main.disable(scope)
 
         log.debug(scope, "no more active tabs left, reinitializing state")
 
-        -- SAFE: state:init() resets tabs but preserves namespaces, so they're still available
-        -- for state:remove_namespace() calls below which need self.namespaces intact
-        state:init()
+        if not session_restore_in_progress then
+            state:init()
+        end
     end
 
     for side, id in pairs(sides) do
