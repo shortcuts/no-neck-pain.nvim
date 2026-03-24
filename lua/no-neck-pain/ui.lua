@@ -46,7 +46,7 @@ function ui.move_sides(scope)
             local wins = vim.api.nvim_tabpage_list_wins(state.active_tab)
             local curr = vim.api.nvim_get_current_win()
 
-            if curr ~= id then
+            if curr ~= id and vim.api.nvim_win_is_valid(id) then
                 vim.api.nvim_set_current_win(id)
             end
 
@@ -107,7 +107,9 @@ function ui.init_scratch_pad(side, id, cleanup)
 
     -- Switch to the side window before editing the buffer
     local curr_win = vim.api.nvim_get_current_win()
-    vim.api.nvim_set_current_win(id)
+    if vim.api.nvim_win_is_valid(id) then
+        vim.api.nvim_set_current_win(id)
+    end
 
     local scratchpad_config = helpers.get_config_field("buffers")[side].scratchPad
     local path = scratchpad_config.pathToFile
