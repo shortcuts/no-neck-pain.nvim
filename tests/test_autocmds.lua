@@ -461,4 +461,149 @@ T["RaceConditions: window focus changes during disable"] = function()
     Helpers.expect.state(child, "enabled", false)
 end
 
+-- =============================================================================
+-- GROUP 4: Focus Invariant Tests
+-- =============================================================================
+
+T["FocusInvariant: focus never on side after init (both sides enabled)"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
+    child.nnp()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+    Helpers.expect.state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
+
+    -- Assert focus is on main buffer, never on sides
+    local current_win = child.api.nvim_get_current_win()
+    local left_id = child.lua_get("_G.NoNeckPain.state.tabs[1].wins.main.left")
+    local right_id = child.lua_get("_G.NoNeckPain.state.tabs[1].wins.main.right")
+    local curr_id = child.lua_get("_G.NoNeckPain.state.tabs[1].wins.main.curr")
+
+    Helpers.expect.equality(current_win, curr_id)
+    if current_win == left_id then
+        error("Focus is on left side buffer - invariant violated")
+    end
+    if current_win == right_id then
+        error("Focus is on right side buffer - invariant violated")
+    end
+end
+
+T["FocusInvariant: focus never on side after init (single side - right disabled)"] = function()
+    child.lua(
+        [[ require('no-neck-pain').setup({width=50, buffers = { right = { enabled = false } }}) ]]
+    )
+    child.nnp()
+
+    Helpers.expect.config(child, "buffers.right.enabled", false)
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000 })
+    Helpers.expect.state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+    })
+
+    -- Assert focus is on main buffer, not on the left side
+    local current_win = child.api.nvim_get_current_win()
+    local left_id = child.lua_get("_G.NoNeckPain.state.tabs[1].wins.main.left")
+    local curr_id = child.lua_get("_G.NoNeckPain.state.tabs[1].wins.main.curr")
+
+    Helpers.expect.equality(current_win, curr_id)
+    if current_win == left_id then
+        error("Focus is on left side buffer with single-side layout - invariant violated")
+    end
+end
+
+T["FocusInvariant: focus restored after VimResized"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
+    child.nnp()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+
+    local curr_id = child.lua_get("_G.NoNeckPain.state.tabs[1].wins.main.curr")
+    Helpers.expect.equality(child.api.nvim_get_current_win(), curr_id)
+
+    -- Trigger VimResized event
+    child.cmd("doautocmd VimResized")
+    child.wait(200)
+
+    -- Assert focus is still on main buffer after resize
+    local current_win = child.api.nvim_get_current_win()
+    local left_id = child.lua_get("_G.NoNeckPain.state.tabs[1].wins.main.left")
+    local right_id = child.lua_get("_G.NoNeckPain.state.tabs[1].wins.main.right")
+    local curr_id_after = child.lua_get("_G.NoNeckPain.state.tabs[1].wins.main.curr")
+
+    Helpers.expect.equality(current_win, curr_id_after)
+    if current_win == left_id then
+        error("Focus leaked to left side buffer after VimResized - invariant violated")
+    end
+    if current_win == right_id then
+        error("Focus leaked to right side buffer after VimResized - invariant violated")
+    end
+end
+
+T["FocusInvariant: skipEnteringNoNeckPainBuffer guards focus on WinEnter"] = function()
+    child.lua(
+        [[ require('no-neck-pain').setup({width=50, autocmds = { skipEnteringNoNeckPainBuffer = true }}) ]]
+    )
+    child.nnp()
+
+    Helpers.expect.config(child, "autocmds.skipEnteringNoNeckPainBuffer", true)
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+    Helpers.expect.equality(child.api.nvim_get_current_win(), 1000)
+
+    -- Attempt to focus left side buffer directly
+    child.fn.win_gotoid(1001)
+    child.wait()
+
+    -- Assert focus was rerouted away from side buffer
+    local current_win = child.api.nvim_get_current_win()
+    Helpers.expect.equality(current_win, 1000)
+    if current_win == 1001 then
+        error("skipEnteringNoNeckPainBuffer did not reroute focus from left side")
+    end
+
+    -- Attempt to focus right side buffer directly
+    child.fn.win_gotoid(1002)
+    child.wait()
+
+    -- Assert focus was rerouted away from side buffer
+    current_win = child.api.nvim_get_current_win()
+    Helpers.expect.equality(current_win, 1000)
+    if current_win == 1002 then
+        error("skipEnteringNoNeckPainBuffer did not reroute focus from right side")
+    end
+end
+
+T["FocusInvariant: focus invariant respects scratchPad exception"] = function()
+    child.lua(
+        [[ require('no-neck-pain').setup({width=50, buffers = { scratchPad = { enabled = true } }, autocmds = { skipEnteringNoNeckPainBuffer = true }}) ]]
+    )
+    child.nnp()
+
+    Helpers.expect.config(child, "buffers.left.scratchPad.enabled", true)
+    Helpers.expect.config(child, "buffers.right.scratchPad.enabled", true)
+    Helpers.expect.config(child, "autocmds.skipEnteringNoNeckPainBuffer", true)
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+    Helpers.expect.equality(child.api.nvim_get_current_win(), 1000)
+
+    -- Focus the left side buffer (scratchPad)
+    child.fn.win_gotoid(1001)
+    child.wait(200)
+
+    -- Assert focus is ALLOWED to stay on side buffer (scratchPad exception)
+    local current_win = child.api.nvim_get_current_win()
+    Helpers.expect.equality(current_win, 1001)
+
+    -- Focus the right side buffer (scratchPad)
+    child.fn.win_gotoid(1002)
+    child.wait(200)
+
+    -- Assert focus is ALLOWED to stay on side buffer (scratchPad exception)
+    current_win = child.api.nvim_get_current_win()
+    Helpers.expect.equality(current_win, 1002)
+end
+
 return T
