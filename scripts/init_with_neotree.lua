@@ -17,7 +17,7 @@ require("neo-tree").setup({
         width = 30,
     },
 })
-require("mini.test").setup()
+require("mini.test").setup({silent=true})
 require("no-neck-pain").setup({
     width = 5,
     minSideBufferWidth = 0,

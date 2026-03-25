@@ -4,7 +4,7 @@ vim.cmd("set rtp+=deps/mini.nvim")
 vim.cmd("set rtp+=deps/nvim-web-devicons")
 vim.cmd("set rtp+=deps/incline")
 
-require("mini.test").setup()
+require("mini.test").setup({silent=true})
 require("no-neck-pain").setup({
     width = 1,
     minSideBufferWidth = 0,

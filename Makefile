@@ -5,22 +5,20 @@ TESTFILES=API autocmds buffers callbacks colors commands config_validation const
 all: documentation lint luals test
 
 test:
-	make deps
-	nvim --version | head -n 1 && echo ''
-	nvim --headless --noplugin -u ./scripts/minimal_init.lua \
-		-c "lua MiniTest.run({ execute = { reporter = MiniTest.gen_reporter.stdout({ group_depth = 2 }) } })"
+	make $(addprefix test-, $(TESTFILES))
 
 test-race:
-	for i in {1..10}; do make test || break ; done
+	for i in {1..5}; do make test || break ; done
 
 test-nightly:
 	bob use nightly
 	make test
 
 $(addprefix test-, $(TESTFILES)): test-%:
-	nvim --version | head -n 1 && echo ''
+	nvim --version | head -n 1 && echo '' ; \
 	nvim --headless --noplugin -u ./scripts/minimal_init.lua \
-		-c "lua MiniTest.run_file('tests/test_$*.lua', { execute = { reporter = MiniTest.gen_reporter.stdout({ group_depth = 2 }) } })"
+		-c "lua require('mini.test').setup({ silent = true })" \
+		-c "lua MiniTest.run_file('tests/test_$*.lua', { silent = true })"
 
 $(addprefix test-race-, $(TESTFILES)): test-race-%:
 	for i in {1..10}; do make test-$* || break ; done

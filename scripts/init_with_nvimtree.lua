@@ -4,7 +4,7 @@ vim.cmd("set rtp+=deps/mini.nvim")
 vim.cmd("set rtp+=deps/nvimtree")
 
 require("nvim-tree").setup({ view = { width = 1 } })
-require("mini.test").setup()
+require("mini.test").setup({silent=true})
 require("no-neck-pain").setup({
     width = 20,
     minSideBufferWidth = 0,

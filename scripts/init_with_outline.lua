@@ -3,7 +3,7 @@ vim.cmd([[let &rtp.=','.getcwd()]])
 vim.cmd("set rtp+=deps/mini.nvim")
 vim.cmd("set rtp+=deps/outline")
 
-require("mini.test").setup()
+require("mini.test").setup({silent=true})
 require("outline").setup()
 require("no-neck-pain").setup({
     width = 20,

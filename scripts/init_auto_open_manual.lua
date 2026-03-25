@@ -19,4 +19,4 @@ vim.api.nvim_create_autocmd({ "BufEnter" }, {
     end,
 })
 
-require("mini.test").setup()
+require("mini.test").setup({silent=true})

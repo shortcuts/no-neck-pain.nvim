@@ -14,4 +14,4 @@ require("no-neck-pain").setup({
 -- Explicitly enable to initialize state before tests run
 require("no-neck-pain").enable()
 
-require("mini.test").setup()
+require("mini.test").setup({silent=true})
