@@ -148,14 +148,6 @@ function main.init(scope)
         end
     end
 
-    -- Ensure focus is always on the main buffer after init, never on a side.
-    -- This is a safety net that guarantees focus restoration even if conditional
-    -- rerouting above fails or doesn't trigger.
-    local curr = state:get_side_id("curr")
-    if curr and vim.api.nvim_win_is_valid(curr) then
-        vim.api.nvim_set_current_win(curr)
-    end
-
     state:save()
 end
 

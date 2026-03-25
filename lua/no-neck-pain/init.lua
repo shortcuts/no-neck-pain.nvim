@@ -191,11 +191,10 @@ function NoNeckPain.setup(opts)
     end
 
     vim.api.nvim_create_autocmd({ "SourceCmd" }, {
+        pattern = "*.vim",
         callback = function(p)
-            if string.match(p.file or "", "%.vim$") then
-                main.signal_session_restore_start()
-                vim.cmd("source " .. p.file)
-            end
+            main.signal_session_restore_start()
+            vim.cmd("source " .. p.file)
         end,
         group = "NoNeckPainAutocmd",
         desc = "Detect session restore from :source command",
