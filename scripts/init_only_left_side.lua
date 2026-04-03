@@ -12,4 +12,4 @@ require("no-neck-pain").setup({
     mappings = { enabled = true },
     buffers = { right = { enabled = false } },
 })
-require("mini.test").setup({silent=true})
+require("mini.test").setup({ silent = true })

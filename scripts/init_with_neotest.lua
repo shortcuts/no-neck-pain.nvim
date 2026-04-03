@@ -10,7 +10,7 @@ require("neotest").setup({
     floating = { max_width = 0.1 },
     strategies = { integrated = { width = 1 } },
 })
-require("mini.test").setup({silent=true})
+require("mini.test").setup({ silent = true })
 require("no-neck-pain").setup({
     width = 10,
     minSideBufferWidth = 0,

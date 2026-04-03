@@ -6,7 +6,7 @@ vim.cmd("set rtp+=deps/nvimdap")
 vim.cmd("set rtp+=deps/nvimdapui")
 
 require("dapui").setup()
-require("mini.test").setup({silent=true})
+require("mini.test").setup({ silent = true })
 require("no-neck-pain").setup({
     width = 1,
     minSideBufferWidth = 0,

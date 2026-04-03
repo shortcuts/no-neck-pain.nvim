@@ -23,4 +23,4 @@ require("no-neck-pain").setup({
         end,
     },
 })
-require("mini.test").setup({silent=true})
+require("mini.test").setup({ silent = true })
