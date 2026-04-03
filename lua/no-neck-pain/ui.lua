@@ -196,6 +196,7 @@ function ui.create_side_buffers()
                     split = side,
                     anchor = wins[side].anchor,
                     width = wins[side].padding,
+                    noautocmd = true,
                 }),
                 side
             )

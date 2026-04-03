@@ -256,9 +256,7 @@ function main.enable(scope)
                     )
                 end
 
-                vim.schedule(function()
-                    vim.api.nvim_set_current_win(new_focus)
-                end)
+                vim.api.nvim_set_current_win(new_focus)
 
                 return log.debug(p.event, "rerouted focus of %d to %d", current_side, new_focus)
             end)
