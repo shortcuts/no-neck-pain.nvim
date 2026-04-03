@@ -366,7 +366,10 @@ function main.enable(scope)
             -- If both sides were already nil, the clearing detected is from stale window checks
             -- Allow reinit to potentially recreate sides
             if left_id_before == nil and right_id_before == nil then
-                log.debug("should_reinit", "side was cleared but both IDs were already nil, allowing init")
+                log.debug(
+                    "should_reinit",
+                    "side was cleared but both IDs were already nil, allowing init"
+                )
                 -- Continue to check other conditions instead of returning "disable"
             else
                 -- At least one side was actually valid and just got cleared
@@ -452,7 +455,11 @@ function main.enable(scope)
                     end)
                 elseif action == "init" then
                     local current_win = vim.api.nvim_get_current_win()
-                    if not api.is_relative_window(current_win) and not state:is_side_focused("left") and not state:is_side_focused("right") then
+                    if
+                        not api.is_relative_window(current_win)
+                        and not state:is_side_focused("left")
+                        and not state:is_side_focused("right")
+                    then
                         state:set_previously_focused_win(current_win)
                     end
                     api.debounce(s, main.init)
