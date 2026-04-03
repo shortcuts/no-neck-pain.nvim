@@ -352,12 +352,26 @@ function main.enable(scope)
         pre_count,
         post_count,
         left_cleared,
-        right_cleared
+        right_cleared,
+        left_id_before,
+        right_id_before
     )
         local side_window_was_cleared = left_cleared or right_cleared
 
+        -- When a side window is detected as cleared on WinClosed, check if it was already
+        -- nil before the event (squeezed out by create_side_buffers due to space).
+        -- If both IDs were already nil, this is a stale WinClosed event and we should
+        -- allow reinitialization to potentially recreate the sides if space is available.
         if side_window_was_cleared and event_name == "WinClosed" then
-            return "disable"
+            -- If both sides were already nil, the clearing detected is from stale window checks
+            -- Allow reinit to potentially recreate sides
+            if left_id_before == nil and right_id_before == nil then
+                log.debug("should_reinit", "side was cleared but both IDs were already nil, allowing init")
+                -- Continue to check other conditions instead of returning "disable"
+            else
+                -- At least one side was actually valid and just got cleared
+                return "disable"
+            end
         elseif init then
             return "init"
         elseif
@@ -393,6 +407,10 @@ function main.enable(scope)
                 local pre_win_count = #vim.api.nvim_tabpage_list_wins(state.active_tab)
                 local init = state:scan_layout(s)
 
+                -- Capture side IDs before validation to detect if they were already nil
+                local left_id_before = state:get_side_id("left")
+                local right_id_before = state:get_side_id("right")
+
                 -- Validate that stored window IDs are still valid after layout change
                 local valid_wins = vim.api.nvim_tabpage_list_wins(state.active_tab)
                 local post_win_count = #valid_wins
@@ -422,7 +440,9 @@ function main.enable(scope)
                     pre_win_count,
                     post_win_count,
                     left_cleared,
-                    right_cleared
+                    right_cleared,
+                    left_id_before,
+                    right_id_before
                 )
 
                 if action == "disable" then
@@ -431,6 +451,10 @@ function main.enable(scope)
                         main.disable(s)
                     end)
                 elseif action == "init" then
+                    local current_win = vim.api.nvim_get_current_win()
+                    if not api.is_relative_window(current_win) and not state:is_side_focused("left") and not state:is_side_focused("right") then
+                        state:set_previously_focused_win(current_win)
+                    end
                     api.debounce(s, main.init)
                 end
             end)
@@ -531,8 +555,7 @@ function main.enable(scope)
 
                 if
                     p.event == "QuitPre"
-                    and not state:is_side_valid("left")
-                    and not state:is_side_valid("right")
+                    and (not state:is_side_valid("left") or not state:is_side_valid("right"))
                 then
                     log.debug(s, "closed a vsplit when no side buffers were present")
 
