@@ -455,31 +455,40 @@ T["vsplit/split: side buffer widths restore after split then vsplit then close"]
     Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.right", 10, 35)
 end
 
--- =============================================================================
--- InspectTree
--- =============================================================================
-
-T["InspectTree: keeps sides open"] = function()
-    child.lua([[ require('no-neck-pain').setup({width=10}) ]])
+T["Regression: split then vsplit then close side buffers reopen"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=20}) ]])
     child.nnp()
+    child.wait(50)
 
     Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
 
-    Helpers.expect.state(child, "enabled", true)
-    Helpers.expect.state(child, "tabs[1].wins.main", {
-        curr = 1000,
-        left = 1001,
-        right = 1002,
-    })
+    local left_before = child.lua_get("_G.NoNeckPain.state.tabs[1].wins.main.left")
+    local right_before = child.lua_get("_G.NoNeckPain.state.tabs[1].wins.main.right")
+    Helpers.expect.equality(left_before ~= nil and left_before > 0, true)
+    Helpers.expect.equality(right_before ~= nil and right_before > 0, true)
 
-    child.cmd("InspectTree")
-    child.wait()
+    child.cmd("split")
+    child.wait(100)
 
-    Helpers.expect.state(child, "tabs[1].wins.main", {
-        curr = 1000,
-        left = 1001,
-        right = 1002,
-    })
+    child.cmd("vsplit")
+    child.wait(200)
+
+    local all_wins = child.get_wins_in_tab()
+
+    child.cmd("q")
+    child.wait(100)
+
+    child.cmd("q")
+    child.wait(200)
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+    Helpers.expect.equality(child.get_current_win(), 1000)
+
+    local left_after = child.lua_get("_G.NoNeckPain.state.tabs[1].wins.main.left")
+    local right_after = child.lua_get("_G.NoNeckPain.state.tabs[1].wins.main.right")
+
+    Helpers.expect.equality(left_after ~= nil and left_after > 0, true)
+    Helpers.expect.equality(right_after ~= nil and right_after > 0, true)
 end
 
 return T

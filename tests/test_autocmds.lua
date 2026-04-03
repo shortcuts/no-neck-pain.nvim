@@ -606,4 +606,34 @@ T["FocusInvariant: focus invariant respects scratchPad exception"] = function()
     Helpers.expect.equality(current_win, 1002)
 end
 
+-- =============================================================================
+-- GROUP 7: Regression Tests
+-- =============================================================================
+
+T["Regression: does not steal focus when file opens immediately after toggle"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
+    child.nnp()
+    child.wait(50)
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+    local focus_before = child.api.nvim_get_current_win()
+    Helpers.expect.equality(focus_before, 1000)
+
+    child.cmd("e test_file.lua")
+    child.wait(10)
+
+    local focus_after_edit = child.api.nvim_get_current_win()
+
+    Helpers.expect.equality(focus_after_edit, 1000)
+
+    local left_id = child.lua_get("_G.NoNeckPain.state.tabs[1].wins.main.left")
+    local right_id = child.lua_get("_G.NoNeckPain.state.tabs[1].wins.main.right")
+
+    local focus_is_left = left_id and focus_after_edit == left_id
+    local focus_is_right = right_id and focus_after_edit == right_id
+
+    Helpers.expect.equality(focus_is_left, false)
+    Helpers.expect.equality(focus_is_right, false)
+end
+
 return T
