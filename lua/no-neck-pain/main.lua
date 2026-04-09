@@ -163,8 +163,9 @@ function main.enable(scope)
         return
     end
 
-    if helpers.get_config_field("callbacks").preEnable ~= nil then
-        helpers.get_config_field("callbacks").preEnable(state)
+    local callbacks = helpers.get_config_field("callbacks")
+    if callbacks.preEnable ~= nil then
+        callbacks.preEnable(state)
     end
 
     log.debug(scope, "calling enable for tab %d", state.active_tab)
@@ -527,7 +528,11 @@ function main.enable(scope)
                             )
 
                             for opt, val in pairs(state.initial_window_opts) do
-                                api.set_window_option(new_win, opt, val)
+                                vim.api.nvim_set_option_value(
+                                    opt,
+                                    val,
+                                    { win = new_win, scope = "local" }
+                                )
                             end
                         end
 
@@ -606,8 +611,9 @@ function main.enable(scope)
 
     state:save()
 
-    if helpers.get_config_field("callbacks").postEnable ~= nil then
-        helpers.get_config_field("callbacks").postEnable(state)
+    local callbacks = helpers.get_config_field("callbacks")
+    if callbacks.postEnable ~= nil then
+        callbacks.postEnable(state)
     end
 end
 
@@ -615,8 +621,9 @@ end
 ---@param scope string: debug/trace identifier for logging (not execution scope) - used in debug output only
 ---@private
 function main.disable(scope)
-    if helpers.get_config_field("callbacks").preDisable ~= nil then
-        helpers.get_config_field("callbacks").preDisable(state)
+    local callbacks = helpers.get_config_field("callbacks")
+    if callbacks.preDisable ~= nil then
+        callbacks.preDisable(state)
     end
 
     local active_tab = state.active_tab
@@ -694,8 +701,9 @@ function main.disable(scope)
 
     state:save()
 
-    if helpers.get_config_field("callbacks").postDisable ~= nil then
-        helpers.get_config_field("callbacks").postDisable(state)
+    local callbacks = helpers.get_config_field("callbacks")
+    if callbacks.postDisable ~= nil then
+        callbacks.postDisable(state)
     end
 end
 
