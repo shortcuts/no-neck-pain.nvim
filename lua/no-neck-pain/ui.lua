@@ -180,7 +180,7 @@ function ui.create_side_buffers()
         then
             local bufid = vim.api.nvim_create_buf(false, false)
 
-            if helpers.get_config_field("buffers").set_names then
+            if helpers.get_config_field("buffers").setNames then
                 local exist = vim.fn.bufnr("no-neck-pain-" .. side)
 
                 if exist ~= -1 then
