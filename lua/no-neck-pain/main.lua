@@ -135,8 +135,9 @@ function main.init(scope)
             state:get_previously_focused_win()
         )
 
-        if vim.api.nvim_win_is_valid(state:get_side_id("curr")) then
-            vim.api.nvim_set_current_win(state:get_side_id("curr"))
+        local curr_id = state:get_side_id("curr")
+        if curr_id and vim.api.nvim_win_is_valid(curr_id) then
+            vim.api.nvim_set_current_win(curr_id)
         end
 
         if
@@ -478,16 +479,16 @@ function main.enable(scope)
                     return
                 end
 
-                if
-                    p.event == "BufDelete"
-                    and vim.api.nvim_win_is_valid(state:get_side_id("curr"))
-                then
+                local curr_id = state:get_side_id("curr")
+
+                if p.event == "BufDelete" and curr_id and vim.api.nvim_win_is_valid(curr_id) then
                     return
                 end
 
                 local refresh = state:scan_layout(s)
 
-                if not vim.api.nvim_win_is_valid(state:get_side_id("curr")) then
+                curr_id = state:get_side_id("curr")
+                if not curr_id or not vim.api.nvim_win_is_valid(curr_id) then
                     if
                         p.event == "BufDelete"
                         and helpers.get_config_field("fallbackOnBufferDelete")
@@ -546,7 +547,7 @@ function main.enable(scope)
                         return
                     end
 
-                    local wins = state:get_unregistered_wins(scope)
+                    local wins = state:get_unregistered_wins(s)
                     if #wins == 0 then
                         log.debug(s, "no active windows found")
 
