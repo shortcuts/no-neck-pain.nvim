@@ -9,6 +9,7 @@ local helpers = require("no-neck-pain.util.helpers")
 local main = {}
 
 local session_restore_in_progress = false
+local skip_entering_in_progress = false
 
 function main.signal_session_restore_start()
     session_restore_in_progress = true
@@ -186,82 +187,88 @@ function main.enable(scope)
 
     vim.api.nvim_create_autocmd({ "VimEnter", "WinEnter" }, {
         callback = function(p)
-            vim.schedule(function()
-                p.event = string.format("%s:skip_entering", p.event)
-                if not state:is_active_tab_registered() then
-                    return log.debug(p.event, "skip")
-                end
+            if skip_entering_in_progress then
+                return
+            end
 
-                if not helpers.get_config_field("autocmds").skipEnteringNoNeckPainBuffer then
-                    state:set_previously_focused_win(vim.api.nvim_get_current_win())
-                    return
-                end
+            p.event = string.format("%s:skip_entering", p.event)
+            if not state:is_active_tab_registered() then
+                return log.debug(p.event, "skip")
+            end
 
-                if state:get_scratch_pad() then
-                    return log.debug(p.event, "skip because scratchpad is enabled")
-                end
+            if not helpers.get_config_field("autocmds").skipEnteringNoNeckPainBuffer then
+                state:set_previously_focused_win(vim.api.nvim_get_current_win())
+                return
+            end
 
-                local current_side = vim.api.nvim_get_current_win()
-                local other_side
-                local left_id = state:get_side_id("left")
-                local right_id = state:get_side_id("right")
+            if state:get_scratch_pad() then
+                return log.debug(p.event, "skip because scratchpad is enabled")
+            end
 
-                if current_side == left_id then
-                    other_side = right_id
-                elseif current_side == right_id then
-                    other_side = left_id
-                else
-                    state:set_previously_focused_win(vim.api.nvim_get_current_win())
-                    return
-                end
+            local current_side = vim.api.nvim_get_current_win()
+            local other_side
+            local left_id = state:get_side_id("left")
+            local right_id = state:get_side_id("right")
 
-                -- we need to know if the user navigates from ltr or rtl
-                -- so we keep track of the encounter of prev,curr to determine
-                -- the next valid window to focus
+            if current_side == left_id then
+                other_side = right_id
+            elseif current_side == right_id then
+                other_side = left_id
+            else
+                state:set_previously_focused_win(vim.api.nvim_get_current_win())
+                return
+            end
 
-                local wins = vim.api.nvim_list_wins()
-                local idx
+            -- we need to know if the user navigates from ltr or rtl
+            -- so we keep track of the encounter of prev,curr to determine
+            -- the next valid window to focus
 
-                for i = 1, #wins do
-                    if wins[i] and api.is_side_id(current_side, wins[i]) then
-                        idx = api.find_next_side_idx(
-                            i - 1,
-                            -1,
-                            wins,
-                            current_side,
-                            other_side,
-                            state:get_previously_focused_win()
-                        )
-                        break
-                    elseif
-                        wins[i] and api.is_side_id(state:get_previously_focused_win(), wins[i])
-                    then
-                        idx = api.find_next_side_idx(
-                            i + 1,
-                            1,
-                            wins,
-                            current_side,
-                            other_side,
-                            state:get_previously_focused_win()
-                        )
-                        break
-                    end
-                end
+            local wins = vim.api.nvim_list_wins()
+            local idx
 
-                local new_focus = wins[idx] or state:get_previously_focused_win()
-
-                if not vim.api.nvim_win_is_valid(new_focus) then
-                    return log.debug(
-                        p.event,
-                        "aborting reroute, %d is not a valid window",
-                        new_focus
+            for i = 1, #wins do
+                if wins[i] and api.is_side_id(current_side, wins[i]) then
+                    idx = api.find_next_side_idx(
+                        i - 1,
+                        -1,
+                        wins,
+                        current_side,
+                        other_side,
+                        state:get_previously_focused_win()
                     )
+                    break
+                elseif
+                    wins[i] and api.is_side_id(state:get_previously_focused_win(), wins[i])
+                then
+                    idx = api.find_next_side_idx(
+                        i + 1,
+                        1,
+                        wins,
+                        current_side,
+                        other_side,
+                        state:get_previously_focused_win()
+                    )
+                    break
                 end
+            end
 
-                vim.api.nvim_set_current_win(new_focus)
+            local new_focus = wins[idx] or state:get_previously_focused_win()
 
-                return log.debug(p.event, "rerouted focus of %d to %d", current_side, new_focus)
-            end)
+            if not vim.api.nvim_win_is_valid(new_focus) then
+                return log.debug(
+                    p.event,
+                    "aborting reroute, %d is not a valid window",
+                    new_focus
+                )
+            end
+
+            skip_entering_in_progress = true
+            vim.api.nvim_set_current_win(new_focus)
+            skip_entering_in_progress = false
+
+            state:set_previously_focused_win(new_focus)
+
+            return log.debug(p.event, "rerouted focus of %d to %d", current_side, new_focus)
         end,
         group = augroup_name,
         desc = "Keeps track of the last focused win, and re-route if necessary",
