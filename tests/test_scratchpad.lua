@@ -83,7 +83,9 @@ T["scratchPad: default to `norg` fileType"] = function()
         left
     )
     Helpers.expect.equality(
-        child.lua_get("vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(1001), 'buflisted')"),
+        child.lua_get(
+            "vim.api.nvim_get_option_value('buflisted', { buf = vim.api.nvim_win_get_buf(1001) })"
+        ),
         false
     )
 
@@ -92,7 +94,9 @@ T["scratchPad: default to `norg` fileType"] = function()
         right
     )
     Helpers.expect.equality(
-        child.lua_get("vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(1002), 'buflisted')"),
+        child.lua_get(
+            "vim.api.nvim_get_option_value('buflisted', { buf = vim.api.nvim_win_get_buf(1002) })"
+        ),
         false
     )
 end
@@ -129,7 +133,9 @@ T["scratchPad: override of filetype is reflected to the buffer"] = function()
         left
     )
     Helpers.expect.equality(
-        child.lua_get("vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(1001), 'buflisted')"),
+        child.lua_get(
+            "vim.api.nvim_get_option_value('buflisted', { buf = vim.api.nvim_win_get_buf(1001) })"
+        ),
         false
     )
 
@@ -138,7 +144,9 @@ T["scratchPad: override of filetype is reflected to the buffer"] = function()
         right
     )
     Helpers.expect.equality(
-        child.lua_get("vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(1002), 'buflisted')"),
+        child.lua_get(
+            "vim.api.nvim_get_option_value('buflisted', { buf = vim.api.nvim_win_get_buf(1002) })"
+        ),
         false
     )
 end
@@ -173,7 +181,9 @@ T["scratchPad: side buffer can have their own definition"] = function()
         left
     )
     Helpers.expect.equality(
-        child.lua_get("vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(1001), 'buflisted')"),
+        child.lua_get(
+            "vim.api.nvim_get_option_value('buflisted', { buf = vim.api.nvim_win_get_buf(1001) })"
+        ),
         false
     )
 
@@ -182,7 +192,9 @@ T["scratchPad: side buffer can have their own definition"] = function()
         right
     )
     Helpers.expect.equality(
-        child.lua_get("vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(1002), 'buflisted')"),
+        child.lua_get(
+            "vim.api.nvim_get_option_value('buflisted', { buf = vim.api.nvim_win_get_buf(1002) })"
+        ),
         false
     )
 end
@@ -216,7 +228,9 @@ T["scratchPad: side buffer definition overrides global one"] = function()
         left
     )
     Helpers.expect.equality(
-        child.lua_get("vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(1001), 'buflisted')"),
+        child.lua_get(
+            "vim.api.nvim_get_option_value('buflisted', { buf = vim.api.nvim_win_get_buf(1001) })"
+        ),
         false
     )
 
@@ -225,7 +239,9 @@ T["scratchPad: side buffer definition overrides global one"] = function()
         right
     )
     Helpers.expect.equality(
-        child.lua_get("vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(1002), 'buflisted')"),
+        child.lua_get(
+            "vim.api.nvim_get_option_value('buflisted', { buf = vim.api.nvim_win_get_buf(1002) })"
+        ),
         false
     )
 end
@@ -251,12 +267,24 @@ T["scratchPad: forwards the given filetype to the scratchPad"] = function()
     Helpers.expect.config(child, "buffers.right.bo.filetype", "custom")
 
     child.fn.win_gotoid(1001)
-    Helpers.expect.equality(child.lua_get("vim.api.nvim_buf_get_option(0, 'filetype')"), "custom")
-    Helpers.expect.equality(child.lua_get("vim.api.nvim_buf_get_option(0, 'buftype')"), "")
+    Helpers.expect.equality(
+        child.lua_get("vim.api.nvim_get_option_value('filetype', { buf = 0 })"),
+        "custom"
+    )
+    Helpers.expect.equality(
+        child.lua_get("vim.api.nvim_get_option_value('buftype', { buf = 0 })"),
+        ""
+    )
 
     child.fn.win_gotoid(1002)
-    Helpers.expect.equality(child.lua_get("vim.api.nvim_buf_get_option(0, 'filetype')"), "custom")
-    Helpers.expect.equality(child.lua_get("vim.api.nvim_buf_get_option(0, 'buftype')"), "")
+    Helpers.expect.equality(
+        child.lua_get("vim.api.nvim_get_option_value('filetype', { buf = 0 })"),
+        "custom"
+    )
+    Helpers.expect.equality(
+        child.lua_get("vim.api.nvim_get_option_value('buftype', { buf = 0 })"),
+        ""
+    )
 end
 
 T["scratchPad: toggling the scratchPad sets the buffer/window options"] = function()
@@ -270,24 +298,32 @@ T["scratchPad: toggling the scratchPad sets the buffer/window options"] = functi
     Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
 
     Helpers.expect.equality(
-        child.lua_get("vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(1001), 'buflisted')"),
+        child.lua_get(
+            "vim.api.nvim_get_option_value('buflisted', { buf = vim.api.nvim_win_get_buf(1001) })"
+        ),
         false
     )
 
     Helpers.expect.equality(
-        child.lua_get("vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(1002), 'buflisted')"),
+        child.lua_get(
+            "vim.api.nvim_get_option_value('buflisted', { buf = vim.api.nvim_win_get_buf(1002) })"
+        ),
         false
     )
 
     child.api.nvim_input("foo")
 
     Helpers.expect.equality(
-        child.lua_get("vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(1001), 'buflisted')"),
+        child.lua_get(
+            "vim.api.nvim_get_option_value('buflisted', { buf = vim.api.nvim_win_get_buf(1001) })"
+        ),
         false
     )
 
     Helpers.expect.equality(
-        child.lua_get("vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(1002), 'buflisted')"),
+        child.lua_get(
+            "vim.api.nvim_get_option_value('buflisted', { buf = vim.api.nvim_win_get_buf(1002) })"
+        ),
         false
     )
 end

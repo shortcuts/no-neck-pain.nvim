@@ -107,7 +107,10 @@ T["fallbackOnBufferDelete: invoking :bd properly resets window options"] = funct
         Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1004, left = 1005, right = 1006 })
     end
 
-    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_option(0, 'linebreak')"), false)
+    Helpers.expect.equality(
+        child.lua_get("vim.api.nvim_get_option_value('linebreak', { win = 0 })"),
+        false
+    )
 end
 
 return T

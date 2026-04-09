@@ -23,12 +23,16 @@ T["Setup: sets default filetypes"] = function()
     Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
 
     Helpers.expect.equality(
-        child.lua_get("vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(1001), 'filetype')"),
+        child.lua_get(
+            "vim.api.nvim_get_option_value('filetype', { buf = vim.api.nvim_win_get_buf(1001) })"
+        ),
         "no-neck-pain"
     )
 
     Helpers.expect.equality(
-        child.lua_get("vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(1002), 'filetype')"),
+        child.lua_get(
+            "vim.api.nvim_get_option_value('filetype', { buf = vim.api.nvim_win_get_buf(1002) })"
+        ),
         "no-neck-pain"
     )
 end
@@ -380,10 +384,12 @@ T["Boundary: side buffer with empty filetype string"] = function()
 
     Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
 
-    local left_ft =
-        child.lua_get("vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(1001), 'filetype')")
-    local right_ft =
-        child.lua_get("vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(1002), 'filetype')")
+    local left_ft = child.lua_get(
+        "vim.api.nvim_get_option_value('filetype', { buf = vim.api.nvim_win_get_buf(1001) })"
+    )
+    local right_ft = child.lua_get(
+        "vim.api.nvim_get_option_value('filetype', { buf = vim.api.nvim_win_get_buf(1002) })"
+    )
 
     Helpers.expect.equality(left_ft, "")
     Helpers.expect.equality(right_ft, "")
@@ -442,12 +448,14 @@ T["Property-Based: side buffer options work across different width configs"] = f
         local wins = child.get_wins_in_tab()
 
         if #wins == 3 then
-            local left_number = child.lua_get("vim.api.nvim_win_get_option(1001, 'number')")
-            local right_number = child.lua_get("vim.api.nvim_win_get_option(1002, 'number')")
+            local left_number =
+                child.lua_get("vim.api.nvim_get_option_value('number', { win = 1001 })")
+            local right_number =
+                child.lua_get("vim.api.nvim_get_option_value('number', { win = 1002 })")
             local left_relnumber =
-                child.lua_get("vim.api.nvim_win_get_option(1001, 'relativenumber')")
+                child.lua_get("vim.api.nvim_get_option_value('relativenumber', { win = 1001 })")
             local right_relnumber =
-                child.lua_get("vim.api.nvim_win_get_option(1002, 'relativenumber')")
+                child.lua_get("vim.api.nvim_get_option_value('relativenumber', { win = 1002 })")
 
             Helpers.expect.equality(left_number, true)
             Helpers.expect.equality(right_number, true)
@@ -508,35 +516,37 @@ T["Edge-Cases: side buffers with all window options disabled"] = function()
 
     local left_win = 1001
     Helpers.expect.equality(
-        child.lua_get("vim.api.nvim_win_get_option(" .. left_win .. ", 'cursorline')"),
+        child.lua_get("vim.api.nvim_get_option_value('cursorline', { win = " .. left_win .. " })"),
         false
     )
     Helpers.expect.equality(
-        child.lua_get("vim.api.nvim_win_get_option(" .. left_win .. ", 'cursorcolumn')"),
+        child.lua_get("vim.api.nvim_get_option_value('cursorcolumn', { win = " .. left_win .. " })"),
         false
     )
     Helpers.expect.equality(
-        child.lua_get("vim.api.nvim_win_get_option(" .. left_win .. ", 'number')"),
+        child.lua_get("vim.api.nvim_get_option_value('number', { win = " .. left_win .. " })"),
         false
     )
     Helpers.expect.equality(
-        child.lua_get("vim.api.nvim_win_get_option(" .. left_win .. ", 'relativenumber')"),
+        child.lua_get(
+            "vim.api.nvim_get_option_value('relativenumber', { win = " .. left_win .. " })"
+        ),
         false
     )
     Helpers.expect.equality(
-        child.lua_get("vim.api.nvim_win_get_option(" .. left_win .. ", 'foldenable')"),
+        child.lua_get("vim.api.nvim_get_option_value('foldenable', { win = " .. left_win .. " })"),
         false
     )
     Helpers.expect.equality(
-        child.lua_get("vim.api.nvim_win_get_option(" .. left_win .. ", 'list')"),
+        child.lua_get("vim.api.nvim_get_option_value('list', { win = " .. left_win .. " })"),
         false
     )
     Helpers.expect.equality(
-        child.lua_get("vim.api.nvim_win_get_option(" .. left_win .. ", 'wrap')"),
+        child.lua_get("vim.api.nvim_get_option_value('wrap', { win = " .. left_win .. " })"),
         false
     )
     Helpers.expect.equality(
-        child.lua_get("vim.api.nvim_win_get_option(" .. left_win .. ", 'linebreak')"),
+        child.lua_get("vim.api.nvim_get_option_value('linebreak', { win = " .. left_win .. " })"),
         false
     )
 end
@@ -560,23 +570,23 @@ T["Edge-Cases: side buffers with all buffer options modified"] = function()
 
     local left_buf = child.lua_get("vim.api.nvim_win_get_buf(1001)")
     Helpers.expect.equality(
-        child.lua_get("vim.api.nvim_buf_get_option(" .. left_buf .. ", 'filetype')"),
+        child.lua_get("vim.api.nvim_get_option_value('filetype', { buf = " .. left_buf .. " })"),
         "custom-type"
     )
     Helpers.expect.equality(
-        child.lua_get("vim.api.nvim_buf_get_option(" .. left_buf .. ", 'buftype')"),
+        child.lua_get("vim.api.nvim_get_option_value('buftype', { buf = " .. left_buf .. " })"),
         "acwrite"
     )
     Helpers.expect.equality(
-        child.lua_get("vim.api.nvim_buf_get_option(" .. left_buf .. ", 'bufhidden')"),
+        child.lua_get("vim.api.nvim_get_option_value('bufhidden', { buf = " .. left_buf .. " })"),
         "wipe"
     )
     Helpers.expect.equality(
-        child.lua_get("vim.api.nvim_buf_get_option(" .. left_buf .. ", 'buflisted')"),
+        child.lua_get("vim.api.nvim_get_option_value('buflisted', { buf = " .. left_buf .. " })"),
         true
     )
     Helpers.expect.equality(
-        child.lua_get("vim.api.nvim_buf_get_option(" .. left_buf .. ", 'swapfile')"),
+        child.lua_get("vim.api.nvim_get_option_value('swapfile', { buf = " .. left_buf .. " })"),
         true
     )
 end
@@ -615,7 +625,7 @@ T["Edge-Cases: zero-width colorcolumn edge case"] = function()
 
     Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
 
-    local left_cc = child.lua_get("vim.api.nvim_win_get_option(1001, 'colorcolumn')")
+    local left_cc = child.lua_get("vim.api.nvim_get_option_value('colorcolumn', { win = 1001 })")
     Helpers.expect.equality(left_cc, "0")
 end
 

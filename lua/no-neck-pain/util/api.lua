@@ -5,7 +5,6 @@
 ---@module "no-neck-pain.util.api"
 
 local log = require("no-neck-pain.util.log")
-local helpers = require("no-neck-pain.util.helpers")
 
 local api = { debouncers = {} }
 
@@ -46,34 +45,6 @@ function api.is_relative_window(win)
     end
 
     return false
-end
-
---- Sets buffer option with backward compatibility (nvim <9).
----
----@param id number: the id of the buffer.
----@param opt string: the opt name.
----@param val string|number|boolean: the opt value.
----@private
-function api.set_buffer_option(id, opt, val)
-    if helpers.get_config_field("has_nvim9") then
-        vim.api.nvim_set_option_value(opt, val, { buf = id })
-    else
-        vim.api.nvim_buf_set_option(id, opt, val)
-    end
-end
-
---- Sets window option with backward compatibility (nvim <9).
----
----@param id number: the id of the window.
----@param opt string: the opt name.
----@param val string|number: the opt value.
----@private
-function api.set_window_option(id, opt, val)
-    if helpers.get_config_field("has_nvim9") then
-        vim.api.nvim_set_option_value(opt, val, { win = id, scope = "local" })
-    else
-        vim.api.nvim_win_set_option(id, opt, val)
-    end
 end
 
 local function timer_stop_close(timer)
@@ -164,7 +135,7 @@ function api.get_opened_buffers()
                 name = string.format("NoNamePain%s", buf)
             end
 
-            opened[name] = vim.api.nvim_buf_get_option(buf, "modified")
+            opened[name] = vim.api.nvim_get_option_value("modified", { buf = buf })
         end
     end
 

@@ -50,7 +50,7 @@ function state:capture_initial_window_opts()
         "relativenumber",
         "wrap",
     }) do
-        self.initial_window_opts[opt] = vim.api.nvim_win_get_option(current_win, opt)
+        self.initial_window_opts[opt] = vim.api.nvim_get_option_value(opt, { win = current_win })
     end
 end
 
@@ -274,7 +274,7 @@ function state:is_supported_integration(scope, win)
     end
 
     local buffer = vim.api.nvim_win_get_buf(win)
-    local filetype = vim.api.nvim_buf_get_option(buffer, "filetype")
+    local filetype = vim.api.nvim_get_option_value("filetype", { buf = buffer })
 
     local integration_name, integration_info = self:get_integration(win)
     if integration_name and integration_info then

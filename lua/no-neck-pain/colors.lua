@@ -110,7 +110,6 @@ end
 --- Creates highlight groups for a given `win` in a `tab` named:
 --- - `NoNeckPain_background_tab_$ID_side_$SIDE` for the background colors.
 --- - `NoNeckPain_text_tab_$ID_side_$SIDE` for the text colors.
---- note: `cmd` is used instead of native commands for backward compatibility with Neovim 0.7
 ---
 ---@param win number?: the id of the win to init.
 ---@param side "left"|"right": the side of the window being resized, used for logging only.

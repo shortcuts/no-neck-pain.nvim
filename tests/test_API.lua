@@ -495,7 +495,10 @@ T["Disable: no file does not close the window if unsaved buffer"] = function()
     Helpers.expect.equality(child.list_buffers(), { 1, 2, 3 })
 
     child.api.nvim_buf_set_lines(1, 0, 1, false, { "foo" })
-    Helpers.expect.equality(child.lua_get("vim.api.nvim_buf_get_option(1, 'modified')"), true)
+    Helpers.expect.equality(
+        child.lua_get("vim.api.nvim_get_option_value('modified', { buf = 1 })"),
+        true
+    )
 
     Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
     Helpers.expect.equality(child.lua_get("vim.api.nvim_get_current_win()"), 1000)
@@ -519,7 +522,10 @@ T["Disable: on file does not close the window if unsaved buffer"] = function()
     Helpers.expect.equality(child.list_buffers(), { 1, 2, 3 })
 
     child.api.nvim_buf_set_lines(1, 0, 1, false, { "foo" })
-    Helpers.expect.equality(child.lua_get("vim.api.nvim_buf_get_option(1, 'modified')"), true)
+    Helpers.expect.equality(
+        child.lua_get("vim.api.nvim_get_option_value('modified', { buf = 1 })"),
+        true
+    )
 
     Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
     Helpers.expect.equality(child.lua_get("vim.api.nvim_get_current_win()"), 1000)

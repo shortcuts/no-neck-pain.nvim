@@ -404,7 +404,8 @@ function NoNeckPain.defaults(options)
 
     -- assert `width` values through vim options
     if NoNeckPain.options.width == "textwidth" then
-        NoNeckPain.options.width = tonumber(vim.api.nvim_buf_get_option(0, "textwidth")) or 0
+        NoNeckPain.options.width = tonumber(vim.api.nvim_get_option_value("textwidth", { buf = 0 }))
+            or 0
     end
 
     if NoNeckPain.options.width == "colorcolumn" then

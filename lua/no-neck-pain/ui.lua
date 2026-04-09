@@ -1,4 +1,3 @@
-local api = require("no-neck-pain.util.api")
 local colors = require("no-neck-pain.colors")
 local constants = require("no-neck-pain.util.constants")
 local log = require("no-neck-pain.util.log")
@@ -19,12 +18,12 @@ function ui.init_side_options(side, id)
 
     for opt, val in pairs(helpers.get_config_field("buffers")[side].bo) do
         if not (state:get_scratch_pad() and opt == "filetype") then
-            api.set_buffer_option(bufid, opt, val)
+            vim.api.nvim_set_option_value(opt, val, { buf = bufid })
         end
     end
 
     for opt, val in pairs(helpers.get_config_field("buffers")[side].wo) do
-        api.set_window_option(id, opt, val)
+        vim.api.nvim_set_option_value(opt, val, { win = id, scope = "local" })
     end
 end
 
@@ -140,20 +139,20 @@ function ui.init_scratch_pad(side, id, cleanup)
 
     local buf_id = vim.api.nvim_win_get_buf(id)
 
-    api.set_buffer_option(buf_id, "bufhidden", "")
-    api.set_buffer_option(buf_id, "buftype", "")
-    api.set_buffer_option(buf_id, "buflisted", false)
-    api.set_buffer_option(buf_id, "autoread", true)
-    api.set_window_option(id, "conceallevel", 2)
+    vim.api.nvim_set_option_value("bufhidden", "", { buf = buf_id })
+    vim.api.nvim_set_option_value("buftype", "", { buf = buf_id })
+    vim.api.nvim_set_option_value("buflisted", false, { buf = buf_id })
+    vim.api.nvim_set_option_value("autoread", true, { buf = buf_id })
+    vim.api.nvim_set_option_value("conceallevel", 2, { win = id, scope = "local" })
 
     -- users might want to use a filetype that isn't supported by neovim, we should let them
     -- if they've defined it on the configuration side.
-    if vim.api.nvim_buf_get_option(buf_id, "filetype") == "" then
+    if vim.api.nvim_get_option_value("filetype", { buf = buf_id }) == "" then
         local filetype = helpers.get_config_field("buffers")[side].bo.filetype
         if filetype == "" or filetype == "no-neck-pain" then
             filetype = "norg"
         end
-        api.set_buffer_option(buf_id, "filetype", filetype)
+        vim.api.nvim_set_option_value("filetype", filetype, { buf = buf_id })
     end
 
     vim.o.autowriteall = true

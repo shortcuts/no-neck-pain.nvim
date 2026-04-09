@@ -5,7 +5,7 @@ category: neovim-plugin
 plugin_type: ui-enhancement
 keywords: [neovim, buffer, centering, zen-mode, focus, distraction-free]
 version: ">=2.0.0"
-requires: neovim >= 0.9
+requires: neovim >= 0.10
 repository: shortcuts/no-neck-pain.nvim
 ---
 
@@ -40,8 +40,8 @@ _Creates evenly sized empty buffers on each side of your focused buffer, which a
 - [Built-in scratchPad feature](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase#side-buffer-as-scratch-pad)
 - [Themed side buffers](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase#custom-background-color)
 - Fully integrates with file trees ([neo-tree.nvim](https://github.com/nvim-neo-tree/neo-tree.nvim), [nvim-tree.lua](https://github.com/nvim-tree/nvim-tree.lua), etc.) and dashboard ([alpha-nvim](https://github.com/goolord/alpha-nvim), [snacks.nvim](https://github.com/folke/snacks.nvim), etc.)
-- Neovim >= 0.9 compatibility
-    - 0.7 and 0.8 support is still available in the [1.x frozen version](https://github.com/shortcuts/no-neck-pain.nvim/tree/1.x)
+- Neovim >= 0.10 compatibility
+    - 0.7, 0.8, and 0.9 support is still available in the [1.x frozen version](https://github.com/shortcuts/no-neck-pain.nvim/tree/1.x)
 
 > Want to see it in action? Take a look at [the showcase section](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase)
 
