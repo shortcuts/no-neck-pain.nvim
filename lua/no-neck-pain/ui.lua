@@ -37,30 +37,36 @@ function ui.move_sides(scope)
         right = vim.api.nvim_replace_termcodes("normal <C-W>L", true, false, true),
     }
 
-    for side, keys in pairs(sides) do
+    local curr_win = vim.api.nvim_get_current_win()
+
+    for _, side in ipairs(constants.SIDES) do
+        local keys = sides[side]
         local sscope = string.format("%s:%s", scope, side)
 
         local id = state:get_side_id(side)
         if id ~= nil then
             local wins = vim.api.nvim_tabpage_list_wins(state.active_tab)
-            local curr = vim.api.nvim_get_current_win()
 
-            if curr ~= id and vim.api.nvim_win_is_valid(id) then
-                vim.api.nvim_set_current_win(id)
+            if curr_win ~= id and vim.api.nvim_win_is_valid(id) then
+                vim.cmd("noautocmd lua vim.api.nvim_set_current_win(" .. id .. ")")
             end
 
-            vim.cmd(keys)
+            vim.cmd("noautocmd " .. keys)
 
             if (side == "left" and wins[1] ~= id) or (side == "right" and wins[#wins] ~= id) then
                 log.debug(
                     sscope,
                     "wrong position after window move, focusing %s, should be %d, wins order %s",
-                    curr,
+                    curr_win,
                     id,
                     vim.inspect(wins)
                 )
             end
         end
+    end
+
+    if vim.api.nvim_win_is_valid(curr_win) then
+        vim.cmd("noautocmd lua vim.api.nvim_set_current_win(" .. curr_win .. ")")
     end
 end
 
