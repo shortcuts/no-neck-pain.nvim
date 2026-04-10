@@ -12,6 +12,16 @@ function log.debug(scope, str, ...)
     return log.notify(scope, vim.log.levels.DEBUG, false, str, ...)
 end
 
+--- always prints a warning message.
+---
+---@param scope string: the scope from where this function is called.
+---@param str string: the formatted string.
+---@param ... any: the arguments of the formatted string.
+---@private
+function log.warn(scope, str, ...)
+    return log.notify(scope, vim.log.levels.WARN, true, str, ...)
+end
+
 --- prints only if debug is true.
 ---
 ---@param scope string: the scope from where this function is called.
