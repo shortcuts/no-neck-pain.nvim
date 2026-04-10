@@ -601,7 +601,7 @@ function state:get_scratch_pad()
     return self.tabs[self.active_tab].scratchpad_enabled
 end
 
------ focused win tacker =======================================================
+----- focused win tracker =======================================================
 ---@private
 
 --- Sets the given `id` as the previously focused window.

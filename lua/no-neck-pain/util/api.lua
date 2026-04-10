@@ -20,10 +20,10 @@ function api.tde(t1, t2)
     return vim.deepcopy(vim.tbl_deep_extend("keep", t1 or {}, t2 or {}))
 end
 
---- Returns the name of the augroup for the given tab Idebug.
+--- Returns the name of the augroup for the given tab id.
 ---
 ---@param id number?: the id of the tab.
----@return string: the initialied state
+---@return string: the augroup name
 ---@private
 function api.get_augroup_name(id)
     return string.format("NoNeckPain-%d", id)
@@ -149,7 +149,7 @@ function api.is_side_id(side, id)
     return side == id
 end
 
---- Itherates over a given list of wins, starting from a given index, walking from a given step (+1/-1).
+--- Iterates over a given list of wins, starting from a given index, walking from a given step (+1/-1).
 --- Once an id that is not any of the side is found, return the position in the table, nil otherwise.
 ---
 ---@param start_idx number: the idx to start from in `wins`.

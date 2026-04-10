@@ -45,10 +45,7 @@ end
 ---  1. if a tab definition already exists in the state
 ---  2. if we are focusing a relative window
 ---  3. if we are focusing a side tree or a dashboard
---- - the plugin is not enabled
---- - we have splits open (when `skip_split` is `true`)
---- - we are focusing a floating window
---- - we are focusing one of the side buffer
+---  4. if the active tab has been manually disabled
 ---
 ---@param scope string: internal identifier for logging purposes.
 ---@private

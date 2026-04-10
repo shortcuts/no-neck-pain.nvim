@@ -7,7 +7,7 @@ local colors = {}
 
 --- Converts an hex color code to RGB, values are returned independently.
 ---
----@param hex string: the hex color to conver to rgb.
+---@param hex string: the hex color to convert to rgb.
 ---@return number?: the r color
 ---@return number?: the g color
 ---@return number?: the b color
@@ -157,7 +157,7 @@ function colors.init(win, side)
     -- link nnp and neovim hl groups
     local groups = { Normal = text_group, NormalNC = text_group }
 
-    -- we only set those for non transparent backgrouns to prevent white lines.
+    -- we only set those for non transparent backgrounds to prevent white lines.
     if config[side].colors.background ~= "NONE" then
         groups = vim.tbl_extend("keep", groups, {
             WinSeparator = background_group,
