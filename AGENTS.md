@@ -2,7 +2,7 @@
 
 Repository: https://github.com/shortcuts/no-neck-pain.nvim
 Language: Lua
-Target runtime: Neovim ≥ 0.9
+Target runtime: Neovim ≥ 0.10
 
 `no-neck-pain.nvim` centers the active buffer by creating left and right padding windows.
 These side windows maintain a consistent reading width without modifying the main editing workflow.
