@@ -37,14 +37,7 @@ end
 function api.is_relative_window(win)
     win = win or vim.api.nvim_get_current_win()
 
-    if
-        vim.api.nvim_win_get_config(0).relative ~= ""
-        or vim.api.nvim_win_get_config(win).relative ~= ""
-    then
-        return true
-    end
-
-    return false
+    return vim.api.nvim_win_get_config(win).relative ~= ""
 end
 
 local function timer_stop_close(timer)
