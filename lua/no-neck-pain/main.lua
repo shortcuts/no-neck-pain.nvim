@@ -237,9 +237,7 @@ function main.enable(scope)
                         state:get_previously_focused_win()
                     )
                     break
-                elseif
-                    wins[i] and api.is_side_id(state:get_previously_focused_win(), wins[i])
-                then
+                elseif wins[i] and api.is_side_id(state:get_previously_focused_win(), wins[i]) then
                     idx = api.find_next_side_idx(
                         i + 1,
                         1,
@@ -255,11 +253,7 @@ function main.enable(scope)
             local new_focus = wins[idx] or state:get_previously_focused_win()
 
             if not vim.api.nvim_win_is_valid(new_focus) then
-                return log.debug(
-                    p.event,
-                    "aborting reroute, %d is not a valid window",
-                    new_focus
-                )
+                return log.debug(p.event, "aborting reroute, %d is not a valid window", new_focus)
             end
 
             skip_entering_in_progress = true
