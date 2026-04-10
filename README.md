@@ -4,7 +4,7 @@ description: Dead simple plugin to center the currently focused buffer to the mi
 category: neovim-plugin
 plugin_type: ui-enhancement
 keywords: [neovim, buffer, centering, zen-mode, focus, distraction-free]
-version: ">=2.0.0"
+version: ">=3.0.0"
 requires: neovim >= 0.10
 repository: shortcuts/no-neck-pain.nvim
 ---
@@ -41,7 +41,8 @@ _Creates evenly sized empty buffers on each side of your focused buffer, which a
 - [Themed side buffers](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase#custom-background-color)
 - Fully integrates with file trees ([neo-tree.nvim](https://github.com/nvim-neo-tree/neo-tree.nvim), [nvim-tree.lua](https://github.com/nvim-tree/nvim-tree.lua), etc.) and dashboard ([alpha-nvim](https://github.com/goolord/alpha-nvim), [snacks.nvim](https://github.com/folke/snacks.nvim), etc.)
 - Neovim >= 0.10 compatibility
-    - 0.7, 0.8, and 0.9 support is still available in the [1.x frozen version](https://github.com/shortcuts/no-neck-pain.nvim/tree/1.x)
+    - 0.7 and 0.8 support is still available in the [1.x frozen version](https://github.com/shortcuts/no-neck-pain.nvim/tree/1.x)
+    - 0.9 support is still available in the [2.x frozen version](https://github.com/shortcuts/no-neck-pain.nvim/tree/2.x)
 
 > Want to see it in action? Take a look at [the showcase section](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase)
 
@@ -161,7 +162,7 @@ require("no-neck-pain").setup({
     ---@type boolean
     disableOnLastBuffer = false,
     -- When `true`, disabling the plugin closes every other windows except the initially focused one.
-    ---@usage: this parameter will be renamed `killAllWindowsOnDisable` in the next major release (^2.x.y).
+    ---@usage: this parameter will be renamed `killAllWindowsOnDisable` in a future release.
     ---@type boolean
     killAllBuffersOnDisable = false,
     -- When `true`, deleting the main no-neck-pain buffer with `:bd`, `:bdelete` does not disable the plugin, it fallbacks on the newly focused window and refreshes the state by re-creating side-windows if necessary.
@@ -395,7 +396,7 @@ require("no-neck-pain").setup({
             position = "none",
         },
         -- this is a generic field to hint no-neck-pain that you use a dashboard plugin.
-        -- you can find the filetype list of natively supported dashboards here: https://github.com/shortcuts/no-neck-pain.nvim/blob/main/lua/no-neck-pain/util/constants.lua#L82-L85
+        -- the filetypes of natively supported dashboards are listed below in the `filetypes` field.
         -- if a dashboard that you use isn't supported, either set `dashboard.filetype` to the expected file type, or open a pull-request with the edited list.
         dashboard = {
             -- When `true`, debounce will be applied to the init method, leaving time for the dashboard to open.
@@ -574,6 +575,7 @@ NoNeckPain.bufferOptions = {
 |`:NoNeckPainWidthUp`| Increases the config `width` by 5 and resizes the no-neck-pain windows. |
 |`:NoNeckPainWidthDown`| Decreases the config `width` by 5 and resizes the no-neck-pain windows. |
 |`:NoNeckPainScratchPad`| Uses the side buffers as a persistent scratchpad so you can take notes easily. |
+|`:NoNeckPainDebug`| Toggles the debug mode. |
 
 <!-- SECTION: BREAKING_CHANGES -->
 ## 🏗 breaking changes
@@ -585,6 +587,10 @@ See [the release description](https://github.com/shortcuts/no-neck-pain.nvim/pul
 ### v2.0.0
 
 See [the release description](https://github.com/shortcuts/no-neck-pain.nvim/pull/384) for the full list of breaking changes.
+
+### v3.0.0
+
+See [the release description](https://github.com/shortcuts/no-neck-pain.nvim/pull/513) for the full list of breaking changes.
 
 <!-- SECTION: AI_ASSISTANTS -->
 ## 🤖 For AI Assistants
@@ -620,7 +626,7 @@ This section provides structured information about the codebase to help AI assis
    - Contains enable/disable/toggle implementations
    
 3. **State management**: `lua/no-neck-pain/state.lua`
-   - Global state accessible via `require("no-neck-pain.util.state_access")`
+   - Global state accessible via `require("no-neck-pain.util.helpers")`
 
 ### ⚙️ Configuration Structure
 
