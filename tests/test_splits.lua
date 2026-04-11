@@ -455,7 +455,7 @@ T["vsplit/split: side buffer widths restore after split then vsplit then close"]
     Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.right", 10, 35)
 end
 
-T["Regression: split then vsplit then close side buffers reopen"] = function()
+T["split/vsplit: split then vsplit then close side buffers reopen"] = function()
     child.lua([[ require('no-neck-pain').setup({width=20}) ]])
     child.nnp()
     child.wait(50)
@@ -489,6 +489,43 @@ T["Regression: split then vsplit then close side buffers reopen"] = function()
 
     Helpers.expect.equality(left_after ~= nil and left_after > 0, true)
     Helpers.expect.equality(right_after ~= nil and right_after > 0, true)
+end
+
+T["vplit/vsplit: split then vsplit then close side buffers reopen (with only one side buffer)"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=50, buffers={right={enabled=false}}}) ]])
+    child.nnp()
+    child.wait(50)
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000 })
+
+    local left_before = child.lua_get("_G.NoNeckPain.state.tabs[1].wins.main.left")
+    local right_before = child.lua_get("_G.NoNeckPain.state.tabs[1].wins.main.right")
+    Helpers.expect.equality(left_before ~= nil and left_before > 0, true)
+    Helpers.expect.equality(right_before, vim.NIL)
+
+    child.cmd("split")
+    child.wait(100)
+
+    child.cmd("vsplit")
+    child.wait(200)
+
+    local all_wins = child.get_wins_in_tab()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1003, 1002, 1000 })
+    Helpers.expect.equality(child.get_current_win(), 1003)
+
+    -- close vsplit
+    child.cmd("q")
+    child.wait(200)
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1004, 1002, 1000 })
+    Helpers.expect.equality(child.get_current_win(), 1002)
+
+    local left_after = child.lua_get("_G.NoNeckPain.state.tabs[1].wins.main.left")
+    local right_after = child.lua_get("_G.NoNeckPain.state.tabs[1].wins.main.right")
+
+    Helpers.expect.equality(left_after ~= nil and left_after > 0, true)
+    Helpers.expect.equality(right_after, vim.NIL)
 end
 
 return T
