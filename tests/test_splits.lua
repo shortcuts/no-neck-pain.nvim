@@ -111,11 +111,11 @@ T["split: correctly starts nnp with previously opened splits"] = function()
 
     Helpers.expect.equality(child.get_wins_in_tab(1), { 1002, 1001, 1003, 1000 })
 
-    Helpers.expect.buf_width_in_range(child, "1002", 18, 20)
-    Helpers.expect.buf_width_in_range(child, "1003", 18, 20)
+    Helpers.expect.buf_width_in_range(child, "1002", 28, 32)
+    Helpers.expect.buf_width_in_range(child, "1003", 28, 32)
 
     Helpers.expect.buf_width_in_range(child, "1000", 78, 80)
-    Helpers.expect.buf_width_in_range(child, "1001", 36, 40)
+    Helpers.expect.buf_width_in_range(child, "1001", 16, 20)
 
     Helpers.expect.equality(child.get_wins_in_tab(), { 1002, 1001, 1003, 1000 })
 end
@@ -379,7 +379,7 @@ T["vsplit/split: closing side buffers because of splits restores focus"] = funct
     Helpers.expect.equality(child.get_current_win(), 1000)
 end
 
-T["vsplit/split: closing help page doens't break layout"] = function()
+T["vsplit/split: closing help page doesn't break layout"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     child.nnp()
 
@@ -491,7 +491,7 @@ T["split/vsplit: split then vsplit then close side buffers reopen"] = function()
     Helpers.expect.equality(right_after ~= nil and right_after > 0, true)
 end
 
-T["vplit/vsplit: split then vsplit then close side buffers reopen (with only one side buffer)"] = function()
+T["split/vsplit: split then vsplit then close side buffers reopen (with only one side buffer)"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50, buffers={right={enabled=false}}}) ]])
     child.nnp()
     child.wait(50)

@@ -521,7 +521,20 @@ function state:scan_layout(scope)
         end
 
         if is_leaf_only then
-            self:set_layout_windows(scope, layout[2])
+            -- A col of leaves = one visual column (windows stacked vertically)
+            self.tabs[self.active_tab].wins.columns = self.tabs[self.active_tab].wins.columns + 1
+            -- Still check for integrations among the leaves
+            for _, win in ipairs(layout[2]) do
+                local id = win[2]
+                if not api.is_relative_window(id) then
+                    local supported, name, integration = self:is_supported_integration(scope, id)
+                    if supported and name and integration then
+                        integration.id = id
+                        self.tabs[self.active_tab].redraw = true
+                        self.tabs[self.active_tab].wins.integrations[name] = integration
+                    end
+                end
+            end
         else
             self:walk_layout(scope, layout[2], false)
         end
