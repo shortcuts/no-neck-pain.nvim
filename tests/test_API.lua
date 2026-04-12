@@ -168,6 +168,9 @@ T["Setup: sets exposed methods and default options value"] = function()
             outline = {
                 position = "right",
             },
+            snacks_picker = {
+                position = "left",
+            },
             undotree = {
                 position = "left",
             },
@@ -315,6 +318,9 @@ T["Setup: overrides default values"] = function()
             },
             outline = {
                 position = "right",
+            },
+            snacks_picker = {
+                position = "left",
             },
             undotree = {
                 position = "left",

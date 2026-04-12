@@ -44,6 +44,9 @@ T["setup: sets default values"] = function()
         outline = {
             position = "right",
         },
+        snacks_picker = {
+            position = "left",
+        },
         undotree = {
             position = "left",
         },
@@ -113,6 +116,9 @@ T["setup: overrides default values and add new entries"] = function()
         },
         oil = {
             position = "none",
+        },
+        snacks_picker = {
+            position = "left",
         },
         foobar = {
             position = "left",
@@ -403,6 +409,9 @@ T["neo-tree: keeps sides open"] = function()
         outline = {
             position = "right",
         },
+        snacks_picker = {
+            position = "left",
+        },
         undotree = {
             position = "left",
         },
@@ -447,6 +456,9 @@ T["neo-tree: keeps sides open"] = function()
         },
         outline = {
             position = "right",
+        },
+        snacks_picker = {
+            position = "left",
         },
         undotree = {
             position = "left",
@@ -500,6 +512,9 @@ T["neo-tree: properly enables nnp with tree already opened"] = function()
         },
         outline = {
             position = "right",
+        },
+        snacks_picker = {
+            position = "left",
         },
         undotree = {
             position = "left",
@@ -570,6 +585,56 @@ T["aerial: keeps sides open"] = function()
         left = 1001,
         right = 1002,
     })
+end
+
+-- =============================================================================
+-- snacks_picker
+-- =============================================================================
+
+T["snacks_picker: detects col-based explorer integration"] = function()
+    child.set_size(10, 300)
+    child.lua([[
+        require('no-neck-pain').setup({
+            width = 100,
+            integrations = {
+                snacks_picker = { position = "left" },
+            }
+        })
+    ]])
+
+    child.nnp()
+    child.wait()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+    Helpers.expect.state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
+
+    -- Simulate snacks_picker col layout: a vertical split with two stacked windows
+    -- This creates the col structure: ["col", {leaf(list), leaf(input)}]
+    child.cmd("topleft 40vnew")
+    child.wait()
+    child.bo.filetype = "snacks_picker_list"
+    child.wait()
+
+    -- Split the picker window to create the col (list on top, input on bottom)
+    child.cmd("split")
+    child.wait()
+    child.bo.filetype = "snacks_picker_input"
+    child.wait()
+
+    -- Navigate back to main window
+    child.cmd("wincmd l")
+    child.wait(50)
+
+    -- The col-based integration should be detected
+    Helpers.expect.state(child, "tabs[1].wins.integrations.snacks_picker.position", "left")
+    Helpers.expect.state_type(child, "tabs[1].wins.integrations.snacks_picker.id", "number")
+
+    -- Layout: col(snacks_picker) + left_pad + main + right_pad = 4 columns
+    Helpers.expect.state(child, "tabs[1].wins.columns", 4)
 end
 
 -- =============================================================================
