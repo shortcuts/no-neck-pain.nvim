@@ -375,6 +375,12 @@ Default values:
               ---@type "none"
               position = "none",
           },
+          -- @link https://github.com/folke/snacks.nvim
+          snacks_picker = {
+              -- The position of the picker explorer.
+              ---@type "left"|"right"
+              position = "left",
+          },
           -- this is a generic field to hint no-neck-pain that you use a dashboard plugin.
           -- the filetypes of natively supported dashboards are listed below in the `filetypes` field.
           -- if a dashboard that you use isn't supported, either set `dashboard.filetype` to the expected file type, or open a pull-request with the edited list.

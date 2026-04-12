@@ -449,6 +449,18 @@ function state:set_layout_windows(scope, wins)
             self.tabs[self.active_tab].wins.columns = self.tabs[self.active_tab].wins.columns + 1
         elseif win[1] == "col" then
             self.tabs[self.active_tab].wins.columns = self.tabs[self.active_tab].wins.columns + 1
+            -- scan leaf children of the col for integrations (e.g. snacks explorer)
+            for _, sub in ipairs(win[2]) do
+                if sub[1] == "leaf" and not api.is_relative_window(sub[2]) then
+                    local supported, name, integration =
+                        self:is_supported_integration(scope, sub[2])
+                    if supported and name and integration then
+                        integration.id = sub[2]
+                        self.tabs[self.active_tab].redraw = true
+                        self.tabs[self.active_tab].wins.integrations[name] = integration
+                    end
+                end
+            end
         end
     end
 end

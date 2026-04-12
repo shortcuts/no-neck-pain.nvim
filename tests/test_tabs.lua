@@ -28,6 +28,9 @@ local function get_integrations()
         oil = {
             position = "none",
         },
+        snacks_picker = {
+            position = "left",
+        },
         dashboard = {
             enabled = false,
             filetypes = { "dashboard", "alpha", "starter", "snacks" },
