@@ -423,6 +423,7 @@ function main.enable(scope)
 
                 local new_integration_found = false
                 for name, opts in pairs(state:get_integrations()) do
+                    log.debug(s, "post-scan integration '%s': id=%s, old_id=%s", name, tostring(opts.id), tostring(old_integration_ids[name]))
                     if opts.id ~= nil and not old_integration_ids[name] then
                         new_integration_found = true
                         break
@@ -466,6 +467,8 @@ function main.enable(scope)
                     left_id_before,
                     right_id_before
                 )
+
+                log.debug(s, "action=%s, new_integration_found=%s, init=%s, pre=%d, post=%d", tostring(action), tostring(new_integration_found), tostring(init), pre_win_count, post_win_count)
 
                 if action == "disable" then
                     log.debug(s, "a side window was closed, disabling plugin")
