@@ -285,9 +285,8 @@ T["nvimdapui: toggle width stability (issue #470)"] = function()
         child.lua([[require('dapui').close()]])
         child.wait()
 
-        local left_id = child.lua_get(
-            "_G.NoNeckPain.state.tabs[_G.NoNeckPain.state.active_tab].wins.main.left"
-        )
+        local left_id =
+            child.lua_get("_G.NoNeckPain.state.tabs[_G.NoNeckPain.state.active_tab].wins.main.left")
         local right_id = child.lua_get(
             "_G.NoNeckPain.state.tabs[_G.NoNeckPain.state.active_tab].wins.main.right"
         )
@@ -300,17 +299,25 @@ T["nvimdapui: toggle width stability (issue #470)"] = function()
         local right_width = child.lua_get("vim.api.nvim_win_get_width(" .. right_id .. ")")
 
         if math.abs(left_width - baseline_left) >= 2 then
-            error(string.format(
-                "Cycle %d: left width drifted from %d to %d",
-                cycle, baseline_left, left_width
-            ))
+            error(
+                string.format(
+                    "Cycle %d: left width drifted from %d to %d",
+                    cycle,
+                    baseline_left,
+                    left_width
+                )
+            )
         end
 
         if math.abs(right_width - baseline_right) >= 2 then
-            error(string.format(
-                "Cycle %d: right width drifted from %d to %d",
-                cycle, baseline_right, right_width
-            ))
+            error(
+                string.format(
+                    "Cycle %d: right width drifted from %d to %d",
+                    cycle,
+                    baseline_right,
+                    right_width
+                )
+            )
         end
 
         Helpers.assert_width_invariant(child)
@@ -645,6 +652,174 @@ end
 -- =============================================================================
 -- snacks_picker
 -- =============================================================================
+
+T["snacks_picker: wrong resizing with right side disabled (issue #511)"] = function()
+    child.set_size(10, 200)
+    child.lua([[
+        require('no-neck-pain').setup({
+            width = 80,
+            buffers = {
+                right = { enabled = false },
+            },
+            integrations = {
+                snacks_picker = { position = "left" },
+            }
+        })
+    ]])
+
+    child.nnp()
+    child.wait()
+
+    -- With right disabled: layout is [left_pad] [main]
+    -- left_pad should absorb the remaining space
+    local wins_before = child.get_wins_in_tab()
+    Helpers.expect.equality(#wins_before, 2)
+
+    local curr_id =
+        child.lua_get("_G.NoNeckPain.state.tabs[_G.NoNeckPain.state.active_tab].wins.main.curr")
+    local left_id =
+        child.lua_get("_G.NoNeckPain.state.tabs[_G.NoNeckPain.state.active_tab].wins.main.left")
+
+    local curr_width_before = child.lua_get("vim.api.nvim_win_get_width(" .. curr_id .. ")")
+    local left_width_before = child.lua_get("vim.api.nvim_win_get_width(" .. left_id .. ")")
+    local total_cols = child.o.columns
+
+    -- Sanity: widths add up before explorer
+    if math.abs((left_width_before + curr_width_before) - total_cols) > 2 then
+        error(
+            string.format(
+                "Pre-explorer invariant failed: left(%d) + curr(%d) = %d, expected ~%d",
+                left_width_before,
+                curr_width_before,
+                left_width_before + curr_width_before,
+                total_cols
+            )
+        )
+    end
+
+    -- Open a snacks explorer on the left (simulated)
+    child.cmd("topleft 30vnew")
+    child.wait()
+    child.bo.filetype = "snacks_picker_list"
+    child.wait()
+
+    -- Navigate back to main window
+    child.cmd("wincmd l")
+    child.wait(50)
+
+    -- The explorer takes ~30 columns. NNP should detect it and adjust widths.
+    -- With the bug, NNP doesn't properly account for the explorer width,
+    -- so the main buffer width is wrong.
+    local explorer_width =
+        child.lua_get("vim.api.nvim_win_get_width(" .. child.lua_get("vim.fn.win_getid(1)") .. ")")
+
+    local curr_width_after = child.lua_get("vim.api.nvim_win_get_width(" .. curr_id .. ")")
+    local left_width_after = child.lua_get("vim.api.nvim_win_get_width(" .. left_id .. ")")
+
+    -- Width invariant WITH the explorer: explorer + left_pad + curr = total_cols
+    local computed = explorer_width + left_width_after + curr_width_after
+    local margin = 2
+
+    if math.abs(computed - total_cols) > margin then
+        error(
+            string.format(
+                "Width invariant failed with explorer: explorer(%d) + left(%d) + curr(%d) = %d, expected ~%d",
+                explorer_width,
+                left_width_after,
+                curr_width_after,
+                computed,
+                total_cols
+            )
+        )
+    end
+
+    -- The main buffer should still be close to the configured width (80)
+    if math.abs(curr_width_after - 80) > 5 then
+        error(string.format("Main buffer width drifted: expected ~80, got %d", curr_width_after))
+    end
+end
+
+T["snacks_picker: wrong resizing with both sides enabled (issue #511)"] = function()
+    child.set_size(10, 200)
+    child.lua([[
+        require('no-neck-pain').setup({
+            width = 80,
+            integrations = {
+                snacks_picker = { position = "left" },
+            }
+        })
+    ]])
+
+    child.nnp()
+    child.wait()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+
+    -- Record baseline widths
+    local left_width_before = child.lua_get("vim.api.nvim_win_get_width(1001)")
+    local curr_width_before = child.lua_get("vim.api.nvim_win_get_width(1000)")
+    local right_width_before = child.lua_get("vim.api.nvim_win_get_width(1002)")
+
+    -- Open snacks explorer on the left
+    child.cmd("topleft 30vnew")
+    child.wait()
+    child.bo.filetype = "snacks_picker_list"
+    child.wait()
+
+    child.cmd("wincmd l")
+    child.wait(50)
+
+    -- Get the explorer window (first window in tab)
+    local wins_after = child.get_wins_in_tab()
+    local explorer_win = wins_after[1]
+    local explorer_width = child.lua_get("vim.api.nvim_win_get_width(" .. explorer_win .. ")")
+
+    local left_width_after = child.lua_get("vim.api.nvim_win_get_width(1001)")
+    local curr_width_after = child.lua_get("vim.api.nvim_win_get_width(1000)")
+    local right_width_after = child.lua_get("vim.api.nvim_win_get_width(1002)")
+    local total_cols = child.o.columns
+
+    -- Full width invariant: explorer + left + curr + right = total (with separators)
+    local computed = explorer_width + left_width_after + curr_width_after + right_width_after
+    local margin = 4 -- allow for window separators
+
+    if math.abs(computed - total_cols) > margin then
+        error(
+            string.format(
+                "Width invariant failed: explorer(%d) + left(%d) + curr(%d) + right(%d) = %d, expected ~%d",
+                explorer_width,
+                left_width_after,
+                curr_width_after,
+                right_width_after,
+                computed,
+                total_cols
+            )
+        )
+    end
+
+    -- The main buffer should remain at configured width
+    if math.abs(curr_width_after - 80) > 5 then
+        error(
+            string.format(
+                "Main buffer width drifted: expected ~80, got %d (was %d before explorer)",
+                curr_width_after,
+                curr_width_before
+            )
+        )
+    end
+
+    -- Left padding should have shrunk to accommodate the explorer
+    if left_width_after >= left_width_before then
+        error(
+            string.format(
+                "Left padding did not shrink: was %d, now %d (explorer takes %d columns)",
+                left_width_before,
+                left_width_after,
+                explorer_width
+            )
+        )
+    end
+end
 
 T["snacks_picker: detects col-based explorer integration"] = function()
     child.set_size(10, 300)

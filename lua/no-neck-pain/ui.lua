@@ -218,6 +218,11 @@ function ui.create_side_buffers()
         end
     end
 
+    -- Refresh column count after creating new windows so the second loop
+    -- computes widths with the correct number of columns.
+    state:scan_layout("ui.create_side_buffers:rescan")
+    state.tabs[state.active_tab].redraw = false
+
     for _, side in ipairs(constants.SIDES) do
         local scope = string.format("ui.create_side_buffers:%s", side)
         if state:is_side_valid(side) then
@@ -238,11 +243,9 @@ function ui.create_side_buffers()
                 log.debug(scope, "Closed side window")
             else
                 log.debug(scope, "Keeping side window (padding >= minWidth)")
-                if not created_in_first_loop[side] then
-                    local current_width = vim.api.nvim_win_get_width(state:get_side_id(side))
-                    if math.abs(current_width - padding) > 1 then
-                        state:resize_win(scope, side, padding)
-                    end
+                local current_width = vim.api.nvim_win_get_width(state:get_side_id(side))
+                if math.abs(current_width - padding) > 1 then
+                    state:resize_win(scope, side, padding)
                 end
             end
         else
@@ -296,7 +299,7 @@ function ui.get_side_width(side)
 
     -- remove columns of registered integrations
     for name, opts in pairs(state:get_integrations()) do
-        if opts.id ~= nil and side == opts.position then
+        if opts.id ~= nil and opts.position ~= "none" then
             local integration_width = vim.api.nvim_win_get_width(opts.id)
 
             log.debug(scope, "%s opened with width %d", name, integration_width)
@@ -305,6 +308,8 @@ function ui.get_side_width(side)
             columns = columns - 1
         end
     end
+
+    columns = columns - state:get_none_columns()
 
     log.debug(
         scope,

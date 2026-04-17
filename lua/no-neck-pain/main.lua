@@ -411,7 +411,23 @@ function main.enable(scope)
                 end
 
                 local pre_win_count = #vim.api.nvim_tabpage_list_wins(state.active_tab)
+
+                local old_integration_ids = {}
+                for name, opts in pairs(state:get_integrations()) do
+                    if opts.id ~= nil then
+                        old_integration_ids[name] = opts.id
+                    end
+                end
+
                 local init = state:scan_layout(s)
+
+                local new_integration_found = false
+                for name, opts in pairs(state:get_integrations()) do
+                    if opts.id ~= nil and not old_integration_ids[name] then
+                        new_integration_found = true
+                        break
+                    end
+                end
 
                 -- Capture side IDs before validation to detect if they were already nil
                 local left_id_before = state:get_side_id("left")
@@ -466,6 +482,9 @@ function main.enable(scope)
                         state:set_previously_focused_win(current_win)
                     end
                     api.debounce(s, main.init)
+                elseif new_integration_found and p.event == "WinEnter" then
+                    state.tabs[state.active_tab].redraw = false
+                    api.debounce(s, ui.create_side_buffers)
                 end
             end)
         end,

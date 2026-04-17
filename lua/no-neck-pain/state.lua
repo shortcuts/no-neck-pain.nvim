@@ -87,6 +87,7 @@ function state:init_columns()
         return
     end
     self.tabs[self.active_tab].wins.columns = 0
+    self.tabs[self.active_tab].wins.none_columns = 0
 end
 
 --- Saves the state in the global _G.NoNeckPain.state object.
@@ -185,6 +186,7 @@ function state:set_tab(id)
         redraw = false,
         wins = {
             columns = 0,
+            none_columns = 0,
             main = {
                 curr = nil,
                 left = nil,
@@ -411,6 +413,15 @@ function state:get_columns()
     return self.tabs[self.active_tab].wins.columns
 end
 
+---@return number: the number of columns occupied by position="none" integrations.
+---@private
+function state:get_none_columns()
+    if not (self:has_tabs() and self.tabs[self.active_tab] ~= nil) then
+        return 0
+    end
+    return self.tabs[self.active_tab].wins.none_columns or 0
+end
+
 --- Consumes the redraw value in the state, in order to know if we should redraw sides or not.
 ---
 ---@return boolean
@@ -447,9 +458,14 @@ function state:set_layout_windows(scope, wins)
                 self.tabs[self.active_tab].wins.integrations[name] = integration
             end
             self.tabs[self.active_tab].wins.columns = self.tabs[self.active_tab].wins.columns + 1
+            if supported and integration and integration.position == "none" then
+                self.tabs[self.active_tab].wins.none_columns = self.tabs[self.active_tab].wins.none_columns
+                    + 1
+            end
         elseif win[1] == "col" then
             self.tabs[self.active_tab].wins.columns = self.tabs[self.active_tab].wins.columns + 1
             -- scan leaf children of the col for integrations (e.g. snacks explorer)
+            local has_none_integration = false
             for _, sub in ipairs(win[2]) do
                 if sub[1] == "leaf" and not api.is_relative_window(sub[2]) then
                     local supported, name, integration =
@@ -458,8 +474,15 @@ function state:set_layout_windows(scope, wins)
                         integration.id = sub[2]
                         self.tabs[self.active_tab].redraw = true
                         self.tabs[self.active_tab].wins.integrations[name] = integration
+                        if integration.position == "none" then
+                            has_none_integration = true
+                        end
                     end
                 end
+            end
+            if has_none_integration then
+                self.tabs[self.active_tab].wins.none_columns = self.tabs[self.active_tab].wins.none_columns
+                    + 1
             end
         end
     end
@@ -535,7 +558,7 @@ function state:scan_layout(scope)
         if is_leaf_only then
             -- A col of leaves = one visual column (windows stacked vertically)
             self.tabs[self.active_tab].wins.columns = self.tabs[self.active_tab].wins.columns + 1
-            -- Still check for integrations among the leaves
+            local has_none_integration = false
             for _, win in ipairs(layout[2]) do
                 local id = win[2]
                 if not api.is_relative_window(id) then
@@ -544,8 +567,15 @@ function state:scan_layout(scope)
                         integration.id = id
                         self.tabs[self.active_tab].redraw = true
                         self.tabs[self.active_tab].wins.integrations[name] = integration
+                        if integration.position == "none" then
+                            has_none_integration = true
+                        end
                     end
                 end
+            end
+            if has_none_integration then
+                self.tabs[self.active_tab].wins.none_columns = self.tabs[self.active_tab].wins.none_columns
+                    + 1
             end
         else
             self:walk_layout(scope, layout[2], false)
