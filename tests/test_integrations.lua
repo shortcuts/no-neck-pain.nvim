@@ -262,6 +262,61 @@ T["nvimdapui: keeps sides open"] = function()
     Helpers.expect.state(child, "tabs[1].wins.columns", 5)
 end
 
+T["nvimdapui: toggle width stability (issue #470)"] = function()
+    child.restart({ "-u", "scripts/init_with_nvimdapui.lua" })
+
+    child.nnp()
+    child.wait()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+    Helpers.expect.state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
+
+    local baseline_left = child.lua_get("vim.api.nvim_win_get_width(1001)")
+    local baseline_right = child.lua_get("vim.api.nvim_win_get_width(1002)")
+
+    for cycle = 1, 3 do
+        child.lua([[require('dapui').open()]])
+        child.wait()
+
+        child.lua([[require('dapui').close()]])
+        child.wait()
+
+        local left_id = child.lua_get(
+            "_G.NoNeckPain.state.tabs[_G.NoNeckPain.state.active_tab].wins.main.left"
+        )
+        local right_id = child.lua_get(
+            "_G.NoNeckPain.state.tabs[_G.NoNeckPain.state.active_tab].wins.main.right"
+        )
+
+        if left_id == vim.NIL or right_id == vim.NIL then
+            error(string.format("Cycle %d: side buffers lost after dap toggle", cycle))
+        end
+
+        local left_width = child.lua_get("vim.api.nvim_win_get_width(" .. left_id .. ")")
+        local right_width = child.lua_get("vim.api.nvim_win_get_width(" .. right_id .. ")")
+
+        if math.abs(left_width - baseline_left) >= 2 then
+            error(string.format(
+                "Cycle %d: left width drifted from %d to %d",
+                cycle, baseline_left, left_width
+            ))
+        end
+
+        if math.abs(right_width - baseline_right) >= 2 then
+            error(string.format(
+                "Cycle %d: right width drifted from %d to %d",
+                cycle, baseline_right, right_width
+            ))
+        end
+
+        Helpers.assert_width_invariant(child)
+    end
+end
+
 -- =============================================================================
 -- neotest
 -- =============================================================================
