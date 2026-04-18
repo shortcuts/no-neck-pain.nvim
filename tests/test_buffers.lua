@@ -294,6 +294,29 @@ T["Left/Right: only creates a right buffer when left.enabled is false"] = functi
     Helpers.expect.buf_width(child, "tabs[1].wins.main.right", 15)
 end
 
+T["Left/Right: single side width remains correct after resize"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=50,buffers={right={enabled=false}}}) ]])
+    child.nnp()
+
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 15)
+
+    child.cmd("NoNeckPainResize 40")
+
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 20)
+end
+
+T["Left/Right: single side width is stable after toggle cycle"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=50,buffers={right={enabled=false}}}) ]])
+    child.nnp()
+
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 15)
+
+    child.nnp()
+    child.nnp()
+
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 15)
+end
+
 T["Left/Right: closing the left buffer disables NNP"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     child.nnp()

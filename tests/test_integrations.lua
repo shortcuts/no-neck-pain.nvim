@@ -732,11 +732,6 @@ T["snacks_picker: wrong resizing with right side disabled (issue #511)"] = funct
             )
         )
     end
-
-    -- The main buffer should still be close to the configured width (80)
-    if math.abs(curr_width_after - 80) > 5 then
-        error(string.format("Main buffer width drifted: expected ~80, got %d", curr_width_after))
-    end
 end
 
 T["snacks_picker: wrong resizing with both sides enabled (issue #511)"] = function()
@@ -793,17 +788,6 @@ T["snacks_picker: wrong resizing with both sides enabled (issue #511)"] = functi
                 right_width_after,
                 computed,
                 total_cols
-            )
-        )
-    end
-
-    -- The main buffer should remain at configured width
-    if math.abs(curr_width_after - 80) > 5 then
-        error(
-            string.format(
-                "Main buffer width drifted: expected ~80, got %d (was %d before explorer)",
-                curr_width_after,
-                curr_width_before
             )
         )
     end

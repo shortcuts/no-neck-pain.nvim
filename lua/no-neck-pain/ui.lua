@@ -229,27 +229,16 @@ function ui.create_side_buffers()
             local padding = ui.get_side_width(side)
             local minWidth = helpers.get_config_field("minSideBufferWidth")
 
-            log.debug(
-                scope,
-                "Checking side: padding=%s, minWidth=%s, should_close=%s",
-                padding,
-                minWidth,
-                tostring(padding < minWidth)
-            )
-
             if padding < minWidth then
                 ui.close_win(scope, state:get_side_id(side), side)
                 state:set_side_id(nil, side)
-                log.debug(scope, "Closed side window")
             else
-                log.debug(scope, "Keeping side window (padding >= minWidth)")
                 local current_width = vim.api.nvim_win_get_width(state:get_side_id(side))
                 if math.abs(current_width - padding) > 1 then
                     state:resize_win(scope, side, padding)
                 end
             end
         else
-            log.debug(scope, "Side not enabled or valid, skipping")
         end
     end
 end
@@ -299,14 +288,7 @@ function ui.get_side_width(side)
 
     -- remove columns of registered integrations
     for name, opts in pairs(state:get_integrations()) do
-        log.debug(
-            scope,
-            "integration '%s': id=%s, position=%s",
-            name,
-            tostring(opts.id),
-            tostring(opts.position)
-        )
-        if opts.id ~= nil and opts.position ~= "none" then
+        if opts.id ~= nil and opts.position == side then
             local integration_width = vim.api.nvim_win_get_width(opts.id)
 
             log.debug(scope, "%s opened with width %d", name, integration_width)
@@ -333,33 +315,7 @@ function ui.get_side_width(side)
 
     log.debug(scope, "%d/%d after vsplits - %d columns remaining", width, vim.o.columns, columns)
 
-    local enabled_sides = 0
-    if state:is_side_enabled("left") then
-        enabled_sides = enabled_sides + 1
-    end
-    if state:is_side_enabled("right") then
-        enabled_sides = enabled_sides + 1
-    end
-
-    -- When only one side is enabled AND integrations are consuming space,
-    -- the remaining width should not be halved since there's no other side
-    -- to share it with. Without integrations, dividing by 2 is correct
-    -- because it accounts for the main buffer taking its configured width
-    -- from the center of the screen.
-    local has_active_integrations = false
-    for _, opts in pairs(state:get_integrations()) do
-        if opts.id ~= nil and opts.position ~= "none" then
-            has_active_integrations = true
-            break
-        end
-    end
-
-    local divisor = 2
-    if enabled_sides == 1 and has_active_integrations then
-        divisor = 1
-    end
-
-    local final = math.floor(width / divisor)
+    local final = math.floor(width / 2)
 
     if final < helpers.get_config_field("minSideBufferWidth") or final < 0 then
         log.debug(scope, "no space left to create side buffer")

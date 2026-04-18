@@ -341,6 +341,7 @@ T["tabnew/tabclose: doesn't keep closed tabs in state"] = function()
                     right = 1002,
                 },
                 columns = 3,
+                none_columns = 0,
             },
         },
     })
@@ -361,6 +362,7 @@ T["tabnew/tabclose: doesn't keep closed tabs in state"] = function()
                     right = 1002,
                 },
                 columns = 3,
+                none_columns = 0,
             },
         },
         {
@@ -375,6 +377,7 @@ T["tabnew/tabclose: doesn't keep closed tabs in state"] = function()
                     right = 1005,
                 },
                 columns = 3,
+                none_columns = 0,
             },
         },
     })
@@ -394,6 +397,7 @@ T["tabnew/tabclose: doesn't keep closed tabs in state"] = function()
                     right = 1002,
                 },
                 columns = 3,
+                none_columns = 0,
             },
         },
     })
@@ -420,6 +424,7 @@ T["tabnew/tabclose: keeps state synchronized between tabs"] = function()
                     right = 1002,
                 },
                 columns = 3,
+                none_columns = 0,
             },
         },
     })
@@ -444,6 +449,7 @@ T["tabnew/tabclose: keeps state synchronized between tabs"] = function()
                     right = 1002,
                 },
                 columns = 3,
+                none_columns = 0,
             },
         },
         {
@@ -458,6 +464,7 @@ T["tabnew/tabclose: keeps state synchronized between tabs"] = function()
                     right = 1005,
                 },
                 columns = 3,
+                none_columns = 0,
             },
         },
     })
@@ -476,6 +483,7 @@ T["tabnew/tabclose: keeps state synchronized between tabs"] = function()
                     right = 1002,
                 },
                 columns = 3,
+                none_columns = 0,
             },
         },
     })
@@ -494,6 +502,7 @@ T["tabnew/tabclose: keeps state synchronized between tabs"] = function()
                     right = 1002,
                 },
                 columns = 3,
+                none_columns = 0,
             },
         },
         {
@@ -508,6 +517,7 @@ T["tabnew/tabclose: keeps state synchronized between tabs"] = function()
                     right = 1007,
                 },
                 columns = 3,
+                none_columns = 0,
             },
         },
     })
@@ -528,6 +538,7 @@ T["tabnew/tabclose: keeps state synchronized between tabs"] = function()
                     right = 1002,
                 },
                 columns = 3,
+                none_columns = 0,
             },
         },
         {
@@ -542,6 +553,7 @@ T["tabnew/tabclose: keeps state synchronized between tabs"] = function()
                     right = 1007,
                 },
                 columns = 3,
+                none_columns = 0,
             },
         },
     })
@@ -583,6 +595,7 @@ T["tabnew/tabclose: does not pick tab 1 for the first active tab"] = function()
                 right = 1003,
             },
             columns = 3,
+            none_columns = 0,
         },
     })
 
@@ -607,6 +620,7 @@ T["tabnew/tabclose: does not pick tab 1 for the first active tab"] = function()
                 right = 1005,
             },
             columns = 3,
+            none_columns = 0,
         },
     })
     Helpers.expect.state(child, "tabs[2]", {
@@ -621,6 +635,7 @@ T["tabnew/tabclose: does not pick tab 1 for the first active tab"] = function()
                 right = 1003,
             },
             columns = 3,
+            none_columns = 0,
         },
     })
 end
@@ -657,6 +672,7 @@ T["tabnew/tabclose: keep state synchronized on second tab"] = function()
                 right = 1003,
             },
             columns = 3,
+            none_columns = 0,
         },
     })
 
@@ -687,6 +703,7 @@ T["tabnew/tabclose: keep state synchronized on second tab"] = function()
                 right = 1003,
             },
             columns = 3,
+            none_columns = 0,
         },
     })
 
@@ -720,6 +737,7 @@ T["tabnew/tabclose: does not close nvim when quitting tab if some are left"] = f
                 right = 1002,
             },
             columns = 3,
+            none_columns = 0,
         },
     })
     Helpers.expect.state(child, "active_tab", 2)
@@ -735,6 +753,7 @@ T["tabnew/tabclose: does not close nvim when quitting tab if some are left"] = f
                 right = 1005,
             },
             columns = 3,
+            none_columns = 0,
         },
     })
 
@@ -754,6 +773,7 @@ T["tabnew/tabclose: does not close nvim when quitting tab if some are left"] = f
                 right = 1002,
             },
             columns = 3,
+            none_columns = 0,
         },
     })
     Helpers.expect.state(child, "tabs[2]", vim.NIL)
@@ -777,6 +797,7 @@ T["tabnew/tabclose: closes terminal tab without affecting no-neck-pain on other 
                 right = 1002,
             },
             columns = 3,
+            none_columns = 0,
         },
     })
 
@@ -806,6 +827,7 @@ T["tabnew/tabclose: closes terminal tab without affecting no-neck-pain on other 
                 right = 1002,
             },
             columns = 3,
+            none_columns = 0,
         },
     })
 

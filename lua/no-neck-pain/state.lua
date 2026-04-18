@@ -76,13 +76,6 @@ function state:init_integrations()
     for name, opts in pairs(vim.deepcopy(helpers.get_config_field("integrations"))) do
         local lower_name = string.lower(name)
         self.tabs[self.active_tab].wins.integrations[lower_name] = opts
-        log.debug(
-            "init_integrations",
-            "registered '%s' (position=%s, id=%s)",
-            lower_name,
-            tostring(opts.position),
-            tostring(opts.id)
-        )
     end
 end
 
@@ -457,19 +450,8 @@ function state:set_layout_windows(scope, wins)
     for _, win in ipairs(wins) do
         local id = win[2]
         if win[1] == "leaf" and not api.is_relative_window(id) then
-            local buf = vim.api.nvim_win_get_buf(id)
-            local ft = vim.api.nvim_get_option_value("filetype", { buf = buf })
-            log.debug(scope, "set_layout_windows: checking leaf win=%d, filetype='%s'", id, ft)
             local supported, name, integration = self:is_supported_integration(scope, id)
             if supported and name and integration then
-                log.debug(
-                    scope,
-                    "set_layout_windows: MATCH win=%d as '%s' (position=%s), setting id=%d",
-                    id,
-                    name,
-                    tostring(integration.position),
-                    id
-                )
                 integration.id = id
 
                 self.tabs[self.active_tab].redraw = true
@@ -486,14 +468,6 @@ function state:set_layout_windows(scope, wins)
             local has_none_integration = false
             for _, sub in ipairs(win[2]) do
                 if sub[1] == "leaf" and not api.is_relative_window(sub[2]) then
-                    local sub_buf = vim.api.nvim_win_get_buf(sub[2])
-                    local sub_ft = vim.api.nvim_get_option_value("filetype", { buf = sub_buf })
-                    log.debug(
-                        scope,
-                        "set_layout_windows:col: checking sub-leaf win=%d, filetype='%s'",
-                        sub[2],
-                        sub_ft
-                    )
                     local supported, name, integration =
                         self:is_supported_integration(scope, sub[2])
                     if supported and name and integration then
@@ -568,8 +542,6 @@ function state:scan_layout(scope)
     local layout = vim.fn.winlayout()
     local layout_type = layout[1]
 
-    log.debug(scope, "scan_layout: layout_type=%s, layout=%s", layout_type, vim.inspect(layout))
-
     if layout_type == "leaf" then
         -- Single window layout (e.g., vim startup with nnp autocmds)
         self:set_layout_windows(scope, { layout })
@@ -617,16 +589,6 @@ function state:scan_layout(scope)
 
     local final_columns = self:get_columns()
     log.debug(scope, "computed columns: %d - %d", initial_columns, final_columns)
-
-    for name, opts in pairs(self:get_integrations()) do
-        log.debug(
-            scope,
-            "scan_layout result: integration '%s' id=%s position=%s",
-            name,
-            tostring(opts.id),
-            tostring(opts.position)
-        )
-    end
 
     return initial_columns ~= final_columns
 end
