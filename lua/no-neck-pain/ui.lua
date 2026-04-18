@@ -299,7 +299,13 @@ function ui.get_side_width(side)
 
     -- remove columns of registered integrations
     for name, opts in pairs(state:get_integrations()) do
-        log.debug(scope, "integration '%s': id=%s, position=%s", name, tostring(opts.id), tostring(opts.position))
+        log.debug(
+            scope,
+            "integration '%s': id=%s, position=%s",
+            name,
+            tostring(opts.id),
+            tostring(opts.position)
+        )
         if opts.id ~= nil and opts.position ~= "none" then
             local integration_width = vim.api.nvim_win_get_width(opts.id)
 
