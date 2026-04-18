@@ -2,3 +2,5 @@ deps
 **.DS_Store
 .ci/**
 .sisyphus
+# Added by code-review-graph
+.code-review-graph/
