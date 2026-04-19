@@ -450,17 +450,19 @@ function state:set_layout_windows(scope, wins)
     for _, win in ipairs(wins) do
         local id = win[2]
         if win[1] == "leaf" and not api.is_relative_window(id) then
-            local supported, name, integration = self:is_supported_integration(scope, id)
-            if supported and name and integration then
-                integration.id = id
-
-                self.tabs[self.active_tab].redraw = true
-                self.tabs[self.active_tab].wins.integrations[name] = integration
-            end
             self.tabs[self.active_tab].wins.columns = self.tabs[self.active_tab].wins.columns + 1
-            if supported and integration and integration.position == "none" then
-                self.tabs[self.active_tab].wins.none_columns = self.tabs[self.active_tab].wins.none_columns
-                    + 1
+            if id ~= self:get_side_id("curr") then
+                local supported, name, integration = self:is_supported_integration(scope, id)
+                if supported and name and integration then
+                    integration.id = id
+
+                    self.tabs[self.active_tab].redraw = true
+                    self.tabs[self.active_tab].wins.integrations[name] = integration
+                end
+                if supported and integration and integration.position == "none" then
+                    self.tabs[self.active_tab].wins.none_columns = self.tabs[self.active_tab].wins.none_columns
+                        + 1
+                end
             end
         elseif win[1] == "col" then
             self.tabs[self.active_tab].wins.columns = self.tabs[self.active_tab].wins.columns + 1
@@ -468,14 +470,16 @@ function state:set_layout_windows(scope, wins)
             local has_none_integration = false
             for _, sub in ipairs(win[2]) do
                 if sub[1] == "leaf" and not api.is_relative_window(sub[2]) then
-                    local supported, name, integration =
-                        self:is_supported_integration(scope, sub[2])
-                    if supported and name and integration then
-                        integration.id = sub[2]
-                        self.tabs[self.active_tab].redraw = true
-                        self.tabs[self.active_tab].wins.integrations[name] = integration
-                        if integration.position == "none" then
-                            has_none_integration = true
+                    if sub[2] ~= self:get_side_id("curr") then
+                        local supported, name, integration =
+                            self:is_supported_integration(scope, sub[2])
+                        if supported and name and integration then
+                            integration.id = sub[2]
+                            self.tabs[self.active_tab].redraw = true
+                            self.tabs[self.active_tab].wins.integrations[name] = integration
+                            if integration.position == "none" then
+                                has_none_integration = true
+                            end
                         end
                     end
                 end
@@ -562,13 +566,16 @@ function state:scan_layout(scope)
             for _, win in ipairs(layout[2]) do
                 local id = win[2]
                 if not api.is_relative_window(id) then
-                    local supported, name, integration = self:is_supported_integration(scope, id)
-                    if supported and name and integration then
-                        integration.id = id
-                        self.tabs[self.active_tab].redraw = true
-                        self.tabs[self.active_tab].wins.integrations[name] = integration
-                        if integration.position == "none" then
-                            has_none_integration = true
+                    if id ~= self:get_side_id("curr") then
+                        local supported, name, integration =
+                            self:is_supported_integration(scope, id)
+                        if supported and name and integration then
+                            integration.id = id
+                            self.tabs[self.active_tab].redraw = true
+                            self.tabs[self.active_tab].wins.integrations[name] = integration
+                            if integration.position == "none" then
+                                has_none_integration = true
+                            end
                         end
                     end
                 end

@@ -1248,4 +1248,40 @@ T["edge_cases: config override for integration position changes"] = function()
     Helpers.expect.no_equality(main.right, vim.NIL)
 end
 
+-- =============================================================================
+-- oil as main buffer
+-- =============================================================================
+
+T["oil: should not count oil as integration when it's the main buffer"] = function()
+    -- Setup: open oil as the main buffer and disable right side
+    child.lua([[
+        require('no-neck-pain').setup({
+            width = 100,
+            right = { enabled = false },
+        })
+    ]])
+
+    -- Open oil (equivalent to `nvim .`)
+    child.cmd("edit .")
+    child.nnp()
+    child.wait()
+
+    -- Assertion 1: oil (as curr) should NOT be counted as integration
+    Helpers.expect.state(child, "tabs[1].wins.none_columns", 0)
+
+    -- Assertion 2: left side should exist and have correct width
+    local main_win =
+        child.lua_get("_G.NoNeckPain.state.tabs[_G.NoNeckPain.state.active_tab].wins.main.curr")
+    local left_win =
+        child.lua_get("_G.NoNeckPain.state.tabs[_G.NoNeckPain.state.active_tab].wins.main.left")
+
+    Helpers.expect.no_equality(main_win, vim.NIL)
+    Helpers.expect.no_equality(left_win, vim.NIL)
+
+    -- Verify right side is disabled
+    local right_win =
+        child.lua_get("_G.NoNeckPain.state.tabs[_G.NoNeckPain.state.active_tab].wins.main.right")
+    Helpers.expect.equality(right_win, vim.NIL)
+end
+
 return T
