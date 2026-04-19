@@ -123,7 +123,30 @@ function main.init(scope)
         ui.move_sides(string.format("%s:consume_redraw", scope))
     end
 
+    local left_before = state:get_side_id("left")
+    local right_before = state:get_side_id("right")
+
     ui.create_side_buffers()
+
+    local left_after = state:get_side_id("left")
+    local right_after = state:get_side_id("right")
+
+    local new_left = left_before == nil and left_after ~= nil
+    local new_right = right_before == nil and right_after ~= nil
+
+    if (new_left or new_right) and not (new_left and new_right) then
+        -- Count expected NNP-managed windows vs actual windows in tab
+        -- If there are more windows, splits exist and the new side buffer
+        -- needs repositioning to span full tab height
+        local expected = 1 -- curr
+            + (left_after ~= nil and 1 or 0)
+            + (right_after ~= nil and 1 or 0)
+        local actual = #vim.api.nvim_tabpage_list_wins(state.active_tab)
+
+        if actual > expected then
+            ui.move_sides(string.format("%s:reposition_new_sides", scope))
+        end
+    end
 
     if
         (state:is_side_focused("left") or state:is_side_focused("right"))
