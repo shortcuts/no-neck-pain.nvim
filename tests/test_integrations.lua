@@ -1253,18 +1253,23 @@ end
 -- =============================================================================
 
 T["oil: should not count oil as integration when it's the main buffer"] = function()
-    -- Setup: open oil as the main buffer and disable right side
+    child.set_size(10, 200)
     child.lua([[
         require('no-neck-pain').setup({
             width = 100,
-            right = { enabled = false },
+            buffers = {
+                right = { enabled = false },
+            },
         })
     ]])
 
-    -- Open oil (equivalent to `nvim .`)
-    child.cmd("edit .")
+    -- Simulate oil.nvim opening a directory buffer by setting filetype to "oil"
+    child.cmd("enew")
+    child.bo.filetype = "oil"
     child.nnp()
     child.wait()
+
+    Helpers.expect.state(child, "enabled", true)
 
     -- Assertion 1: oil (as curr) should NOT be counted as integration
     Helpers.expect.state(child, "tabs[1].wins.none_columns", 0)
