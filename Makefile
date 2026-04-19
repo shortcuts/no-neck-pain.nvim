@@ -1,6 +1,6 @@
 .SUFFIXES:
 
-TESTFILES=API autocmds buffers callbacks colors commands config_validation constants debug_tabs diagnostic event integrations log mappings options scratchpad splits state_access_regression state_edge_cases tabs width_calculations
+TESTFILES=API autocmds buffers callbacks colors commands config_validation constants debug_tabs diagnostic event integrations log mappings options regression_issues scratchpad splits state_access_regression state_edge_cases tabs width_calculations
 
 all: documentation lint luals test
 
