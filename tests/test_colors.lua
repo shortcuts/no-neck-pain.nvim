@@ -118,6 +118,7 @@ T["Setup: does not throw on invalid windows"] = function()
 
     child.cmd("e aaa.txt")
     child.cmd("vnew aaa.txt")
+    child.wait()
     child.cmd("mksession! deps/mk.vim")
 
     Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1003, 1000, 1002 })
