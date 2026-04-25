@@ -357,6 +357,7 @@ function main.enable(scope)
         if left_id and not valid_win_set[left_id] then
             log.debug(scope, "left side window %d is no longer valid", left_id)
             left_was_cleared = true
+            state:set_side_id(nil, "left")
         end
 
         -- Check if right window is still valid
@@ -365,6 +366,7 @@ function main.enable(scope)
         if right_id and not valid_win_set[right_id] then
             log.debug(scope, "right side window %d is no longer valid", right_id)
             right_was_cleared = true
+            state:set_side_id(nil, "right")
         end
 
         return left_was_cleared, right_was_cleared
@@ -410,12 +412,9 @@ function main.enable(scope)
             and not side_window_was_cleared
         then
             return "init"
-        elseif
-            event_name == "WinEnter"
-            and not init
-            and pre_count ~= post_count
-            and not side_window_was_cleared
-        then
+        elseif event_name == "WinEnter" and not init and pre_count ~= post_count then
+            -- On WinEnter, if window count changed, reinit to recreate side windows
+            -- even if they were cleared (e.g., by a split operation)
             return "init"
         end
 
