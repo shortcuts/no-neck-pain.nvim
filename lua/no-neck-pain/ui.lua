@@ -229,7 +229,7 @@ function ui.create_side_buffers()
             local padding = ui.get_side_width(side)
             local minWidth = helpers.get_config_field("minSideBufferWidth")
 
-            if padding < minWidth and padding > 0 then
+            if padding == -1 or (padding < minWidth and padding > 0) then
                 ui.close_win(scope, state:get_side_id(side), side)
                 state:set_side_id(nil, side)
             elseif padding > 0 then
@@ -317,10 +317,26 @@ function ui.get_side_width(side)
 
     local final = math.floor(width / 2)
 
-    if final < helpers.get_config_field("minSideBufferWidth") or final < 0 then
+    local other_side = side == "left" and "right" or "left"
+
+    if final < 0 and not state:is_side_enabled(other_side) then
+        log.debug(scope, "no space left and only one side active, closing")
+
+        return -1
+    end
+
+    if final < 0 then
         log.debug(scope, "no space left to create side buffer")
 
         return 0
+    end
+
+    local minWidth = helpers.get_config_field("minSideBufferWidth")
+
+    if minWidth > 0 and final < minWidth then
+        log.debug(scope, "side buffer too small, closing")
+
+        return -1
     end
 
     return final

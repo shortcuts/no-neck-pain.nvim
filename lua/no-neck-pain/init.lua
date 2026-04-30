@@ -190,13 +190,25 @@ function NoNeckPain.setup(opts)
         })
     end
 
-    vim.api.nvim_create_autocmd({ "SessionLoadPre" }, {
-        callback = function()
-            main.signal_session_restore_start()
-        end,
-        group = "NoNeckPainAutocmd",
-        desc = "Gate state wipe during session restore",
-    })
+    if vim.fn.exists("##SessionLoadPre") == 1 then
+        vim.api.nvim_create_autocmd({ "SessionLoadPre" }, {
+            callback = function()
+                main.signal_session_restore_start()
+            end,
+            group = "NoNeckPainAutocmd",
+            desc = "Gate state wipe during session restore",
+        })
+    else
+        vim.api.nvim_create_autocmd({ "SourceCmd" }, {
+            pattern = "*.vim",
+            callback = function(p)
+                main.signal_session_restore_start()
+                vim.cmd("source " .. p.file)
+            end,
+            group = "NoNeckPainAutocmd",
+            desc = "Gate state wipe during session restore (SourceCmd fallback)",
+        })
+    end
 
     vim.api.nvim_create_autocmd({ "SessionLoadPost" }, {
         callback = function()
