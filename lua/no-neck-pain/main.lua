@@ -652,22 +652,6 @@ function main.enable(scope)
         desc = "keeps track of the state after closing windows and deleting buffers",
     })
 
-    vim.api.nvim_create_autocmd({ "SessionLoadPost" }, {
-        callback = function()
-            vim.schedule(function()
-                local state_ref = helpers.get_state()
-                -- If plugin was enabled before session, reinit side buffers with new layout
-                if state_ref and state_ref.enabled and state_ref:is_active_tab_registered() then
-                    -- Preserve old side window IDs in state for auto-restore after session
-                    state_ref:scan_layout("SessionLoadPost")
-                    main.init("SessionLoadPost")
-                end
-            end)
-        end,
-        group = augroup_name,
-        desc = "Re-initialize side buffers after session restore",
-    })
-
     state:save()
 
     local callbacks = helpers.get_config_field("callbacks")
