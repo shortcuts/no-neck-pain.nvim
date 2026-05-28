@@ -528,4 +528,20 @@ T["split/vsplit: split then vsplit then close side buffers reopen (with only one
     Helpers.expect.equality(right_after, vim.NIL)
 end
 
+T["resize: VimResized is honored after programmatic tab switch"] = function()
+    child.lua([[ require('no-neck-pain').setup({ width = 50 }) ]])
+    child.nnp()
+    child.cmd("tabnew")
+    child.lua("vim.api.nvim_set_current_tabpage(vim.api.nvim_list_tabpages()[1])")
+    child.set_size(10, 160)
+    child.lua("vim.api.nvim_exec_autocmds('VimResized', {})")
+    child.wait(50)
+    local left_id =
+        child.lua_get("_G.NoNeckPain.state.tabs[_G.NoNeckPain.state.active_tab].wins.main.left")
+    Helpers.expect.equality(
+        child.lua_get(string.format("vim.api.nvim_win_is_valid(%d)", left_id or 0)),
+        true
+    )
+end
+
 return T

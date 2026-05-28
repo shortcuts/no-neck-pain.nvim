@@ -7,8 +7,6 @@
 
 local helpers = {}
 
-local log = require("no-neck-pain.util.log")
-
 --- Gets the complete config table from the global NoNeckPain object.
 ---
 --- @return table | nil The complete config table, or nil if _G.NoNeckPain.config is not set.
@@ -59,97 +57,33 @@ end
 
 --- Sets the complete config table in the global NoNeckPain object.
 ---
---- Validates that the config has the required structure (width field exists).
----
 --- @param config table The new config table to set.
---- @return boolean True if the config was set successfully, false if validation failed.
 ---@private
 function helpers.set_config(config)
-    if config == nil then
-        log.warn("helpers", "Cannot set nil config")
-        return false
-    end
-
-    if _G.NoNeckPain == nil then
-        log.warn("helpers", "_G.NoNeckPain is not initialized")
-        return false
-    end
-
-    -- Validate config structure
-    if config.width == nil then
-        log.warn("helpers", "Invalid config: missing 'width' field")
-        return false
-    end
-
-    -- Validate width type
-    local width_type = type(config.width)
-    if width_type ~= "number" and width_type ~= "string" then
-        log.warn("helpers", "Invalid config: 'width' must be number or string, got %s", width_type)
-        return false
-    end
-
     _G.NoNeckPain.config = config
-    return true
 end
 
 --- Sets the complete state table in the global NoNeckPain object.
 ---
---- Validates that the state has the required structure (enabled field exists and is boolean).
----
 --- @param state table The new state table to set.
---- @return boolean True if the state was set successfully, false if validation failed.
 ---@private
 function helpers.set_state(state)
-    if state == nil then
-        log.warn("helpers", "Cannot set nil state")
-        return false
-    end
-
-    if _G.NoNeckPain == nil then
-        log.warn("helpers", "_G.NoNeckPain is not initialized")
-        return false
-    end
-
-    -- Validate state structure
-    if state.enabled == nil then
-        log.warn("helpers", "Invalid state: missing 'enabled' field")
-        return false
-    end
-
-    if type(state.enabled) ~= "boolean" then
-        log.warn("helpers", "Invalid state: 'enabled' must be boolean, got %s", type(state.enabled))
-        return false
-    end
-
     _G.NoNeckPain.state = state
-    return true
 end
 
 --- Merges the provided config updates into the existing config table.
 ---
 --- Uses vim.tbl_deep_extend with "force" strategy to merge the update into the existing config.
---- Validates the merged result before assignment.
 ---
 --- @param updates table The config fields to merge/update.
---- @return boolean True if the merge was successful, false if validation failed.
 ---@private
 function helpers.merge_config(updates)
-    if updates == nil then
-        log.warn("helpers", "Cannot merge nil config updates")
-        return false
-    end
-
     local current_config = helpers.get_config()
     if current_config == nil then
-        log.warn("helpers", "Current config is not initialized, cannot merge")
-        return false
+        return
     end
 
-    -- Perform deep merge
-    local merged_config = vim.tbl_deep_extend("force", current_config, updates)
-
-    -- Validate the merged result
-    return helpers.set_config(merged_config)
+    helpers.set_config(vim.tbl_deep_extend("force", current_config, updates))
 end
 
 --- Ensures the plugin config is loaded and initialized.

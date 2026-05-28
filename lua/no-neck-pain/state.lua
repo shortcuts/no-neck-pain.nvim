@@ -18,6 +18,7 @@ local state = {
     disabled_tabs = {},
     initial_window_opts = {},
     previously_focused_win = vim.api.nvim_get_current_win(),
+    session_restore_in_progress = false,
 }
 
 --- Captures initial window options from the current normal window.
@@ -192,7 +193,7 @@ function state:set_tab(id)
                 left = nil,
                 right = nil,
             },
-            integrations = vim.deepcopy(helpers.get_config_field("integrations")),
+            integrations = {},
         },
     }
     self.active_tab = id
@@ -467,27 +468,7 @@ function state:set_layout_windows(scope, wins)
         elseif win[1] == "col" then
             self.tabs[self.active_tab].wins.columns = self.tabs[self.active_tab].wins.columns + 1
             -- scan leaf children of the col for integrations (e.g. snacks explorer)
-            local has_none_integration = false
-            for _, sub in ipairs(win[2]) do
-                if sub[1] == "leaf" and not api.is_relative_window(sub[2]) then
-                    if sub[2] ~= self:get_side_id("curr") then
-                        local supported, name, integration =
-                            self:is_supported_integration(scope, sub[2])
-                        if supported and name and integration then
-                            integration.id = sub[2]
-                            self.tabs[self.active_tab].redraw = true
-                            self.tabs[self.active_tab].wins.integrations[name] = integration
-                            if integration.position == "none" then
-                                has_none_integration = true
-                            end
-                        end
-                    end
-                end
-            end
-            if has_none_integration then
-                self.tabs[self.active_tab].wins.none_columns = self.tabs[self.active_tab].wins.none_columns
-                    + 1
-            end
+            self:_scan_col_children(scope, win[2])
         end
     end
 end
@@ -562,28 +543,7 @@ function state:scan_layout(scope)
         if is_leaf_only then
             -- A col of leaves = one visual column (windows stacked vertically)
             self.tabs[self.active_tab].wins.columns = self.tabs[self.active_tab].wins.columns + 1
-            local has_none_integration = false
-            for _, win in ipairs(layout[2]) do
-                local id = win[2]
-                if not api.is_relative_window(id) then
-                    if id ~= self:get_side_id("curr") then
-                        local supported, name, integration =
-                            self:is_supported_integration(scope, id)
-                        if supported and name and integration then
-                            integration.id = id
-                            self.tabs[self.active_tab].redraw = true
-                            self.tabs[self.active_tab].wins.integrations[name] = integration
-                            if integration.position == "none" then
-                                has_none_integration = true
-                            end
-                        end
-                    end
-                end
-            end
-            if has_none_integration then
-                self.tabs[self.active_tab].wins.none_columns = self.tabs[self.active_tab].wins.none_columns
-                    + 1
-            end
+            self:_scan_col_children(scope, layout[2])
         else
             self:walk_layout(scope, layout[2], false)
         end
@@ -661,6 +621,151 @@ function state:get_scratch_pad()
         return false
     end
     return self.tabs[self.active_tab].scratchpad_enabled
+end
+
+----- layout decision helpers =======================================================
+---@private
+
+--- Scans leaf children of a col node, registering any integrations found and
+--- incrementing none_columns if a position="none" integration is present.
+---
+---@param scope string: the caller of the method.
+---@param children table: array of layout nodes that are children of a col node.
+---@private
+function state:_scan_col_children(scope, children)
+    if not (self:has_tabs() and self.tabs[self.active_tab]) then
+        return
+    end
+    local has_none = false
+    for _, sub in ipairs(children) do
+        if sub[1] == "leaf" and not api.is_relative_window(sub[2]) then
+            local id = sub[2]
+            if id ~= self:get_side_id("curr") then
+                local supported, name, integration = self:is_supported_integration(scope, id)
+                if supported and name and integration then
+                    integration.id = id
+                    self.tabs[self.active_tab].redraw = true
+                    self.tabs[self.active_tab].wins.integrations[name] = integration
+                    if integration.position == "none" then
+                        has_none = true
+                    end
+                end
+            end
+        end
+    end
+    if has_none then
+        self.tabs[self.active_tab].wins.none_columns = self.tabs[self.active_tab].wins.none_columns
+            + 1
+    end
+end
+
+--- Validates the stored side window IDs against the set of currently valid windows.
+--- Clears any side ID that no longer refers to a valid window and optionally reassigns
+--- the `curr` window to the best available replacement.
+---
+---@param scope string: the caller of the method.
+---@param valid_win_set table: map of window ID → true for all currently valid windows.
+---@return boolean: whether the left side was cleared.
+---@return boolean: whether the right side was cleared.
+---@private
+function state:validate_sides(scope, valid_win_set)
+    local curr_id = self:get_side_id("curr")
+    if curr_id and not valid_win_set[curr_id] then
+        log.debug(scope, "clearing invalid main window %d", curr_id)
+        local unregistered = self:get_unregistered_wins(scope)
+        local candidate
+        for _, win in ipairs(unregistered) do
+            if vim.api.nvim_win_is_valid(win) then
+                local ft = vim.bo[vim.api.nvim_win_get_buf(win)].filetype
+                if not helpers.is_filetype_integration(ft) then
+                    candidate = win
+                    break
+                end
+            end
+        end
+        if candidate then
+            self:set_side_id(candidate, "curr")
+            log.debug(scope, "reassigned main window to %d", candidate)
+        elseif
+            self:get_previously_focused_win()
+            and vim.api.nvim_win_is_valid(self:get_previously_focused_win())
+        then
+            self:set_side_id(self:get_previously_focused_win(), "curr")
+            log.debug(
+                scope,
+                "reassigned main window to previously focused %d",
+                self:get_previously_focused_win()
+            )
+        end
+    end
+
+    local left_id = self:get_side_id("left")
+    local left_cleared = false
+    if left_id and not valid_win_set[left_id] then
+        log.debug(scope, "left side window %d is no longer valid", left_id)
+        left_cleared = true
+        self:set_side_id(nil, "left")
+    end
+
+    local right_id = self:get_side_id("right")
+    local right_cleared = false
+    if right_id and not valid_win_set[right_id] then
+        log.debug(scope, "right side window %d is no longer valid", right_id)
+        right_cleared = true
+        self:set_side_id(nil, "right")
+    end
+
+    return left_cleared, right_cleared
+end
+
+--- Determines what layout action to take after a window event.
+---
+---@param event_name string: the triggering autocmd event name ("WinClosed" or "WinEnter").
+---@param init boolean: whether scan_layout detected a column count change.
+---@param pre_count number: window count before the event.
+---@param post_count number: window count after the event.
+---@param left_cleared boolean: whether the left side ID was just cleared.
+---@param right_cleared boolean: whether the right side ID was just cleared.
+---@param left_id_before number?: the left side ID before validation.
+---@param right_id_before number?: the right side ID before validation.
+---@return "disable"|"init"|nil
+---@private
+function state:determine_layout_action(
+    event_name,
+    init,
+    pre_count,
+    post_count,
+    left_cleared,
+    right_cleared,
+    left_id_before,
+    right_id_before
+)
+    local side_window_was_cleared = left_cleared or right_cleared
+
+    if side_window_was_cleared and event_name == "WinClosed" then
+        if left_id_before == nil and right_id_before == nil then
+            log.debug(
+                "determine_layout_action",
+                "side was cleared but both IDs were already nil, allowing init"
+            )
+            -- fall through to check remaining conditions
+        else
+            return "disable"
+        end
+    elseif init then
+        return "init"
+    elseif
+        event_name == "WinClosed"
+        and not init
+        and pre_count ~= post_count
+        and not side_window_was_cleared
+    then
+        return "init"
+    elseif event_name == "WinEnter" and not init and pre_count ~= post_count then
+        return "init"
+    end
+
+    return nil
 end
 
 ----- focused win tracker =======================================================

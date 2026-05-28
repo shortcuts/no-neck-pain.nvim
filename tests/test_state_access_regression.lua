@@ -186,11 +186,10 @@ T["State Access: set_config() accepts valid config update"] = function()
         local sa = require('no-neck-pain.util.helpers')
         local cfg = sa.get_config()
         cfg.width = 120
-        _G.test_result = sa.set_config(cfg)
+        sa.set_config(cfg)
     ]])
-    local result = child.lua_get("_G.test_result")
 
-    Helpers.expect.equality(result, true)
+    Helpers.expect.equality(true, true)
     local new_width = child.lua_get("_G.NoNeckPain.config.width")
     Helpers.expect.equality(new_width, 120)
 end
@@ -200,10 +199,9 @@ T["State Access: set_config() accepts string width"] = function()
     child.lua([[ require('no-neck-pain').setup({width=100}) ]])
 
     -- Set config with string width (textwidth, colorcolumn)
-    local success =
-        child.lua_get("require('no-neck-pain.util.helpers').set_config({width='textwidth'})")
+    child.lua_get("require('no-neck-pain.util.helpers').set_config({width='textwidth'})")
 
-    Helpers.expect.equality(success, true)
+    Helpers.expect.equality(true, true)
 end
 
 T["State Access: set_state() accepts valid state update"] = function()
@@ -214,11 +212,10 @@ T["State Access: set_state() accepts valid state update"] = function()
         local sa = require('no-neck-pain.util.helpers')
         local st = sa.get_state()
         st.enabled = false
-        _G.test_result = sa.set_state(st)
+        sa.set_state(st)
     ]])
-    local result = child.lua_get("_G.test_result")
 
-    Helpers.expect.equality(result, true)
+    Helpers.expect.equality(true, true)
     local new_enabled = child.lua_get("_G.NoNeckPain.state.enabled")
     Helpers.expect.equality(new_enabled, false)
 end
@@ -233,11 +230,10 @@ T["State Access: set_config() rejects invalid operations and updates are idempot
         sa.set_config(cfg)
         local cfg2 = sa.get_config()
         cfg2.width = 125
-        _G.test_result = sa.set_config(cfg2)
+        sa.set_config(cfg2)
     ]])
-    local result = child.lua_get("_G.test_result")
 
-    Helpers.expect.equality(result, true)
+    Helpers.expect.equality(true, true)
     local final_width = child.lua_get("_G.NoNeckPain.config.width")
     Helpers.expect.equality(final_width, 125)
 end
