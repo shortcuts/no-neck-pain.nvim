@@ -18,7 +18,6 @@ local state = {
     disabled_tabs = {},
     initial_window_opts = {},
     previously_focused_win = vim.api.nvim_get_current_win(),
-    session_restore_in_progress = false,
 }
 
 --- Captures initial window options from the current normal window.

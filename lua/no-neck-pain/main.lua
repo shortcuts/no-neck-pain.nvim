@@ -9,13 +9,14 @@ local helpers = require("no-neck-pain.util.helpers")
 local main = {}
 
 local skip_entering_in_progress = false
+local session_restore_in_progress = false
 
 function main.signal_session_restore_start()
-    state.session_restore_in_progress = true
+    session_restore_in_progress = true
 end
 
 function main.signal_session_restore_complete()
-    state.session_restore_in_progress = false
+    session_restore_in_progress = false
 end
 
 -- Toggle the plugin by calling the `enable`/`disable` methods respectively.
@@ -629,7 +630,7 @@ function main.disable(scope)
 
         log.debug(scope, "no more active tabs left, reinitializing state")
 
-        if not state.session_restore_in_progress then
+        if not session_restore_in_progress then
             state:init()
         end
     end

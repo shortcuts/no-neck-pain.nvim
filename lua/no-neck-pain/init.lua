@@ -7,6 +7,8 @@ local state = require("no-neck-pain.state")
 
 local NoNeckPain = {}
 
+local filetype_autocmd_in_progress = false
+
 --- Toggle the plugin by calling the `enable`/`disable` methods respectively.
 function NoNeckPain.toggle()
     helpers.ensure_config_loaded(config)
@@ -144,6 +146,11 @@ function NoNeckPain.setup(opts)
         vim.api.nvim_create_autocmd({ "FileType" }, {
             pattern = "*",
             callback = function()
+                if filetype_autocmd_in_progress then
+                    return
+                end
+                filetype_autocmd_in_progress = true
+
                 local filetype = string.lower(vim.bo.filetype)
                 local state = helpers.get_state()
 
@@ -152,6 +159,7 @@ function NoNeckPain.setup(opts)
                     if helpers.is_filetype_integration(filetype) then
                         NoNeckPain.disable()
                         pcall(vim.api.nvim_del_augroup_by_name, "NoNeckPainVimEnterAutocmd")
+                        filetype_autocmd_in_progress = false
                         return
                     end
                 end
@@ -168,6 +176,8 @@ function NoNeckPain.setup(opts)
                         pcall(vim.api.nvim_del_augroup_by_name, "NoNeckPainVimEnterAutocmd")
                     end
                 end
+
+                filetype_autocmd_in_progress = false
             end,
             group = "NoNeckPainVimEnterAutocmd",
             desc = "Safety net for deferred filetype resolution.",

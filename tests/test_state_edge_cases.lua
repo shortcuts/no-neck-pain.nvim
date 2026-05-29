@@ -732,4 +732,189 @@ T["Edge Cases"]["disabled_tabs tracking across tab operations"] = function()
     Helpers.expect.equality(is_enabled, true)
 end
 
+-- ========================================================================
+-- Group: determine_layout_action
+-- ========================================================================
+
+T["determine_layout_action"] = MiniTest.new_set()
+
+T["determine_layout_action"]["returns 'disable' when side cleared via WinClosed and IDs were set"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
+    child.nnp()
+    child.wait()
+
+    Helpers.expect.state(child, "enabled", true)
+
+    child.lua([[
+        _G._nnp_test_action = require('no-neck-pain.state'):determine_layout_action(
+            "WinClosed", false, 3, 2, true, false, 1001, nil
+        )
+    ]])
+
+    local action = child.lua_get("_G._nnp_test_action")
+    Helpers.expect.equality(action, "disable")
+end
+
+T["determine_layout_action"]["returns nil (not 'disable') when both IDs were already nil before WinClosed"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
+    child.nnp()
+    child.wait()
+
+    Helpers.expect.state(child, "enabled", true)
+
+    -- When both side IDs were nil before the close and counts match, no action is needed
+    child.lua([[
+        _G._nnp_test_action = require('no-neck-pain.state'):determine_layout_action(
+            "WinClosed", false, 3, 3, true, false, nil, nil
+        )
+    ]])
+
+    local action = child.lua_get("_G._nnp_test_action")
+    -- Both IDs were nil → no actual side was closed → no disable needed
+    Helpers.expect.equality(action, vim.NIL)
+end
+
+T["determine_layout_action"]["returns 'init' when column layout changed (init=true)"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
+    child.nnp()
+    child.wait()
+
+    Helpers.expect.state(child, "enabled", true)
+
+    child.lua([[
+        _G._nnp_test_action = require('no-neck-pain.state'):determine_layout_action(
+            "WinEnter", true, 2, 3, false, false, nil, nil
+        )
+    ]])
+
+    local action = child.lua_get("_G._nnp_test_action")
+    Helpers.expect.equality(action, "init")
+end
+
+T["determine_layout_action"]["returns 'init' on WinClosed with count change and no side cleared"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
+    child.nnp()
+    child.wait()
+
+    Helpers.expect.state(child, "enabled", true)
+
+    child.lua([[
+        _G._nnp_test_action = require('no-neck-pain.state'):determine_layout_action(
+            "WinClosed", false, 4, 3, false, false, nil, nil
+        )
+    ]])
+
+    local action = child.lua_get("_G._nnp_test_action")
+    Helpers.expect.equality(action, "init")
+end
+
+T["determine_layout_action"]["returns 'init' on WinEnter with count change"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
+    child.nnp()
+    child.wait()
+
+    Helpers.expect.state(child, "enabled", true)
+
+    child.lua([[
+        _G._nnp_test_action = require('no-neck-pain.state'):determine_layout_action(
+            "WinEnter", false, 2, 3, false, false, nil, nil
+        )
+    ]])
+
+    local action = child.lua_get("_G._nnp_test_action")
+    Helpers.expect.equality(action, "init")
+end
+
+T["determine_layout_action"]["returns nil when no action is needed"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
+    child.nnp()
+    child.wait()
+
+    Helpers.expect.state(child, "enabled", true)
+
+    child.lua([[
+        _G._nnp_test_action = require('no-neck-pain.state'):determine_layout_action(
+            "WinEnter", false, 3, 3, false, false, nil, nil
+        )
+    ]])
+
+    local action = child.lua_get("_G._nnp_test_action")
+    Helpers.expect.equality(action, vim.NIL)
+end
+
+-- ========================================================================
+-- Group: validate_sides
+-- ========================================================================
+
+T["validate_sides"] = MiniTest.new_set()
+
+T["validate_sides"]["clears stale left side ID when window no longer valid"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
+    child.nnp()
+    child.wait()
+
+    Helpers.expect.state(child, "enabled", true)
+
+    child.lua([[
+        local state = require('no-neck-pain.state')
+        -- set a fake left side ID that doesn't exist
+        state:set_side_id(99999, "left")
+        -- valid_win_set does NOT contain 99999
+        local valid_win_set = {}
+        for _, win in ipairs(vim.api.nvim_tabpage_list_wins(state.active_tab)) do
+            valid_win_set[win] = true
+        end
+        local left_cleared, _ = state:validate_sides("test", valid_win_set)
+        _G._nnp_test_left_cleared = left_cleared
+        _G._nnp_test_left_id = state:get_side_id("left")
+    ]])
+
+    local left_cleared = child.lua_get("_G._nnp_test_left_cleared")
+    Helpers.expect.equality(left_cleared, true)
+
+    local left_id = child.lua_get("_G._nnp_test_left_id")
+    Helpers.expect.equality(left_id, vim.NIL)
+end
+
+T["validate_sides"]["retains valid side IDs"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
+    child.nnp()
+    child.wait()
+
+    Helpers.expect.state(child, "enabled", true)
+
+    child.lua([[
+        local state = require('no-neck-pain.state')
+        local valid_win_set = {}
+        for _, win in ipairs(vim.api.nvim_tabpage_list_wins(state.active_tab)) do
+            valid_win_set[win] = true
+        end
+        local left_cleared, right_cleared = state:validate_sides("test", valid_win_set)
+        _G._nnp_test_left_cleared = left_cleared
+        _G._nnp_test_right_cleared = right_cleared
+    ]])
+
+    local left_cleared = child.lua_get("_G._nnp_test_left_cleared")
+    local right_cleared = child.lua_get("_G._nnp_test_right_cleared")
+    Helpers.expect.equality(left_cleared, false)
+    Helpers.expect.equality(right_cleared, false)
+end
+
+T["validate_sides"]["closing unrelated split window keeps plugin enabled"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
+    child.nnp()
+    child.wait()
+
+    Helpers.expect.state(child, "enabled", true)
+
+    -- Open a split and close it
+    child.cmd("split")
+    child.wait()
+    child.cmd("close")
+    child.wait()
+
+    -- Plugin should remain enabled
+    Helpers.expect.state(child, "enabled", true)
+end
+
 return T
