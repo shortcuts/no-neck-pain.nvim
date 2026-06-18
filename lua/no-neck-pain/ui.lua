@@ -238,7 +238,6 @@ function ui.create_side_buffers()
                     state:resize_win(scope, side, padding)
                 end
             end
-        else
         end
     end
 end

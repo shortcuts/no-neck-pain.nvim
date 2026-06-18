@@ -327,16 +327,17 @@ function main._on_win_change(p)
         end
 
         -- Determine action based on layout state
-        local action = state:determine_layout_action(
-            p.event,
-            init,
-            pre_win_count,
-            post_win_count,
-            left_cleared,
-            right_cleared,
-            left_id_before,
-            right_id_before
-        )
+        local action = state:determine_layout_action({
+            event_name = p.event,
+            columns_changed = init,
+            new_integration_found = new_integration_found,
+            pre_count = pre_win_count,
+            post_count = post_win_count,
+            left_cleared = left_cleared,
+            right_cleared = right_cleared,
+            left_id_before = left_id_before,
+            right_id_before = right_id_before,
+        })
 
         log.debug(
             s,
@@ -363,7 +364,7 @@ function main._on_win_change(p)
                 state:set_previously_focused_win(current_win)
             end
             api.debounce(s, main.init)
-        elseif new_integration_found and p.event == "WinEnter" then
+        elseif action == "redraw" then
             state.tabs[state.active_tab].redraw = false
             api.debounce(s, ui.create_side_buffers)
         end
@@ -567,7 +568,6 @@ function main.enable(scope)
 
     state:save()
 
-    local callbacks = helpers.get_config_field("callbacks")
     if callbacks.postEnable ~= nil then
         callbacks.postEnable(state)
     end
@@ -657,7 +657,6 @@ function main.disable(scope)
 
     state:save()
 
-    local callbacks = helpers.get_config_field("callbacks")
     if callbacks.postDisable ~= nil then
         callbacks.postDisable(state)
     end

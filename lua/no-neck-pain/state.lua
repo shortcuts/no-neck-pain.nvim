@@ -465,9 +465,7 @@ function state:set_layout_windows(scope, wins)
                 end
             end
         elseif win[1] == "col" then
-            self.tabs[self.active_tab].wins.columns = self.tabs[self.active_tab].wins.columns + 1
-            -- scan leaf children of the col for integrations (e.g. snacks explorer)
-            self:_scan_col_children(scope, win[2])
+            self:_register_column(scope, win[2])
         end
     end
 end
@@ -541,8 +539,7 @@ function state:scan_layout(scope)
 
         if is_leaf_only then
             -- A col of leaves = one visual column (windows stacked vertically)
-            self.tabs[self.active_tab].wins.columns = self.tabs[self.active_tab].wins.columns + 1
-            self:_scan_col_children(scope, layout[2])
+            self:_register_column(scope, layout[2])
         else
             self:walk_layout(scope, layout[2], false)
         end
@@ -624,6 +621,19 @@ end
 
 ----- layout decision helpers =======================================================
 ---@private
+
+--- Counts a `col` layout node as one visual column and scans its leaf children for integrations.
+---
+---@param scope string: the caller of the method.
+---@param children table: array of layout nodes that are children of the col node.
+---@private
+function state:_register_column(scope, children)
+    if not (self:has_tabs() and self.tabs[self.active_tab]) then
+        return
+    end
+    self.tabs[self.active_tab].wins.columns = self.tabs[self.active_tab].wins.columns + 1
+    self:_scan_col_children(scope, children)
+end
 
 --- Scans leaf children of a col node, registering any integrations found and
 --- incrementing none_columns if a position="none" integration is present.
@@ -719,30 +729,24 @@ end
 
 --- Determines what layout action to take after a window event.
 ---
----@param event_name string: the triggering autocmd event name ("WinClosed" or "WinEnter").
----@param init boolean: whether scan_layout detected a column count change.
----@param pre_count number: window count before the event.
----@param post_count number: window count after the event.
----@param left_cleared boolean: whether the left side ID was just cleared.
----@param right_cleared boolean: whether the right side ID was just cleared.
----@param left_id_before number?: the left side ID before validation.
----@param right_id_before number?: the right side ID before validation.
----@return "disable"|"init"|nil
+---@param ctx table: {
+---   event_name: string ("WinClosed" or "WinEnter"),
+---   columns_changed: boolean (whether scan_layout detected a column count change),
+---   new_integration_found: boolean (whether a previously-untracked integration appeared),
+---   pre_count: number (window count before the event),
+---   post_count: number (window count after the event),
+---   left_cleared: boolean (whether the left side ID was just cleared),
+---   right_cleared: boolean (whether the right side ID was just cleared),
+---   left_id_before: number? (the left side ID before validation),
+---   right_id_before: number? (the right side ID before validation),
+--- }
+---@return "disable"|"init"|"redraw"|nil
 ---@private
-function state:determine_layout_action(
-    event_name,
-    init,
-    pre_count,
-    post_count,
-    left_cleared,
-    right_cleared,
-    left_id_before,
-    right_id_before
-)
-    local side_window_was_cleared = left_cleared or right_cleared
+function state:determine_layout_action(ctx)
+    local side_window_was_cleared = ctx.left_cleared or ctx.right_cleared
 
-    if side_window_was_cleared and event_name == "WinClosed" then
-        if left_id_before == nil and right_id_before == nil then
+    if side_window_was_cleared and ctx.event_name == "WinClosed" then
+        if ctx.left_id_before == nil and ctx.right_id_before == nil then
             log.debug(
                 "determine_layout_action",
                 "side was cleared but both IDs were already nil, allowing init"
@@ -751,17 +755,25 @@ function state:determine_layout_action(
         else
             return "disable"
         end
-    elseif init then
+    elseif ctx.columns_changed then
         return "init"
     elseif
-        event_name == "WinClosed"
-        and not init
-        and pre_count ~= post_count
+        ctx.event_name == "WinClosed"
+        and not ctx.columns_changed
+        and ctx.pre_count ~= ctx.post_count
         and not side_window_was_cleared
     then
         return "init"
-    elseif event_name == "WinEnter" and not init and pre_count ~= post_count then
+    elseif
+        ctx.event_name == "WinEnter"
+        and not ctx.columns_changed
+        and ctx.pre_count ~= ctx.post_count
+    then
         return "init"
+    end
+
+    if ctx.new_integration_found and ctx.event_name == "WinEnter" then
+        return "redraw"
     end
 
     return nil

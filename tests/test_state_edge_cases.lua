@@ -746,9 +746,10 @@ T["determine_layout_action"]["returns 'disable' when side cleared via WinClosed 
     Helpers.expect.state(child, "enabled", true)
 
     child.lua([[
-        _G._nnp_test_action = require('no-neck-pain.state'):determine_layout_action(
-            "WinClosed", false, 3, 2, true, false, 1001, nil
-        )
+        _G._nnp_test_action = require('no-neck-pain.state'):determine_layout_action({
+            event_name = "WinClosed", columns_changed = false, pre_count = 3, post_count = 2,
+            left_cleared = true, right_cleared = false, left_id_before = 1001, right_id_before = nil,
+        })
     ]])
 
     local action = child.lua_get("_G._nnp_test_action")
@@ -764,9 +765,10 @@ T["determine_layout_action"]["returns nil (not 'disable') when both IDs were alr
 
     -- When both side IDs were nil before the close and counts match, no action is needed
     child.lua([[
-        _G._nnp_test_action = require('no-neck-pain.state'):determine_layout_action(
-            "WinClosed", false, 3, 3, true, false, nil, nil
-        )
+        _G._nnp_test_action = require('no-neck-pain.state'):determine_layout_action({
+            event_name = "WinClosed", columns_changed = false, pre_count = 3, post_count = 3,
+            left_cleared = true, right_cleared = false, left_id_before = nil, right_id_before = nil,
+        })
     ]])
 
     local action = child.lua_get("_G._nnp_test_action")
@@ -782,9 +784,10 @@ T["determine_layout_action"]["returns 'init' when column layout changed (init=tr
     Helpers.expect.state(child, "enabled", true)
 
     child.lua([[
-        _G._nnp_test_action = require('no-neck-pain.state'):determine_layout_action(
-            "WinEnter", true, 2, 3, false, false, nil, nil
-        )
+        _G._nnp_test_action = require('no-neck-pain.state'):determine_layout_action({
+            event_name = "WinEnter", columns_changed = true, pre_count = 2, post_count = 3,
+            left_cleared = false, right_cleared = false, left_id_before = nil, right_id_before = nil,
+        })
     ]])
 
     local action = child.lua_get("_G._nnp_test_action")
@@ -799,9 +802,10 @@ T["determine_layout_action"]["returns 'init' on WinClosed with count change and 
     Helpers.expect.state(child, "enabled", true)
 
     child.lua([[
-        _G._nnp_test_action = require('no-neck-pain.state'):determine_layout_action(
-            "WinClosed", false, 4, 3, false, false, nil, nil
-        )
+        _G._nnp_test_action = require('no-neck-pain.state'):determine_layout_action({
+            event_name = "WinClosed", columns_changed = false, pre_count = 4, post_count = 3,
+            left_cleared = false, right_cleared = false, left_id_before = nil, right_id_before = nil,
+        })
     ]])
 
     local action = child.lua_get("_G._nnp_test_action")
@@ -816,9 +820,10 @@ T["determine_layout_action"]["returns 'init' on WinEnter with count change"] = f
     Helpers.expect.state(child, "enabled", true)
 
     child.lua([[
-        _G._nnp_test_action = require('no-neck-pain.state'):determine_layout_action(
-            "WinEnter", false, 2, 3, false, false, nil, nil
-        )
+        _G._nnp_test_action = require('no-neck-pain.state'):determine_layout_action({
+            event_name = "WinEnter", columns_changed = false, pre_count = 2, post_count = 3,
+            left_cleared = false, right_cleared = false, left_id_before = nil, right_id_before = nil,
+        })
     ]])
 
     local action = child.lua_get("_G._nnp_test_action")
@@ -833,9 +838,10 @@ T["determine_layout_action"]["returns nil when no action is needed"] = function(
     Helpers.expect.state(child, "enabled", true)
 
     child.lua([[
-        _G._nnp_test_action = require('no-neck-pain.state'):determine_layout_action(
-            "WinEnter", false, 3, 3, false, false, nil, nil
-        )
+        _G._nnp_test_action = require('no-neck-pain.state'):determine_layout_action({
+            event_name = "WinEnter", columns_changed = false, pre_count = 3, post_count = 3,
+            left_cleared = false, right_cleared = false, left_id_before = nil, right_id_before = nil,
+        })
     ]])
 
     local action = child.lua_get("_G._nnp_test_action")
