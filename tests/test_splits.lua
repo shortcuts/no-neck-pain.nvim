@@ -511,21 +511,57 @@ T["split/vsplit: split then vsplit then close side buffers reopen (with only one
 
     local all_wins = child.get_wins_in_tab()
 
-    Helpers.expect.equality(child.get_wins_in_tab(), { 1003, 1002, 1000 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1003, 1002, 1000 })
     Helpers.expect.equality(child.get_current_win(), 1003)
 
-    -- close vsplit
+    -- close vsplit: splitting/vsplitting the main buffer must not be treated as
+    -- extra vsplit columns, so the left padding keeps its width and never closes
+    -- (regression: https://github.com/shortcuts/no-neck-pain.nvim split/vsplit/close on
+    -- the main buffer with one side disabled used to inflate the column count and
+    -- wrongly close the remaining side buffer).
     child.cmd("q")
     child.wait(200)
 
-    Helpers.expect.equality(child.get_wins_in_tab(), { 1004, 1002, 1000 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1002, 1000 })
     Helpers.expect.equality(child.get_current_win(), 1002)
 
     local left_after = child.lua_get("_G.NoNeckPain.state.tabs[1].wins.main.left")
     local right_after = child.lua_get("_G.NoNeckPain.state.tabs[1].wins.main.right")
 
-    Helpers.expect.equality(left_after ~= nil and left_after > 0, true)
+    Helpers.expect.equality(left_after, 1001)
     Helpers.expect.equality(right_after, vim.NIL)
+end
+
+T["split/vsplit: left padding keeps its width when splitting/vsplitting the main buffer with right disabled"] = function()
+    child.set_size(10, 200)
+    child.lua([[ require('no-neck-pain').setup({ buffers = { right = { enabled = false } } }) ]])
+    child.nnp()
+    child.wait()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000 })
+
+    local left_id = child.lua_get("_G.NoNeckPain.state.tabs[1].wins.main.left")
+    local left_width_before = child.lua_get("vim.api.nvim_win_get_width(" .. left_id .. ")")
+
+    -- splitting then vsplitting the main buffer duplicates it into new windows,
+    -- this must not be counted as extra vsplit columns or the left padding gets
+    -- starved of width and force-closed, even though there's plenty of room.
+    child.cmd("split")
+    child.wait()
+    child.cmd("vsplit")
+    child.wait()
+
+    Helpers.expect.equality(child.lua_get("_G.NoNeckPain.state.tabs[1].wins.main.left"), left_id)
+
+    -- close the vsplit
+    child.cmd("q")
+    child.wait()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1002, 1000 })
+    Helpers.expect.equality(child.lua_get("_G.NoNeckPain.state.tabs[1].wins.main.left"), left_id)
+
+    local left_width_after = child.lua_get("vim.api.nvim_win_get_width(" .. left_id .. ")")
+    Helpers.expect.equality(left_width_after, left_width_before)
 end
 
 T["resize: VimResized is honored after programmatic tab switch"] = function()

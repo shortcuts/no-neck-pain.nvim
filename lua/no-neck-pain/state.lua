@@ -493,8 +493,33 @@ function state:walk_layout(scope, tree, has_col_parent)
     for idx, leaf in ipairs(tree) do
         if leaf == "row" then
             local leafs = tree[idx + 1]
-            -- if on a row we were on a col, then it means one iteam of the row must be of the same width as a col one
-            if has_col_parent and vim.tbl_count(leafs) > 1 then
+            -- a row nested inside a col is ambiguous: it's either a genuine extra
+            -- column (e.g. dapui's watches/scopes panels, opened in their own buffers)
+            -- which still needs its own width reservation, or just the user
+            -- subdividing the col's own single column (e.g. :split then :vsplit on
+            -- the bottom pane, which duplicates the same buffer into the new window)
+            -- which must NOT be double-counted on top of the col's own column.
+            -- Use "does any leaf hold a different buffer than `curr`" as the signal:
+            -- plain splits of the main buffer share its buffer, real extra panels don't.
+            local curr_buf = nil
+            local curr_id = self:get_side_id("curr")
+            if curr_id and vim.api.nvim_win_is_valid(curr_id) then
+                curr_buf = vim.api.nvim_win_get_buf(curr_id)
+            end
+
+            local is_main_split = curr_buf ~= nil
+            for _, sub in ipairs(leafs) do
+                if sub[1] == "leaf" and not api.is_relative_window(sub[2]) then
+                    if vim.api.nvim_win_get_buf(sub[2]) ~= curr_buf then
+                        is_main_split = false
+                        break
+                    end
+                end
+            end
+
+            if has_col_parent and is_main_split then
+                self:_scan_col_children(scope, leafs)
+            elseif has_col_parent and vim.tbl_count(leafs) > 1 then
                 local leafs_copy = vim.list_extend({}, leafs)
                 table.remove(leafs_copy, 1)
                 self:set_layout_windows(scope, leafs_copy)
