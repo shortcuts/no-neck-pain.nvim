@@ -18,6 +18,9 @@ local state = {
     disabled_tabs = {},
     initial_window_opts = {},
     previously_focused_win = vim.api.nvim_get_current_win(),
+    -- per-tab window counts, kept outside of `tabs` so it doesn't show up in
+    -- snapshot-style equality assertions of `tabs[n]` in tests.
+    window_counts = {},
 }
 
 --- Captures initial window options from the current normal window.
@@ -420,6 +423,25 @@ function state:get_none_columns()
         return 0
     end
     return self.tabs[self.active_tab].wins.none_columns or 0
+end
+
+--- Gets the total window count last observed for the active tab.
+--- Used to detect a real window count change across separate events, since
+--- comparing window counts taken before/after a single scan within the same
+--- event is always equal (no window can appear/disappear in between).
+---
+---@return number?: the last observed window count, nil if never set.
+---@private
+function state:get_window_count()
+    return self.window_counts[self.active_tab]
+end
+
+--- Sets the total window count for the active tab, see `get_window_count`.
+---
+---@param count number: the window count to store.
+---@private
+function state:set_window_count(count)
+    self.window_counts[self.active_tab] = count
 end
 
 --- Consumes the redraw value in the state, in order to know if we should redraw sides or not.

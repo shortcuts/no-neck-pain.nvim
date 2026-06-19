@@ -422,8 +422,10 @@ T["vsplit/split: splits and vsplits keeps a correct size"] = function()
     Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1004, 1003, 1000, 1002 })
     Helpers.expect.equality(child.get_current_win(), 1004)
 
-    Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.curr", 38, 40)
-    Helpers.expect.buf_width_in_range(child, "1003", 17, 19)
+    -- vsplitting the already-split main buffer further must not be treated as
+    -- an extra vsplit column: it's all the same main column, just subdivided,
+    -- so its (and the sides') width must stay the same as before the vsplit.
+    Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.curr", 17, 20)
 end
 
 T["vsplit/split: side buffer widths restore after split then vsplit then close"] = function()
@@ -440,9 +442,10 @@ T["vsplit/split: side buffer widths restore after split then vsplit then close"]
     child.cmd("vsplit")
     child.wait()
 
-    -- After split and vsplit, side buffers should be smaller due to more columns
-    Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.left", 15, 25)
-    Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.right", 15, 25)
+    -- splitting/vsplitting the main buffer subdivides its own column, it does
+    -- not add an extra vsplit column, so side buffers keep their width.
+    Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.left", 28, 35)
+    Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.right", 28, 35)
 
     -- Close vsplit and split - verify main window is still centered
     child.cmd("q")
@@ -552,6 +555,12 @@ T["split/vsplit: left padding keeps its width when splitting/vsplitting the main
     child.wait()
 
     Helpers.expect.equality(child.lua_get("_G.NoNeckPain.state.tabs[1].wins.main.left"), left_id)
+
+    -- vim's 'equalalways' resizes every window (including the side buffer) the
+    -- instant the vsplit is created; NNP must immediately resize it back, not
+    -- only once the vsplit is later closed.
+    local left_width_during = child.lua_get("vim.api.nvim_win_get_width(" .. left_id .. ")")
+    Helpers.expect.equality(left_width_during, left_width_before)
 
     -- close the vsplit
     child.cmd("q")

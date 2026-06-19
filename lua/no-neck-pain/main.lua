@@ -175,6 +175,11 @@ function main.init(scope)
         end
     end
 
+    -- ui.create_side_buffers() may have created/closed side windows without
+    -- firing WinEnter/WinClosed (noautocmd), resync the persisted window count
+    -- so the next user-triggered event compares against the right baseline.
+    state:set_window_count(#vim.api.nvim_tabpage_list_wins(state.active_tab))
+
     state:save()
 end
 
@@ -274,7 +279,12 @@ function main._on_win_change(p)
             return
         end
 
-        local pre_win_count = #vim.api.nvim_tabpage_list_wins(state.active_tab)
+        -- Use the window count observed at the end of the previous event, not one
+        -- recomputed within this same call (which would always equal post_win_count
+        -- since no window can appear/disappear between the two), so a real count
+        -- change (e.g. a fresh :vsplit) is actually detected.
+        local live_win_count = #vim.api.nvim_tabpage_list_wins(state.active_tab)
+        local pre_win_count = state:get_window_count() or live_win_count
 
         local old_integration_ids = {}
         for name, opts in pairs(state:get_integrations()) do
@@ -313,6 +323,8 @@ function main._on_win_change(p)
         end
 
         local left_cleared, right_cleared = state:validate_sides(s, valid_win_set)
+
+        state:set_window_count(post_win_count)
 
         -- Early exit if no changes and active window is a side buffer
         if
