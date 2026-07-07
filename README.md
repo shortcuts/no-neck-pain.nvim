@@ -496,6 +496,7 @@ See [Makefile](./Makefile) for the available commands
 
 > It's recommended to use [Bob](https://github.com/MordechaiHadad/bob), a useful nvim version manager in order to run the test suite for every supported versions.
 
+
 ## 🗞 Wiki
 
 You can find guides and showcase of the plugin on [the Wiki](https://github.com/shortcuts/no-neck-pain.nvim/wiki)
