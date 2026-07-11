@@ -1,3 +1,9 @@
+--- Vim API utilities and debouncing helpers
+---
+--- Provides debouncing, window utilities, and Vim API wrappers for common operations.
+---
+---@module "no-neck-pain.util.api"
+
 local log = require("no-neck-pain.util.log")
 
 local api = { debouncers = {} }
@@ -14,10 +20,10 @@ function api.tde(t1, t2)
     return vim.deepcopy(vim.tbl_deep_extend("keep", t1 or {}, t2 or {}))
 end
 
---- Returns the name of the augroup for the given tab Idebug.
+--- Returns the name of the augroup for the given tab id.
 ---
 ---@param id number?: the id of the tab.
----@return string: the initialied state
+---@return string: the augroup name
 ---@private
 function api.get_augroup_name(id)
     return string.format("NoNeckPain-%d", id)
@@ -31,42 +37,7 @@ end
 function api.is_relative_window(win)
     win = win or vim.api.nvim_get_current_win()
 
-    if
-        vim.api.nvim_win_get_config(0).relative ~= ""
-        or vim.api.nvim_win_get_config(win).relative ~= ""
-    then
-        return true
-    end
-
-    return false
-end
-
---- Sets buffer option with backward compatibility (nvim <9).
----
----@param id number: the id of the buffer.
----@param opt string: the opt name.
----@param val string|number|boolean: the opt value.
----@private
-function api.set_buffer_option(id, opt, val)
-    if _G.NoNeckPain.config.has_nvim9 then
-        vim.api.nvim_set_option_value(opt, val, { buf = id })
-    else
-        vim.api.nvim_buf_set_option(id, opt, val)
-    end
-end
-
---- Sets window option with backward compatibility (nvim <9).
----
----@param id number: the id of the window.
----@param opt string: the opt name.
----@param val string|number: the opt value.
----@private
-function api.set_window_option(id, opt, val)
-    if _G.NoNeckPain.config.has_nvim9 then
-        vim.api.nvim_set_option_value(opt, val, { win = id, scope = "local" })
-    else
-        vim.api.nvim_win_set_option(id, opt, val)
-    end
+    return vim.api.nvim_win_get_config(win).relative ~= ""
 end
 
 local function timer_stop_close(timer)
@@ -83,7 +54,12 @@ end
 --- Invocation will be rescheduled while a callback is being executed.
 --- Caller must ensure that callback performs the same or functionally equivalent actions.
 ---
----@param context string: identifies the callback to debounce.
+--- Usage patterns:
+--- - Direct reference (no args needed): api.debounce("context", main.toggle)
+--- - Wrapper (args needed): api.debounce("context", function(scope) main.init(scope) end)
+--- - Custom timeout: api.debounce("context", callback, 5)
+---
+---@param context string: logging context identifier (e.g., "public_api_toggle", "WinEnter:1001") - for debug tracing, not execution control
 ---@param callback function: to execute on completion.
 ---@param timeout number?: ms to wait for before execution.
 ---@private
@@ -101,6 +77,9 @@ function api.debounce(context, callback, timeout)
 
     local timer = vim.loop.new_timer()
     debouncer.timer = timer
+    -- Flag to track if a reschedule is needed while callback is executing
+    debouncer.reschedule = false
+
     timer:start(timeout, 0, function()
         -- Check if timer is still valid before processing
         if timer:is_closing() then
@@ -110,18 +89,24 @@ function api.debounce(context, callback, timeout)
         timer_stop_close(timer)
 
         if debouncer.executing then
-            -- Use a new timer for recursion instead of reusing the same one
-            return api.debounce(context, callback, timeout)
+            -- Mark for reschedule instead of recursing
+            debouncer.reschedule = true
+            return
         end
 
         debouncer.executing = true
         vim.schedule(function()
+            -- context is passed to log.debug for trace/debug output only
             log.debug(context, ">> debouncer triggered")
             callback(context)
             debouncer.executing = false
 
-            -- no other timer waiting
-            if debouncer.timer == timer then
+            -- Check if we need to reschedule
+            if debouncer.reschedule then
+                debouncer.reschedule = false
+                api.debounce(context, callback, timeout)
+            elseif debouncer.timer == timer then
+                -- no other timer waiting
                 api.debouncers[context] = nil
             end
         end)
@@ -143,7 +128,7 @@ function api.get_opened_buffers()
                 name = string.format("NoNamePain%s", buf)
             end
 
-            opened[name] = vim.api.nvim_buf_get_option(buf, "modified")
+            opened[name] = vim.api.nvim_get_option_value("modified", { buf = buf })
         end
     end
 
@@ -164,14 +149,14 @@ function api.is_side_id(side, id)
     return side == id
 end
 
---- Itherates over a given list of wins, starting from a given index, walking from a given step (+1/-1).
+--- Iterates over a given list of wins, starting from a given index, walking from a given step (+1/-1).
 --- Once an id that is not any of the side is found, return the position in the table, nil otherwise.
 ---
 ---@param start_idx number: the idx to start from in `wins`.
 ---@param step -1|1: the walk direction in `wins`, from `start_idx`.
 ---@param wins table: the table of wins ids to walk in.
----@param current_side number: the `left` or `right` side id.
----@param other_side number: the `left` or `right` side id.
+---@param current_side number?: the `left` or `right` side id.
+---@param other_side number?: the `left` or `right` side id.
 ---@param previously_focused number: the previously focused window.
 ---@return number?
 ---@private

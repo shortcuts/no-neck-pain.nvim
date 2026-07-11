@@ -12,6 +12,16 @@ function log.debug(scope, str, ...)
     return log.notify(scope, vim.log.levels.DEBUG, false, str, ...)
 end
 
+--- always prints a warning message.
+---
+---@param scope string: the scope from where this function is called.
+---@param str string: the formatted string.
+---@param ... any: the arguments of the formatted string.
+---@private
+function log.warn(scope, str, ...)
+    return log.notify(scope, vim.log.levels.WARN, true, str, ...)
+end
+
 --- prints only if debug is true.
 ---
 ---@param scope string: the scope from where this function is called.
@@ -21,8 +31,11 @@ end
 ---@param ... any: the arguments of the formatted string.
 ---@private
 function log.notify(scope, level, verbose, str, ...)
-    if not verbose and _G.NoNeckPain.config ~= nil and not _G.NoNeckPain.config.debug then
-        return
+    if not verbose then
+        local helpers = require("no-neck-pain.util.helpers")
+        if not helpers.get_config_field("debug") then
+            return
+        end
     end
 
     if string.len(scope) > longest_scope then

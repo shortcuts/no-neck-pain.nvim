@@ -1,7 +1,13 @@
+--- Event handling and skip logic for autocmds
+---
+--- Determines when to skip events and when the plugin should be enabled based on context.
+---
+---@module "no-neck-pain.util.event"
+
 local log = require("no-neck-pain.util.log")
 local api = require("no-neck-pain.util.api")
-local constants = require("no-neck-pain.util.constants")
 local state = require("no-neck-pain.state")
+local helpers = require("no-neck-pain.util.helpers")
 
 local event = {}
 
@@ -12,7 +18,8 @@ local event = {}
 ---
 ---@private
 function event.skip()
-    if _G.NoNeckPain.state == nil or not _G.NoNeckPain.state.enabled then
+    local plugin_state = helpers.get_state()
+    if plugin_state == nil or not plugin_state.enabled then
         return true
     end
 
@@ -38,38 +45,45 @@ end
 ---  1. if a tab definition already exists in the state
 ---  2. if we are focusing a relative window
 ---  3. if we are focusing a side tree or a dashboard
---- - the plugin is not enabled
---- - we have splits open (when `skip_split` is `true`)
---- - we are focusing a floating window
---- - we are focusing one of the side buffer
+---  4. if the active tab has been manually disabled
 ---
 ---@param scope string: internal identifier for logging purposes.
 ---@private
 function event.skip_enable(scope)
     if state:is_active_tab_registered() then
+        log.debug(scope, "skip: is_active_tab_registered")
+
         return true
     end
 
     if api.is_relative_window() then
+        log.debug(scope, "skip: is_relative_window")
+
         return true
     end
 
     if state:is_active_tab_disabled() then
-        if scope == "enable_on_tab_enter" then
+        if scope == "public_api_enable:TabEnter" then
+            log.debug(scope, "skip: is_active_tab_disabled,public_api_enable:TabEnter")
+
             return true
         end
+
+        log.debug(scope, "skip: is_active_tab_disabled,remove_active_tab_from_disabled")
 
         state:remove_active_tab_from_disabled()
 
         return false
     end
 
-    -- dashboards delays the plugin enable step until next buffer entered
-    if vim.tbl_contains(constants.DASHBOARDS, vim.bo.filetype) then
+    local filetype = string.lower(vim.bo.filetype)
+
+    if helpers.is_filetype_integration(filetype) then
+        log.debug(scope, "skip: filetype is an integration")
         return true
     end
 
-    return state:is_supported_integration("event.skip_enable", 0)
+    return false
 end
 
 return event

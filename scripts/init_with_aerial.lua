@@ -5,12 +5,10 @@ vim.cmd("set rtp+=deps/nvim-treesitter")
 vim.cmd("set rtp+=deps/nvim-web-devicons")
 vim.cmd("set rtp+=deps/aerial")
 
-require("mini.test").setup()
+require("mini.test").setup({ silent = true })
 require("no-neck-pain").setup({
-    debug = true,
     width = 20,
     minSideBufferWidth = 0,
-    integrations = { aerial = { reopen = true } },
 })
 require("aerial").setup({
     -- optionally use on_attach to set keymaps when aerial has attached to a buffer

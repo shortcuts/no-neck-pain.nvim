@@ -138,6 +138,21 @@ Helpers.new_child_neovim = function()
         child.wait()
     end
 
+    child.wait_for_plugin_enabled = function(timeout)
+        timeout = timeout or 2000
+        local start_time = vim.loop.now()
+        while vim.loop.now() - start_time < timeout do
+            local is_enabled = child.lua_get(
+                "_G.NoNeckPain ~= nil and _G.NoNeckPain.state ~= nil and _G.NoNeckPain.state.enabled"
+            )
+            if is_enabled then
+                return true
+            end
+            child.wait(50)
+        end
+        return false
+    end
+
     child.get_wins_in_tab = function(tab)
         tab = tab or "_G.NoNeckPain.state.active_tab"
 
@@ -228,6 +243,230 @@ Helpers.new_child_neovim = function()
     end
 
     return child
+end
+
+-- Generate random valid width configurations for property-based testing
+--
+-- Creates multiple configuration tables with random width values and other settings.
+-- Useful for testing plugin behavior across different width scenarios.
+--
+-- Parameters:
+--   min_width: minimum width value (e.g., 50)
+--   max_width: maximum width value (e.g., 150)
+--   count: number of configs to generate (default: 5)
+--
+-- Returns: table of width configurations, each with width and minSideBufferWidth
+--
+-- Example usage:
+--   local configs = Helpers.generate_width_configs(50, 150, 10)
+--   for _, config in ipairs(configs) do
+--       child.lua_get("_G.NoNeckPain.config.width = " .. config.width)
+--   end
+Helpers.generate_width_configs = function(min_width, max_width, count)
+    count = count or 5
+    local configs = {}
+
+    for i = 1, count do
+        table.insert(configs, {
+            width = math.random(min_width, max_width),
+            minSideBufferWidth = math.random(10, 30),
+        })
+    end
+
+    return configs
+end
+
+-- Generate random window layout tree structures for testing
+--
+-- Creates realistic Neovim window layout trees using col/row/leaf format.
+-- Simulates complex window scenarios to test layout scanning and computation.
+--
+-- Parameters:
+--   depth: current recursion depth (start with 1 or 2)
+--   max_children: maximum number of children at each level (2-3 recommended)
+--
+-- Returns: table representing window layout tree structure
+--   Format: { "col", { { "leaf", winid }, ... } } or { "row", { ... } }
+--
+-- Example usage:
+--   local tree = Helpers.generate_layout_tree(2, 3)
+--   -- Use in layout scanning tests
+Helpers.generate_layout_tree = function(depth, max_children)
+    max_children = max_children or 3
+    depth = depth or 1
+
+    -- Base case: return a leaf node with random window ID
+    if depth <= 0 then
+        return { "leaf", math.random(1000, 9999) }
+    end
+
+    local container = math.random(1, 2) == 1 and "col" or "row"
+    local num_children = math.random(1, max_children)
+    local children = {}
+
+    for _ = 1, num_children do
+        table.insert(children, Helpers.generate_layout_tree(depth - 1, max_children))
+    end
+
+    return { container, children }
+end
+
+-- Verify width calculation invariant: left + curr + right + integrations = total
+--
+-- Checks that the sum of all window widths matches the terminal width.
+-- Allows small margin (±2 columns) for rounding errors.
+-- Evaluates in child Neovim process to access actual window widths.
+--
+-- Parameters:
+--   child: child Neovim process with lua_get/api access
+--
+-- Returns: boolean (true if invariant holds)
+--
+-- Throws error if:
+--   - Window IDs are invalid or missing
+--   - Width calculation doesn't match (outside ±2 margin)
+--
+-- Example usage:
+--   Helpers.assert_width_invariant(child)  -- raises on failure
+Helpers.assert_width_invariant = function(child)
+    local left_id =
+        child.lua_get("_G.NoNeckPain.state.tabs[_G.NoNeckPain.state.active_tab].wins.main.left")
+    local curr_id =
+        child.lua_get("_G.NoNeckPain.state.tabs[_G.NoNeckPain.state.active_tab].wins.main.curr")
+    local right_id =
+        child.lua_get("_G.NoNeckPain.state.tabs[_G.NoNeckPain.state.active_tab].wins.main.right")
+    local total_cols = child.o.columns
+
+    if curr_id == nil or curr_id == vim.NIL then
+        error("Current window ID is invalid or nil")
+    end
+
+    local left_width = 0
+    local right_width = 0
+    local curr_width = 0
+
+    if left_id and left_id ~= vim.NIL then
+        left_width = child.lua_get("vim.api.nvim_win_get_width(" .. left_id .. ")")
+    end
+
+    if right_id and right_id ~= vim.NIL then
+        right_width = child.lua_get("vim.api.nvim_win_get_width(" .. right_id .. ")")
+    end
+
+    curr_width = child.lua_get("vim.api.nvim_win_get_width(" .. curr_id .. ")")
+
+    local computed_total = left_width + curr_width + right_width
+    local margin = 2
+
+    if math.abs(computed_total - total_cols) > margin then
+        error(
+            string.format(
+                "Width invariant failed: left(%d) + curr(%d) + right(%d) = %d, expected ~%d",
+                left_width,
+                curr_width,
+                right_width,
+                computed_total,
+                total_cols
+            )
+        )
+    end
+
+    return true
+end
+
+-- Verify state consistency: state.tabs matches actual windows
+--
+-- Checks that registered window IDs in state are valid and exist in current tab.
+-- Verifies no orphaned state entries (entries with invalid window IDs).
+-- Validates state.active_tab matches nvim's current tab.
+--
+-- Parameters:
+--   child: child Neovim process with lua_get/api access
+--
+-- Returns: boolean (true if state is consistent)
+--
+-- Throws error if:
+--   - Registered window IDs are invalid
+--   - Window IDs don't exist in current tab
+--   - Orphaned state entries detected
+--   - active_tab mismatch
+--
+-- Example usage:
+--   Helpers.assert_state_consistency(child)  -- raises on failure
+Helpers.assert_state_consistency = function(child)
+    local active_tab = child.lua_get("_G.NoNeckPain.state.active_tab")
+    local current_tab = child.lua_get("vim.api.nvim_get_current_tabpage()")
+
+    if active_tab ~= current_tab then
+        error(
+            string.format(
+                "Active tab mismatch: state has %d, current is %d",
+                active_tab,
+                current_tab
+            )
+        )
+    end
+
+    -- Get all windows in the current tab
+    local tab_wins = child.lua_get("vim.api.nvim_tabpage_list_wins(" .. active_tab .. ")")
+
+    -- Get registered main windows
+    local left_id =
+        child.lua_get("_G.NoNeckPain.state.tabs[_G.NoNeckPain.state.active_tab].wins.main.left")
+    local curr_id =
+        child.lua_get("_G.NoNeckPain.state.tabs[_G.NoNeckPain.state.active_tab].wins.main.curr")
+    local right_id =
+        child.lua_get("_G.NoNeckPain.state.tabs[_G.NoNeckPain.state.active_tab].wins.main.right")
+
+    -- Helper to check if window ID is in tab_wins
+    local function is_win_in_tab(win_id)
+        if win_id == nil or win_id == vim.NIL then
+            return true
+        end
+        for _, id in ipairs(tab_wins) do
+            if id == win_id then
+                return true
+            end
+        end
+        return false
+    end
+
+    -- Validate each registered window
+    if left_id and left_id ~= vim.NIL then
+        if not is_win_in_tab(left_id) then
+            error(string.format("Left window %d not found in current tab %d", left_id, active_tab))
+        end
+        local is_valid = child.lua_get("vim.api.nvim_win_is_valid(" .. left_id .. ")")
+        if not is_valid then
+            error(string.format("Left window %d is invalid", left_id))
+        end
+    end
+
+    if curr_id and curr_id ~= vim.NIL then
+        if not is_win_in_tab(curr_id) then
+            error(
+                string.format("Current window %d not found in current tab %d", curr_id, active_tab)
+            )
+        end
+        local is_valid = child.lua_get("vim.api.nvim_win_is_valid(" .. curr_id .. ")")
+        if not is_valid then
+            error(string.format("Current window %d is invalid", curr_id))
+        end
+    end
+
+    if right_id and right_id ~= vim.NIL then
+        if not is_win_in_tab(right_id) then
+            error(
+                string.format("Right window %d not found in current tab %d", right_id, active_tab)
+            )
+        end
+        local is_valid = child.lua_get("vim.api.nvim_win_is_valid(" .. right_id .. ")")
+        if not is_valid then
+            error(string.format("Right window %d is invalid", right_id))
+        end
+    end
+
+    return true
 end
 
 return Helpers

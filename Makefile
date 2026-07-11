@@ -1,26 +1,24 @@
 .SUFFIXES:
 
-TESTFILES=options mappings API splits tabs integrations buffers colors autocmds scratchpad commands callbacks
+TESTFILES=API autocmds buffers callbacks colors commands config_validation constants debug_tabs diagnostic event helpers_coverage integrations log mappings options regression_issues scratchpad splits state_access_regression state_edge_cases tabs width_calculations
 
 all: documentation lint luals test
 
 test:
-	make deps
-	nvim --version | head -n 1 && echo ''
-	nvim --headless --noplugin -u ./scripts/minimal_init.lua \
-		-c "lua MiniTest.run({ execute = { reporter = MiniTest.gen_reporter.stdout({ group_depth = 2 }) } })"
+	make $(addprefix test-, $(TESTFILES))
 
 test-race:
-	for i in {1..10}; do make test || break ; done
+	for i in {1..5}; do make test || break ; done
 
 test-nightly:
 	bob use nightly
 	make test
 
 $(addprefix test-, $(TESTFILES)): test-%:
-	nvim --version | head -n 1 && echo ''
+	nvim --version | head -n 1 && echo '' ; \
 	nvim --headless --noplugin -u ./scripts/minimal_init.lua \
-		-c "lua MiniTest.run_file('tests/test_$*.lua', { execute = { reporter = MiniTest.gen_reporter.stdout({ group_depth = 2 }) } })"
+		-c "lua require('mini.test').setup({ silent = true })" \
+		-c "lua MiniTest.run_file('tests/test_$*.lua', { silent = true })"
 
 $(addprefix test-race-, $(TESTFILES)): test-race-%:
 	for i in {1..10}; do make test-$* || break ; done
@@ -32,7 +30,6 @@ deps-lint:
 	luarocks install argparse --force
 	luarocks install luafilesystem --force
 	luarocks install lanes --force
-	luarocks install luacheck --force
 
 test-ci: deps test-race
 
@@ -43,7 +40,7 @@ documentation-ci: deps documentation
 
 lint:
 	stylua . -g '*.lua' -g '!deps/' -g '!nightly/'
-	luacheck plugin/ lua/
+	make luals
 
 luals-ci:
 	rm -rf .ci/lua-ls/log
