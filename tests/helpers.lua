@@ -1,5 +1,3 @@
-local api = dofile("lua/no-neck-pain/util/api.lua")
-
 -- imported from https://github.com/echasnovski/mini.nvim
 local Helpers = {}
 
@@ -138,21 +136,6 @@ Helpers.new_child_neovim = function()
         child.wait()
     end
 
-    child.wait_for_plugin_enabled = function(timeout)
-        timeout = timeout or 2000
-        local start_time = vim.loop.now()
-        while vim.loop.now() - start_time < timeout do
-            local is_enabled = child.lua_get(
-                "_G.NoNeckPain ~= nil and _G.NoNeckPain.state ~= nil and _G.NoNeckPain.state.enabled"
-            )
-            if is_enabled then
-                return true
-            end
-            child.wait(50)
-        end
-        return false
-    end
-
     child.get_wins_in_tab = function(tab)
         tab = tab or "_G.NoNeckPain.state.active_tab"
 
@@ -274,41 +257,6 @@ Helpers.generate_width_configs = function(min_width, max_width, count)
     end
 
     return configs
-end
-
--- Generate random window layout tree structures for testing
---
--- Creates realistic Neovim window layout trees using col/row/leaf format.
--- Simulates complex window scenarios to test layout scanning and computation.
---
--- Parameters:
---   depth: current recursion depth (start with 1 or 2)
---   max_children: maximum number of children at each level (2-3 recommended)
---
--- Returns: table representing window layout tree structure
---   Format: { "col", { { "leaf", winid }, ... } } or { "row", { ... } }
---
--- Example usage:
---   local tree = Helpers.generate_layout_tree(2, 3)
---   -- Use in layout scanning tests
-Helpers.generate_layout_tree = function(depth, max_children)
-    max_children = max_children or 3
-    depth = depth or 1
-
-    -- Base case: return a leaf node with random window ID
-    if depth <= 0 then
-        return { "leaf", math.random(1000, 9999) }
-    end
-
-    local container = math.random(1, 2) == 1 and "col" or "row"
-    local num_children = math.random(1, max_children)
-    local children = {}
-
-    for _ = 1, num_children do
-        table.insert(children, Helpers.generate_layout_tree(depth - 1, max_children))
-    end
-
-    return { container, children }
 end
 
 -- Verify width calculation invariant: left + curr + right + integrations = total
