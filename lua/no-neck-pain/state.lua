@@ -474,9 +474,11 @@ function state:set_layout_windows(scope, wins)
             if id ~= self:get_side_id("curr") then
                 local supported, name, integration = self:is_supported_integration(scope, id)
                 if supported and name and integration then
-                    integration.id = id
+                    if not self._integration_ids or self._integration_ids[name] ~= id then
+                        tab.redraw = true
+                    end
 
-                    tab.redraw = true
+                    integration.id = id
                     tab.wins.integrations[name] = integration
                 end
                 if supported and integration and integration.position == "none" then
@@ -562,6 +564,15 @@ end
 function state:scan_layout(scope)
     local initial_columns = self:get_columns()
 
+    -- `init_integrations` drops every recorded integration id, and the scan
+    -- below re-registers them. Keep the ids so the registration sites can tell
+    -- a genuinely new/moved integration from a re-registration at the same
+    -- window, and only then request a redraw.
+    self._integration_ids = {}
+    for name, opts in pairs(self:get_integrations()) do
+        self._integration_ids[name] = opts.id
+    end
+
     self:init_columns()
     self:init_integrations()
 
@@ -591,6 +602,8 @@ function state:scan_layout(scope)
         -- Complex layout structure
         self:walk_layout(scope, layout, false)
     end
+
+    self._integration_ids = nil
 
     self:save()
 
@@ -700,8 +713,11 @@ function state:_scan_col_children(scope, children)
             if id ~= self:get_side_id("curr") then
                 local supported, name, integration = self:is_supported_integration(scope, id)
                 if supported and name and integration then
+                    if not self._integration_ids or self._integration_ids[name] ~= id then
+                        tab.redraw = true
+                    end
+
                     integration.id = id
-                    tab.redraw = true
                     tab.wins.integrations[name] = integration
                     if integration.position == "none" then
                         has_none = true

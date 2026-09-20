@@ -1298,4 +1298,53 @@ T["oil: should not count oil as integration when it's the main buffer"] = functi
     Helpers.expect.equality(right_win, vim.NIL)
 end
 
+-- =============================================================================
+-- redraw flag
+-- =============================================================================
+
+T["redraw: re-registering an unchanged integration does not request a redraw"] = function()
+    child.set_size(10, 200)
+    child.lua([[
+        require('no-neck-pain').setup({
+            width = 80,
+            integrations = {
+                outline = { position = "right" }
+            }
+        })
+    ]])
+
+    child.nnp()
+    child.wait()
+
+    child.cmd("botright 30vnew")
+    child.bo.filetype = "Outline"
+    local outline_win = child.get_current_win()
+
+    child.cmd("wincmd h")
+    child.wait()
+
+    Helpers.expect.state(child, "tabs[1].wins.integrations.outline.id", outline_win)
+
+    -- Drain whatever the autocmds left behind, then rescan an unchanged layout.
+    child.lua([[
+        local state = require('no-neck-pain.state')
+        state:consume_redraw()
+        state:scan_layout('test:unchanged')
+    ]])
+
+    Helpers.expect.equality(child.lua_get("require('no-neck-pain.state'):consume_redraw()"), false)
+    Helpers.expect.state(child, "tabs[1].wins.integrations.outline.id", outline_win)
+
+    -- Forgetting the recorded id makes the integration look newly appeared:
+    -- the next scan must request a redraw again.
+    child.lua([[
+        local state = require('no-neck-pain.state')
+        state:init_integrations()
+        state:consume_redraw()
+        state:scan_layout('test:appeared')
+    ]])
+
+    Helpers.expect.equality(child.lua_get("require('no-neck-pain.state'):consume_redraw()"), true)
+end
+
 return T
