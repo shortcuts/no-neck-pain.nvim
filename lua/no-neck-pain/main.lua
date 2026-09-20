@@ -123,18 +123,14 @@ function main.init(scope)
     local new_left = left_before == nil and left_after ~= nil
     local new_right = right_before == nil and right_after ~= nil
 
-    if (new_left or new_right) and not (new_left and new_right) then
-        -- Count expected NNP-managed windows vs actual windows in tab
-        -- If there are more windows, splits exist and the new side buffer
-        -- needs repositioning to span full tab height
-        local expected = 1 -- curr
-            + (left_after ~= nil and 1 or 0)
-            + (right_after ~= nil and 1 or 0)
-        local actual = api.count_layout_wins(state.active_tab)
+    local action = state:determine_layout_action({
+        single_new_side = new_left ~= new_right,
+        side_count = (left_after ~= nil and 1 or 0) + (right_after ~= nil and 1 or 0),
+        post_count = api.count_layout_wins(state.active_tab),
+    })
 
-        if actual > expected then
-            ui.move_sides(string.format("%s:reposition_new_sides", scope))
-        end
+    if action == "reposition" then
+        ui.move_sides(string.format("%s:reposition_new_sides", scope))
     end
 
     if

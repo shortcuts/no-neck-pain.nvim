@@ -599,4 +599,36 @@ T["move_sides: restores eventignore"] = function()
     Helpers.expect.equality(child.lua_get("vim.o.eventignore"), "CursorMoved")
 end
 
+T["vsplit: recreated side buffer spans the full tab height (regression 66d96a5)"] = function()
+    child.set_size(30, 200)
+    child.lua([[require('no-neck-pain').setup({
+        width = 20,
+        minSideBufferWidth = 85,
+        buffers = { right = { enabled = false } },
+    })]])
+    child.nnp()
+    child.wait(50)
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000 })
+    Helpers.assert_sides_full_height(child)
+
+    -- a horizontal split nests `curr` inside a `col`
+    child.cmd("split")
+    child.wait(50)
+    Helpers.expect.state(child, "tabs[1].wins.main.left", 1001)
+
+    -- a full-height vsplit takes a column, leaving no room for the left side
+    child.cmd("botright vnew")
+    child.wait(100)
+    Helpers.expect.state(child, "tabs[1].wins.main.left", vim.NIL)
+
+    -- closing it frees the column, so the side is recreated while the focused
+    -- window lives inside the `col`
+    child.cmd("close")
+    child.wait(200)
+
+    Helpers.expect.state_type(child, "tabs[1].wins.main.left", "number")
+    Helpers.assert_sides_full_height(child)
+end
+
 return T

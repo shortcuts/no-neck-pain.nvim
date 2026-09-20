@@ -417,4 +417,59 @@ Helpers.assert_state_consistency = function(child)
     return true
 end
 
+-- Verify every existing side buffer spans the full height of the tab
+--
+-- A side recreated while the focused window sits inside a horizontal split is
+-- nested in that split instead of spanning the tab, see `reposition_new_sides`
+-- in `main.init`. Height is otherwise never asserted in the harness.
+--
+-- Parameters:
+--   child: child Neovim process with lua_get/api access
+--
+-- Returns: boolean (true if every present side spans the tab height)
+--
+-- Throws error if a side does not start at row 0 or does not reach the bottom
+-- of the tab.
+--
+-- Example usage:
+--   Helpers.assert_sides_full_height(child)  -- raises on failure
+Helpers.assert_sides_full_height = function(child)
+    local wins = child.lua_get([[
+        vim.tbl_map(function(w)
+            return { w, vim.api.nvim_win_get_position(w)[1], vim.api.nvim_win_get_height(w) }
+        end, vim.tbl_filter(function(w)
+            return vim.api.nvim_win_get_config(w).relative == ""
+        end, vim.api.nvim_tabpage_list_wins(0)))
+    ]])
+
+    local bottom = 0
+    for _, win in ipairs(wins) do
+        bottom = math.max(bottom, win[2] + win[3])
+    end
+
+    for _, side in ipairs({ "left", "right" }) do
+        local id = child.lua_get(
+            "_G.NoNeckPain.state.tabs[_G.NoNeckPain.state.active_tab].wins.main." .. side
+        )
+
+        if id and id ~= vim.NIL then
+            for _, win in ipairs(wins) do
+                if win[1] == id and (win[2] ~= 0 or win[2] + win[3] ~= bottom) then
+                    error(
+                        string.format(
+                            "%s side is not full height: row %d, height %d, tab height %d",
+                            side,
+                            win[2],
+                            win[3],
+                            bottom
+                        )
+                    )
+                end
+            end
+        end
+    end
+
+    return true
+end
+
 return Helpers

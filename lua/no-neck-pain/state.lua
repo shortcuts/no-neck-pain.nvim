@@ -801,9 +801,19 @@ end
 ---   left_cleared: boolean (whether the left side ID was just cleared),
 ---   right_cleared: boolean (whether the right side ID was just cleared),
 --- }
----@return "disable"|"init"|"redraw"|nil
+---   Alternatively, after a side was (re)created by `ui.create_side_buffers`:
+---   single_new_side: boolean (whether exactly one side was just created),
+---   side_count: number (how many sides exist now),
+---   post_count: number (non-relative windows in the tab),
+---@return "disable"|"init"|"redraw"|"reposition"|nil
 ---@private
 function state:determine_layout_action(ctx)
+    -- a single side was just recreated: any window beyond `curr` and the sides
+    -- means it was split off an existing split, so it misses the tab height.
+    if ctx.single_new_side then
+        return ctx.post_count > ctx.side_count + 1 and "reposition" or nil
+    end
+
     if (ctx.left_cleared or ctx.right_cleared) and ctx.event_name == "WinClosed" then
         return "disable"
     end
