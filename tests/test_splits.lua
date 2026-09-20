@@ -422,10 +422,12 @@ T["vsplit/split: splits and vsplits keeps a correct size"] = function()
     Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1004, 1003, 1000, 1002 })
     Helpers.expect.equality(child.get_current_win(), 1004)
 
-    -- vsplitting the already-split main buffer further must not be treated as
-    -- an extra vsplit column: it's all the same main column, just subdivided,
-    -- so its (and the sides') width must stay the same as before the vsplit.
-    Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.curr", 17, 20)
+    -- the vsplit is a genuine extra column: both sides shrink to make room for
+    -- it, and `curr` (the col's bottom leaf) spans the two subdivided columns.
+    Helpers.expect.state(child, "tabs[1].wins.columns", 4)
+    Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.left", 18, 21)
+    Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.right", 18, 21)
+    Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.curr", 38, 42)
 end
 
 T["vsplit/split: side buffer widths restore after split then vsplit then close"] = function()
@@ -442,10 +444,9 @@ T["vsplit/split: side buffer widths restore after split then vsplit then close"]
     child.cmd("vsplit")
     child.wait()
 
-    -- splitting/vsplitting the main buffer subdivides its own column, it does
-    -- not add an extra vsplit column, so side buffers keep their width.
-    Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.left", 28, 35)
-    Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.right", 28, 35)
+    -- the vsplit adds a real column, so both sides shrink to make room for it
+    Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.left", 18, 21)
+    Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.right", 18, 21)
 
     -- Close vsplit and split - verify main window is still centered
     child.cmd("q")
@@ -514,63 +515,80 @@ T["split/vsplit: split then vsplit then close side buffers reopen (with only one
 
     local all_wins = child.get_wins_in_tab()
 
-    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1003, 1002, 1000 })
+    -- the vsplit is a real extra column: 2 x 50 leaves no room for the padding,
+    -- so it is closed here and recreated once the vsplit goes away
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1003, 1002, 1000 })
     Helpers.expect.equality(child.get_current_win(), 1003)
+    Helpers.expect.equality(child.lua_get("_G.NoNeckPain.state.tabs[1].wins.main.left"), vim.NIL)
 
-    -- close vsplit: splitting/vsplitting the main buffer must not be treated as
-    -- extra vsplit columns, so the left padding keeps its width and never closes
-    -- (regression: https://github.com/shortcuts/no-neck-pain.nvim split/vsplit/close on
-    -- the main buffer with one side disabled used to inflate the column count and
-    -- wrongly close the remaining side buffer).
     child.cmd("q")
     child.wait(200)
 
-    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1002, 1000 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1004, 1002, 1000 })
     Helpers.expect.equality(child.get_current_win(), 1002)
 
     local left_after = child.lua_get("_G.NoNeckPain.state.tabs[1].wins.main.left")
     local right_after = child.lua_get("_G.NoNeckPain.state.tabs[1].wins.main.right")
 
-    Helpers.expect.equality(left_after, 1001)
+    Helpers.expect.equality(left_after, 1004)
     Helpers.expect.equality(right_after, vim.NIL)
 end
 
-T["split/vsplit: left padding keeps its width when splitting/vsplitting the main buffer with right disabled"] = function()
+T["split/vsplit: vsplitting the main buffer closes the left padding once no room is left (only left enabled)"] = function()
     child.set_size(10, 200)
     child.lua([[ require('no-neck-pain').setup({ buffers = { right = { enabled = false } } }) ]])
     child.nnp()
-    child.wait()
+    child.wait(200)
 
     Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000 })
 
     local left_id = child.lua_get("_G.NoNeckPain.state.tabs[1].wins.main.left")
-    local left_width_before = child.lua_get("vim.api.nvim_win_get_width(" .. left_id .. ")")
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(" .. left_id .. ")"), 50)
+    Helpers.expect.state(child, "tabs[1].wins.columns", 2)
 
-    -- splitting then vsplitting the main buffer duplicates it into new windows,
-    -- this must not be counted as extra vsplit columns or the left padding gets
-    -- starved of width and force-closed, even though there's plenty of room.
+    -- a horizontal split subdivides the main column, it adds none
+    child.cmd("split")
+    child.wait(200)
+
+    Helpers.expect.state(child, "tabs[1].wins.columns", 2)
+    Helpers.expect.equality(child.lua_get("_G.NoNeckPain.state.tabs[1].wins.main.left"), left_id)
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(" .. left_id .. ")"), 50)
+
+    -- the vsplit is a real extra column: 2 x 100 fills the 200 available
+    -- columns, so the padding no longer fits and must be closed
+    child.cmd("vsplit")
+    child.wait(300)
+
+    Helpers.expect.equality(child.lua_get("_G.NoNeckPain.state.tabs[1].wins.main.left"), vim.NIL)
+
+    -- closing the vsplit frees the column again, the padding comes back at its
+    -- computed width instead of a default half-of-the-column one
+    child.cmd("q")
+    child.wait(300)
+
+    local left_again = child.lua_get("_G.NoNeckPain.state.tabs[1].wins.main.left")
+    Helpers.expect.no_equality(left_again, vim.NIL)
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(" .. left_again .. ")"), 50)
+end
+
+T["split/vsplit: enabling on an existing horizontal split keeps the padding at its computed width (only left enabled)"] = function()
+    child.set_size(10, 200)
+    child.lua([[ require('no-neck-pain').setup({ buffers = { right = { enabled = false } } }) ]])
+
     child.cmd("split")
     child.wait()
-    child.cmd("vsplit")
-    child.wait()
 
-    Helpers.expect.equality(child.lua_get("_G.NoNeckPain.state.tabs[1].wins.main.left"), left_id)
+    child.nnp()
+    child.wait(200)
 
-    -- vim's 'equalalways' resizes every window (including the side buffer) the
-    -- instant the vsplit is created; NNP must immediately resize it back, not
-    -- only once the vsplit is later closed.
-    local left_width_during = child.lua_get("vim.api.nvim_win_get_width(" .. left_id .. ")")
-    Helpers.expect.equality(left_width_during, left_width_before)
+    local left_id = child.lua_get("_G.NoNeckPain.state.tabs[1].wins.main.left")
+    Helpers.expect.no_equality(left_id, vim.NIL)
 
-    -- close the vsplit
-    child.cmd("q")
-    child.wait()
-
-    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1002, 1000 })
-    Helpers.expect.equality(child.lua_get("_G.NoNeckPain.state.tabs[1].wins.main.left"), left_id)
-
-    local left_width_after = child.lua_get("vim.api.nvim_win_get_width(" .. left_id .. ")")
-    Helpers.expect.equality(left_width_after, left_width_before)
+    -- 200 columns - 100 for the main buffer = 100 spare, halved = 50. The side
+    -- is created inside the split and then repositioned with `wincmd H`, which
+    -- used to hand it a fresh default width (half of the 200-wide column).
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(" .. left_id .. ")"), 50)
+    Helpers.assert_sides_full_height(child)
 end
 
 T["resize: VimResized is honored after programmatic tab switch"] = function()

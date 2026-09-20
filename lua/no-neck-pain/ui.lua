@@ -52,11 +52,24 @@ function ui.move_sides(scope)
         if id ~= nil then
             local wins = vim.api.nvim_tabpage_list_wins(state.active_tab)
 
+            local width
+            if vim.api.nvim_win_is_valid(id) then
+                width = vim.api.nvim_win_get_width(id)
+            end
+
             if curr_win ~= id and vim.api.nvim_win_is_valid(id) then
                 vim.api.nvim_set_current_win(id)
             end
 
             vim.cmd(keys)
+
+            -- `wincmd H`/`L` re-splits the window at the top level, which hands
+            -- it a fresh default width (half of what it was carved out of)
+            -- instead of the one `create_side_buffers` computed. Moving is a
+            -- position-only operation, so put the width back.
+            if width and vim.api.nvim_win_is_valid(id) then
+                vim.api.nvim_win_set_width(id, width)
+            end
 
             if (side == "left" and wins[1] ~= id) or (side == "right" and wins[#wins] ~= id) then
                 log.debug(
