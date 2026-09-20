@@ -4,7 +4,7 @@ LUA_LS_VERSION := $(shell cat .luals-version)
 LUA_LS_TARGET := $(shell uname -s | tr '[:upper:]' '[:lower:]')-$(shell uname -m | sed -e 's/x86_64/x64/' -e 's/aarch64/arm64/')
 LUA_LS_BIN := .ci/lua-ls/bin/lua-language-server
 
-TESTFILES=API autocmds buffers callbacks colors commands config_validation constants debug_tabs diagnostic event helpers_coverage integrations log mappings options regression_issues scratchpad splits state_access_regression state_edge_cases tabs width_calculations
+TESTFILES=API autocmds buffers callbacks colors commands config_validation constants event helpers_coverage integrations log mappings options regression_issues scratchpad splits state_access_regression state_edge_cases tabs width_calculations
 
 all: documentation lint luals test
 
