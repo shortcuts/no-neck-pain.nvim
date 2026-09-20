@@ -257,4 +257,33 @@ T["regression #297: custom user-defined integrations are recognized"] = function
     end
 end
 
+T["regression: FileType safety net never disables the plugin on an integration filetype"] = function()
+    child.set_size(10, 200)
+
+    local setup = [[require('no-neck-pain').setup({
+        width = 50,
+        minSideBufferWidth = 5,
+        autocmds = { enableOnVimEnter = true },
+    })]]
+
+    child.lua(setup)
+    child.nnp()
+    child.wait()
+
+    Helpers.expect.state(child, "enabled", true)
+    Helpers.expect.equality(#child.get_wins_in_tab(), 3)
+
+    -- The first BufEnter after an enable deletes NoNeckPainVimEnterAutocmd, so
+    -- re-run setup to re-arm the FileType net while the plugin is enabled: that is
+    -- the window in which the net used to call NoNeckPain.disable().
+    child.lua(setup)
+    child.wait()
+
+    child.bo.filetype = "NvimTree"
+    child.wait()
+
+    Helpers.expect.state(child, "enabled", true)
+    Helpers.expect.equality(#child.get_wins_in_tab(), 3)
+end
+
 return T

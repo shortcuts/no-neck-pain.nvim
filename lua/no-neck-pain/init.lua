@@ -7,8 +7,6 @@ local state = require("no-neck-pain.state")
 
 local NoNeckPain = {}
 
-local filetype_autocmd_in_progress = false
-
 --- Toggle the plugin by calling the `enable`/`disable` methods respectively.
 function NoNeckPain.toggle()
     helpers.ensure_config_loaded(config)
@@ -140,38 +138,25 @@ function NoNeckPain.setup(opts)
         vim.api.nvim_create_autocmd({ "FileType" }, {
             pattern = "*",
             callback = function()
-                if filetype_autocmd_in_progress then
+                -- the plugin has already run at least once; enabling/disabling on a
+                -- filetype change is not this net's job.
+                if helpers.get_state() ~= nil then
                     return
                 end
-                filetype_autocmd_in_progress = true
 
                 local filetype = string.lower(vim.bo.filetype)
-                local state = helpers.get_state()
-
-                -- Disable path: if enabled and filetype is integration
-                if state ~= nil and filetype ~= "" then
-                    if helpers.is_filetype_integration(filetype) then
-                        NoNeckPain.disable()
-                        pcall(vim.api.nvim_del_augroup_by_name, "NoNeckPainVimEnterAutocmd")
-                        filetype_autocmd_in_progress = false
-                        return
-                    end
+                if filetype == "" or helpers.is_filetype_integration(filetype) then
+                    return
                 end
 
-                -- Enable path: if not yet enabled and filetype is not integration
-                if state == nil and filetype ~= "" then
-                    if not helpers.is_filetype_integration(filetype) then
-                        local scope = string.format(
-                            "enable_on_filetype:%s:%s",
-                            config.options.integrations.dashboard.enabled,
-                            config.options.autocmds.enableOnVimEnter
-                        )
-                        NoNeckPain.enable(scope)
-                        pcall(vim.api.nvim_del_augroup_by_name, "NoNeckPainVimEnterAutocmd")
-                    end
-                end
-
-                filetype_autocmd_in_progress = false
+                NoNeckPain.enable(
+                    string.format(
+                        "enable_on_filetype:%s:%s",
+                        config.options.integrations.dashboard.enabled,
+                        config.options.autocmds.enableOnVimEnter
+                    )
+                )
+                helpers.safe_delete_augroup("NoNeckPainVimEnterAutocmd")
             end,
             group = "NoNeckPainVimEnterAutocmd",
             desc = "Safety net for deferred filetype resolution.",
