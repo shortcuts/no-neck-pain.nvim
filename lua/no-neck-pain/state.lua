@@ -76,7 +76,7 @@ function state:init_integrations()
     self.tabs[self.active_tab].wins.integrations = {}
 
     -- normalize to lowercase
-    for name, opts in pairs(vim.deepcopy(helpers.get_config_field("integrations"))) do
+    for name, opts in pairs(vim.deepcopy(_G.NoNeckPain.config.integrations)) do
         local lower_name = string.lower(name)
         self.tabs[self.active_tab].wins.integrations[lower_name] = opts
     end
@@ -97,7 +97,7 @@ end
 ---
 ---@private
 function state:save()
-    helpers.set_state(self)
+    _G.NoNeckPain.state = self
 end
 
 --- Sets the global state as enabled.
@@ -315,8 +315,8 @@ end
 ---@return boolean
 ---@private
 function state:is_side_enabled(side)
-    local buffers = helpers.get_config_field("buffers")
-    if buffers == nil or buffers[side] == nil then
+    local buffers = _G.NoNeckPain.config.buffers
+    if buffers[side] == nil then
         return false
     end
     return buffers[side].enabled

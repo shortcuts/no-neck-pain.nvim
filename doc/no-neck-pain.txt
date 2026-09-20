@@ -461,8 +461,8 @@ Determines when to skip events and when the plugin should be enabled based on co
 ------------------------------------------------------------------------------
 Utility helpers module for no-neck-pain.nvim
 
-This module provides helper functions for common patterns used throughout
-the plugin, including state and config access, validation, and augroup cleanup.
+This module provides helper functions for augroup cleanup, plugin-state
+validation and integration filetype matching.
 
 "no-neck-pain.util.helpers"
 

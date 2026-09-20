@@ -64,26 +64,24 @@ function main.toggle_side(scope, side)
         return state:save()
     end
 
-    helpers.set_config(vim.tbl_deep_extend("keep", {
+    _G.NoNeckPain.config = vim.tbl_deep_extend("keep", {
         buffers = {
             [side] = {
-                enabled = not helpers.get_config_field("buffers")[side].enabled,
+                enabled = not _G.NoNeckPain.config.buffers[side].enabled,
             },
         },
-    }, helpers.get_config()))
+    }, _G.NoNeckPain.config)
 
-    if not helpers.get_config_field("buffers")[side].enabled then
+    if not _G.NoNeckPain.config.buffers[side].enabled then
         ui.close_win(scope, state:get_side_id(side), side)
         state:set_side_id(nil, side)
     end
 
     if not (state:is_side_valid("left") or state:is_side_valid("right")) then
-        helpers.set_config(
-            vim.tbl_deep_extend(
-                "keep",
-                { buffers = { left = { enabled = true }, right = { enabled = true } } },
-                helpers.get_config()
-            )
+        _G.NoNeckPain.config = vim.tbl_deep_extend(
+            "keep",
+            { buffers = { left = { enabled = true }, right = { enabled = true } } },
+            _G.NoNeckPain.config
         )
 
         return main.disable(scope)
@@ -188,7 +186,7 @@ function main._on_skip_entering(p)
         return log.debug(p.event, "skip")
     end
 
-    if not helpers.get_config_field("autocmds").skipEnteringNoNeckPainBuffer then
+    if not _G.NoNeckPain.config.autocmds.skipEnteringNoNeckPainBuffer then
         state:set_previously_focused_win(vim.api.nvim_get_current_win())
         return
     end
@@ -399,7 +397,7 @@ function main._on_buf_delete(p)
 
         curr_id = state:get_side_id("curr")
         if not curr_id or not vim.api.nvim_win_is_valid(curr_id) then
-            if p.event == "BufDelete" and helpers.get_config_field("fallbackOnBufferDelete") then
+            if p.event == "BufDelete" and _G.NoNeckPain.config.fallbackOnBufferDelete then
                 local win = vim.api.nvim_get_current_win()
 
                 log.debug(s, "`curr` has been deleted, resetting state, now focusing %d", win)
@@ -499,7 +497,7 @@ function main.enable(scope)
         return
     end
 
-    local callbacks = helpers.get_config_field("callbacks")
+    local callbacks = _G.NoNeckPain.config.callbacks
     if callbacks.preEnable ~= nil then
         callbacks.preEnable(state)
     end
@@ -534,8 +532,8 @@ function main.enable(scope)
             vim.schedule(function()
                 state:set_active_tab(api.get_current_tab())
                 if
-                    helpers.get_state() == nil
-                    or not helpers.get_state_field("enabled")
+                    _G.NoNeckPain.state == nil
+                    or not _G.NoNeckPain.state.enabled
                     or not state:is_active_tab_registered()
                 then
                     return
@@ -585,7 +583,7 @@ end
 ---@param scope string: debug/trace identifier for logging (not execution scope) - used in debug output only
 ---@private
 function main.disable(scope)
-    local callbacks = helpers.get_config_field("callbacks")
+    local callbacks = _G.NoNeckPain.config.callbacks
     if callbacks.preDisable ~= nil then
         callbacks.preDisable(state)
     end
@@ -652,7 +650,7 @@ function main.disable(scope)
     if curr_id ~= nil and vim.api.nvim_win_is_valid(curr_id) then
         vim.api.nvim_set_current_win(curr_id)
 
-        if helpers.get_config_field("killAllBuffersOnDisable") then
+        if _G.NoNeckPain.config.killAllBuffersOnDisable then
             vim.cmd("only")
         end
     end

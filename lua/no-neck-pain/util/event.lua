@@ -29,7 +29,7 @@ end
 ---
 ---@private
 function event.skip()
-    local plugin_state = helpers.get_state()
+    local plugin_state = _G.NoNeckPain.state
     if plugin_state == nil or not plugin_state.enabled then
         return true
     end

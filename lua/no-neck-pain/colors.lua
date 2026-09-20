@@ -1,7 +1,6 @@
 local constants = require("no-neck-pain.util.constants")
 local log = require("no-neck-pain.util.log")
 local state = require("no-neck-pain.state")
-local helpers = require("no-neck-pain.util.helpers")
 
 local colors = {}
 
@@ -132,10 +131,7 @@ function colors.init(win, side)
     vim.api.nvim_set_hl(id, background_group, {})
     vim.api.nvim_set_hl(id, text_group, {})
 
-    local config = helpers.get_config_field("buffers")
-    if config == nil then
-        return log.debug("colors.init", "config not initialized")
-    end
+    local config = _G.NoNeckPain.config.buffers
 
     local has_custom_colors = config[side].colors.background ~= nil
         or config[side].colors.text ~= nil
