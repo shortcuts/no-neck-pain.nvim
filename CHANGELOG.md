@@ -1,4 +1,21 @@
 <a name="0.2.3"></a>
+## [3.0.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.5.3...v3.0.0) (2026-09-20)
+
+
+### ⚠ BREAKING CHANGES
+
+* breaking change v3
+
+### Features
+
+* breaking change v3 ([46199a5](https://github.com/shortcuts/no-neck-pain.nvim/commit/46199a59fafc7bf9a99ee1e17970e121363af8e0))
+* v3 ([#513](https://github.com/shortcuts/no-neck-pain.nvim/issues/513)) ([029f530](https://github.com/shortcuts/no-neck-pain.nvim/commit/029f530bcb4702f3ee344e4e62f64d66b64d9cdb))
+
+
+### Bug Fixes
+
+* kill orphan tabs ([#509](https://github.com/shortcuts/no-neck-pain.nvim/issues/509)) ([e5d1abf](https://github.com/shortcuts/no-neck-pain.nvim/commit/e5d1abf50010a1fb4285493202467aa982b459c2))
+
 ## [2.5.3](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.5.2...v2.5.3) (2025-12-19)
 
 
