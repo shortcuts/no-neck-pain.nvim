@@ -589,4 +589,14 @@ T["resize: VimResized is honored after programmatic tab switch"] = function()
     )
 end
 
+T["move_sides: restores eventignore"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=20}) ]])
+    child.nnp()
+
+    child.lua([[ vim.o.eventignore = "CursorMoved" ]])
+    child.lua([[ require('no-neck-pain.ui').move_sides('test') ]])
+
+    Helpers.expect.equality(child.lua_get("vim.o.eventignore"), "CursorMoved")
+end
+
 return T

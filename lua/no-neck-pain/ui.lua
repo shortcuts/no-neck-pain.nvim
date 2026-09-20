@@ -39,6 +39,11 @@ function ui.move_sides(scope)
 
     local curr_win = vim.api.nvim_get_current_win()
 
+    -- suppress autocmds for the whole move, which covers the `wincmd` calls too
+    -- and avoids per-call `noautocmd` Ex-command parsing.
+    local eventignore = vim.o.eventignore
+    vim.o.eventignore = "all"
+
     for _, side in ipairs(constants.SIDES) do
         local keys = sides[side]
         local sscope = string.format("%s:%s", scope, side)
@@ -48,10 +53,10 @@ function ui.move_sides(scope)
             local wins = vim.api.nvim_tabpage_list_wins(state.active_tab)
 
             if curr_win ~= id and vim.api.nvim_win_is_valid(id) then
-                vim.cmd("noautocmd lua vim.api.nvim_set_current_win(" .. id .. ")")
+                vim.api.nvim_set_current_win(id)
             end
 
-            vim.cmd("noautocmd " .. keys)
+            vim.cmd(keys)
 
             if (side == "left" and wins[1] ~= id) or (side == "right" and wins[#wins] ~= id) then
                 log.debug(
@@ -66,8 +71,10 @@ function ui.move_sides(scope)
     end
 
     if vim.api.nvim_win_is_valid(curr_win) then
-        vim.cmd("noautocmd lua vim.api.nvim_set_current_win(" .. curr_win .. ")")
+        vim.api.nvim_set_current_win(curr_win)
     end
+
+    vim.o.eventignore = eventignore
 end
 
 --- Closes a window if it's valid.
