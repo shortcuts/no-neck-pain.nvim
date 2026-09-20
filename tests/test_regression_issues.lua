@@ -286,4 +286,35 @@ T["regression: FileType safety net never disables the plugin on an integration f
     Helpers.expect.equality(#child.get_wins_in_tab(), 3)
 end
 
+T["regression: move_sides ignores user <C-W>H / <C-W>L mappings"] = function()
+    child.set_size(10, 200)
+    child.lua([[require('no-neck-pain').setup({ width = 100 })]])
+
+    child.nnp()
+    child.wait()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+
+    -- A user remapping the window-move keys must not be able to intercept the
+    -- side repositioning: `:wincmd` ignores mappings, `:normal` did not.
+    child.lua([[
+        _G.hijacked = false
+        vim.keymap.set("n", "<C-W>H", function() _G.hijacked = true end)
+        vim.keymap.set("n", "<C-W>L", function() _G.hijacked = true end)
+    ]])
+
+    child.lua([[require('no-neck-pain.ui').move_sides("test")]])
+    child.wait()
+
+    Helpers.expect.equality(child.lua_get("_G.hijacked"), false)
+
+    -- and the layout is still the one NNP believes it has
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+    Helpers.expect.state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
+end
+
 return T

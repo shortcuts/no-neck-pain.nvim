@@ -33,8 +33,8 @@ end
 ---@private
 function ui.move_sides(scope)
     local sides = {
-        left = vim.api.nvim_replace_termcodes("normal <C-W>H", true, false, true),
-        right = vim.api.nvim_replace_termcodes("normal <C-W>L", true, false, true),
+        left = "wincmd H",
+        right = "wincmd L",
     }
 
     local curr_win = vim.api.nvim_get_current_win()
