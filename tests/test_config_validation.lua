@@ -500,4 +500,26 @@ T["Config Validation: widthUp and widthDown accept table format"] = function()
     Helpers.expect.equality(has_widthdown, true)
 end
 
+T["Config Validation: setup succeeds with all autocmds flags disabled"] = function()
+    child.lua([[
+        require('no-neck-pain').setup({
+            autocmds = {
+                enableOnVimEnter = false,
+                enableOnTabEnter = false,
+                reloadOnColorSchemeChange = false
+            }
+        })
+    ]])
+
+    Helpers.expect.config(child, "autocmds.enableOnVimEnter", false)
+    Helpers.expect.config(child, "autocmds.enableOnTabEnter", false)
+    Helpers.expect.config(child, "autocmds.reloadOnColorSchemeChange", false)
+
+    -- the session-restore autocmds register into NoNeckPainAutocmd unconditionally,
+    -- so the augroup must exist even with every flag off
+    local has_session_autocmds =
+        child.lua_get([[#vim.api.nvim_get_autocmds({ group = "NoNeckPainAutocmd" }) > 0]])
+    Helpers.expect.equality(has_session_autocmds, true)
+end
+
 return T

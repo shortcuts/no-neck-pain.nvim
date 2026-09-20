@@ -81,14 +81,8 @@ end
 function NoNeckPain.setup(opts)
     helpers.set_config(config.setup(opts))
 
-    if
-        helpers.get_config_field("autocmds").enableOnVimEnter
-        or helpers.get_config_field("autocmds").enableOnTabEnter
-        or helpers.get_config_field("autocmds").reloadOnColorSchemeChange
-    then
-        vim.api.nvim_create_augroup("NoNeckPainAutocmd", { clear = true })
-        vim.api.nvim_create_augroup("NoNeckPainVimEnterAutocmd", { clear = true })
-    end
+    vim.api.nvim_create_augroup("NoNeckPainAutocmd", { clear = true })
+    vim.api.nvim_create_augroup("NoNeckPainVimEnterAutocmd", { clear = true })
 
     if helpers.get_config_field("autocmds").reloadOnColorSchemeChange then
         vim.api.nvim_create_autocmd({ "ColorScheme" }, {
