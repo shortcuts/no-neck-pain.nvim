@@ -175,8 +175,6 @@ function ui.create_side_buffers()
         right = { anchor = "SE", padding = ui.get_side_width("right") },
     }
 
-    local created_in_first_loop = {}
-
     for _, side in ipairs(constants.SIDES) do
         if
             wins[side].padding >= helpers.get_config_field("minSideBufferWidth")
@@ -214,7 +212,6 @@ function ui.create_side_buffers()
             end
 
             colors.init(state:get_side_id(side), side)
-            created_in_first_loop[side] = true
         end
     end
 
