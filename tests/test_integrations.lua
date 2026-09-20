@@ -849,6 +849,15 @@ T["snacks_picker: detects col-based explorer integration"] = function()
 
     -- Layout: col(snacks_picker) + left_pad + main + right_pad = 4 columns
     Helpers.expect.state(child, "tabs[1].wins.columns", 4)
+
+    -- the redraw request raised by the new integration must not leave the
+    -- sides off the extremes of the layout
+    local wins = child.get_wins_in_tab()
+    Helpers.expect.equality(wins[1], child.lua_get("_G.NoNeckPain.state.tabs[1].wins.main.left"))
+    Helpers.expect.equality(
+        wins[#wins],
+        child.lua_get("_G.NoNeckPain.state.tabs[1].wins.main.right")
+    )
 end
 
 -- =============================================================================

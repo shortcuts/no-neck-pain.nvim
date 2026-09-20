@@ -219,9 +219,12 @@ function ui.create_side_buffers()
     end
 
     -- Refresh column count after creating new windows so the second loop
-    -- computes widths with the correct number of columns.
+    -- computes widths with the correct number of columns. The rescan
+    -- re-registers the same integrations, so it raises a redraw request that
+    -- is not a new one: clear it through the guarded accessor, since a
+    -- debounced caller can run after the tab was unregistered.
     state:scan_layout("ui.create_side_buffers:rescan")
-    state.tabs[state.active_tab].redraw = false
+    state:consume_redraw()
 
     for _, side in ipairs(constants.SIDES) do
         local scope = string.format("ui.create_side_buffers:%s", side)

@@ -374,7 +374,8 @@ function main._on_win_change(p)
             end
             api.debounce(s, main.init)
         elseif action == "redraw" then
-            state.tabs[state.active_tab].redraw = false
+            -- `ui.create_side_buffers` clears the flag itself, through the
+            -- guarded accessor: the tab can be gone once the timer fires.
             api.debounce(s, ui.create_side_buffers)
         end
     end)
