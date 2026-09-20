@@ -90,26 +90,31 @@ end
 
 T["session restore"] = MiniTest.new_set()
 
-T["session restore"]["signal_session_restore_start sets flag, complete clears it"] = function()
+T["session restore"]["sourcing a non-session .vim file does not break disable()"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
-    child.nnp()
+
+    -- the plugin must not hijack `:source`
+    child.lua([[
+        _G._nnp_srccmd = 0
+        for _, a in ipairs(vim.api.nvim_get_autocmds({ event = "SourceCmd" })) do
+            if a.group_name == "NoNeckPainAutocmd" then
+                _G._nnp_srccmd = _G._nnp_srccmd + 1
+            end
+        end
+    ]])
+    Helpers.expect.equality(child.lua_get("_G._nnp_srccmd"), 0)
+
+    -- a plain .vim file, at a path containing a space, still sources normally
+    child.lua([[
+        _G._nnp_vim_file = vim.fn.tempname() .. " nnp source.vim"
+        vim.fn.writefile({ "let g:nnp_sourced = 1" }, _G._nnp_vim_file)
+        vim.cmd({ cmd = "source", args = { _G._nnp_vim_file } })
+    ]])
     child.wait()
 
-    Helpers.expect.state(child, "enabled", true)
+    Helpers.expect.equality(child.lua_get("vim.g.nnp_sourced"), 1)
 
-    -- Start restore: disable should not call state:init()
-    child.lua([[ require('no-neck-pain.main').signal_session_restore_start() ]])
-    child.wait()
-
-    -- Call disable while restore is in progress
-    child.lua([[ require('no-neck-pain').disable() ]])
-    child.wait()
-
-    -- Complete restore
-    child.lua([[ require('no-neck-pain.main').signal_session_restore_complete() ]])
-    child.wait()
-
-    -- Re-enable and disable normally to confirm the flag is cleared
+    -- disable() still resets the state after that source
     child.nnp()
     child.wait()
     Helpers.expect.state(child, "enabled", true)
@@ -117,6 +122,7 @@ T["session restore"]["signal_session_restore_start sets flag, complete clears it
     child.nnp()
     child.wait()
     Helpers.expect.state(child, "enabled", false)
+    Helpers.expect.state(child, "tabs", {})
 end
 
 return T

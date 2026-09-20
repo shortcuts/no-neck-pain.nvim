@@ -9,15 +9,6 @@ local helpers = require("no-neck-pain.util.helpers")
 local main = {}
 
 local skip_entering_in_progress = false
-local session_restore_in_progress = false
-
-function main.signal_session_restore_start()
-    session_restore_in_progress = true
-end
-
-function main.signal_session_restore_complete()
-    session_restore_in_progress = false
-end
 
 -- Toggle the plugin by calling the `enable`/`disable` methods respectively.
 --
@@ -270,6 +261,12 @@ end
 ---@param p table: autocmd callback params.
 ---@private
 function main._on_win_change(p)
+    -- a session restore closes and recreates every window; let `SessionLoadPost`
+    -- rebuild the layout once instead of reacting to each intermediate step
+    if event.session_loading() then
+        return
+    end
+
     local s = string.format("%s:%d", p.event, vim.api.nvim_get_current_win())
     vim.schedule(function()
         -- Update active tab first (TabEnter debounce might not have run yet)
@@ -387,6 +384,10 @@ end
 ---@param p table: autocmd callback params.
 ---@private
 function main._on_buf_delete(p)
+    if event.session_loading() then
+        return
+    end
+
     vim.schedule(function()
         local s = string.format("%s:%d", p.event, vim.api.nvim_get_current_win())
         if not state:is_active_tab_registered() or api.is_relative_window() then
@@ -641,15 +642,11 @@ function main.disable(scope)
         helpers.safe_delete_augroup("NoNeckPainVimEnterAutocmd")
 
         log.debug(scope, "no more active tabs left, reinitializing state")
-
-        if not session_restore_in_progress then
-            state:init()
-        end
     end
 
     for side, id in pairs(sides) do
         if vim.api.nvim_win_is_valid(id) then
-            -- Safe to use self.namespaces here even after state:init() call above
+            -- Safe to use self.namespaces here even after the state:init() inside refresh_tabs above
             -- because init() only resets self.tabs and self.active_tab, not self.namespaces
             state:remove_namespace(vim.api.nvim_win_get_buf(id), side)
             ui.close_win(scope, id, side)

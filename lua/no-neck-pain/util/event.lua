@@ -11,6 +11,17 @@ local helpers = require("no-neck-pain.util.helpers")
 
 local event = {}
 
+--- determines if a session file is currently being sourced: session files set
+--- `g:SessionLoad` while they replay their window layout and unset it at the end.
+--- Must be called synchronously from the autocmd callback, before any
+--- `vim.schedule`/debounce, as the flag is gone by the time deferred work runs.
+---
+---@return boolean
+---@private
+function event.session_loading()
+    return vim.g.SessionLoad ~= nil
+end
+
 --- skips the event if:
 --- - the plugin is not enabled
 --- - the current window is a relative window
