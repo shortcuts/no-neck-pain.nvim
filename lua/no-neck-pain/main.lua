@@ -307,10 +307,6 @@ function main._on_win_change(p)
             end
         end
 
-        -- Capture side IDs before validation to detect if they were already nil
-        local left_id_before = state:get_side_id("left")
-        local right_id_before = state:get_side_id("right")
-
         -- Validate that stored window IDs are still valid after layout change
         local valid_wins = vim.api.nvim_tabpage_list_wins(state.active_tab)
         local post_win_count = #valid_wins
@@ -344,8 +340,6 @@ function main._on_win_change(p)
             post_count = post_win_count,
             left_cleared = left_cleared,
             right_cleared = right_cleared,
-            left_id_before = left_id_before,
-            right_id_before = right_id_before,
         })
 
         log.debug(

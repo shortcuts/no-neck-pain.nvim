@@ -749,32 +749,12 @@ T["determine_layout_action"]["returns 'disable' when side cleared via WinClosed 
     child.lua([[
         _G._nnp_test_action = require('no-neck-pain.state'):determine_layout_action({
             event_name = "WinClosed", columns_changed = false, pre_count = 3, post_count = 2,
-            left_cleared = true, right_cleared = false, left_id_before = 1001, right_id_before = nil,
+            left_cleared = true, right_cleared = false,
         })
     ]])
 
     local action = child.lua_get("_G._nnp_test_action")
     Helpers.expect.equality(action, "disable")
-end
-
-T["determine_layout_action"]["returns nil (not 'disable') when both IDs were already nil before WinClosed"] = function()
-    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
-    child.nnp()
-    child.wait()
-
-    Helpers.expect.state(child, "enabled", true)
-
-    -- When both side IDs were nil before the close and counts match, no action is needed
-    child.lua([[
-        _G._nnp_test_action = require('no-neck-pain.state'):determine_layout_action({
-            event_name = "WinClosed", columns_changed = false, pre_count = 3, post_count = 3,
-            left_cleared = true, right_cleared = false, left_id_before = nil, right_id_before = nil,
-        })
-    ]])
-
-    local action = child.lua_get("_G._nnp_test_action")
-    -- Both IDs were nil → no actual side was closed → no disable needed
-    Helpers.expect.equality(action, vim.NIL)
 end
 
 T["determine_layout_action"]["returns 'init' when column layout changed (init=true)"] = function()
@@ -787,7 +767,7 @@ T["determine_layout_action"]["returns 'init' when column layout changed (init=tr
     child.lua([[
         _G._nnp_test_action = require('no-neck-pain.state'):determine_layout_action({
             event_name = "WinEnter", columns_changed = true, pre_count = 2, post_count = 3,
-            left_cleared = false, right_cleared = false, left_id_before = nil, right_id_before = nil,
+            left_cleared = false, right_cleared = false,
         })
     ]])
 
@@ -805,7 +785,7 @@ T["determine_layout_action"]["returns 'init' on WinClosed with count change and 
     child.lua([[
         _G._nnp_test_action = require('no-neck-pain.state'):determine_layout_action({
             event_name = "WinClosed", columns_changed = false, pre_count = 4, post_count = 3,
-            left_cleared = false, right_cleared = false, left_id_before = nil, right_id_before = nil,
+            left_cleared = false, right_cleared = false,
         })
     ]])
 
@@ -823,7 +803,7 @@ T["determine_layout_action"]["returns 'init' on WinEnter with count change"] = f
     child.lua([[
         _G._nnp_test_action = require('no-neck-pain.state'):determine_layout_action({
             event_name = "WinEnter", columns_changed = false, pre_count = 2, post_count = 3,
-            left_cleared = false, right_cleared = false, left_id_before = nil, right_id_before = nil,
+            left_cleared = false, right_cleared = false,
         })
     ]])
 
@@ -841,7 +821,7 @@ T["determine_layout_action"]["returns nil when no action is needed"] = function(
     child.lua([[
         _G._nnp_test_action = require('no-neck-pain.state'):determine_layout_action({
             event_name = "WinEnter", columns_changed = false, pre_count = 3, post_count = 3,
-            left_cleared = false, right_cleared = false, left_id_before = nil, right_id_before = nil,
+            left_cleared = false, right_cleared = false,
         })
     ]])
 

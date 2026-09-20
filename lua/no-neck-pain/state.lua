@@ -784,38 +784,15 @@ end
 ---   post_count: number (window count after the event),
 ---   left_cleared: boolean (whether the left side ID was just cleared),
 ---   right_cleared: boolean (whether the right side ID was just cleared),
----   left_id_before: number? (the left side ID before validation),
----   right_id_before: number? (the right side ID before validation),
 --- }
 ---@return "disable"|"init"|"redraw"|nil
 ---@private
 function state:determine_layout_action(ctx)
-    local side_window_was_cleared = ctx.left_cleared or ctx.right_cleared
+    if (ctx.left_cleared or ctx.right_cleared) and ctx.event_name == "WinClosed" then
+        return "disable"
+    end
 
-    if side_window_was_cleared and ctx.event_name == "WinClosed" then
-        if ctx.left_id_before == nil and ctx.right_id_before == nil then
-            log.debug(
-                "determine_layout_action",
-                "side was cleared but both IDs were already nil, allowing init"
-            )
-            -- fall through to check remaining conditions
-        else
-            return "disable"
-        end
-    elseif ctx.columns_changed then
-        return "init"
-    elseif
-        ctx.event_name == "WinClosed"
-        and not ctx.columns_changed
-        and ctx.pre_count ~= ctx.post_count
-        and not side_window_was_cleared
-    then
-        return "init"
-    elseif
-        ctx.event_name == "WinEnter"
-        and not ctx.columns_changed
-        and ctx.pre_count ~= ctx.post_count
-    then
+    if ctx.columns_changed or ctx.pre_count ~= ctx.post_count then
         return "init"
     end
 
