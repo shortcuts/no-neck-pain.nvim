@@ -600,6 +600,29 @@ T["Edge Cases"]["is_active_tab_registered() handles invalid tab"] = function()
     Helpers.expect.equality(is_registered, false)
 end
 
+T["Edge Cases"]["debounced create_side_buffers survives an unregistered tab"] = function()
+    child.set_size(10, 200)
+    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
+    child.nnp()
+    child.wait()
+
+    Helpers.expect.state(child, "enabled", true)
+
+    -- a debounced redraw can fire after the tab was unregistered
+    child.lua([[
+        local state = require('no-neck-pain.state')
+        state.active_tab = 999
+        _G.nnp_redraw_ok = pcall(require('no-neck-pain.ui').create_side_buffers)
+    ]])
+    child.wait()
+
+    Helpers.expect.equality(child.lua_get("_G.nnp_redraw_ok"), true)
+
+    -- both sibling accessors agree on the missing-tab value
+    Helpers.expect.equality(child.lua_get("require('no-neck-pain.state'):get_columns()"), 0)
+    Helpers.expect.equality(child.lua_get("require('no-neck-pain.state'):get_none_columns()"), 0)
+end
+
 T["Edge Cases"]["resize_win() handles invalid window gracefully"] = function()
     child.lua([[ require('no-neck-pain').setup({
         width = 50,

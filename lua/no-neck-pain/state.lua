@@ -392,12 +392,13 @@ end
 
 --- Gets the columns count in the current layout.
 ---
----@return table?: the columns window IDs.
+---@return number: the number of columns in the current layout, 0 when the
+--- active tab is not registered.
 ---@private
 function state:get_columns()
     local tab = self:get_tab()
     if not tab then
-        return nil
+        return 0
     end
     return tab.wins.columns
 end
