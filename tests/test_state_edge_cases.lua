@@ -611,22 +611,23 @@ T["Edge Cases"]["is_active_tab_registered() handles invalid tab"] = function()
 end
 
 T["Edge Cases"]["resize_win() handles invalid window gracefully"] = function()
-    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
+    child.lua([[ require('no-neck-pain').setup({
+        width = 50,
+        debug = true,
+        buffers = { right = { enabled = false } },
+    }) ]])
     child.nnp()
     child.wait()
 
     Helpers.expect.state(child, "enabled", true)
 
-    -- Try to resize invalid window - should not crash
-    local no_error = pcall(function()
-        child.lua([[
-            local state = require('no-neck-pain.state')
-            state:resize_win('test', 99999, 100)
-        ]])
-        child.wait()
-    end)
+    -- right side is disabled, so `get_side_id("right")` is nil.
+    -- With debug = true this used to raise
+    -- "bad argument #2 to 'format' (number expected, got nil)".
+    child.lua([[ require('no-neck-pain.state'):resize_win('test', 'right', 100) ]])
+    child.wait()
 
-    Helpers.expect.equality(no_error, true)
+    Helpers.expect.state(child, "enabled", true)
 end
 
 T["Edge Cases"]["get_unregistered_wins() filters correctly"] = function()

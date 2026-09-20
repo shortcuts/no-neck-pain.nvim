@@ -396,13 +396,13 @@ end
 function state:resize_win(scope, side, width)
     local id = self:get_side_id(side)
 
-    log.debug(scope, "win %d with width %d", id, width)
-
-    if id ~= nil and vim.api.nvim_win_is_valid(id) then
-        vim.api.nvim_win_set_width(id, width)
-    else
-        log.debug(scope, "win is not valid")
+    if id == nil or not vim.api.nvim_win_is_valid(id) then
+        log.debug(scope, "%s win is not valid", side)
+        return
     end
+
+    log.debug(scope, "win %d with width %d", id, width)
+    vim.api.nvim_win_set_width(id, width)
 end
 
 --- Gets the columns count in the current layout.
