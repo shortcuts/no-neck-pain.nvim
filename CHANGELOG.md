@@ -1,4 +1,118 @@
 <a name="0.2.3"></a>
+## [3.0.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.5.3...v3.0.0) (2026-09-20)
+
+
+### ⚠ BREAKING CHANGES
+
+#### Neovim 0.10 is the minimum version
+
+- Neovim 0.9 support is dropped. Stay on the [`2.x` branch](https://github.com/shortcuts/no-neck-pain.nvim/tree/2.x) for 0.9.
+- All deprecated `nvim_buf_get_option`, `nvim_buf_set_option`, `nvim_win_get_option` and `nvim_win_set_option` calls now use `nvim_get_option_value` / `nvim_set_option_value`.
+- The `has_nvim9` flag and its compatibility shims (`api.set_buffer_option`, `api.set_window_option`) are removed.
+
+#### Integration keys are filetypes
+
+An `integrations` key must now be the `filetype` of the integration window. The `fileTypePattern` field is gone. Rename your overrides:
+
+| v2 key | v3 key |
+|---|---|
+| `NeoTree` | `["neo-tree"]` |
+| `NvimDAPUI` | `dap` |
+| `NvimTree` | `NvimTree` (unchanged, the filetype matches) |
+
+Keys are lowercased internally, so `NvimTree` and `nvimtree` are the same entry.
+
+#### `integrations.*.reopen` is removed
+
+The plugin no longer closes and reopens an integration around enable. It accounts for the integration width instead. Remove `reopen` from your config.
+
+#### `constants.INTEGRATIONS` and `constants.DASHBOARDS` are removed
+
+Integration definitions come from `_G.NoNeckPain.config.integrations` only. A new integration needs no upstream change.
+
+#### `integrations.*.position` is validated at setup time
+
+`position` must be a string and one of `left`, `right` or `none`. Any other value raises an assertion in `setup()` instead of silently breaking the layout.
+
+#### Default value changes
+
+| Option | v2 | v3 | Why |
+|---|---|---|---|
+| `autocmds.reloadOnColorSchemeChange` | `false` | `true` | Side buffer colors follow the colorscheme. |
+| `autocmds.skipEnteringNoNeckPainBuffer` | `false` | `true` | Side buffers are padding, not edit targets. The option is ignored while the scratchpad is enabled. |
+| `integrations.dashboard.filetypes` | `nil` | `{ "dashboard", "alpha", "starter", "snacks" }` | The list moved out of `constants.DASHBOARDS` into the config. |
+
+#### 🔄 Behavior changes
+
+- `integrations.dashboard.enabled = true` no longer forces `autocmds.enableOnVimEnter = "safe"`. Set `"safe"` yourself if you need it.
+- A new `FileType` autocmd enables the plugin when a plugin resolves its filetype late. This makes `enableOnVimEnter = "safe"` reliable with dashboards.
+- `enable()` runs synchronously from the public API. It is no longer debounced by 10ms.
+- Side windows are created with `nvim_create_buf` + `nvim_open_win` under `noautocmd` instead of `topleft vnew` / `botright vnew`.
+- Side windows are repositioned with `wincmd` under `noautocmd`, so user mappings and autocmds cannot hijack the move or steal focus.
+- A side buffer squeezed out by a split reinitializes the layout instead of disabling the plugin.
+- Session restore (`:mksession` / `:source`) keeps the plugin state. The `SessionLoadPost` handler gates on `g:SessionLoad`.
+- Floating windows are excluded from window and column counts, so popups no longer trigger a reposition or skew the padding width.
+- `integrations` with `position = "none"` (`dap`, `oil`) are counted in a dedicated `none_columns` state field and subtracted from the padding width.
+- A deprecated `scratchPad.location` is only used as a directory when it is non-empty. Otherwise `pathToFile` defaults to a relative filename, expanded at runtime.
+- Tests run per file (`make test` runs each `test-*` target). `luacheck` is dropped from `make lint`; `luals` is the only linter. CI covers `v0.10.4`, `v0.11.7` and `v0.12.0`.
+
+#### 🚀 Features
+
+- **User-defined integrations.** Any filetype is a valid `integrations` key, with a `position` of `left`, `right` or `none`. No upstream change is needed to support a new sidebar plugin.
+  ```lua
+  integrations = {
+      NvimTree = { position = "left" },
+      ["neo-tree"] = { position = "left" },
+      snacks_picker = { position = "left" },
+      my_custom_sidebar = { position = "right" },
+  }
+  ```
+- **New built-in integrations:** `oil` (position `none`) and `snacks_picker` (position `left`).
+- **Column layout detection.** The layout scanner walks `col` nodes, not only `leaf` nodes. This detects integrations that stack windows vertically, such as `snacks_picker` and `dap-ui`.
+- **Nested vertical splits are counted.** The column count includes nested vsplits, so the padding stays correct in complex layouts.
+- **`WinEnter` and `WinClosed` resize on window count change.** Opening or closing a split now resizes the side buffers instead of leaving the layout drifted.
+- **`log.warn(scope, str, ...)`** prints at `WARN` level regardless of `debug`.
+- **`lua/no-neck-pain/util/helpers.lua`** centralizes config and state access (`get_config_field`, `merge_config`, `get_state`, `is_filetype_integration`, …). All direct `_G.NoNeckPain.*` reads go through it.
+
+#### 🐛 Fixes
+
+- `buffers.setNames` had no effect: the UI read a `set_names` key that never existed (#227).
+- Side buffer width was wrong when only one side is enabled (#507).
+- Side buffers drifted or disappeared after a `split` / `vsplit`, and after closing a vsplit inside a split layout (#444, #514).
+- Toggling `dap-ui` repeatedly drifted the side widths and could lose the side buffers (#470).
+- `snacks_picker` / snacks explorer was not detected, so the layout resized wrong (#511).
+- The main buffer was tagged as an integration during the layout scan, which inflated the column count. `oil` as the main buffer is no longer counted as an integration.
+- A plain split of the main buffer no longer inflates the column count.
+- The plugin no longer disables itself on an integration filetype (#297, #436).
+- `skipEnteringNoNeckPainBuffer` could close the wrong window or loop. The reroute is now synchronous and guarded against reentrancy, and is skipped while the scratchpad is active.
+- `api.is_relative_window()` checked the wrong window config.
+- `state:get_side_id()` and the other tab accessors (`get_columns`, `get_none_columns`, `consume_redraw`, `get_integrations`, `set_side_id`, `get_scratch_pad`, …) return a default instead of indexing a `nil` tab.
+- `nvim_set_current_win` and `nvim_win_get_width` calls are guarded by `nvim_win_is_valid`, which prevents errors when a window closes between the event and the handler.
+- `toggle_scratch_pad` validates the previously focused window before restoring focus.
+- The `QuitPre` / `BufDelete` handler validates the `curr` window ID, and uses the right local variable.
+- `state:walk_layout` no longer mutates its `leafs` argument, and counts a top-level `col` of leaves as one visual column.
+- A redraw is only requested when an integration window ID actually changed.
+- A side buffer is created when the available padding equals `minSideBufferWidth` (`>=` instead of `>`).
+- Side buffers are resized right after a `vsplit` instead of waiting for the next event.
+- Integration registration no longer writes a window `id` into the user config.
+- `api.debounce()` reschedules through a flag instead of recreating a timer from inside its own callback.
+- Autocmd groups are created unconditionally in `setup()`, which fixes missing autocmds when only a subset of `autocmds.*` is enabled.
+
+#### 🧪 Tests
+
+- New suites: `test_config_validation`, `test_constants`, `test_event`, `test_log`, `test_width_calculations`, `test_state_edge_cases`, `test_state_access_regression`, `test_regression_issues`, `test_helpers_coverage`.
+- `test_integrations`, `test_autocmds`, `test_buffers`, `test_API`, `test_splits` and `test_tabs` gained layout, focus and width invariant assertions.
+- New helpers: `child.wait_for_plugin_enabled(timeout)`, `Helpers.assert_width_invariant(child)`, `Helpers.generate_width_configs(min, max, count)`.
+
+#### 🏗 Internals
+
+- `main.enable()` is split into `_on_skip_entering`, `_on_win_change` and `_on_buf_delete`. The function is now wiring only.
+- Layout decisions moved to `state`: `determine_layout_action()`, `validate_sides()`, `_scan_col_children()`.
+- `state:is_side_enabled_and_valid()` is now `state:is_side_valid()`, and `state:is_side_the_active_win()` is now `state:is_side_focused()`.
+- `state:resize_win(scope, side, width)` takes a side name and resolves the window ID itself.
+- `session_restore_in_progress` lives on the state object instead of a module-level global.
+- `state:set_tab()` no longer deep-copies integrations. `init_integrations()` is the single source of truth.
+
 ## [2.5.3](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.5.2...v2.5.3) (2025-12-19)
 
 
