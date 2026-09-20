@@ -413,7 +413,7 @@ function state:get_none_columns()
     return tab.wins.none_columns or 0
 end
 
---- Gets the total window count last observed for the active tab.
+--- Gets the layout (non-relative) window count last observed for the active tab.
 --- Used to detect a real window count change across separate events, since
 --- comparing window counts taken before/after a single scan within the same
 --- event is always equal (no window can appear/disappear in between).
@@ -428,7 +428,7 @@ function state:get_window_count()
     return tab.window_count
 end
 
---- Sets the total window count for the active tab, see `get_window_count`.
+--- Sets the layout window count for the active tab, see `get_window_count`.
 ---
 ---@param count number: the window count to store.
 ---@private

@@ -90,6 +90,47 @@ T["Auto Command: does not shift when opening/closing float window"] = function()
     Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.right", 13, 15)
 end
 
+T["Auto Command: unfocused float is not counted in the layout window count"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
+    child.nnp()
+    child.wait()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+    Helpers.expect.state(child, "tabs[1].window_count", 3)
+
+    local left_width = child.lua_get("vim.api.nvim_win_get_width(1001)")
+    local right_width = child.lua_get("vim.api.nvim_win_get_width(1002)")
+
+    -- an unfocused float: no WinEnter fires for it, and `event.skip` never sees it
+    child.lua([[
+        _G.float = vim.api.nvim_open_win(vim.api.nvim_create_buf(false, true), false, {
+            width = 20, height = 5, relative = "editor", row = 1, col = 1,
+        })
+    ]])
+    child.wait()
+
+    -- the next real window event must compare against a float-free baseline
+    child.lua("vim.api.nvim_exec_autocmds('WinEnter', {})")
+    child.wait()
+
+    Helpers.expect.state(child, "tabs[1].window_count", 3)
+    Helpers.expect.state(child, "tabs[1].wins.main", {
+        curr = 1000,
+        left = 1001,
+        right = 1002,
+    })
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1001)"), left_width)
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1002)"), right_width)
+
+    child.lua("vim.api.nvim_win_close(_G.float, true)")
+    child.wait()
+
+    Helpers.expect.state(child, "tabs[1].window_count", 3)
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1001)"), left_width)
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1002)"), right_width)
+end
+
 -- =============================================================================
 -- GROUP 2: Skip Entering NoNeckPain Buffer Tests
 -- =============================================================================

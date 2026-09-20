@@ -40,6 +40,18 @@ function api.is_relative_window(win)
     return vim.api.nvim_win_get_config(win).relative ~= ""
 end
 
+--- Counts the windows of the given tab that occupy layout space, i.e. every
+--- non-relative (non-floating) window.
+---
+---@param tab number: the id of the tab.
+---@return number: the number of non-relative windows in the tab.
+---@private
+function api.count_layout_wins(tab)
+    return #vim.tbl_filter(function(win)
+        return not api.is_relative_window(win)
+    end, vim.api.nvim_tabpage_list_wins(tab))
+end
+
 local function timer_stop_close(timer)
     if timer:is_active() then
         timer:stop()

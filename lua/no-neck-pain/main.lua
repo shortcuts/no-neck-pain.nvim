@@ -130,9 +130,7 @@ function main.init(scope)
         local expected = 1 -- curr
             + (left_after ~= nil and 1 or 0)
             + (right_after ~= nil and 1 or 0)
-        local actual = #vim.tbl_filter(function(win)
-            return not api.is_relative_window(win)
-        end, vim.api.nvim_tabpage_list_wins(state.active_tab))
+        local actual = api.count_layout_wins(state.active_tab)
 
         if actual > expected then
             ui.move_sides(string.format("%s:reposition_new_sides", scope))
@@ -167,7 +165,7 @@ function main.init(scope)
     -- ui.create_side_buffers() may have created/closed side windows without
     -- firing WinEnter/WinClosed (noautocmd), resync the persisted window count
     -- so the next user-triggered event compares against the right baseline.
-    state:set_window_count(#vim.api.nvim_tabpage_list_wins(state.active_tab))
+    state:set_window_count(api.count_layout_wins(state.active_tab))
 
     state:save()
 end
@@ -278,7 +276,7 @@ function main._on_win_change(p)
         -- recomputed within this same call (which would always equal post_win_count
         -- since no window can appear/disappear between the two), so a real count
         -- change (e.g. a fresh :vsplit) is actually detected.
-        local live_win_count = #vim.api.nvim_tabpage_list_wins(state.active_tab)
+        local live_win_count = api.count_layout_wins(state.active_tab)
         local pre_win_count = state:get_window_count() or live_win_count
 
         local old_integration_ids = {}
@@ -307,7 +305,7 @@ function main._on_win_change(p)
 
         -- Validate that stored window IDs are still valid after layout change
         local valid_wins = vim.api.nvim_tabpage_list_wins(state.active_tab)
-        local post_win_count = #valid_wins
+        local post_win_count = api.count_layout_wins(state.active_tab)
         local valid_win_set = {}
         for _, win_id in ipairs(valid_wins) do
             valid_win_set[win_id] = true
