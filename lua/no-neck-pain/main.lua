@@ -15,7 +15,7 @@ local skip_entering_in_progress = false
 ---@param scope string: debug/trace identifier for logging (not execution scope) - used in debug output only
 ---@private
 function main.toggle(scope)
-    if state:has_tabs() and state:is_active_tab_registered() then
+    if state:is_active_tab_registered() then
         return main.disable(scope)
     end
 

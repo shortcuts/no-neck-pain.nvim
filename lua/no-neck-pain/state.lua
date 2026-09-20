@@ -70,15 +70,16 @@ end
 ---
 ---@private
 function state:init_integrations()
-    if not (self:has_tabs() and self.tabs[self.active_tab]) then
+    local tab = self:get_tab()
+    if not tab then
         return
     end
-    self.tabs[self.active_tab].wins.integrations = {}
+    tab.wins.integrations = {}
 
     -- normalize to lowercase
     for name, opts in pairs(vim.deepcopy(_G.NoNeckPain.config.integrations)) do
         local lower_name = string.lower(name)
-        self.tabs[self.active_tab].wins.integrations[lower_name] = opts
+        tab.wins.integrations[lower_name] = opts
     end
 end
 
@@ -86,11 +87,12 @@ end
 ---
 ---@private
 function state:init_columns()
-    if not (self:has_tabs() and self.tabs[self.active_tab]) then
+    local tab = self:get_tab()
+    if not tab then
         return
     end
-    self.tabs[self.active_tab].wins.columns = 0
-    self.tabs[self.active_tab].wins.none_columns = 0
+    tab.wins.columns = 0
+    tab.wins.none_columns = 0
 end
 
 --- Saves the state in the global _G.NoNeckPain.state object.
@@ -115,17 +117,7 @@ end
 ---@return boolean
 ---@private
 function state:is_active_tab_registered()
-    return self:has_tabs()
-        and self.tabs[self.active_tab] ~= nil
-        and vim.api.nvim_tabpage_is_valid(self.active_tab)
-end
-
---- Whether there is tabs registered or not.
----
----@return boolean
----@private
-function state:has_tabs()
-    return self.tabs ~= nil
+    return self:get_tab() ~= nil and vim.api.nvim_tabpage_is_valid(self.active_tab)
 end
 
 --- Sets the active tab.
@@ -141,13 +133,7 @@ end
 ---@return table?: the `tab` information, or `nil` if it's not found.
 ---@private
 function state:get_tab()
-    if not self:has_tabs() then
-        return nil
-    end
-
-    local id = self.active_tab or api.get_current_tab()
-
-    return self.tabs[id]
+    return self.tabs[self.active_tab]
 end
 
 --- Iterates over the tabs in the state to remove invalid tabs.
@@ -235,10 +221,11 @@ end
 ---@return table: the integration infos.
 ---@private
 function state:get_integrations()
-    if not (self:has_tabs() and self.tabs[self.active_tab] ~= nil) then
+    local tab = self:get_tab()
+    if not tab then
         return {}
     end
-    return self.tabs[self.active_tab].wins.integrations
+    return tab.wins.integrations
 end
 
 --- Gets the integration with the given `win` if it's already registered.
@@ -349,10 +336,11 @@ end
 ---@return number?
 ---@private
 function state:get_side_id(side)
-    if not (self:has_tabs() and self.tabs[self.active_tab] ~= nil) then
+    local tab = self:get_tab()
+    if not tab then
         return nil
     end
-    return self.tabs[self.active_tab].wins.main[side]
+    return tab.wins.main[side]
 end
 
 --- Sets the ID of the given `side`.
@@ -361,10 +349,11 @@ end
 ---@param side "left"|"right"|"curr": the side of the window.
 ---@private
 function state:set_side_id(id, side)
-    if not (self:has_tabs() and self.tabs[self.active_tab] ~= nil) then
+    local tab = self:get_tab()
+    if not tab then
         return
     end
-    self.tabs[self.active_tab].wins.main[side] = id
+    tab.wins.main[side] = id
 end
 
 --- Gets wins that are not relative or main wins.
@@ -407,19 +396,21 @@ end
 ---@return table?: the columns window IDs.
 ---@private
 function state:get_columns()
-    if not (self:has_tabs() and self.tabs[self.active_tab] ~= nil) then
+    local tab = self:get_tab()
+    if not tab then
         return nil
     end
-    return self.tabs[self.active_tab].wins.columns
+    return tab.wins.columns
 end
 
 ---@return number: the number of columns occupied by position="none" integrations.
 ---@private
 function state:get_none_columns()
-    if not (self:has_tabs() and self.tabs[self.active_tab] ~= nil) then
+    local tab = self:get_tab()
+    if not tab then
         return 0
     end
-    return self.tabs[self.active_tab].wins.none_columns or 0
+    return tab.wins.none_columns or 0
 end
 
 --- Gets the total window count last observed for the active tab.
@@ -446,12 +437,13 @@ end
 ---@return boolean
 ---@private
 function state:consume_redraw()
-    if not (self:has_tabs() and self.tabs[self.active_tab] ~= nil) then
+    local tab = self:get_tab()
+    if not tab then
         return false
     end
-    local redraw = self.tabs[self.active_tab].redraw
+    local redraw = tab.redraw
 
-    self.tabs[self.active_tab].redraw = false
+    tab.redraw = false
 
     return redraw
 end
@@ -463,24 +455,24 @@ end
 ---@param wins table: the layout windows.
 ---@private
 function state:set_layout_windows(scope, wins)
-    if not (self:has_tabs() and self.tabs[self.active_tab]) then
+    local tab = self:get_tab()
+    if not tab then
         return
     end
     for _, win in ipairs(wins) do
         local id = win[2]
         if win[1] == "leaf" and not api.is_relative_window(id) then
-            self.tabs[self.active_tab].wins.columns = self.tabs[self.active_tab].wins.columns + 1
+            tab.wins.columns = tab.wins.columns + 1
             if id ~= self:get_side_id("curr") then
                 local supported, name, integration = self:is_supported_integration(scope, id)
                 if supported and name and integration then
                     integration.id = id
 
-                    self.tabs[self.active_tab].redraw = true
-                    self.tabs[self.active_tab].wins.integrations[name] = integration
+                    tab.redraw = true
+                    tab.wins.integrations[name] = integration
                 end
                 if supported and integration and integration.position == "none" then
-                    self.tabs[self.active_tab].wins.none_columns = self.tabs[self.active_tab].wins.none_columns
-                        + 1
+                    tab.wins.none_columns = tab.wins.none_columns + 1
                 end
             end
         elseif win[1] == "col" then
@@ -646,10 +638,11 @@ end
 ---@param bool boolean: the value of the scratch_pad.
 ---@private
 function state:set_scratch_pad(bool)
-    if not (self:has_tabs() and self.tabs[self.active_tab] ~= nil) then
+    local tab = self:get_tab()
+    if not tab then
         return
     end
-    self.tabs[self.active_tab].scratchpad_enabled = bool
+    tab.scratchpad_enabled = bool
 end
 
 --- Gets the scratch_pad value for the active tab.
@@ -657,10 +650,11 @@ end
 ---@return boolean: the value of the scratch_pad.
 ---@private
 function state:get_scratch_pad()
-    if not (self:has_tabs() and self.tabs[self.active_tab] ~= nil) then
+    local tab = self:get_tab()
+    if not tab then
         return false
     end
-    return self.tabs[self.active_tab].scratchpad_enabled
+    return tab.scratchpad_enabled
 end
 
 ----- layout decision helpers =======================================================
@@ -672,10 +666,11 @@ end
 ---@param children table: array of layout nodes that are children of the col node.
 ---@private
 function state:_register_column(scope, children)
-    if not (self:has_tabs() and self.tabs[self.active_tab]) then
+    local tab = self:get_tab()
+    if not tab then
         return
     end
-    self.tabs[self.active_tab].wins.columns = self.tabs[self.active_tab].wins.columns + 1
+    tab.wins.columns = tab.wins.columns + 1
     self:_scan_col_children(scope, children)
 end
 
@@ -686,7 +681,8 @@ end
 ---@param children table: array of layout nodes that are children of a col node.
 ---@private
 function state:_scan_col_children(scope, children)
-    if not (self:has_tabs() and self.tabs[self.active_tab]) then
+    local tab = self:get_tab()
+    if not tab then
         return
     end
     local has_none = false
@@ -697,8 +693,8 @@ function state:_scan_col_children(scope, children)
                 local supported, name, integration = self:is_supported_integration(scope, id)
                 if supported and name and integration then
                     integration.id = id
-                    self.tabs[self.active_tab].redraw = true
-                    self.tabs[self.active_tab].wins.integrations[name] = integration
+                    tab.redraw = true
+                    tab.wins.integrations[name] = integration
                     if integration.position == "none" then
                         has_none = true
                     end
@@ -707,8 +703,7 @@ function state:_scan_col_children(scope, children)
         end
     end
     if has_none then
-        self.tabs[self.active_tab].wins.none_columns = self.tabs[self.active_tab].wins.none_columns
-            + 1
+        tab.wins.none_columns = tab.wins.none_columns + 1
     end
 end
 

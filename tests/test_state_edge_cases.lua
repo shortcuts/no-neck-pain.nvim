@@ -581,16 +581,6 @@ T["Edge Cases"]["get_tab() returns nil when tabs not initialized"] = function()
     Helpers.expect.equality(tab, vim.NIL)
 end
 
-T["Edge Cases"]["has_tabs() handles nil tabs"] = function()
-    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
-
-    -- Before enabling, tabs should be nil/empty
-    local has_tabs = child.lua_get("require('no-neck-pain.state'):has_tabs()")
-
-    -- Should be false or true but not error
-    Helpers.expect.equality(type(has_tabs), "boolean")
-end
-
 T["Edge Cases"]["is_active_tab_registered() handles invalid tab"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     child.nnp()
