@@ -285,7 +285,7 @@ T["Tab State"]["is_supported_integration() recognizes neo-tree"] = function()
 
     -- Create a buffer with neo-tree filetype (lowercase)
     child.cmd("edit tree.txt")
-    child.bo.filetype = "neotree"
+    child.bo.filetype = "neo-tree"
     child.wait()
 
     local win = child.get_current_win()

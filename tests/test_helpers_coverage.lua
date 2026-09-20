@@ -29,11 +29,8 @@ end
 T["is_filetype_integration"]["returns true for neo-tree filetype"] = function()
     child.lua([[ require('no-neck-pain').setup({}) ]])
 
-    -- neo-tree's actual filetype in Neovim is 'neo-tree'; the integration key 'neo-tree'
-    -- is matched via string.find which treats '-' as a Lua pattern lazy quantifier,
-    -- so the match may be partial. NvimTree (key 'NvimTree', ft 'nvimtree') is reliable.
     child.lua(
-        [[ _G._nnp_r = require('no-neck-pain.util.helpers').is_filetype_integration('nvimtree') ]]
+        [[ _G._nnp_r = require('no-neck-pain.util.helpers').is_filetype_integration('neo-tree') ]]
     )
     Helpers.expect.equality(child.lua_get("_G._nnp_r"), true)
 end
@@ -82,6 +79,16 @@ T["is_filetype_integration"]["returns false for integration with position=none (
 
     child.lua([[ _G._nnp_r = require('no-neck-pain.util.helpers').is_filetype_integration('oil') ]])
     Helpers.expect.equality(child.lua_get("_G._nnp_r"), false)
+end
+
+T["is_filetype_integration"]["match_integration reports position=none integrations"] = function()
+    child.lua([[ require('no-neck-pain').setup({}) ]])
+
+    child.lua(
+        [[ _G._nnp_n, _G._nnp_o = require('no-neck-pain.util.helpers').match_integration('oil') ]]
+    )
+    Helpers.expect.equality(child.lua_get("_G._nnp_n"), "oil")
+    Helpers.expect.equality(child.lua_get("_G._nnp_o.position"), "none")
 end
 
 -- ========================================================================

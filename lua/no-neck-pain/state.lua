@@ -278,9 +278,6 @@ function state:is_supported_integration(scope, win)
         return false
     end
 
-    local buffer = vim.api.nvim_win_get_buf(win)
-    local filetype = vim.api.nvim_get_option_value("filetype", { buf = buffer })
-
     local integration_name, integration_info = self:get_integration(win)
     if integration_name and integration_info then
         log.debug(scope, "integration already registered, skipping computing...")
@@ -288,17 +285,17 @@ function state:is_supported_integration(scope, win)
         return true, integration_name, integration_info
     end
 
-    local lowercase_filetype = string.lower(filetype)
+    local buffer = vim.api.nvim_win_get_buf(win)
+    local filetype = vim.api.nvim_get_option_value("filetype", { buf = buffer })
 
-    for name, integration in pairs(self:get_integrations()) do
-        if name == lowercase_filetype or string.find(lowercase_filetype, name) then
-            log.debug(scope, "win '%d' is an integration '%s'", win, filetype)
-
-            return true, name, integration
-        end
+    local name, config_opts = helpers.match_integration(filetype)
+    if name == nil then
+        return false, nil
     end
 
-    return false, nil
+    log.debug(scope, "win '%d' is an integration '%s'", win, filetype)
+
+    return true, name, self:get_integrations()[name] or vim.deepcopy(config_opts)
 end
 
 ----- side buffers =======================================================
@@ -732,11 +729,8 @@ function state:validate_sides(scope, valid_win_set)
         local candidate
         for _, win in ipairs(unregistered) do
             if vim.api.nvim_win_is_valid(win) then
-                local ft = vim.bo[vim.api.nvim_win_get_buf(win)].filetype
-                if not helpers.is_filetype_integration(ft) then
-                    candidate = win
-                    break
-                end
+                candidate = win
+                break
             end
         end
         if candidate then

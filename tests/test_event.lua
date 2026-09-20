@@ -298,7 +298,7 @@ T["skip_enable(): detects neo-tree integration"] = function()
     }) ]])
 
     child.cmd("edit tree.txt")
-    child.bo.filetype = "neotree"
+    child.bo.filetype = "neo-tree"
     child.wait()
 
     child.lua([[
@@ -592,7 +592,7 @@ T["Edge Cases: skip_enable() partial filetype match works correctly"] = function
     }) ]])
 
     child.cmd("edit tree.txt")
-    child.bo.filetype = "neotree-popup"
+    child.bo.filetype = "neo-tree-popup"
     child.wait()
 
     child.lua([[

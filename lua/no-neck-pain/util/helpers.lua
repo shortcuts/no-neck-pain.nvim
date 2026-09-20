@@ -37,42 +37,56 @@ function helpers.safe_delete_augroup(name)
     pcall(vim.api.nvim_del_augroup_by_name, name)
 end
 
---- Checks if a given filetype matches any configured integration.
+--- Matches a filetype against the configured integrations.
 ---
---- Iterates through the integrations config to determine if the filetype is:
---- - A dashboard filetype (from the dashboard integration array)
---- - A regular integration (string match on the key)
+--- The `dashboard` integration is matched through its `filetypes` list; every
+--- other integration is matched on its (lowercased) config key. Applies no
+--- `position` policy: callers decide what to do with `position == "none"`.
 ---
---- Returns false for integrations with position "none" (they don't affect layout).
----
---- @param filetype string The filetype to check (typically from vim.bo.filetype)
---- @return boolean True if filetype matches an integration, false otherwise
+---@param filetype string?: the filetype to match, any case.
+---@return string?: the lowercased integration name, nil when no match.
+---@return table?: the matched integration config, nil when no match.
 ---@private
-function helpers.is_filetype_integration(filetype)
-    if filetype == "" or filetype == nil then
-        return false
+function helpers.match_integration(filetype)
+    if filetype == nil or filetype == "" then
+        return nil
     end
 
-    for key, integration_config in pairs(_G.NoNeckPain.config.integrations) do
-        if key == "dashboard" then
-            if integration_config.filetypes ~= nil then
-                for _, ftype in ipairs(integration_config.filetypes) do
-                    if filetype == string.lower(ftype) then
-                        return true
-                    end
+    local integrations = _G.NoNeckPain.config.integrations
+    if integrations == nil then
+        return nil
+    end
+
+    local ft = string.lower(filetype)
+
+    for key, opts in pairs(integrations) do
+        local name = string.lower(key)
+        if name == "dashboard" then
+            for _, dashboard_ft in ipairs(opts.filetypes or {}) do
+                if ft == string.lower(dashboard_ft) then
+                    return name, opts
                 end
             end
-        else
-            if
-                string.find(filetype, string.lower(key))
-                and integration_config.position ~= "none"
-            then
-                return true
-            end
+        elseif name == ft or string.find(ft, name, 1, true) then
+            return name, opts
         end
     end
 
-    return false
+    return nil
+end
+
+--- Whether the given filetype is an integration that affects the layout.
+---
+--- `position == "none"` integrations (oil, dap) are excluded: they don't take
+--- a side, so they must not stop the plugin from enabling.
+---
+---@param filetype string?: the filetype to check (typically from vim.bo.filetype).
+---@return boolean: whether the filetype is a layout-affecting integration.
+---@private
+function helpers.is_filetype_integration(filetype)
+    local _, opts = helpers.match_integration(filetype)
+
+    return opts ~= nil and opts.position ~= "none"
 end
 
 return helpers
