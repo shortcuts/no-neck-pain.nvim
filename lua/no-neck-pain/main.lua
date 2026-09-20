@@ -290,13 +290,15 @@ function main._on_win_change(p)
 
         local new_integration_found = false
         for name, opts in pairs(state:get_integrations()) do
-            log.debug(
-                s,
-                "post-scan integration '%s': id=%s, old_id=%s",
-                name,
-                tostring(opts.id),
-                tostring(old_integration_ids[name])
-            )
+            if _G.NoNeckPain.config.debug then
+                log.debug(
+                    s,
+                    "post-scan integration '%s': id=%s, old_id=%s",
+                    name,
+                    tostring(opts.id),
+                    tostring(old_integration_ids[name])
+                )
+            end
             if opts.id ~= nil and not old_integration_ids[name] then
                 new_integration_found = true
                 break

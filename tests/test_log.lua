@@ -587,4 +587,32 @@ T["edge cases: deprecated options with nil values are skipped"] = function()
     Helpers.expect.equality(count, 0)
 end
 
+T["log.debug(): _on_win_change still logs integrations with debug=true"] = function()
+    child.lua([[ require('no-neck-pain').setup({debug=true}) ]])
+    child.nnp()
+    child.wait()
+
+    child.lua([[
+        _G.notify_calls = {}
+        function vim.notify_once(msg, level, opts)
+            table.insert(_G.notify_calls, msg)
+        end
+    ]])
+
+    child.cmd("vsplit")
+    child.wait()
+
+    local matches = child.lua_get([[(function()
+        local n = 0
+        for _, msg in ipairs(_G.notify_calls) do
+            if msg:find("post%-scan integration", 1, false) then
+                n = n + 1
+            end
+        end
+        return n
+    end)()]])
+
+    Helpers.expect.no_equality(matches, 0)
+end
+
 return T
