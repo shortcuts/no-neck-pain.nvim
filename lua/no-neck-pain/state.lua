@@ -74,9 +74,10 @@ function state:init_integrations()
     tab.wins.integrations = {}
 
     -- normalize to lowercase
-    for name, opts in pairs(vim.deepcopy(_G.NoNeckPain.config.integrations)) do
-        local lower_name = string.lower(name)
-        tab.wins.integrations[lower_name] = opts
+    -- entries are stored by reference; the two sites that assign `integration.id`
+    -- deep-copy the single entry first, so the user config is never mutated.
+    for name, opts in pairs(_G.NoNeckPain.config.integrations) do
+        tab.wins.integrations[string.lower(name)] = opts
     end
 end
 
@@ -478,6 +479,7 @@ function state:set_layout_windows(scope, wins)
                         tab.redraw = true
                     end
 
+                    integration = vim.deepcopy(integration)
                     integration.id = id
                     tab.wins.integrations[name] = integration
                 end
@@ -717,6 +719,7 @@ function state:_scan_col_children(scope, children)
                         tab.redraw = true
                     end
 
+                    integration = vim.deepcopy(integration)
                     integration.id = id
                     tab.wins.integrations[name] = integration
                     if integration.position == "none" then

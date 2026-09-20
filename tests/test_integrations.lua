@@ -1347,4 +1347,39 @@ T["redraw: re-registering an unchanged integration does not request a redraw"] =
     Helpers.expect.equality(child.lua_get("require('no-neck-pain.state'):consume_redraw()"), true)
 end
 
+-- =============================================================================
+-- config purity
+-- =============================================================================
+
+T["config: integration registration never writes an id into the user config"] = function()
+    child.set_size(10, 200)
+    child.lua([[
+        require('no-neck-pain').setup({
+            width = 80,
+            integrations = {
+                outline = { position = "right" }
+            }
+        })
+    ]])
+
+    child.nnp()
+    child.wait()
+
+    child.cmd("botright 30vnew")
+    child.bo.filetype = "Outline"
+    local outline_win = child.get_current_win()
+
+    child.cmd("wincmd h")
+    child.wait()
+
+    -- the integration is registered on the tab...
+    Helpers.expect.state(child, "tabs[1].wins.integrations.outline.id", outline_win)
+
+    -- ...and the user config stays free of any `id`
+    child.lua(
+        "_G.test_result = (function() for _, opts in pairs(_G.NoNeckPain.config.integrations) do if opts.id ~= nil then return true end end return false end)()"
+    )
+    Helpers.expect.equality(child.lua_get("_G.test_result"), false)
+end
+
 return T
