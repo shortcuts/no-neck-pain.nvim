@@ -1,3 +1,14 @@
+---
+title: no-neck-pain.nvim
+description: Dead simple plugin to center the currently focused buffer to the middle of the screen
+category: neovim-plugin
+plugin_type: ui-enhancement
+keywords: [neovim, buffer, centering, zen-mode, focus, distraction-free]
+version: ">=3.0.0"
+requires: neovim >= 0.10
+repository: shortcuts/no-neck-pain.nvim
+---
+
 <p align="center">
   <h1 align="center">☕ no-neck-pain.nvim</h2>
 </p>
@@ -16,6 +27,7 @@ _[Alternative GIF showcase video for mobile users](https://github.com/shortcuts/
 
 </div>
 
+<!-- SECTION: FEATURES -->
 ## ⚡️ Features
 
 _Creates evenly sized empty buffers on each side of your focused buffer, which acts as padding for your window._
@@ -28,11 +40,13 @@ _Creates evenly sized empty buffers on each side of your focused buffer, which a
 - [Built-in scratchPad feature](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase#side-buffer-as-scratch-pad)
 - [Themed side buffers](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase#custom-background-color)
 - Fully integrates with file trees ([neo-tree.nvim](https://github.com/nvim-neo-tree/neo-tree.nvim), [nvim-tree.lua](https://github.com/nvim-tree/nvim-tree.lua), etc.) and dashboard ([alpha-nvim](https://github.com/goolord/alpha-nvim), [snacks.nvim](https://github.com/folke/snacks.nvim), etc.)
-- Neovim >= 0.9 compatibility
+- Neovim >= 0.10 compatibility
     - 0.7 and 0.8 support is still available in the [1.x frozen version](https://github.com/shortcuts/no-neck-pain.nvim/tree/1.x)
+    - 0.9 support is still available in the [2.x frozen version](https://github.com/shortcuts/no-neck-pain.nvim/tree/2.x)
 
 > Want to see it in action? Take a look at [the showcase section](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase)
 
+<!-- SECTION: INSTALLATION -->
 ## 📋 Installation
 
 <div align="center">
@@ -113,10 +127,12 @@ plugins.no-neck-pain.enable = true;
 </table>
 </div>
 
+<!-- SECTION: GETTING_STARTED -->
 ## ☄ Getting started
 
 No configuration/setup steps needed! Sit back, relax and call `:NoNeckPain`.
 
+<!-- SECTION: CONFIGURATION -->
 ## ⚙ Configuration
 
 > **Note**:
@@ -146,7 +162,7 @@ require("no-neck-pain").setup({
     ---@type boolean
     disableOnLastBuffer = false,
     -- When `true`, disabling the plugin closes every other windows except the initially focused one.
-    ---@usage: this parameter will be renamed `killAllWindowsOnDisable` in the next major release (^2.x.y).
+    ---@usage: this parameter will be renamed `killAllWindowsOnDisable` in a future release.
     ---@type boolean
     killAllBuffersOnDisable = false,
     -- When `true`, deleting the main no-neck-pain buffer with `:bd`, `:bdelete` does not disable the plugin, it fallbacks on the newly focused window and refreshes the state by re-creating side-windows if necessary.
@@ -170,10 +186,10 @@ require("no-neck-pain").setup({
         enableOnTabEnter = false,
         -- When `true`, reloads the plugin configuration after a colorscheme change.
         ---@type boolean
-        reloadOnColorSchemeChange = false,
-        -- When `true`, entering one of no-neck-pain side buffer will automatically skip it and go to the next available buffer.
+        reloadOnColorSchemeChange = true,
+        -- When `true`, entering one of no-neck-pain side buffer will automatically skip it and go to the next available buffer. This setting is omitted when scratch pad is enabled.
         ---@type boolean
-        skipEnteringNoNeckPainBuffer = false,
+        skipEnteringNoNeckPainBuffer = true,
     },
     -- Creates mappings for you to easily interact with the exposed commands.
     ---@type table
@@ -205,6 +221,190 @@ require("no-neck-pain").setup({
         -- When `false`, the mapping is not created.
         ---@type string
         scratchPad = "<Leader>ns",
+        -- Sets a global mapping to Neovim, which allows you to toggle the debug mode.
+        -- When `false`, the mapping is not created.
+        ---@type string
+        debug = "<Leader>nd",
+    },
+    --- Common options that are set to both side buffers.
+    --- See |NoNeckPain.bufferOptions| for option scoped to the `left` and/or `right` buffer.
+    ---@type table
+    buffers = {
+        -- When `true`, the side buffers will be named `no-neck-pain-left` and `no-neck-pain-right` respectively.
+        ---@type boolean
+        setNames = false,
+        -- Leverages the side buffers as notepads, which work like any Neovim buffer and automatically saves its content at the given `location`.
+        -- note: quitting an unsaved scratchPad buffer is non-blocking, and the content is still saved.
+        --- see |NoNeckPain.bufferOptionsScratchPad|
+        scratchPad = {
+            -- When `true`, automatically sets the following options to the side buffers:
+            -- - `autowriteall`
+            -- - `autoread`.
+            ---@type boolean
+            enabled = false,
+            -- The name of the generated file. See `location` for more information.
+            -- /!\ deprecated /!\ use `pathToFile` instead.
+            ---@type string
+            ---@example: `no-neck-pain-left.norg`
+            ---@deprecated: use `pathToFile` instead.
+            fileName = "no-neck-pain",
+            -- By default, files are saved at the same location as the current Neovim session.
+            -- note: filetype is defaulted to `norg` (https://github.com/nvim-neorg/neorg), but can be changed in `buffers.bo.filetype` or |NoNeckPain.bufferOptions| for option scoped to the `left` and/or `right` buffer.
+            -- /!\ deprecated /!\ use `pathToFile` instead.
+            ---@type string?
+            ---@example: `no-neck-pain-left.norg`
+            ---@deprecated: use `pathToFile` instead.
+            location = nil,
+            -- The path to the file to save the scratchPad content to and load it in the buffer.
+            ---@type string?
+            ---@example: `~/notes.norg`
+            pathToFile = "",
+        },
+        -- colors to apply to both side buffers, for buffer scopped options @see |NoNeckPain.bufferOptions|
+        --- see |NoNeckPain.bufferOptionsColors|
+        colors = {
+            -- Hexadecimal color code to override the current background color of the buffer. (e.g. #24273A)
+            -- Transparent backgrounds are supported by default.
+            -- popular theme are supported by their name:
+            -- - catppuccin-frappe
+            -- - catppuccin-frappe-dark
+            -- - catppuccin-latte
+            -- - catppuccin-latte-dark
+            -- - catppuccin-macchiato
+            -- - catppuccin-macchiato-dark
+            -- - catppuccin-mocha
+            -- - catppuccin-mocha-dark
+            -- - github-nvim-theme-dark
+            -- - github-nvim-theme-dimmed
+            -- - github-nvim-theme-light
+            -- - rose-pine
+            -- - rose-pine-dawn
+            -- - rose-pine-moon
+            -- - tokyonight-day
+            -- - tokyonight-moon
+            -- - tokyonight-night
+            -- - tokyonight-storm
+            ---@type string?
+            background = nil,
+            -- Brighten (positive) or darken (negative) the side buffers background color. Accepted values are [-1..1].
+            ---@type integer
+            blend = 0,
+            -- Hexadecimal color code to override the current text color of the buffer. (e.g. #7480c2)
+            ---@type string?
+            text = nil,
+        },
+        -- Vim buffer-scoped options: any `vim.bo` options is accepted here.
+        ---@see NoNeckPain.bufferOptionsBo `:h NoNeckPain.bufferOptionsBo`
+        bo = {
+            ---@type string
+            filetype = "no-neck-pain",
+            ---@type string
+            buftype = "nofile",
+            ---@type string
+            bufhidden = "hide",
+            ---@type boolean
+            buflisted = false,
+            ---@type boolean
+            swapfile = false,
+        },
+        -- Vim window-scoped options: any `vim.wo` options is accepted here.
+        ---@see NoNeckPain.bufferOptionsWo `:h NoNeckPain.bufferOptionsWo`
+        wo = {
+            ---@type boolean
+            cursorline = false,
+            ---@type boolean
+            cursorcolumn = false,
+            ---@type string
+            colorcolumn = "0",
+            ---@type boolean
+            number = false,
+            ---@type boolean
+            relativenumber = false,
+            ---@type boolean
+            foldenable = false,
+            ---@type boolean
+            list = false,
+            ---@type boolean
+            wrap = true,
+            ---@type boolean
+            linebreak = true,
+        },
+        --- Options applied to the `left` buffer, options defined here overrides the `buffers` ones.
+        ---@see NoNeckPain.bufferOptions `:h NoNeckPain.bufferOptions`
+        left = NoNeckPain.bufferOptions,
+        --- Options applied to the `right` buffer, options defined here overrides the `buffers` ones.
+        ---@see NoNeckPain.bufferOptions `:h NoNeckPain.bufferOptions`
+        right = NoNeckPain.bufferOptions,
+    },
+    -- Supported integrations that might clash with `no-neck-pain.nvim`'s behavior.
+    --
+    -- The key of each integration must be the filetype of the integration window.
+    --
+    -- The `position` is used when the plugin scans the layout in order to compute the width that should be added
+    -- on each side. For example, if you were supposed to have a padding of 100 columns on each side, but an
+    -- integration takes 42, only 58 will be added so your layout is still centered.
+    --
+    ---@type table
+    integrations = {
+        -- @link https://github.com/nvim-tree/nvim-tree.lua
+        ---@type table
+        NvimTree = {
+            -- The position of the tree.
+            ---@type "left"|"right"
+            position = "left",
+        },
+        -- @link https://github.com/nvim-neo-tree/neo-tree.nvim
+        ["neo-tree"] = {
+            -- The position of the tree.
+            ---@type "left"|"right"
+            position = "left",
+        },
+        -- @link https://github.com/mbbill/undotree
+        undotree = {
+            -- The position of the tree.
+            ---@type "left"|"right"
+            position = "left",
+        },
+        -- @link https://github.com/nvim-neotest/neotest
+        neotest = {
+            -- The position of the tree.
+            ---@type "right"
+            position = "right",
+        },
+        -- @link https://github.com/rcarriga/nvim-dap-ui
+        dap = {
+            -- The position of the tree.
+            ---@type "none"
+            position = "none",
+        },
+        -- @link https://github.com/hedyhli/outline.nvim
+        outline = {
+            -- The position of the tree.
+            ---@type "left"|"right"
+            position = "right",
+        },
+        -- @link https://github.com/stevearc/aerial.nvim
+        aerial = {
+            -- The position of the tree.
+            ---@type "left"|"right"
+            position = "right",
+        },
+        -- @link https://github.com/stevearc/oil.nvim
+        oil = {
+            -- The position of the tree.
+            ---@type "none"
+            position = "none",
+        },
+        -- this is a generic field to hint no-neck-pain that you use a dashboard plugin.
+        -- the filetypes of natively supported dashboards are listed below in the `filetypes` field.
+        -- if a dashboard that you use isn't supported, either set `dashboard.filetype` to the expected file type, or open a pull-request with the edited list.
+        dashboard = {
+            -- When `true`, debounce will be applied to the init method, leaving time for the dashboard to open.
+            enabled = false,
+            -- if a dashboard that you use isn't supported, you can use this field to set a matching filetype.
+            ---@type string[]|nil
+            filetypes = { "dashboard", "alpha", "starter", "snacks" },
+        },
     },
     --- Allows you to provide custom code to run before (pre) and after (post) no-neck-pain steps (e.g. enabling).
     --- See |NoNeckPain.callbacks|
@@ -222,109 +422,6 @@ require("no-neck-pain").setup({
         -- Runs right after NoNeckPain has been turned off
         ---@type fun(state: { enabled: boolean, active_tab: number, tabs: number[], disabled_tabs: number[], previously_focused_win: number })|nil
         postDisable = nil,
-    },
-    --- Common options that are set to both side buffers.
-    --- See |NoNeckPain.bufferOptions| for option scoped to the `left` and/or `right` buffer.
-    ---@type table
-    buffers = {
-        -- When `true`, the side buffers will be named `no-neck-pain-left` and `no-neck-pain-right` respectively.
-        ---@type boolean
-        setNames = false,
-        -- Leverages the side buffers as notepads, which work like any Neovim buffer and automatically saves its content at the given `location`.
-        -- note: quitting an unsaved scratchPad buffer is non-blocking, and the content is still saved.
-        --- see |NoNeckPain.bufferOptionsScratchPad|
-        scratchPad = NoNeckPain.bufferOptionsScratchPad,
-        -- colors to apply to both side buffers, for buffer scopped options @see |NoNeckPain.bufferOptions|
-        --- see |NoNeckPain.bufferOptionsColors|
-        colors = NoNeckPain.bufferOptionsColors,
-        -- Vim buffer-scoped options: any `vim.bo` options is accepted here.
-        ---@see NoNeckPain.bufferOptionsBo `:h NoNeckPain.bufferOptionsBo`
-        bo = NoNeckPain.bufferOptionsBo,
-        -- Vim window-scoped options: any `vim.wo` options is accepted here.
-        ---@see NoNeckPain.bufferOptionsWo `:h NoNeckPain.bufferOptionsWo`
-        wo = NoNeckPain.bufferOptionsWo,
-        --- Options applied to the `left` buffer, options defined here overrides the `buffers` ones.
-        ---@see NoNeckPain.bufferOptions `:h NoNeckPain.bufferOptions`
-        left = NoNeckPain.bufferOptions,
-        --- Options applied to the `right` buffer, options defined here overrides the `buffers` ones.
-        ---@see NoNeckPain.bufferOptions `:h NoNeckPain.bufferOptions`
-        right = NoNeckPain.bufferOptions,
-    },
-    -- Supported integrations that might clash with `no-neck-pain.nvim`'s behavior.
-    --
-    -- The `position` is used when the plugin scans the layout in order to compute the width that should be added
-    -- on each side. For example, if you were supposed to have a padding of 100 columns on each side, but an
-    -- integration takes 42, only 58 will be added so your layout is still centered.
-    --
-    -- If `reopen` is set to `false`, we won't account the width but close the integration when encountered.
-    ---@type table
-    integrations = {
-        -- @link https://github.com/nvim-tree/nvim-tree.lua
-        ---@type table
-        NvimTree = {
-            -- The position of the tree.
-            ---@type "left"|"right"
-            position = "left",
-            -- When `true`, if the tree was opened before enabling the plugin, we will reopen it.
-            ---@type boolean
-            reopen = true,
-        },
-        -- @link https://github.com/nvim-neo-tree/neo-tree.nvim
-        NeoTree = {
-            -- The position of the tree.
-            ---@type "left"|"right"
-            position = "left",
-            -- When `true`, if the tree was opened before enabling the plugin, we will reopen it.
-            reopen = true,
-        },
-        -- @link https://github.com/mbbill/undotree
-        undotree = {
-            -- The position of the tree.
-            ---@type "left"|"right"
-            position = "left",
-        },
-        -- @link https://github.com/nvim-neotest/neotest
-        neotest = {
-            -- The position of the tree.
-            ---@type "right"
-            position = "right",
-            -- When `true`, if the tree was opened before enabling the plugin, we will reopen it.
-            reopen = true,
-        },
-        -- @link https://github.com/rcarriga/nvim-dap-ui
-        NvimDAPUI = {
-            -- The position of the tree.
-            ---@type "none"
-            position = "none",
-            -- When `true`, if the tree was opened before enabling the plugin, we will reopen it.
-            reopen = true,
-        },
-        -- @link https://github.com/hedyhli/outline.nvim
-        outline = {
-            -- The position of the tree.
-            ---@type "left"|"right"
-            position = "right",
-            -- When `true`, if the tree was opened before enabling the plugin, we will reopen it.
-            reopen = true,
-        },
-        -- @link https://github.com/stevearc/aerial.nvim
-        aerial = {
-            -- The position of the tree.
-            ---@type "left"|"right"
-            position = "right",
-            -- When `true`, if the tree was opened before enabling the plugin, we will reopen it.
-            reopen = true,
-        },
-        -- this is a generic field to hint no-neck-pain that you use a dashboard plugin.
-        -- you can find the filetype list of natively supported dashboards here: https://github.com/shortcuts/no-neck-pain.nvim/blob/main/lua/no-neck-pain/util/constants.lua#L82-L85
-        -- if a dashboard that you use isn't supported, either set `dashboard.filetype` to the expected file type, or open a pull-request with the edited list.
-        dashboard = {
-            -- When `true`, debounce will be applied to the init method, leaving time for the dashboard to open.
-            enabled = false,
-            -- if a dashboard that you use isn't supported, you can use this field to set a matching filetype, also don't hesitate to open a pull-request with the edited list (DASHBOARDS) found in lua/no-neck-pain/util/constants.lua.
-            ---@type string[]|nil
-            filetypes = nil,
-        },
     },
 })
 
@@ -466,6 +563,7 @@ NoNeckPain.bufferOptions = {
 
 </details>
 
+<!-- SECTION: COMMANDS -->
 ## 🧰 Commands
 
 |   Command   |         Description        |
@@ -477,7 +575,9 @@ NoNeckPain.bufferOptions = {
 |`:NoNeckPainWidthUp`| Increases the config `width` by 5 and resizes the no-neck-pain windows. |
 |`:NoNeckPainWidthDown`| Decreases the config `width` by 5 and resizes the no-neck-pain windows. |
 |`:NoNeckPainScratchPad`| Uses the side buffers as a persistent scratchpad so you can take notes easily. |
+|`:NoNeckPainDebug`| Toggles the debug mode. |
 
+<!-- SECTION: BREAKING_CHANGES -->
 ## 🏗 breaking changes
 
 ### v1.0.0
@@ -488,6 +588,74 @@ See [the release description](https://github.com/shortcuts/no-neck-pain.nvim/pul
 
 See [the release description](https://github.com/shortcuts/no-neck-pain.nvim/pull/384) for the full list of breaking changes.
 
+### v3.0.0
+
+See [the release description](https://github.com/shortcuts/no-neck-pain.nvim/pull/513) for the full list of breaking changes.
+
+<!-- SECTION: AI_ASSISTANTS -->
+## 🤖 For AI Assistants
+
+This section provides structured information about the codebase to help AI assistants understand and work with the plugin effectively.
+
+### 📁 Codebase Structure
+
+**Core Modules** (`lua/no-neck-pain/`):
+- `init.lua` - Public API entry point, exports main commands (`toggle()`, `resize()`, etc.)
+- `main.lua` - Core plugin logic, orchestrates enable/disable/toggle operations
+- `state.lua` - Global state management (plugin enabled, tabs, windows)
+- `config.lua` - Configuration validation and defaults
+- `ui.lua` - Window/buffer creation and manipulation
+- `colors.lua` - Color/theme management for side buffers
+
+**Utilities** (`lua/no-neck-pain/util/`):
+- `api.lua` - Debouncing and API utilities
+- `helpers.lua` - Common helper functions and safe state/config access
+- `constants.lua` - Plugin constants (supported integrations, filetypes)
+- `log.lua` - Debug logging
+
+**Tests** (`tests/`):
+- `test_*.lua` - Feature-specific test suites
+- `helpers.lua` - Test utilities and fixtures
+
+### 🔑 Key Entry Points
+
+1. **Plugin initialization**: `lua/no-neck-pain/init.lua`
+   - Exports: `NoNeckPain.toggle()`, `NoNeckPain.resize()`, `NoNeckPain.toggle_scratch_pad()`
+   
+2. **Core logic**: `lua/no-neck-pain/main.lua`
+   - Contains enable/disable/toggle implementations
+   
+3. **State management**: `lua/no-neck-pain/state.lua`
+   - Global state accessible via `require("no-neck-pain.util.helpers")`
+
+### ⚙️ Configuration Structure
+
+The plugin uses a deeply nested configuration object, see `lua/no-neck-pain/config.lua`
+
+### 🔄 Common Patterns
+
+1. **State and Config Access**: Always use `require("no-neck-pain.util.helpers")` for state manipulation
+   - `get_config_field(key)` - Read config values
+   - `merge_config(partial)` - Update config
+   - `get_tab()` - Get current tab state
+
+2. **Event Handling**: Plugin responds to autocmds (VimEnter, TabEnter, ColorScheme, etc.)
+
+3. **Side Buffer Management**: Creates "padding" buffers on left/right sides
+   - Named `no-neck-pain-left` and `no-neck-pain-right` when `setNames = true`
+   - Filetype: `no-neck-pain` (or custom via `buffers.bo.filetype`)
+
+4. **Integration Support**: Detects file trees (NvimTree, neo-tree) and dashboards
+   - Adjusts width calculations to account for sidebar positions
+
+### 🧪 Testing
+
+- Test framework: `MiniTest`
+- Run tests: `make test`
+- Test pattern: Each feature has dedicated `test_*.lua` file
+- Helpers: `tests/helpers.lua` provides utilities for test setup/teardown
+
+<!-- SECTION: CONTRIBUTING -->
 ## ⌨ Contributing
 
 PRs and issues are always welcome. Make sure to provide as much context as possible when opening one.

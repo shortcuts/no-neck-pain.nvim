@@ -161,7 +161,7 @@ NoNeckPain.options = {
     ---@type boolean
     disableOnLastBuffer = false,
     -- When `true`, disabling the plugin closes every other windows except the initially focused one.
-    ---@usage: this parameter will be renamed `killAllWindowsOnDisable` in the next major release (^2.x.y).
+    ---@usage: this parameter will be renamed `killAllWindowsOnDisable` in a future release.
     ---@type boolean
     killAllBuffersOnDisable = false,
     -- When `true`, deleting the main no-neck-pain buffer with `:bd`, `:bdelete` does not disable the plugin, it fallbacks on the newly focused window and refreshes the state by re-creating side-windows if necessary.
@@ -185,10 +185,10 @@ NoNeckPain.options = {
         enableOnTabEnter = false,
         -- When `true`, reloads the plugin configuration after a colorscheme change.
         ---@type boolean
-        reloadOnColorSchemeChange = false,
-        -- When `true`, entering one of no-neck-pain side buffer will automatically skip it and go to the next available buffer.
+        reloadOnColorSchemeChange = true,
+        -- When `true`, entering one of no-neck-pain side buffer will automatically skip it and go to the next available buffer. This setting is omitted when scratch pad is enabled.
         ---@type boolean
-        skipEnteringNoNeckPainBuffer = false,
+        skipEnteringNoNeckPainBuffer = true,
     },
     -- Creates mappings for you to easily interact with the exposed commands.
     ---@type table
@@ -254,11 +254,12 @@ NoNeckPain.options = {
     },
     -- Supported integrations that might clash with `no-neck-pain.nvim`'s behavior.
     --
+    -- The key of each integration must be the filetype of the integration window.
+    --
     -- The `position` is used when the plugin scans the layout in order to compute the width that should be added
     -- on each side. For example, if you were supposed to have a padding of 100 columns on each side, but an
     -- integration takes 42, only 58 will be added so your layout is still centered.
     --
-    -- If `reopen` is set to `false`, we won't account the width but close the integration when encountered.
     ---@type table
     integrations = {
         -- @link https://github.com/nvim-tree/nvim-tree.lua
@@ -267,17 +268,12 @@ NoNeckPain.options = {
             -- The position of the tree.
             ---@type "left"|"right"
             position = "left",
-            -- When `true`, if the tree was opened before enabling the plugin, we will reopen it.
-            ---@type boolean
-            reopen = true,
         },
         -- @link https://github.com/nvim-neo-tree/neo-tree.nvim
-        NeoTree = {
+        ["neo-tree"] = {
             -- The position of the tree.
             ---@type "left"|"right"
             position = "left",
-            -- When `true`, if the tree was opened before enabling the plugin, we will reopen it.
-            reopen = true,
         },
         -- @link https://github.com/mbbill/undotree
         undotree = {
@@ -287,45 +283,49 @@ NoNeckPain.options = {
         },
         -- @link https://github.com/nvim-neotest/neotest
         neotest = {
-            -- The position of the tree.
+            -- The position of the test panel.
             ---@type "right"
             position = "right",
-            -- When `true`, if the tree was opened before enabling the plugin, we will reopen it.
-            reopen = true,
         },
         -- @link https://github.com/rcarriga/nvim-dap-ui
-        NvimDAPUI = {
-            -- The position of the tree.
+        dap = {
+            -- The position of the debug panel.
             ---@type "none"
             position = "none",
-            -- When `true`, if the tree was opened before enabling the plugin, we will reopen it.
-            reopen = true,
         },
         -- @link https://github.com/hedyhli/outline.nvim
         outline = {
-            -- The position of the tree.
+            -- The position of the outline panel.
             ---@type "left"|"right"
             position = "right",
-            -- When `true`, if the tree was opened before enabling the plugin, we will reopen it.
-            reopen = true,
         },
         -- @link https://github.com/stevearc/aerial.nvim
         aerial = {
-            -- The position of the tree.
+            -- The position of the symbols panel.
             ---@type "left"|"right"
             position = "right",
-            -- When `true`, if the tree was opened before enabling the plugin, we will reopen it.
-            reopen = true,
+        },
+        -- @link https://github.com/stevearc/oil.nvim
+        oil = {
+            -- The position of the file manager.
+            ---@type "none"
+            position = "none",
+        },
+        -- @link https://github.com/folke/snacks.nvim
+        snacks_picker = {
+            -- The position of the picker explorer.
+            ---@type "left"|"right"
+            position = "left",
         },
         -- this is a generic field to hint no-neck-pain that you use a dashboard plugin.
-        -- you can find the filetype list of natively supported dashboards here: https://github.com/shortcuts/no-neck-pain.nvim/blob/main/lua/no-neck-pain/util/constants.lua#L82-L85
+        -- the filetypes of natively supported dashboards are listed below in the `filetypes` field.
         -- if a dashboard that you use isn't supported, either set `dashboard.filetype` to the expected file type, or open a pull-request with the edited list.
         dashboard = {
             -- When `true`, debounce will be applied to the init method, leaving time for the dashboard to open.
             enabled = false,
-            -- if a dashboard that you use isn't supported, you can use this field to set a matching filetype, also don't hesitate to open a pull-request with the edited list (DASHBOARDS) found in lua/no-neck-pain/util/constants.lua.
+            -- if a dashboard that you use isn't supported, you can use this field to set a matching filetype.
             ---@type string[]|nil
-            filetypes = nil,
+            filetypes = { "dashboard", "alpha", "starter", "snacks" },
         },
     },
     --- Allows you to provide custom code to run before (pre) and after (post) no-neck-pain steps (e.g. enabling).
@@ -365,18 +365,20 @@ local function parse_deprecated_scratchPad(side, options, fileType)
 
     -- handle the deprecation to `fileName` and `location`
     if options.pathToFile == "" then
-        if options.location ~= nil then
-            options.pathToFile = options.location
-        end
-
-        if options.pathToFile ~= "" and string.sub(options.pathToFile, -1) ~= "/" then
-            options.pathToFile = options.pathToFile .. "/"
-        end
-
         fileType = fileType or "norg"
 
-        options.pathToFile =
-            string.format("%s%s-%s.%s", options.pathToFile, options.fileName, side, fileType)
+        if options.location ~= nil and options.location ~= "" then
+            -- User provided a deprecated location: use it as a directory
+            local location = options.location
+            if string.sub(location, -1) ~= "/" then
+                location = location .. "/"
+            end
+            options.pathToFile =
+                string.format("%s%s-%s.%s", location, options.fileName, side, fileType)
+        else
+            -- Default: use just the filename (relative), will expand at runtime
+            options.pathToFile = string.format("%s-%s.%s", options.fileName, side, fileType)
+        end
     end
 
     return options
@@ -408,7 +410,8 @@ function NoNeckPain.defaults(options)
 
     -- assert `width` values through vim options
     if NoNeckPain.options.width == "textwidth" then
-        NoNeckPain.options.width = tonumber(vim.api.nvim_buf_get_option(0, "textwidth")) or 0
+        NoNeckPain.options.width = tonumber(vim.api.nvim_get_option_value("textwidth", { buf = 0 }))
+            or 0
     end
 
     if NoNeckPain.options.width == "colorcolumn" then
@@ -417,12 +420,30 @@ function NoNeckPain.defaults(options)
         ) or 0
     end
 
-    if NoNeckPain.options.integrations.dashboard.enabled == true then
-        NoNeckPain.options.autocmds.enableOnVimEnter = "safe"
+    if NoNeckPain.options.integrations ~= nil then
+        for key, config in pairs(NoNeckPain.options.integrations) do
+            if key ~= "dashboard" and config.position ~= nil then
+                -- Validate position is a string
+                assert(
+                    type(config.position) == "string",
+                    string.format(
+                        "`integrations.%s.position` must be a string, got %s",
+                        key,
+                        type(config.position)
+                    )
+                )
 
-        if NoNeckPain.options.integrations.dashboard.filetypes ~= nil then
-            for _, value in pairs(NoNeckPain.options.integrations.dashboard.filetypes) do
-                table.insert(constants.DASHBOARDS, value)
+                -- Validate position value
+                assert(
+                    config.position == "left"
+                        or config.position == "right"
+                        or config.position == "none",
+                    string.format(
+                        "`integrations.%s.position` must be 'left', 'right', or 'none', got '%s'",
+                        key,
+                        config.position
+                    )
+                )
             end
         end
     end

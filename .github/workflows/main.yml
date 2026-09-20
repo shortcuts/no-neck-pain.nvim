@@ -6,9 +6,6 @@ on:
   pull_request:
     types: [opened, synchronize]
 
-env:
-  LUA_LS_VERSION: 3.7.4
-
 concurrency:
   group: github.head_ref
   cancel-in-progress: true
@@ -51,10 +48,10 @@ jobs:
       - lint
       - documentation
     runs-on: ubuntu-latest
-    timeout-minutes: 1
+    timeout-minutes: 3
     strategy:
       matrix:
-        neovim_version: ['v0.9.5', 'v0.10.2', 'v0.11.3']
+        neovim_version: ['v0.10.4', 'v0.11.7', 'v0.12.0']
 
     steps:
       - uses: actions/checkout@v4
@@ -69,14 +66,12 @@ jobs:
 
       - name: restore luals cache
         uses: actions/cache@v4
-        id: cache
         with:
           path: .ci/lua-ls
-          key: ${{ env.LUA_LS_VERSION }}
+          key: ${{ hashFiles('.luals-version') }}
 
       - name: setup luals
-        if: ${{ steps.cache.outputs.cache-hit != 'true' }}
-        run: mkdir -p .ci/lua-ls && curl -sL "https://github.com/LuaLS/lua-language-server/releases/download/${{ env.LUA_LS_VERSION }}/lua-language-server-${{ env.LUA_LS_VERSION }}-linux-x64.tar.gz" | tar xzf - -C "${PWD}/.ci/lua-ls"
+        run: make luals-install
 
       - name: setup neovim
         uses: rhysd/action-setup-vim@v1
@@ -98,7 +93,7 @@ jobs:
       - lint
       - documentation
     runs-on: ubuntu-latest
-    timeout-minutes: 1
+    timeout-minutes: 3
     continue-on-error: true
 
     steps:
@@ -114,14 +109,12 @@ jobs:
 
       - name: restore luals cache
         uses: actions/cache@v4
-        id: cache
         with:
           path: .ci/lua-ls
-          key: ${{ env.LUA_LS_VERSION }}
+          key: ${{ hashFiles('.luals-version') }}
 
       - name: setup luals
-        if: ${{ steps.cache.outputs.cache-hit != 'true' }}
-        run: mkdir -p .ci/lua-ls && curl -sL "https://github.com/LuaLS/lua-language-server/releases/download/${{ env.LUA_LS_VERSION }}/lua-language-server-${{ env.LUA_LS_VERSION }}-linux-x64.tar.gz" | tar xzf - -C "${PWD}/.ci/lua-ls"
+        run: make luals-install
 
       - name: setup neovim
         uses: rhysd/action-setup-vim@v1

@@ -6,7 +6,7 @@ local colors = {}
 
 --- Converts an hex color code to RGB, values are returned independently.
 ---
----@param hex string: the hex color to conver to rgb.
+---@param hex string: the hex color to convert to rgb.
 ---@return number?: the r color
 ---@return number?: the g color
 ---@return number?: the b color
@@ -109,9 +109,8 @@ end
 --- Creates highlight groups for a given `win` in a `tab` named:
 --- - `NoNeckPain_background_tab_$ID_side_$SIDE` for the background colors.
 --- - `NoNeckPain_text_tab_$ID_side_$SIDE` for the text colors.
---- note: `cmd` is used instead of native commands for backward compatibility with Neovim 0.7
 ---
----@param win number: the id of the win to init.
+---@param win number?: the id of the win to init.
 ---@param side "left"|"right": the side of the window being resized, used for logging only.
 ---@private
 function colors.init(win, side)
@@ -132,28 +131,30 @@ function colors.init(win, side)
     vim.api.nvim_set_hl(id, background_group, {})
     vim.api.nvim_set_hl(id, text_group, {})
 
-    if
-        _G.NoNeckPain.config.buffers[side].colors.background == nil
-        and _G.NoNeckPain.config.buffers[side].colors.text == nil
-        and _G.NoNeckPain.config.buffers[side].colors.blend == 0
-    then
+    local config = _G.NoNeckPain.config.buffers
+
+    local has_custom_colors = config[side].colors.background ~= nil
+        or config[side].colors.text ~= nil
+        or config[side].colors.blend ~= 0
+
+    if not has_custom_colors then
         return log.debug("colors.init", "skipping color initialization for side %s", side)
     end
 
     vim.api.nvim_set_hl(id, background_group, {
-        fg = _G.NoNeckPain.config.buffers[side].colors.background,
-        bg = _G.NoNeckPain.config.buffers[side].colors.background,
+        fg = config[side].colors.background,
+        bg = config[side].colors.background,
     })
     vim.api.nvim_set_hl(id, text_group, {
-        fg = _G.NoNeckPain.config.buffers[side].colors.text,
-        bg = _G.NoNeckPain.config.buffers[side].colors.background,
+        fg = config[side].colors.text,
+        bg = config[side].colors.background,
     })
 
     -- link nnp and neovim hl groups
     local groups = { Normal = text_group, NormalNC = text_group }
 
-    -- we only set those for non transparent backgrouns to prevent white lines.
-    if _G.NoNeckPain.config.buffers[side].colors.background ~= "NONE" then
+    -- we only set those for non transparent backgrounds to prevent white lines.
+    if config[side].colors.background ~= "NONE" then
         groups = vim.tbl_extend("keep", groups, {
             WinSeparator = background_group,
             VertSplit = background_group,

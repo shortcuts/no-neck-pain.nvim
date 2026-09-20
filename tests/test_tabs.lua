@@ -1,23 +1,57 @@
-local Co = require("no-neck-pain.util.constants")
 local Helpers = dofile("tests/helpers.lua")
 
 local child = Helpers.new_child_neovim()
 
+local function get_integrations()
+    return {
+        nvimtree = {
+            position = "left",
+        },
+        ["neo-tree"] = {
+            position = "left",
+        },
+        undotree = {
+            position = "left",
+        },
+        neotest = {
+            position = "right",
+        },
+        dap = {
+            position = "none",
+        },
+        outline = {
+            position = "right",
+        },
+        aerial = {
+            position = "right",
+        },
+        oil = {
+            position = "none",
+        },
+        snacks_picker = {
+            position = "left",
+        },
+        dashboard = {
+            enabled = false,
+            filetypes = { "dashboard", "alpha", "starter", "snacks" },
+        },
+    }
+end
+
 local T = MiniTest.new_set({
     hooks = {
-        -- This will be executed before every (even nested) case
         pre_case = function()
-            -- Restart child process with custom 'init.lua' script
             child.restart({ "-u", "scripts/minimal_init.lua" })
         end,
-        -- This will be executed one after all tests from this set are finished
         post_once = child.stop,
     },
 })
 
-T["tabs"] = MiniTest.new_set()
+-- =============================================================================
+-- GROUP 1: tabs
+-- =============================================================================
 
-T["tabs"]["keeps the active tab in state"] = function()
+T["tabs: keeps the active tab in state"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     child.nnp()
 
@@ -29,7 +63,7 @@ T["tabs"]["keeps the active tab in state"] = function()
     Helpers.expect.state(child, "active_tab", 2)
 end
 
-T["tabs"]["new tab doesn't have side buffers"] = function()
+T["tabs: new tab doesn't have side buffers"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     child.nnp()
 
@@ -42,7 +76,7 @@ T["tabs"]["new tab doesn't have side buffers"] = function()
     Helpers.expect.equality(child.get_wins_in_tab(), { 1003 })
 end
 
-T["tabs"]["side buffers coexist on many tabs"] = function()
+T["tabs: side buffers coexist on many tabs"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     child.nnp()
 
@@ -55,6 +89,12 @@ T["tabs"]["side buffers coexist on many tabs"] = function()
 
     -- tab 2
     child.cmd("tabnew")
+    child.cmd("e test2.lua")
+    child.wait(1000)
+    Helpers.expect.state(child, "active_tab", 2)
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1003 })
+
     child.nnp()
 
     Helpers.expect.equality(child.get_wins_in_tab(), { 1004, 1003, 1005 })
@@ -77,7 +117,7 @@ T["tabs"]["side buffers coexist on many tabs"] = function()
     Helpers.expect.equality(child.get_wins_in_tab(3), { 1007, 1006, 1008 })
 end
 
-T["tabs"]["previous tab kept side buffers if enabled"] = function()
+T["tabs: previous tab kept side buffers if enabled"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     child.nnp()
 
@@ -99,7 +139,7 @@ T["tabs"]["previous tab kept side buffers if enabled"] = function()
     Helpers.expect.state(child, "active_tab", 1)
 end
 
-T["tabs"]["does not throw when resizing and tab isn't registered"] = function()
+T["tabs: does not throw when resizing and tab isn't registered"] = function()
     child.restart({
         "-u",
         "scripts/minimal_init.lua",
@@ -134,11 +174,14 @@ T["tabs"]["does not throw when resizing and tab isn't registered"] = function()
     Helpers.expect.state(child, "active_tab", 1)
 end
 
-T["TabEnter"] = MiniTest.new_set()
+-- =============================================================================
+-- GROUP 2: TabEnter
+-- =============================================================================
 
-T["TabEnter"]["starts the plugin on new tab"] = function()
+T["TabEnter: starts the plugin on new tab"] = function()
     child.restart({ "-u", "scripts/init_auto_open.lua" })
-    child.wait()
+    child.cmd("e test.lua")
+    child.wait(1000)
 
     Helpers.expect.state(child, "enabled", true)
 
@@ -149,16 +192,18 @@ T["TabEnter"]["starts the plugin on new tab"] = function()
 
     -- tab 2
     child.cmd("tabnew")
-    child.wait()
+    child.cmd("e test2.lua")
+    child.wait(1000)
 
     Helpers.expect.state(child, "active_tab", 2)
 
     Helpers.expect.equality(child.get_wins_in_tab(), { 1004, 1003, 1005 })
 end
 
-T["TabEnter"]["does not re-enable if the user disables it"] = function()
+T["TabEnter: does not re-enable if the user disables it"] = function()
     child.restart({ "-u", "scripts/init_auto_open.lua" })
-    child.wait()
+    child.cmd("e test.lua")
+    child.wait(1000)
 
     Helpers.expect.state(child, "enabled", true)
 
@@ -169,7 +214,8 @@ T["TabEnter"]["does not re-enable if the user disables it"] = function()
 
     -- tab 2
     child.cmd("tabnew")
-    child.wait()
+    child.cmd("e test2.lua")
+    child.wait(1000)
     Helpers.expect.state(child, "active_tab", 2)
 
     Helpers.expect.equality(child.get_wins_in_tab(), { 1004, 1003, 1005 })
@@ -192,9 +238,10 @@ T["TabEnter"]["does not re-enable if the user disables it"] = function()
     Helpers.expect.equality(child.get_wins_in_tab(), { 1003 })
 end
 
-T["TabEnter"]["allows re-enabling a tab manually disabled"] = function()
+T["TabEnter: allows re-enabling a tab manually disabled"] = function()
     child.restart({ "-u", "scripts/init_auto_open.lua" })
-    child.wait()
+    child.cmd("e test.lua")
+    child.wait(1000)
 
     Helpers.expect.state(child, "enabled", true)
 
@@ -205,7 +252,8 @@ T["TabEnter"]["allows re-enabling a tab manually disabled"] = function()
 
     -- tab 2
     child.cmd("tabnew")
-    child.wait()
+    child.cmd("e test2.lua")
+    child.wait(1000)
     Helpers.expect.state(child, "active_tab", 2)
 
     Helpers.expect.equality(child.get_wins_in_tab(), { 1004, 1003, 1005 })
@@ -235,17 +283,21 @@ T["TabEnter"]["allows re-enabling a tab manually disabled"] = function()
     Helpers.expect.equality(child.get_wins_in_tab(), { 1006, 1003, 1007 })
 end
 
-T["tabnew/tabclose"] = MiniTest.new_set()
+-- =============================================================================
+-- GROUP 3: tabnew/tabclose
+-- =============================================================================
 
-T["tabnew/tabclose"]["opening and closing tabs does not throw any error"] = function()
+T["tabnew/tabclose: opening and closing tabs does not throw any error"] = function()
     child.restart({ "-u", "scripts/init_auto_open.lua" })
-    child.wait()
+    child.cmd("e test.lua")
+    child.wait(1000)
 
     Helpers.expect.state(child, "enabled", true)
     Helpers.expect.state(child, "active_tab", 1)
 
     child.cmd("tabnew")
-    child.wait()
+    child.cmd("e test2.lua")
+    child.wait(100)
     Helpers.expect.state(child, "active_tab", 2)
 
     child.cmd("tabclose")
@@ -253,9 +305,11 @@ T["tabnew/tabclose"]["opening and closing tabs does not throw any error"] = func
     Helpers.expect.state(child, "active_tab", 1)
 
     child.cmd("tabnew")
-    child.wait()
+    child.cmd("e test3.lua")
+    child.wait(100)
     child.cmd("tabnew")
-    child.wait()
+    child.cmd("e test4.lua")
+    child.wait(100)
     Helpers.expect.state(child, "active_tab", 4)
 
     child.cmd("tabclose")
@@ -267,9 +321,10 @@ T["tabnew/tabclose"]["opening and closing tabs does not throw any error"] = func
     Helpers.expect.state(child, "active_tab", 1)
 end
 
-T["tabnew/tabclose"]["doesn't keep closed tabs in state"] = function()
+T["tabnew/tabclose: doesn't keep closed tabs in state"] = function()
     child.restart({ "-u", "scripts/init_auto_open.lua" })
-    child.wait()
+    child.cmd("e test.lua")
+    child.wait(100)
 
     Helpers.expect.state(child, "enabled", true)
     Helpers.expect.state(child, "active_tab", 1)
@@ -278,47 +333,54 @@ T["tabnew/tabclose"]["doesn't keep closed tabs in state"] = function()
             id = 1,
             redraw = false,
             scratchpad_enabled = false,
+            window_count = 3,
             wins = {
-                integrations = Co.INTEGRATIONS,
+                integrations = get_integrations(),
                 main = {
                     curr = 1000,
                     left = 1001,
                     right = 1002,
                 },
                 columns = 3,
+                none_columns = 0,
             },
         },
     })
 
     child.cmd("tabnew")
-    child.wait()
+    child.cmd("e test2.lua")
+    child.wait(100)
     Helpers.expect.state(child, "tabs", {
         {
             id = 1,
             redraw = false,
             scratchpad_enabled = false,
+            window_count = 3,
             wins = {
-                integrations = Co.INTEGRATIONS,
+                integrations = get_integrations(),
                 main = {
                     curr = 1000,
                     left = 1001,
                     right = 1002,
                 },
                 columns = 3,
+                none_columns = 0,
             },
         },
         {
             id = 2,
             redraw = false,
             scratchpad_enabled = false,
+            window_count = 3,
             wins = {
-                integrations = Co.INTEGRATIONS,
+                integrations = get_integrations(),
                 main = {
                     curr = 1003,
                     left = 1004,
                     right = 1005,
                 },
                 columns = 3,
+                none_columns = 0,
             },
         },
     })
@@ -330,22 +392,25 @@ T["tabnew/tabclose"]["doesn't keep closed tabs in state"] = function()
             id = 1,
             redraw = false,
             scratchpad_enabled = false,
+            window_count = 3,
             wins = {
-                integrations = Co.INTEGRATIONS,
+                integrations = get_integrations(),
                 main = {
                     curr = 1000,
                     left = 1001,
                     right = 1002,
                 },
                 columns = 3,
+                none_columns = 0,
             },
         },
     })
 end
 
-T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
+T["tabnew/tabclose: keeps state synchronized between tabs"] = function()
     child.restart({ "-u", "scripts/init_auto_open.lua" })
-    child.wait()
+    child.cmd("e test.lua")
+    child.wait(100)
 
     child.cmd("badd 1")
     Helpers.expect.state(child, "enabled", true)
@@ -355,20 +420,23 @@ T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
             id = 1,
             redraw = false,
             scratchpad_enabled = false,
+            window_count = 3,
             wins = {
-                integrations = Co.INTEGRATIONS,
+                integrations = get_integrations(),
                 main = {
                     curr = 1000,
                     left = 1001,
                     right = 1002,
                 },
                 columns = 3,
+                none_columns = 0,
             },
         },
     })
 
     child.cmd("tabnew")
-    child.wait()
+    child.cmd("e test2.lua")
+    child.wait(100)
     child.cmd("badd 2")
     child.wait()
     Helpers.expect.state(child, "enabled", true)
@@ -378,28 +446,32 @@ T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
             id = 1,
             redraw = false,
             scratchpad_enabled = false,
+            window_count = 3,
             wins = {
-                integrations = Co.INTEGRATIONS,
+                integrations = get_integrations(),
                 main = {
                     curr = 1000,
                     left = 1001,
                     right = 1002,
                 },
                 columns = 3,
+                none_columns = 0,
             },
         },
         {
             id = 2,
             redraw = false,
             scratchpad_enabled = false,
+            window_count = 3,
             wins = {
-                integrations = Co.INTEGRATIONS,
+                integrations = get_integrations(),
                 main = {
                     curr = 1003,
                     left = 1004,
                     right = 1005,
                 },
                 columns = 3,
+                none_columns = 0,
             },
         },
     })
@@ -410,14 +482,16 @@ T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
             id = 1,
             redraw = false,
             scratchpad_enabled = false,
+            window_count = 3,
             wins = {
-                integrations = Co.INTEGRATIONS,
+                integrations = get_integrations(),
                 main = {
                     curr = 1000,
                     left = 1001,
                     right = 1002,
                 },
                 columns = 3,
+                none_columns = 0,
             },
         },
     })
@@ -428,28 +502,32 @@ T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
             id = 1,
             redraw = false,
             scratchpad_enabled = false,
+            window_count = 3,
             wins = {
-                integrations = Co.INTEGRATIONS,
+                integrations = get_integrations(),
                 main = {
                     curr = 1000,
                     left = 1001,
                     right = 1002,
                 },
                 columns = 3,
+                none_columns = 0,
             },
         },
         {
             id = 2,
             redraw = false,
             scratchpad_enabled = false,
+            window_count = 3,
             wins = {
-                integrations = Co.INTEGRATIONS,
+                integrations = get_integrations(),
                 main = {
                     curr = 1003,
                     left = 1006,
                     right = 1007,
                 },
                 columns = 3,
+                none_columns = 0,
             },
         },
     })
@@ -462,28 +540,32 @@ T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
             id = 1,
             redraw = false,
             scratchpad_enabled = false,
+            window_count = 3,
             wins = {
-                integrations = Co.INTEGRATIONS,
+                integrations = get_integrations(),
                 main = {
                     curr = 1000,
                     left = 1001,
                     right = 1002,
                 },
                 columns = 3,
+                none_columns = 0,
             },
         },
         {
             id = 2,
             redraw = false,
             scratchpad_enabled = false,
+            window_count = 3,
             wins = {
-                integrations = Co.INTEGRATIONS,
+                integrations = get_integrations(),
                 main = {
                     curr = 1003,
                     left = 1006,
                     right = 1007,
                 },
                 columns = 3,
+                none_columns = 0,
             },
         },
     })
@@ -493,7 +575,7 @@ T["tabnew/tabclose"]["keeps state synchronized between tabs"] = function()
     Helpers.expect.state(child, "active_tab", 2)
 end
 
-T["tabnew/tabclose"]["does not pick tab 1 for the first active tab"] = function()
+T["tabnew/tabclose: does not pick tab 1 for the first active tab"] = function()
     child.lua([[require('no-neck-pain').setup({width=50})]])
     Helpers.expect.global_type(child, "_G.NoNeckPain.config", "table")
     Helpers.expect.global_type(child, "_G.NoNeckPain.state", "nil")
@@ -517,14 +599,16 @@ T["tabnew/tabclose"]["does not pick tab 1 for the first active tab"] = function(
         id = 2,
         redraw = false,
         scratchpad_enabled = false,
+        window_count = 3,
         wins = {
-            integrations = Co.INTEGRATIONS,
+            integrations = get_integrations(),
             main = {
                 curr = 1001,
                 left = 1002,
                 right = 1003,
             },
             columns = 3,
+            none_columns = 0,
         },
     })
 
@@ -541,69 +625,37 @@ T["tabnew/tabclose"]["does not pick tab 1 for the first active tab"] = function(
         id = 1,
         redraw = false,
         scratchpad_enabled = false,
+        window_count = 3,
         wins = {
-            integrations = {
-                NeoTree = {
-                    close = "Neotree close",
-                    fileTypePattern = "neo-tree",
-                    open = "Neotree reveal",
-                },
-                NvimDAPUI = {
-                    close = "lua require('dapui').close()",
-                    fileTypePattern = "dap",
-                    open = "lua require('dapui').open()",
-                },
-                NvimTree = {
-                    close = "NvimTreeClose",
-                    fileTypePattern = "nvimtree",
-                    open = "NvimTreeOpen",
-                },
-                neotest = {
-                    close = "lua require('neotest').summary.close()",
-                    fileTypePattern = "neotest",
-                    open = "lua require('neotest').summary.open()",
-                },
-                undotree = {
-                    close = "UndotreeToggle",
-                    fileTypePattern = "undotree",
-                    open = "UndotreeToggle",
-                },
-                outline = {
-                    close = "Outline",
-                    fileTypePattern = "outline",
-                    open = "Outline",
-                },
-                aerial = {
-                    close = "AerialToggle",
-                    fileTypePattern = "aerial",
-                    open = "AerialToggle",
-                },
-            },
+            integrations = get_integrations(),
             main = {
                 curr = 1000,
                 left = 1004,
                 right = 1005,
             },
             columns = 3,
+            none_columns = 0,
         },
     })
     Helpers.expect.state(child, "tabs[2]", {
         id = 2,
         redraw = false,
         scratchpad_enabled = false,
+        window_count = 3,
         wins = {
-            integrations = Co.INTEGRATIONS,
+            integrations = get_integrations(),
             main = {
                 curr = 1001,
                 left = 1002,
                 right = 1003,
             },
             columns = 3,
+            none_columns = 0,
         },
     })
 end
 
-T["tabnew/tabclose"]["keep state synchronized on second tab"] = function()
+T["tabnew/tabclose: keep state synchronized on second tab"] = function()
     child.lua([[require('no-neck-pain').setup({width=50})]])
     Helpers.expect.global_type(child, "_G.NoNeckPain.config", "table")
     Helpers.expect.global_type(child, "_G.NoNeckPain.state", "nil")
@@ -627,14 +679,16 @@ T["tabnew/tabclose"]["keep state synchronized on second tab"] = function()
         id = 2,
         redraw = false,
         scratchpad_enabled = false,
+        window_count = 3,
         wins = {
-            integrations = Co.INTEGRATIONS,
+            integrations = get_integrations(),
             main = {
                 curr = 1001,
                 left = 1002,
                 right = 1003,
             },
             columns = 3,
+            none_columns = 0,
         },
     })
 
@@ -657,14 +711,16 @@ T["tabnew/tabclose"]["keep state synchronized on second tab"] = function()
         id = 2,
         redraw = false,
         scratchpad_enabled = false,
+        window_count = 3,
         wins = {
-            integrations = Co.INTEGRATIONS,
+            integrations = get_integrations(),
             main = {
                 curr = 1001,
                 left = 1002,
                 right = 1003,
             },
             columns = 3,
+            none_columns = 0,
         },
     })
 
@@ -672,7 +728,7 @@ T["tabnew/tabclose"]["keep state synchronized on second tab"] = function()
     Helpers.expect.state(child, "tabs", {})
 end
 
-T["tabnew/tabclose"]["does not close nvim when quitting tab if some are left"] = function()
+T["tabnew/tabclose: does not close nvim when quitting tab if some are left"] = function()
     child.lua([[require('no-neck-pain').setup({width=50})]])
 
     Helpers.expect.equality(child.api.nvim_get_current_tabpage(), 1)
@@ -690,14 +746,16 @@ T["tabnew/tabclose"]["does not close nvim when quitting tab if some are left"] =
         id = 1,
         redraw = false,
         scratchpad_enabled = false,
+        window_count = 3,
         wins = {
-            integrations = Co.INTEGRATIONS,
+            integrations = get_integrations(),
             main = {
                 curr = 1000,
                 left = 1001,
                 right = 1002,
             },
             columns = 3,
+            none_columns = 0,
         },
     })
     Helpers.expect.state(child, "active_tab", 2)
@@ -705,14 +763,16 @@ T["tabnew/tabclose"]["does not close nvim when quitting tab if some are left"] =
         id = 2,
         redraw = false,
         scratchpad_enabled = false,
+        window_count = 3,
         wins = {
-            integrations = Co.INTEGRATIONS,
+            integrations = get_integrations(),
             main = {
                 curr = 1003,
                 left = 1004,
                 right = 1005,
             },
             columns = 3,
+            none_columns = 0,
         },
     })
 
@@ -724,20 +784,22 @@ T["tabnew/tabclose"]["does not close nvim when quitting tab if some are left"] =
         id = 1,
         redraw = false,
         scratchpad_enabled = false,
+        window_count = 3,
         wins = {
-            integrations = Co.INTEGRATIONS,
+            integrations = get_integrations(),
             main = {
                 curr = 1000,
                 left = 1001,
                 right = 1002,
             },
             columns = 3,
+            none_columns = 0,
         },
     })
     Helpers.expect.state(child, "tabs[2]", vim.NIL)
 end
 
-T["tabnew/tabclose"]["closes terminal tab without affecting no-neck-pain on other tabs"] = function()
+T["tabnew/tabclose: closes terminal tab without affecting no-neck-pain on other tabs"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     child.nnp()
 
@@ -747,14 +809,16 @@ T["tabnew/tabclose"]["closes terminal tab without affecting no-neck-pain on othe
         id = 1,
         redraw = false,
         scratchpad_enabled = false,
+        window_count = 3,
         wins = {
-            integrations = Co.INTEGRATIONS,
+            integrations = get_integrations(),
             main = {
                 curr = 1000,
                 left = 1001,
                 right = 1002,
             },
             columns = 3,
+            none_columns = 0,
         },
     })
 
@@ -776,14 +840,16 @@ T["tabnew/tabclose"]["closes terminal tab without affecting no-neck-pain on othe
         id = 1,
         redraw = false,
         scratchpad_enabled = false,
+        window_count = 3,
         wins = {
-            integrations = Co.INTEGRATIONS,
+            integrations = get_integrations(),
             main = {
                 curr = 1000,
                 left = 1001,
                 right = 1002,
             },
             columns = 3,
+            none_columns = 0,
         },
     })
 

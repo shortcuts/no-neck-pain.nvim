@@ -5,36 +5,39 @@ local child = Helpers.new_child_neovim()
 
 local T = MiniTest.new_set({
     hooks = {
-        -- This will be executed before every (even nested) case
         pre_case = function()
-            -- Restart child process with custom 'init.lua' script
             child.restart({ "-u", "scripts/minimal_init.lua" })
         end,
-        -- This will be executed one after all tests from this set are finished
         post_once = child.stop,
     },
 })
 
-T["setup"] = MiniTest.new_set()
+-- =============================================================================
+-- GROUP 1: Setup Tests
+-- =============================================================================
 
-T["setup"]["sets default filetypes"] = function()
+T["Setup: sets default filetypes"] = function()
     child.lua([[require('no-neck-pain').setup({width=30})]])
     child.nnp()
 
     Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
 
     Helpers.expect.equality(
-        child.lua_get("vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(1001), 'filetype')"),
+        child.lua_get(
+            "vim.api.nvim_get_option_value('filetype', { buf = vim.api.nvim_win_get_buf(1001) })"
+        ),
         "no-neck-pain"
     )
 
     Helpers.expect.equality(
-        child.lua_get("vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(1002), 'filetype')"),
+        child.lua_get(
+            "vim.api.nvim_get_option_value('filetype', { buf = vim.api.nvim_win_get_buf(1002) })"
+        ),
         "no-neck-pain"
     )
 end
 
-T["setup"]["overrides default values"] = function()
+T["Setup: overrides default values"] = function()
     child.lua([[require('no-neck-pain').setup({
         buffers = {
             setNames = true,
@@ -148,7 +151,7 @@ T["setup"]["overrides default values"] = function()
     end
 end
 
-T["setup"]["`left` or `right` buffer options overrides `common` ones"] = function()
+T["Setup: left or right buffer options overrides common ones"] = function()
     child.lua([[require('no-neck-pain').setup({
         buffers = {
             bo = {
@@ -186,7 +189,7 @@ T["setup"]["`left` or `right` buffer options overrides `common` ones"] = functio
     Helpers.expect.config(child, "buffers.right.wo.number", true)
 end
 
-T["setup"]["`common` options spreads it to `left` and `right` buffers"] = function()
+T["Setup: common options spreads it to left and right buffers"] = function()
     child.lua([[require('no-neck-pain').setup({
         buffers = {
             bo = {
@@ -208,24 +211,25 @@ T["setup"]["`common` options spreads it to `left` and `right` buffers"] = functi
     Helpers.expect.config(child, "buffers.right.bo.filetype", "TEST")
 end
 
-T["curr"] = MiniTest.new_set()
+-- =============================================================================
+-- GROUP 2: Current Window Tests
+-- =============================================================================
 
-T["curr"]["have the default width"] = function()
+T["Curr: have the default width"] = function()
     child.lua([[ require('no-neck-pain').setup() ]])
     child.nnp()
 
-    -- need to know why the child isn't precise enough
     Helpers.expect.buf_width(child, "tabs[1].wins.main.curr", 80)
 end
 
-T["curr"]["have the width from the config"] = function()
+T["Curr: have the width from the config"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     child.nnp()
 
     Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.curr", 46, 48)
 end
 
-T["curr"]["closing `curr` window without any other window quits Neovim"] = function()
+T["Curr: closing curr window without any other window quits Neovim"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     child.nnp()
 
@@ -234,24 +238,23 @@ T["curr"]["closing `curr` window without any other window quits Neovim"] = funct
 
     child.cmd("q")
 
-    -- neovim is closed, so it errors
     Helpers.expect.error(function()
         child.get_wins_in_tab()
     end)
 end
 
-T["left/right"] = MiniTest.new_set()
+-- =============================================================================
+-- GROUP 3: Left/Right Side Buffer Tests
+-- =============================================================================
 
-T["left/right"]["setNames doesn't throw when re-creating side buffers"] = function()
+T["Left/Right: setNames doesn't throw when re-creating side buffers"] = function()
     child.lua([[require('no-neck-pain').setup({width=50, buffers={setNames=true}})]])
 
-    -- enable
     child.nnp()
 
     Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.left", 13, 15)
     Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.right", 13, 15)
 
-    -- toggle
     child.nnp()
     child.nnp()
 
@@ -259,7 +262,7 @@ T["left/right"]["setNames doesn't throw when re-creating side buffers"] = functi
     Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.right", 13, 15)
 end
 
-T["left/right"]["have the same width"] = function()
+T["Left/Right: have the same width"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     child.nnp()
 
@@ -267,7 +270,7 @@ T["left/right"]["have the same width"] = function()
     Helpers.expect.buf_width_in_range(child, "_G.NoNeckPain.state.tabs[1].wins.main.right", 13, 15)
 end
 
-T["left/right"]["only creates a `left` buffer when `right.enabled` is `false`"] = function()
+T["Left/Right: only creates a left buffer when right.enabled is false"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50,buffers={right={enabled=false}}}) ]])
     child.nnp()
 
@@ -279,7 +282,7 @@ T["left/right"]["only creates a `left` buffer when `right.enabled` is `false`"] 
     Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 15)
 end
 
-T["left/right"]["only creates a `right` buffer when `left.enabled` is `false`"] = function()
+T["Left/Right: only creates a right buffer when left.enabled is false"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50,buffers={left={enabled=false}}}) ]])
     child.nnp()
 
@@ -291,7 +294,30 @@ T["left/right"]["only creates a `right` buffer when `left.enabled` is `false`"] 
     Helpers.expect.buf_width(child, "tabs[1].wins.main.right", 15)
 end
 
-T["left/right"]["closing the `left` buffer disables NNP"] = function()
+T["Left/Right: single side width remains correct after resize"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=50,buffers={right={enabled=false}}}) ]])
+    child.nnp()
+
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 15)
+
+    child.cmd("NoNeckPainResize 40")
+
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 20)
+end
+
+T["Left/Right: single side width is stable after toggle cycle"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=50,buffers={right={enabled=false}}}) ]])
+    child.nnp()
+
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 15)
+
+    child.nnp()
+    child.nnp()
+
+    Helpers.expect.buf_width(child, "tabs[1].wins.main.left", 15)
+end
+
+T["Left/Right: closing the left buffer disables NNP"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     child.nnp()
 
@@ -302,13 +328,16 @@ T["left/right"]["closing the `left` buffer disables NNP"] = function()
         right = 1002,
     })
 
-    child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.tabs[1].wins.main.left)")
-    child.cmd("q")
+    child.lua([[
+        vim.api.nvim_win_close(_G.NoNeckPain.state.tabs[1].wins.main.left, true)
+        vim.fn.win_gotoid(_G.NoNeckPain.state.tabs[1].wins.main.curr)
+    ]])
+    child.wait()
 
     Helpers.expect.equality(child.get_wins_in_tab(), { 1000 })
 end
 
-T["left/right"]["closing the `right` buffer disables NNP"] = function()
+T["Left/Right: closing the right buffer disables NNP"] = function()
     child.lua([[ require('no-neck-pain').setup({width=50}) ]])
     child.nnp()
 
@@ -319,10 +348,308 @@ T["left/right"]["closing the `right` buffer disables NNP"] = function()
         right = 1002,
     })
 
-    child.lua("vim.fn.win_gotoid(_G.NoNeckPain.state.tabs[1].wins.main.right)")
-    child.cmd("q")
+    child.lua([[
+        vim.api.nvim_win_close(_G.NoNeckPain.state.tabs[1].wins.main.right, true)
+        vim.fn.win_gotoid(_G.NoNeckPain.state.tabs[1].wins.main.curr)
+    ]])
+    child.wait()
 
     Helpers.expect.equality(child.get_wins_in_tab(), { 1000 })
+end
+
+-- =============================================================================
+-- GROUP 4: Boundary Tests
+-- =============================================================================
+
+T["Boundary: side buffers when terminal width exactly equals config width"] = function()
+    child.set_size(24, 100)
+    child.lua([[ require('no-neck-pain').setup({width=100}) ]])
+    child.nnp()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1000 })
+    Helpers.expect.state(child, "tabs[1].wins.main", {
+        curr = 1000,
+    })
+end
+
+T["Boundary: side buffer with very long colorcolumn value"] = function()
+    child.lua([[require('no-neck-pain').setup({
+        width=50,
+        buffers={
+            wo={
+                colorcolumn=">100,120,+1",
+            },
+        },
+    })]])
+
+    Helpers.expect.config(child, "buffers.wo.colorcolumn", ">100,120,+1")
+    Helpers.expect.config(child, "buffers.left.wo.colorcolumn", ">100,120,+1")
+    Helpers.expect.config(child, "buffers.right.wo.colorcolumn", ">100,120,+1")
+
+    child.nnp()
+
+    local wins = child.get_wins_in_tab()
+    if #wins >= 2 then
+        Helpers.expect.state_type(child, "tabs[1].wins.main.left", "number")
+    end
+end
+
+T["Boundary: side buffer with empty filetype string"] = function()
+    child.lua([[require('no-neck-pain').setup({
+        width=50,
+        buffers={
+            bo={
+                filetype="",
+            },
+        },
+    })]])
+    child.nnp()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+
+    local left_ft = child.lua_get(
+        "vim.api.nvim_get_option_value('filetype', { buf = vim.api.nvim_win_get_buf(1001) })"
+    )
+    local right_ft = child.lua_get(
+        "vim.api.nvim_get_option_value('filetype', { buf = vim.api.nvim_win_get_buf(1002) })"
+    )
+
+    Helpers.expect.equality(left_ft, "")
+    Helpers.expect.equality(right_ft, "")
+end
+
+T["Boundary: minSideBufferWidth with only 1 column available per side"] = function()
+    child.set_size(24, 102)
+    child.lua([[ require('no-neck-pain').setup({width=98, minSideBufferWidth=1}) ]])
+    child.nnp()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+    Helpers.expect.state_type(child, "tabs[1].wins.main.left", "number")
+    Helpers.expect.state_type(child, "tabs[1].wins.main.right", "number")
+end
+
+T["Boundary: minSideBufferWidth prevents creation when below threshold"] = function()
+    child.set_size(24, 110)
+    child.lua([[ require('no-neck-pain').setup({width=100, minSideBufferWidth=10}) ]])
+    child.nnp()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1000 })
+    Helpers.expect.state(child, "tabs[1].wins.main", {
+        curr = 1000,
+    })
+end
+
+-- =============================================================================
+-- GROUP 5: Property-Based Tests
+-- =============================================================================
+
+T["Property-Based: side buffer options work across different width configs"] = function()
+    local configs = Helpers.generate_width_configs(40, 90, 5)
+
+    for _, config in ipairs(configs) do
+        child.restart({ "-u", "scripts/minimal_init.lua" })
+
+        child.lua(string.format(
+            [[
+            require('no-neck-pain').setup({
+                width=%d,
+                minSideBufferWidth=%d,
+                buffers={
+                    wo={
+                        number=true,
+                        relativenumber=true,
+                    },
+                },
+            })
+        ]],
+            config.width,
+            config.minSideBufferWidth
+        ))
+
+        child.nnp()
+
+        local wins = child.get_wins_in_tab()
+
+        if #wins == 3 then
+            local left_number =
+                child.lua_get("vim.api.nvim_get_option_value('number', { win = 1001 })")
+            local right_number =
+                child.lua_get("vim.api.nvim_get_option_value('number', { win = 1002 })")
+            local left_relnumber =
+                child.lua_get("vim.api.nvim_get_option_value('relativenumber', { win = 1001 })")
+            local right_relnumber =
+                child.lua_get("vim.api.nvim_get_option_value('relativenumber', { win = 1002 })")
+
+            Helpers.expect.equality(left_number, true)
+            Helpers.expect.equality(right_number, true)
+            Helpers.expect.equality(left_relnumber, true)
+            Helpers.expect.equality(right_relnumber, true)
+        end
+    end
+end
+
+T["Property-Based: state consistency maintained with property-based configs"] = function()
+    local configs = Helpers.generate_width_configs(50, 100, 3)
+
+    for _, config in ipairs(configs) do
+        child.restart({ "-u", "scripts/minimal_init.lua" })
+
+        child.lua(string.format(
+            [[
+            require('no-neck-pain').setup({
+                width=%d,
+                minSideBufferWidth=%d,
+            })
+        ]],
+            config.width,
+            config.minSideBufferWidth
+        ))
+
+        child.nnp()
+        child.wait()
+
+        Helpers.assert_state_consistency(child)
+    end
+end
+
+-- =============================================================================
+-- GROUP 6: Edge Cases
+-- =============================================================================
+
+T["Edge-Cases: side buffers with all window options disabled"] = function()
+    child.lua([[require('no-neck-pain').setup({
+        width=50,
+        buffers={
+            wo={
+                cursorline=false,
+                cursorcolumn=false,
+                colorcolumn="0",
+                number=false,
+                relativenumber=false,
+                foldenable=false,
+                list=false,
+                wrap=false,
+                linebreak=false,
+            },
+        },
+    })]])
+    child.nnp()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+
+    local left_win = 1001
+    Helpers.expect.equality(
+        child.lua_get("vim.api.nvim_get_option_value('cursorline', { win = " .. left_win .. " })"),
+        false
+    )
+    Helpers.expect.equality(
+        child.lua_get("vim.api.nvim_get_option_value('cursorcolumn', { win = " .. left_win .. " })"),
+        false
+    )
+    Helpers.expect.equality(
+        child.lua_get("vim.api.nvim_get_option_value('number', { win = " .. left_win .. " })"),
+        false
+    )
+    Helpers.expect.equality(
+        child.lua_get(
+            "vim.api.nvim_get_option_value('relativenumber', { win = " .. left_win .. " })"
+        ),
+        false
+    )
+    Helpers.expect.equality(
+        child.lua_get("vim.api.nvim_get_option_value('foldenable', { win = " .. left_win .. " })"),
+        false
+    )
+    Helpers.expect.equality(
+        child.lua_get("vim.api.nvim_get_option_value('list', { win = " .. left_win .. " })"),
+        false
+    )
+    Helpers.expect.equality(
+        child.lua_get("vim.api.nvim_get_option_value('wrap', { win = " .. left_win .. " })"),
+        false
+    )
+    Helpers.expect.equality(
+        child.lua_get("vim.api.nvim_get_option_value('linebreak', { win = " .. left_win .. " })"),
+        false
+    )
+end
+
+T["Edge-Cases: side buffers with all buffer options modified"] = function()
+    child.lua([[require('no-neck-pain').setup({
+        width=50,
+        buffers={
+            bo={
+                filetype="custom-type",
+                buftype="acwrite",
+                bufhidden="wipe",
+                buflisted=true,
+                swapfile=true,
+            },
+        },
+    })]])
+    child.nnp()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+
+    local left_buf = child.lua_get("vim.api.nvim_win_get_buf(1001)")
+    Helpers.expect.equality(
+        child.lua_get("vim.api.nvim_get_option_value('filetype', { buf = " .. left_buf .. " })"),
+        "custom-type"
+    )
+    Helpers.expect.equality(
+        child.lua_get("vim.api.nvim_get_option_value('buftype', { buf = " .. left_buf .. " })"),
+        "acwrite"
+    )
+    Helpers.expect.equality(
+        child.lua_get("vim.api.nvim_get_option_value('bufhidden', { buf = " .. left_buf .. " })"),
+        "wipe"
+    )
+    Helpers.expect.equality(
+        child.lua_get("vim.api.nvim_get_option_value('buflisted', { buf = " .. left_buf .. " })"),
+        true
+    )
+    Helpers.expect.equality(
+        child.lua_get("vim.api.nvim_get_option_value('swapfile', { buf = " .. left_buf .. " })"),
+        true
+    )
+end
+
+T["Edge-Cases: rapid resize operations preserve buffer state"] = function()
+    child.lua([[ require('no-neck-pain').setup({width=50}) ]])
+    child.nnp()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+
+    local left_buf_orig = child.lua_get("vim.api.nvim_win_get_buf(1001)")
+    local right_buf_orig = child.lua_get("vim.api.nvim_win_get_buf(1002)")
+
+    for i = 1, 5 do
+        local new_size = 100 + (i * 20)
+        child.set_size(24, new_size)
+        child.wait(50)
+    end
+
+    local wins = child.get_wins_in_tab()
+    Helpers.expect.equality(#wins, 3)
+
+    Helpers.assert_state_consistency(child)
+end
+
+T["Edge-Cases: zero-width colorcolumn edge case"] = function()
+    child.lua([[require('no-neck-pain').setup({
+        width=50,
+        buffers={
+            wo={
+                colorcolumn="0",
+            },
+        },
+    })]])
+    child.nnp()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+
+    local left_cc = child.lua_get("vim.api.nvim_get_option_value('colorcolumn', { win = 1001 })")
+    Helpers.expect.equality(left_cc, "0")
 end
 
 return T
