@@ -1,4 +1,13 @@
 <a name="0.2.3"></a>
+## [3.0.1](https://github.com/shortcuts/no-neck-pain.nvim/compare/v3.0.0...v3.0.1) (2026-09-22)
+
+
+### Bug Fixes
+
+* **ui:** count position=none integration columns in side width ([0713ff2](https://github.com/shortcuts/no-neck-pain.nvim/commit/0713ff25487e13277d733db0ac1807d76ec23797)), closes [#470](https://github.com/shortcuts/no-neck-pain.nvim/issues/470)
+* **ui:** keep main buffer at config.width when a side integration opens ([bf2f385](https://github.com/shortcuts/no-neck-pain.nvim/commit/bf2f3850fb1bd40b85d65810118ed41fdf82f08e))
+* **ui:** resize and close side buffers when a vsplit shrinks room ([845ed5d](https://github.com/shortcuts/no-neck-pain.nvim/commit/845ed5d31b64999d4bfb461b550df8eb12a5a3cd)), closes [#517](https://github.com/shortcuts/no-neck-pain.nvim/issues/517)
+
 ## [3.0.0](https://github.com/shortcuts/no-neck-pain.nvim/compare/v2.5.3...v3.0.0) (2026-09-20)
 
 
