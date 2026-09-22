@@ -263,21 +263,19 @@ T["vsplit: hides side buffers"] = function()
     child.cmd("vsplit")
     child.wait()
 
-    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1003, 1000, 1002 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1003, 1000 })
     Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,
-        left = 1001,
-        right = 1002,
     })
 
     child.lua("vim.fn.win_gotoid(1003)")
     child.cmd("q")
 
-    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1004, 1000, 1005 })
     Helpers.expect.state(child, "tabs[1].wins.main", {
         curr = 1000,
-        left = 1001,
-        right = 1002,
+        left = 1004,
+        right = 1005,
     })
     Helpers.expect.state(child, "tabs[1].wins.splits", vim.NIL)
 end

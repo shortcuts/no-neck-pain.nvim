@@ -249,16 +249,15 @@ function ui.create_side_buffers()
         local scope = string.format("ui.create_side_buffers:%s", side)
         if state:is_side_valid(side) then
             local padding = ui.get_side_width(side)
-            local minWidth = config.minSideBufferWidth
 
-            if padding == -1 or (padding < minWidth and padding > 0) then
-                ui.close_win(scope, state:get_side_id(side), side)
-                state:set_side_id(nil, side)
-            elseif padding > 0 then
+            if padding > 0 then
                 local current_width = vim.api.nvim_win_get_width(state:get_side_id(side))
                 if math.abs(current_width - padding) > 1 then
                     state:resize_win(scope, side, padding)
                 end
+            else
+                ui.close_win(scope, state:get_side_id(side), side)
+                state:set_side_id(nil, side)
             end
         end
     end

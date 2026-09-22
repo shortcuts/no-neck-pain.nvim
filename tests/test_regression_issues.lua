@@ -72,6 +72,51 @@ T["regression #514: layout consistency after help split close/re-split"] = funct
     Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
 end
 
+T["regression #517: side buffers shrink then close when a vsplit opens, and reopen when it closes"] = function()
+    child.set_size(50, 200)
+    child.lua([[require('no-neck-pain').setup({ width = 60 })]])
+
+    child.nnp()
+    child.wait()
+
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1001)"), 70)
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1002)"), 70)
+
+    child.cmd("vsplit")
+    child.wait()
+
+    local wins_after_shrink = child.get_wins_in_tab()
+    Helpers.expect.equality(vim.tbl_contains(wins_after_shrink, 1001), true)
+    Helpers.expect.equality(vim.tbl_contains(wins_after_shrink, 1002), true)
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1001)"), 40)
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1002)"), 40)
+
+    child.restart({ "-u", "scripts/minimal_init.lua" })
+    child.set_size(30, 120)
+    child.lua([[require('no-neck-pain').setup({ width = 100 })]])
+
+    child.nnp()
+    child.wait()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1001)"), 10)
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1002)"), 10)
+
+    child.cmd("vsplit")
+    child.wait()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1003, 1000 })
+    Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1000 })
+
+    child.cmd("q")
+    child.wait()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1004, 1000, 1005 })
+    Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1000, left = 1004, right = 1005 })
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1004)"), 10)
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1005)"), 10)
+end
+
 T["regression #507: closing window with splits does not exit nvim"] = function()
     child.set_size(10, 200)
     child.lua([[require('no-neck-pain').setup({ width = 100 })]])

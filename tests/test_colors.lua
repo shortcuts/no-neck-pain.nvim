@@ -121,8 +121,8 @@ T["Setup: does not throw on invalid windows"] = function()
     child.wait()
     child.cmd("mksession! deps/mk.vim")
 
-    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1003, 1000, 1002 })
-    Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1000, left = 1001, right = 1002 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1003, 1000 })
+    Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1000 })
 
     child.restart({ "-u", "scripts/init_auto_open.lua" })
     child.wait(100)
@@ -132,7 +132,7 @@ T["Setup: does not throw on invalid windows"] = function()
     child.cmd("source deps/mk.vim")
     child.wait()
 
-    Helpers.expect.equality(child.get_wins_in_tab(), { 1000, 1003, 1004, 1005 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1000, 1003 })
     Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1000, left = 1001, right = 1002 })
 end
 
