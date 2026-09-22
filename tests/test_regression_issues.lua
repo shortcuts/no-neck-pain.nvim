@@ -117,6 +117,34 @@ T["regression #517: side buffers shrink then close when a vsplit opens, and reop
     Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_width(1005)"), 10)
 end
 
+T['regression #470: dap-ui with dap.position = "none" collapses the left side below minSideBufferWidth'] = function()
+    child.restart({ "-u", "scripts/init_with_nvimdapui.lua" })
+    child.set_size(50, 200)
+    child.lua([[
+        require('no-neck-pain').setup({
+            width = 140,
+            buffers = {
+                right = { enabled = false },
+            },
+            integrations = {
+                dap = { position = "none" },
+            },
+        })
+    ]])
+
+    child.nnp()
+    child.wait()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000 })
+    Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1000, left = 1001 })
+
+    child.lua([[require('dapui').open()]])
+    child.wait()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1009, 1008, 1007, 1006, 1000, 1005, 1002 })
+    Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1000 })
+end
+
 T["regression #507: closing window with splits does not exit nvim"] = function()
     child.set_size(10, 200)
     child.lua([[require('no-neck-pain').setup({ width = 100 })]])

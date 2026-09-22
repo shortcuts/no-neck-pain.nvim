@@ -319,8 +319,6 @@ function ui.get_side_width(side)
         end
     end
 
-    columns = columns - state:get_none_columns()
-
     log.debug(
         scope,
         "%d/%d after integrations - %d columns remaining",
