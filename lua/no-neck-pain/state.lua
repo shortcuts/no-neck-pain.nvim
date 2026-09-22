@@ -474,7 +474,21 @@ function state:set_layout_windows(scope, wins)
             tab.wins.columns = tab.wins.columns + 1
             if id ~= self:get_side_id("curr") then
                 local supported, name, integration = self:is_supported_integration(scope, id)
-                if supported and name and integration then
+                -- a name matches loosely (e.g. every nvim-dap-ui panel filetype
+                -- matches the "dap" integration): once this scan has already
+                -- tracked a real window for `name`, further matches must not
+                -- overwrite it, or the tracked id (and its real width, used to
+                -- size the side buffers) becomes whichever matching window was
+                -- scanned last rather than a stable, specific one.
+                if
+                    supported
+                    and name
+                    and integration
+                    and (
+                        tab.wins.integrations[name] == nil
+                        or tab.wins.integrations[name].id == nil
+                    )
+                then
                     if not self._integration_ids or self._integration_ids[name] ~= id then
                         tab.redraw = true
                     end
@@ -690,7 +704,18 @@ function state:_scan_col_children(scope, children)
             local id = sub[2]
             if id ~= self:get_side_id("curr") then
                 local supported, name, integration = self:is_supported_integration(scope, id)
-                if supported and name and integration then
+                -- see the matching guard in `set_layout_windows`: don't let a
+                -- later, loosely-matching window steal the name from the one
+                -- already tracked for this scan.
+                if
+                    supported
+                    and name
+                    and integration
+                    and (
+                        tab.wins.integrations[name] == nil
+                        or tab.wins.integrations[name].id == nil
+                    )
+                then
                     if not self._integration_ids or self._integration_ids[name] ~= id then
                         tab.redraw = true
                     end
@@ -698,9 +723,9 @@ function state:_scan_col_children(scope, children)
                     integration = vim.deepcopy(integration)
                     integration.id = id
                     tab.wins.integrations[name] = integration
-                    if integration.position == "none" then
-                        has_none = true
-                    end
+                end
+                if supported and integration and integration.position == "none" then
+                    has_none = true
                 end
             end
         end

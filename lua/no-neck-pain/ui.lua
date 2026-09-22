@@ -261,6 +261,28 @@ function ui.create_side_buffers()
             end
         end
     end
+
+    -- a side-positioned integration (e.g. nvim-dap-ui's sidebar) splits itself
+    -- off `curr` directly, which permanently takes width away from it: nvim's
+    -- own split/close redistribution never routes that width back to `curr`
+    -- once its side pad has shrunk or closed to make room (freed pad width
+    -- goes to the integration's own column, its immediate neighbour, not to
+    -- `curr`). Reclaim it explicitly so `curr` stays at `config.width`
+    -- whenever there is room for it.
+    local curr_id = state:get_side_id("curr")
+    if curr_id ~= nil and vim.api.nvim_win_is_valid(curr_id) and config.width < vim.o.columns then
+        local has_side_integration = false
+        for _, opts in pairs(state:get_integrations()) do
+            if opts.id ~= nil and (opts.position == "left" or opts.position == "right") then
+                has_side_integration = true
+                break
+            end
+        end
+
+        if has_side_integration and vim.api.nvim_win_get_width(curr_id) ~= config.width then
+            vim.api.nvim_win_set_width(curr_id, config.width)
+        end
+    end
 end
 
 --- Determine the "padding" (width) of a side window (`left` or `right` nnp buffer)
@@ -315,6 +337,15 @@ function ui.get_side_width(side)
             log.debug(scope, "%s opened with width %d", name, integration_width)
 
             width = width - integration_width
+            columns = columns - 1
+        elseif opts.id ~= nil and (opts.position == "left" or opts.position == "right") then
+            -- a real, side-specific integration column that belongs to the
+            -- other side: its width is (or will be) accounted for by that
+            -- side's own `get_side_width` call, so it must not also fall
+            -- into this side's generic per-column charge below, which
+            -- assumes `config.width` for anything it can't identify.
+            log.debug(scope, "%s belongs to the other side, excluding from generic charge", name)
+
             columns = columns - 1
         end
     end

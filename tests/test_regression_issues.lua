@@ -145,6 +145,84 @@ T['regression #470: dap-ui with dap.position = "none" collapses the left side be
     Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1000 })
 end
 
+T['regression #470: dap-ui with dap.position = "right" keeps the main buffer width stable (right side disabled)'] = function()
+    child.restart({ "-u", "scripts/init_with_nvimdapui.lua" })
+    child.set_size(50, 200)
+    child.lua([[
+        require('no-neck-pain').setup({
+            width = 140,
+            buffers = {
+                right = { enabled = false },
+            },
+            integrations = {
+                dap = { position = "right" },
+            },
+        })
+    ]])
+
+    child.nnp()
+    child.wait()
+
+    local curr_id =
+        child.lua_get("_G.NoNeckPain.state.tabs[_G.NoNeckPain.state.active_tab].wins.main.curr")
+
+    child.lua([[require('dapui').open()]])
+    child.wait()
+
+    local curr_after = child.lua_get("vim.api.nvim_win_get_width(" .. curr_id .. ")")
+
+    -- with the dapui sidebar (a real, side-positioned column NNP does not
+    -- control) taking real screen width on the right, the main buffer can no
+    -- longer keep the exact width it had before dapui opened (there simply
+    -- isn't room for both): the meaningful stability guarantee is that it
+    -- settles back at the user's configured `width` instead of being left
+    -- with whatever nvim's own window-close/split redistribution happens to
+    -- hand it (the original #470 regression, e.g. shrinking to under 110).
+    if math.abs(curr_after - 140) >= 3 then
+        error(
+            string.format(
+                'main buffer width is %d after opening dapui with dap.position = "right", expected ~140 (config.width)',
+                curr_after
+            )
+        )
+    end
+end
+
+T['regression #470: dap-ui with dap.position = "right" keeps the main buffer width stable (both sides enabled)'] = function()
+    child.restart({ "-u", "scripts/init_with_nvimdapui.lua" })
+    child.set_size(50, 200)
+    child.lua([[
+        require('no-neck-pain').setup({
+            width = 140,
+            integrations = {
+                dap = { position = "right" },
+            },
+        })
+    ]])
+
+    child.nnp()
+    child.wait()
+
+    local curr_id =
+        child.lua_get("_G.NoNeckPain.state.tabs[_G.NoNeckPain.state.active_tab].wins.main.curr")
+
+    child.lua([[require('dapui').open()]])
+    child.wait()
+
+    local curr_after = child.lua_get("vim.api.nvim_win_get_width(" .. curr_id .. ")")
+
+    -- see the comment in the right-side-disabled variant above: the
+    -- reachable stability guarantee is settling back at `config.width`.
+    if math.abs(curr_after - 140) >= 3 then
+        error(
+            string.format(
+                'main buffer width is %d after opening dapui with dap.position = "right", expected ~140 (config.width)',
+                curr_after
+            )
+        )
+    end
+end
+
 T["regression #507: closing window with splits does not exit nvim"] = function()
     child.set_size(10, 200)
     child.lua([[require('no-neck-pain').setup({ width = 100 })]])
