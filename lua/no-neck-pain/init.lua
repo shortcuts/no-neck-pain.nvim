@@ -100,9 +100,15 @@ function NoNeckPain.setup(opts)
     end
 
     if autocmds.enableOnVimEnter ~= nil and autocmds.enableOnVimEnter ~= false then
-        vim.api.nvim_create_autocmd({ "BufEnter" }, {
+        vim.api.nvim_create_autocmd({ "VimEnter", "BufEnter" }, {
             pattern = "*",
             callback = function()
+                -- opening windows while Neovim still loads `-o`/`-O` files makes it
+                -- skip or misplace them, VimEnter fires once they are all in place.
+                if vim.v.vim_did_enter == 0 then
+                    return
+                end
+
                 local scope = string.format(
                     "enable_on_vim_enter:%s:%s",
                     config.options.integrations.dashboard.enabled,
@@ -136,7 +142,7 @@ function NoNeckPain.setup(opts)
             callback = function()
                 -- the plugin has already run at least once; enabling/disabling on a
                 -- filetype change is not this net's job.
-                if _G.NoNeckPain.state ~= nil then
+                if _G.NoNeckPain.state ~= nil or vim.v.vim_did_enter == 0 then
                     return
                 end
 

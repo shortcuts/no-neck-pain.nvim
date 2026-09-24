@@ -27,64 +27,28 @@ function ui.init_side_options(side, id)
     end
 end
 
---- Moves the side buffers to their initial place
+--- Moves the side buffers to their place, see `ui.get_side_target`.
 ---
 ---@param scope string: the scope from where this function is called.
 ---@private
 function ui.move_sides(scope)
-    local sides = {
-        left = "wincmd H",
-        right = "wincmd L",
-    }
-
-    local curr_win = vim.api.nvim_get_current_win()
-
-    -- suppress autocmds for the whole move, which covers the `wincmd` calls too
-    -- and avoids per-call `noautocmd` Ex-command parsing.
     local eventignore = vim.o.eventignore
     vim.o.eventignore = "all"
 
     for _, side in ipairs(constants.SIDES) do
-        local keys = sides[side]
-        local sscope = string.format("%s:%s", scope, side)
-
         local id = state:get_side_id(side)
-        if id ~= nil then
-            local wins = vim.api.nvim_tabpage_list_wins(state.active_tab)
+        if id ~= nil and vim.api.nvim_win_is_valid(id) then
+            local win, split, placed = ui.get_side_target(side)
 
-            local width
-            if vim.api.nvim_win_is_valid(id) then
-                width = vim.api.nvim_win_get_width(id)
-            end
+            if not placed then
+                log.debug(string.format("%s:%s", scope, side), "moving next to %d", win)
 
-            if curr_win ~= id and vim.api.nvim_win_is_valid(id) then
-                vim.api.nvim_set_current_win(id)
-            end
-
-            vim.cmd(keys)
-
-            -- `wincmd H`/`L` re-splits the window at the top level, which hands
-            -- it a fresh default width (half of what it was carved out of)
-            -- instead of the one `create_side_buffers` computed. Moving is a
-            -- position-only operation, so put the width back.
-            if width and vim.api.nvim_win_is_valid(id) then
+                local width = vim.api.nvim_win_get_width(id)
+                vim.api.nvim_win_set_config(id, { win = win, split = split })
+                -- a moved split gets a default width, moving is position-only.
                 vim.api.nvim_win_set_width(id, width)
             end
-
-            if (side == "left" and wins[1] ~= id) or (side == "right" and wins[#wins] ~= id) then
-                log.debug(
-                    sscope,
-                    "wrong position after window move, focusing %s, should be %d, wins order %s",
-                    curr_win,
-                    id,
-                    vim.inspect(wins)
-                )
-            end
         end
-    end
-
-    if vim.api.nvim_win_is_valid(curr_win) then
-        vim.api.nvim_set_current_win(curr_win)
     end
 
     vim.o.eventignore = eventignore
@@ -185,6 +149,83 @@ function ui.init_scratch_pad(side, id, cleanup)
     vim.o.autowriteall = true
 end
 
+--- Computes where the `side` buffer belongs: at the screen edge, or against
+--- the integrations positioned on that `side`. Integrations are never moved,
+--- so the plugin does not compete with them for the edge.
+---
+---@param side "left"|"right": the side of the window.
+---@return number: the window to split from, `-1` for the whole tab.
+---@return "left"|"right": the split direction relative to that window.
+---@return boolean: whether the `side` buffer already is at its place.
+---@private
+function ui.get_side_target(side)
+    local id = state:get_side_id(side)
+    local layout = vim.fn.winlayout()
+    local nodes = layout[1] == "row" and layout[2] or { layout }
+
+    local integrations = {}
+    for _, opts in pairs(state:get_integrations()) do
+        if opts.id ~= nil and opts.position == side then
+            integrations[opts.id] = true
+        end
+    end
+
+    local function has_integration(node)
+        if node[1] == "leaf" then
+            return integrations[node[2]] == true
+        end
+        for _, child in ipairs(node[2]) do
+            if has_integration(child) then
+                return true
+            end
+        end
+        return false
+    end
+
+    -- walk from the `side` edge towards the middle of the screen.
+    local ordered = {}
+    local only_integrations = true
+    for i = 1, #nodes do
+        local node = side == "left" and nodes[i] or nodes[#nodes - i + 1]
+        if not (node[1] == "leaf" and node[2] == id) then
+            table.insert(ordered, node)
+            only_integrations = only_integrations and has_integration(node)
+        elseif only_integrations then
+            -- the side buffer must not have any integration further inside.
+            local rest_has_integration = false
+            for j = i + 1, #nodes do
+                local rest = side == "left" and nodes[j] or nodes[#nodes - j + 1]
+                rest_has_integration = rest_has_integration or has_integration(rest)
+            end
+            if not rest_has_integration then
+                return -1, side, true
+            end
+        end
+    end
+
+    local opposite = side == "left" and "right" or "left"
+    local outer
+    for _, node in ipairs(ordered) do
+        if not has_integration(node) then
+            if outer == nil then
+                return -1, side, false
+            end
+            -- splitting a direct leaf of the top-level row keeps the full height.
+            if node[1] == "leaf" then
+                return node[2], side, false
+            end
+            if outer[1] == "leaf" then
+                return outer[2], opposite, false
+            end
+            break
+        end
+        outer = node
+    end
+
+    -- ponytail: no full-height leaf to split from, the edge wins over the integrations.
+    return -1, side, false
+end
+
 --- Creates side buffers with the correct padding, considering the side integrations.
 --- - A side buffer is not created if there's not enough space.
 --- - If it already exists, we resized it.
@@ -204,6 +245,7 @@ function ui.create_side_buffers()
             and wins[side].padding > 0
         then
             local bufid = vim.api.nvim_create_buf(false, false)
+            local target, split = ui.get_side_target(side)
 
             if config.buffers.setNames then
                 local exist = vim.fn.bufnr("no-neck-pain-" .. side)
@@ -217,8 +259,9 @@ function ui.create_side_buffers()
 
             state:set_side_id(
                 vim.api.nvim_open_win(bufid, false, {
+                    win = target,
                     vertical = true,
-                    split = side,
+                    split = split,
                     anchor = wins[side].anchor,
                     width = wins[side].padding,
                     noautocmd = true,

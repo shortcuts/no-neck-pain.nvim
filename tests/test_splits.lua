@@ -109,15 +109,16 @@ T["split: correctly starts nnp with previously opened splits"] = function()
     child.nnp()
     child.wait()
 
-    Helpers.expect.equality(child.get_wins_in_tab(1), { 1002, 1001, 1003, 1000 })
+    Helpers.expect.equality(child.get_wins_in_tab(1), { 1002, 1001, 1000, 1003 })
 
     Helpers.expect.buf_width_in_range(child, "1002", 28, 32)
     Helpers.expect.buf_width_in_range(child, "1003", 28, 32)
 
-    Helpers.expect.buf_width_in_range(child, "1000", 78, 80)
+    -- the sides span the whole split, both windows are centered
+    Helpers.expect.buf_width_in_range(child, "1000", 16, 20)
     Helpers.expect.buf_width_in_range(child, "1001", 16, 20)
 
-    Helpers.expect.equality(child.get_wins_in_tab(), { 1002, 1001, 1003, 1000 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1002, 1001, 1000, 1003 })
 end
 
 T["split: correctly starts nnp with previously opened splits (only one side)"] = function()
@@ -175,7 +176,7 @@ T["vsplit: correctly position side buffers when there's enough space"] = functio
     child.lua([[ require('no-neck-pain').setup({width=20}) ]])
     child.nnp()
 
-    Helpers.expect.equality(child.get_wins_in_tab(), { 1002, 1001, 1003, 1000 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1002, 1001, 1000, 1003 })
 end
 
 T["vsplit: preserve vsplit width when having side buffers"] = function()
@@ -372,9 +373,10 @@ T["vsplit/split: closing side buffers because of splits restores focus"] = funct
 
     child.cmd("q")
     child.cmd("q")
-    Helpers.expect.equality(child.get_wins_in_tab(), { 1006, 1007, 1003, 1000 })
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1006, 1003, 1000, 1007 })
 
-    Helpers.expect.equality(child.get_current_win(), 1000)
+    -- `:q` hands focus to the closed split's neighbour, the plugin must not steal it.
+    Helpers.expect.equality(child.get_current_win(), 1003)
 end
 
 T["vsplit/split: closing help page doesn't break layout"] = function()

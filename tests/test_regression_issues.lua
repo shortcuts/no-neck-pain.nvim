@@ -362,6 +362,36 @@ T["regression #436: enableOnVimEnter with deferred filetype buffer"] = function(
     Helpers.assert_width_invariant(child)
 end
 
+T["regression #519: enableOnVimEnter keeps every file of a vertical split visible"] = function()
+    -- the size must be set before startup: the bug only shows when there is room
+    -- for the sides while Neovim still loads the `-O` files.
+    child.restart({
+        "--cmd",
+        "set columns=200 lines=10",
+        "-u",
+        "scripts/init_vim_enter.lua",
+        "-O",
+        "README.md",
+        "Makefile",
+    })
+    child.wait(200)
+
+    Helpers.expect.state(child, "enabled", true)
+
+    local bufnames = child.lua_get([[vim.tbl_map(function(win)
+        return vim.fn.bufname(vim.api.nvim_win_get_buf(win))
+    end, vim.api.nvim_tabpage_list_wins(0))]])
+
+    Helpers.expect.equality(bufnames, { "", "README.md", "Makefile", "" })
+
+    local wins = child.get_wins_in_tab()
+    Helpers.expect.equality(wins[1], child.lua_get("_G.NoNeckPain.state.tabs[1].wins.main.left"))
+    Helpers.expect.equality(
+        wins[#wins],
+        child.lua_get("_G.NoNeckPain.state.tabs[1].wins.main.right")
+    )
+end
+
 T["regression #297: custom user-defined integrations are recognized"] = function()
     child.set_size(10, 200)
     child.lua([[
