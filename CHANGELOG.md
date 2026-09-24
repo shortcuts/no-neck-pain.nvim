@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [3.0.2](https://github.com/shortcuts/no-neck-pain.nvim/compare/v3.0.1...v3.0.2) (2026-09-24)
+
+
+### Bug Fixes
+
+* **ui:** place side buffers deterministically around the content ([dd9ce13](https://github.com/shortcuts/no-neck-pain.nvim/commit/dd9ce1331878717176503065c36a28fdf4165618)), closes [#519](https://github.com/shortcuts/no-neck-pain.nvim/issues/519)
+
 ## [3.0.1](https://github.com/shortcuts/no-neck-pain.nvim/compare/v3.0.0...v3.0.1) (2026-09-22)
 
 
