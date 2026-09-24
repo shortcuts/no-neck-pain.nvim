@@ -461,6 +461,7 @@ function main._on_buf_delete(p)
         if
             p.event == "QuitPre"
             and (not state:is_side_valid("left") or not state:is_side_valid("right"))
+            and p.file ~= ""
         then
             log.debug(s, "closed a vsplit when no side buffers were present")
 
