@@ -1,4 +1,12 @@
 <a name="0.2.3"></a>
+## [3.0.3](https://github.com/shortcuts/no-neck-pain.nvim/compare/v3.0.2...v3.0.3) (2026-09-25)
+
+
+### Bug Fixes
+
+* **QuitPre:** keep layout and error on every blocked quit ([#515](https://github.com/shortcuts/no-neck-pain.nvim/issues/515)) ([33530be](https://github.com/shortcuts/no-neck-pain.nvim/commit/33530be6449f22d7477c7d75678c83a346432424))
+* **QuitPre:** quit nvim when closing curr with a focusable float open ([#521](https://github.com/shortcuts/no-neck-pain.nvim/issues/521)) ([34f47e6](https://github.com/shortcuts/no-neck-pain.nvim/commit/34f47e6ed3fc3cd901c3d4bcf44951b9acb8227b))
+
 ## [3.0.2](https://github.com/shortcuts/no-neck-pain.nvim/compare/v3.0.1...v3.0.2) (2026-09-24)
 
 
