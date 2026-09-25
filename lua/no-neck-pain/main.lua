@@ -377,9 +377,13 @@ function main._on_buf_delete(p)
         return
     end
 
+    -- checked before scheduling: once the window is closed, focus can land on a
+    -- focusable float (e.g. nvim-notify) and the event would be ignored (#521)
+    local from_float = api.is_relative_window()
+
     vim.schedule(function()
         local s = string.format("%s:%d", p.event, vim.api.nvim_get_current_win())
-        if not state:is_active_tab_registered() or api.is_relative_window() then
+        if not state:is_active_tab_registered() or from_float then
             return
         end
 

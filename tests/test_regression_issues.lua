@@ -498,4 +498,30 @@ T["regression: move_sides ignores user <C-W>H / <C-W>L mappings"] = function()
     })
 end
 
+T["regression #521: `:q` on curr quits nvim when an unfocused float is open"] = function()
+    child.set_size(10, 200)
+    child.lua([[require('no-neck-pain').setup({ width = 100 })]])
+
+    child.nnp()
+    child.wait()
+
+    -- mimics a nvim-notify popup: focusable, but never entered
+    child.lua([[
+        local buf = vim.api.nvim_create_buf(false, true)
+        vim.api.nvim_open_win(buf, false, {
+            relative = "editor", row = 0, col = 150, width = 30, height = 2,
+        })
+    ]])
+    child.wait()
+
+    Helpers.expect.equality(#child.get_wins_in_tab(), 4)
+
+    -- `:q` makes the child exit, which kills the RPC channel mid-request
+    pcall(child.cmd, "q")
+    vim.uv.sleep(200)
+
+    -- the channel only answers while the child process is alive
+    Helpers.expect.equality(pcall(child.lua_get, "1"), false)
+end
+
 return T
