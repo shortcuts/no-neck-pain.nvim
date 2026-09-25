@@ -20,8 +20,8 @@ T["log.notify(): verbose=true prints regardless of debug=false"] = function()
 
     child.lua([[
         _G.notify_calls = {}
-        local original = vim.notify_once
-        function vim.notify_once(msg, level, opts)
+        local original = vim.notify
+        function vim.notify(msg, level, opts)
             table.insert(_G.notify_calls, msg)
         end
     ]])
@@ -40,7 +40,7 @@ T["log.notify(): verbose=false respects debug=true"] = function()
 
     child.lua([[
         _G.notify_calls = {}
-        function vim.notify_once(msg, level, opts)
+        function vim.notify(msg, level, opts)
             table.insert(_G.notify_calls, msg)
         end
     ]])
@@ -59,7 +59,7 @@ T["log.notify(): verbose=false skips when debug=false"] = function()
 
     child.lua([[
         _G.notify_calls = {}
-        function vim.notify_once(msg, level, opts)
+        function vim.notify(msg, level, opts)
             table.insert(_G.notify_calls, msg)
         end
     ]])
@@ -78,7 +78,7 @@ T["log.notify(): formats string with arguments"] = function()
 
     child.lua([[
         _G.notify_calls = {}
-        function vim.notify_once(msg, level, opts)
+        function vim.notify(msg, level, opts)
             table.insert(_G.notify_calls, msg)
         end
     ]])
@@ -99,7 +99,7 @@ T["log.notify(): includes correct log level"] = function()
     child.lua([[
         _G.notify_calls = {}
         _G.notify_levels = {}
-        function vim.notify_once(msg, level, opts)
+        function vim.notify(msg, level, opts)
             table.insert(_G.notify_calls, msg)
             table.insert(_G.notify_levels, level)
         end
@@ -120,7 +120,7 @@ T["log.notify(): includes title in opts"] = function()
 
     child.lua([[
         _G.notify_opts = {}
-        function vim.notify_once(msg, level, opts)
+        function vim.notify(msg, level, opts)
             table.insert(_G.notify_opts, opts)
         end
     ]])
@@ -139,7 +139,7 @@ T["log.notify(): pads scope names for alignment"] = function()
 
     child.lua([[
         _G.notify_calls = {}
-        function vim.notify_once(msg, level, opts)
+        function vim.notify(msg, level, opts)
             table.insert(_G.notify_calls, msg)
         end
     ]])
@@ -163,7 +163,7 @@ T["log.debug(): prints with debug=true"] = function()
 
     child.lua([[
         _G.notify_calls = {}
-        function vim.notify_once(msg, level, opts)
+        function vim.notify(msg, level, opts)
             table.insert(_G.notify_calls, msg)
         end
     ]])
@@ -182,7 +182,7 @@ T["log.debug(): skips with debug=false"] = function()
 
     child.lua([[
         _G.notify_calls = {}
-        function vim.notify_once(msg, level, opts)
+        function vim.notify(msg, level, opts)
             table.insert(_G.notify_calls, msg)
         end
     ]])
@@ -201,7 +201,7 @@ T["log.debug(): uses DEBUG level"] = function()
 
     child.lua([[
         _G.notify_levels = {}
-        function vim.notify_once(msg, level, opts)
+        function vim.notify(msg, level, opts)
             table.insert(_G.notify_levels, level)
         end
     ]])
@@ -221,7 +221,7 @@ T["log.debug(): formats message correctly"] = function()
 
     child.lua([[
         _G.notify_calls = {}
-        function vim.notify_once(msg, level, opts)
+        function vim.notify(msg, level, opts)
             table.insert(_G.notify_calls, msg)
         end
     ]])
@@ -244,7 +244,7 @@ T["log.warn_deprecation(): detects enableOnVimEnter deprecation"] = function()
 
     child.lua([[
         _G.notify_calls = {}
-        function vim.notify_once(msg, level, opts)
+        function vim.notify(msg, level, opts)
             table.insert(_G.notify_calls, msg)
         end
     ]])
@@ -270,7 +270,7 @@ T["log.warn_deprecation(): detects toggleMapping deprecation"] = function()
 
     child.lua([[
         _G.notify_calls = {}
-        function vim.notify_once(msg, level, opts)
+        function vim.notify(msg, level, opts)
             table.insert(_G.notify_calls, msg)
         end
     ]])
@@ -293,7 +293,7 @@ T["log.warn_deprecation(): detects backgroundColor deprecation"] = function()
 
     child.lua([[
         _G.notify_calls = {}
-        function vim.notify_once(msg, level, opts)
+        function vim.notify(msg, level, opts)
             table.insert(_G.notify_calls, msg)
         end
     ]])
@@ -319,7 +319,7 @@ T["log.warn_deprecation(): detects textColor deprecation in left buffer"] = func
 
     child.lua([[
         _G.notify_calls = {}
-        function vim.notify_once(msg, level, opts)
+        function vim.notify(msg, level, opts)
             table.insert(_G.notify_calls, msg)
         end
     ]])
@@ -344,7 +344,7 @@ T["log.warn_deprecation(): detects blend deprecation in right buffer"] = functio
 
     child.lua([[
         _G.notify_calls = {}
-        function vim.notify_once(msg, level, opts)
+        function vim.notify(msg, level, opts)
             table.insert(_G.notify_calls, msg)
         end
     ]])
@@ -369,7 +369,7 @@ T["log.warn_deprecation(): shows help message when deprecation found"] = functio
 
     child.lua([[
         _G.notify_calls = {}
-        function vim.notify_once(msg, level, opts)
+        function vim.notify(msg, level, opts)
             table.insert(_G.notify_calls, msg)
         end
     ]])
@@ -396,7 +396,7 @@ T["log.warn_deprecation(): does nothing for no deprecated options"] = function()
 
     child.lua([[
         _G.notify_calls = {}
-        function vim.notify_once(msg, level, opts)
+        function vim.notify(msg, level, opts)
             table.insert(_G.notify_calls, msg)
         end
     ]])
@@ -419,7 +419,7 @@ T["log.warn_deprecation(): handles multiple deprecated options"] = function()
 
     child.lua([[
         _G.notify_calls = {}
-        function vim.notify_once(msg, level, opts)
+        function vim.notify(msg, level, opts)
             table.insert(_G.notify_calls, msg)
         end
     ]])
@@ -447,7 +447,7 @@ T["edge cases: handles empty message string"] = function()
 
     child.lua([[
         _G.notify_calls = {}
-        function vim.notify_once(msg, level, opts)
+        function vim.notify(msg, level, opts)
             table.insert(_G.notify_calls, msg)
         end
     ]])
@@ -466,7 +466,7 @@ T["edge cases: handles very long scope names"] = function()
 
     child.lua([[
         _G.notify_calls = {}
-        function vim.notify_once(msg, level, opts)
+        function vim.notify(msg, level, opts)
             table.insert(_G.notify_calls, msg)
         end
     ]])
@@ -486,7 +486,7 @@ T["edge cases: handles special characters in message"] = function()
 
     child.lua([[
         _G.notify_calls = {}
-        function vim.notify_once(msg, level, opts)
+        function vim.notify(msg, level, opts)
             table.insert(_G.notify_calls, msg)
         end
     ]])
@@ -505,7 +505,7 @@ T["edge cases: handles many format arguments"] = function()
 
     child.lua([[
         _G.notify_calls = {}
-        function vim.notify_once(msg, level, opts)
+        function vim.notify(msg, level, opts)
             table.insert(_G.notify_calls, msg)
         end
     ]])
@@ -524,7 +524,7 @@ T["edge cases: consecutive debug calls persist state"] = function()
 
     child.lua([[
         _G.notify_calls = {}
-        function vim.notify_once(msg, level, opts)
+        function vim.notify(msg, level, opts)
             table.insert(_G.notify_calls, msg)
         end
     ]])
@@ -545,7 +545,7 @@ T["edge cases: all vim log levels work"] = function()
 
     child.lua([[
         _G.notify_calls = {}
-        function vim.notify_once(msg, level, opts)
+        function vim.notify(msg, level, opts)
             table.insert(_G.notify_calls, msg)
         end
     ]])
@@ -568,7 +568,7 @@ T["edge cases: deprecated options with nil values are skipped"] = function()
 
     child.lua([[
         _G.notify_calls = {}
-        function vim.notify_once(msg, level, opts)
+        function vim.notify(msg, level, opts)
             table.insert(_G.notify_calls, msg)
         end
     ]])
@@ -594,7 +594,7 @@ T["log.debug(): _on_win_change still logs integrations with debug=true"] = funct
 
     child.lua([[
         _G.notify_calls = {}
-        function vim.notify_once(msg, level, opts)
+        function vim.notify(msg, level, opts)
             table.insert(_G.notify_calls, msg)
         end
     ]])

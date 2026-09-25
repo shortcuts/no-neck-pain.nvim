@@ -614,6 +614,8 @@ function main.disable(scope)
                     )
                     vim.cmd("rightbelow vertical split")
                     vim.cmd("buffer " .. name)
+                    -- the split lands next to whichever side got focus, not between them (#515)
+                    ui.move_sides(scope)
                     main.init(scope)
                 end)
                 return

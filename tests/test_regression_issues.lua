@@ -524,4 +524,52 @@ T["regression #521: `:q` on curr quits nvim when an unfocused float is open"] = 
     Helpers.expect.equality(pcall(child.lua_get, "1"), false)
 end
 
+T["regression #515: every `:q` with a modified buffer shows the error"] = function()
+    child.set_size(10, 200)
+    child.lua([[require('no-neck-pain').setup({ width = 100 })]])
+
+    child.nnp()
+    child.wait()
+
+    child.lua([[
+        _G.quit_errors = 0
+        vim.notify = function(msg)
+            if msg:find("unable to quit nvim") then
+                _G.quit_errors = _G.quit_errors + 1
+            end
+        end
+        vim.api.nvim_buf_set_lines(0, 0, -1, false, { "unsaved" })
+    ]])
+
+    for attempt = 1, 3 do
+        pcall(child.cmd, "q")
+        child.wait(100)
+
+        Helpers.expect.equality(child.lua_get("_G.quit_errors"), attempt)
+    end
+end
+
+T["regression #515: a blocked `:q` keeps curr between the sides"] = function()
+    child.set_size(10, 200)
+    child.lua([[require('no-neck-pain').setup({ width = 100 })]])
+
+    child.nnp()
+    child.wait()
+
+    child.lua([[
+        vim.notify = function() end
+        vim.api.nvim_buf_set_lines(0, 0, -1, false, { "unsaved" })
+    ]])
+
+    for _ = 1, 3 do
+        pcall(child.cmd, "q")
+        child.wait(100)
+
+        local main = child.lua_get("_G.NoNeckPain.state.tabs[1].wins.main")
+        Helpers.expect.equality(child.get_wins_in_tab(), { main.left, main.curr, main.right })
+        Helpers.expect.equality(child.lua_get("vim.api.nvim_get_current_win()"), main.curr)
+        Helpers.assert_width_invariant(child)
+    end
+end
+
 return T
