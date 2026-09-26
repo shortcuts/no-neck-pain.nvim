@@ -321,9 +321,9 @@ Default values:
       --
       -- The key of each integration must be the filetype of the integration window.
       --
-      -- The `position` is used when the plugin scans the layout in order to compute the width that should be added
-      -- on each side. For example, if you were supposed to have a padding of 100 columns on each side, but an
-      -- integration takes 42, only 58 will be added so your layout is still centered.
+      -- The `position` is the side buffer that shrinks while the integration window is open. The main window is
+      -- centered in the space left by the integration, not on the full screen. For example, with 200 columns,
+      -- `width = 100` and a 40 columns tree on the left, each side buffer gets (200 - 40 - 100) / 2 = 30 columns.
       --
       ---@type table
       integrations = {
