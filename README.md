@@ -287,6 +287,7 @@ require("no-neck-pain").setup({
             ---@type string?
             background = nil,
             -- Brighten (positive) or darken (negative) the side buffers background color. Accepted values are [-1..1].
+            -- Only works when background is provided as well.
             ---@type integer
             blend = 0,
             -- Hexadecimal color code to override the current text color of the buffer. (e.g. #7480c2)
@@ -621,10 +622,10 @@ This section provides structured information about the codebase to help AI assis
 
 1. **Plugin initialization**: `lua/no-neck-pain/init.lua`
    - Exports: `NoNeckPain.toggle()`, `NoNeckPain.resize()`, `NoNeckPain.toggle_scratch_pad()`
-   
+
 2. **Core logic**: `lua/no-neck-pain/main.lua`
    - Contains enable/disable/toggle implementations
-   
+
 3. **State management**: `lua/no-neck-pain/state.lua`
    - Global state accessible via `require("no-neck-pain.util.helpers")`
 
