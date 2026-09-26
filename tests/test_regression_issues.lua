@@ -572,4 +572,42 @@ T["regression #515: a blocked `:q` keeps curr between the sides"] = function()
     end
 end
 
+T["regression: toggling the scratch pad off keeps curr's buffer"] = function()
+    child.lua([[require('no-neck-pain').setup({
+        width = 50,
+        buffers = { scratchPad = { enabled = true } },
+    })]])
+    child.cmd("e README.md")
+    child.nnp()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+
+    local curr_buf = child.lua_get("vim.api.nvim_win_get_buf(1000)")
+    local cwd = child.lua_get("vim.fn.getcwd()")
+    local side_name = "vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(%d))"
+    local side_ft =
+        "vim.api.nvim_get_option_value('filetype', { buf = vim.api.nvim_win_get_buf(%d) })"
+
+    -- off: the side buffers are swapped for padding, curr is untouched
+    child.cmd("NoNeckPainScratchPad")
+    child.wait()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_buf(1000)"), curr_buf)
+    Helpers.expect.equality(child.get_current_win(), 1000)
+    Helpers.expect.equality(child.lua_get(side_ft:format(1001)), "no-neck-pain")
+    Helpers.expect.equality(child.lua_get(side_ft:format(1002)), "no-neck-pain")
+
+    -- on again: the notes come back in the sides, curr is still untouched
+    child.cmd("NoNeckPainScratchPad")
+    child.wait()
+
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_win_get_buf(1000)"), curr_buf)
+    Helpers.expect.equality(child.lua_get(side_name:format(1001)), cwd .. "/no-neck-pain-left.norg")
+    Helpers.expect.equality(
+        child.lua_get(side_name:format(1002)),
+        cwd .. "/no-neck-pain-right.norg"
+    )
+end
+
 return T

@@ -85,7 +85,8 @@ function ui.init_scratch_pad(side, id, cleanup)
 
     -- cleanup is used when the `toggle` method disables the scratch_pad, we then reinitialize it with the user-given configuration.
     if cleanup then
-        vim.cmd("enew")
+        -- target `id` explicitly: the skip-entering autocmd may already have moved focus to `curr`.
+        vim.api.nvim_win_set_buf(id, vim.api.nvim_create_buf(false, true))
         return ui.init_side_options(side, id)
     end
 
