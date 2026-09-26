@@ -168,6 +168,7 @@ Default values:
       ---@type string?
       background = nil,
       -- Brighten (positive) or darken (negative) the side buffers background color. Accepted values are [-1..1].
+      -- Only works when background is provided as well.
       ---@type integer
       blend = 0,
       -- Hexadecimal color code to override the current text color of the buffer. (e.g. #7480c2)
