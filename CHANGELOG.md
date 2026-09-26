@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [3.0.4](https://github.com/shortcuts/no-neck-pain.nvim/compare/v3.0.3...v3.0.4) (2026-09-26)
+
+
+### Bug Fixes
+
+* **scratchPad:** keep the main buffer when toggling the scratch pad off ([ac6d037](https://github.com/shortcuts/no-neck-pain.nvim/commit/ac6d0379deaf43e0826ba8abb35d3a21d9633a42))
+
 ## [3.0.3](https://github.com/shortcuts/no-neck-pain.nvim/compare/v3.0.2...v3.0.3) (2026-09-25)
 
 
