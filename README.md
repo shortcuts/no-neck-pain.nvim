@@ -1,16 +1,5 @@
----
-title: no-neck-pain.nvim
-description: Dead simple plugin to center the currently focused buffer to the middle of the screen
-category: neovim-plugin
-plugin_type: ui-enhancement
-keywords: [neovim, buffer, centering, zen-mode, focus, distraction-free]
-version: ">=3.0.0"
-requires: neovim >= 0.10
-repository: shortcuts/no-neck-pain.nvim
----
-
 <p align="center">
-  <h1 align="center">☕ no-neck-pain.nvim</h2>
+  <h1 align="center">☕ no-neck-pain.nvim</h1>
 </p>
 
 <p align="center">
@@ -18,132 +7,73 @@ repository: shortcuts/no-neck-pain.nvim
 </p>
 
 <div align="center">
-  <video src="https://user-images.githubusercontent.com/20689156/215357783-b69f4339-a681-410f-982a-44655986f0ce.mp4"/>
-</div>
 
-<div align="center">
-
-_[Alternative GIF showcase video for mobile users](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase#default-configuration-with-splitvsplit-showcase)_
+![no-neck-pain.nvim toggling, splitting, and resizing](https://raw.githubusercontent.com/wiki/shortcuts/no-neck-pain.nvim/assets/hero.gif)
 
 </div>
+
+no-neck-pain.nvim opens an empty window on each side of the focused window, so your code sits in the middle of the screen at a fixed width. It does not change your splits, tabs, or keymaps, and it works with no configuration.
 
 <!-- SECTION: FEATURES -->
 ## ⚡️ Features
 
-_Creates evenly sized empty buffers on each side of your focused buffer, which acts as padding for your window._
-
-- Plug and play, no configuration required
-- Seamless experience with your workflow.
-- Multiple tabs support
-- [Highly customizable experience](https://github.com/shortcuts/no-neck-pain.nvim#configuration)
-- [Support split/vsplit windows](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase#window-layout-support)
-- [Built-in scratchPad feature](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase#side-buffer-as-scratch-pad)
-- [Themed side buffers](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase#custom-background-color)
-- Fully integrates with file trees ([neo-tree.nvim](https://github.com/nvim-neo-tree/neo-tree.nvim), [nvim-tree.lua](https://github.com/nvim-tree/nvim-tree.lua), etc.) and dashboard ([alpha-nvim](https://github.com/goolord/alpha-nvim), [snacks.nvim](https://github.com/folke/snacks.nvim), etc.)
-- Neovim >= 0.10 compatibility
-    - 0.7 and 0.8 support is still available in the [1.x frozen version](https://github.com/shortcuts/no-neck-pain.nvim/tree/1.x)
-    - 0.9 support is still available in the [2.x frozen version](https://github.com/shortcuts/no-neck-pain.nvim/tree/2.x)
-
-> Want to see it in action? Take a look at [the showcase section](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase)
+- Works without configuration: run `:NoNeckPain`.
+- Keeps the layout centered across [splits and vsplits](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase#splits), tabs, and terminal resizes.
+- Side buffers can be [colored](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase#side-buffer-colors) or used as [scratch pads](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase#side-buffers-as-scratch-pads) that save to a file.
+- [Integrates](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Integrations) with file trees (neo-tree, nvim-tree, snacks explorer), symbol panels (aerial, outline), neotest, nvim-dap-ui, and dashboards.
+- Requires Neovim 0.10 or later. For Neovim 0.7 and 0.8, use the frozen [1.x branch](https://github.com/shortcuts/no-neck-pain.nvim/tree/1.x). For 0.9, use the [2.x branch](https://github.com/shortcuts/no-neck-pain.nvim/tree/2.x).
 
 <!-- SECTION: INSTALLATION -->
 ## 📋 Installation
 
-<div align="center">
-<table>
-<thead>
-<tr>
-<th>Package manager</th>
-<th>Snippet</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-
-[wbthomason/packer.nvim](https://github.com/wbthomason/packer.nvim)
-
-</td>
-<td>
-
-```lua
--- stable version
-use {"shortcuts/no-neck-pain.nvim", tag = "*" }
--- dev version
-use {"shortcuts/no-neck-pain.nvim"}
-```
-
-</td>
-</tr>
-<tr>
-<td>
-
-[junegunn/vim-plug](https://github.com/junegunn/vim-plug)
-
-</td>
-<td>
-
-```lua
--- stable version
-Plug 'shortcuts/no-neck-pain.nvim', { 'tag': '*' }
--- dev version
-Plug 'shortcuts/no-neck-pain.nvim'
-```
-
-</td>
-</tr>
-<tr>
-<td>
+Pin a release with the snippets below. Remove the version pin to follow `main`.
 
 [folke/lazy.nvim](https://github.com/folke/lazy.nvim)
 
-</td>
-<td>
+```lua
+{ "shortcuts/no-neck-pain.nvim", version = "*" }
+```
+
+[wbthomason/packer.nvim](https://github.com/wbthomason/packer.nvim)
 
 ```lua
--- stable version
-require("lazy").setup({{"shortcuts/no-neck-pain.nvim", version = "*"}})
--- dev version
-require("lazy").setup({"shortcuts/no-neck-pain.nvim"})
+use({ "shortcuts/no-neck-pain.nvim", tag = "*" })
 ```
 
-</td>
-</tr>
-<tr>
-<td>
+[junegunn/vim-plug](https://github.com/junegunn/vim-plug)
+
+```vim
+Plug 'shortcuts/no-neck-pain.nvim', { 'tag': '*' }
+```
 
 [nix-community/nixvim](https://github.com/nix-community/nixvim)
-</td>
-<td>
 
 ```nix
-
 plugins.no-neck-pain.enable = true;
 ```
-
-</td>
-</tr>
-</tbody>
-</table>
-</div>
 
 <!-- SECTION: GETTING_STARTED -->
 ## ☄ Getting started
 
-No configuration/setup steps needed! Sit back, relax and call `:NoNeckPain`.
+Run `:NoNeckPain` to center the current window. Run it again to go back to your normal layout.
+
+To change the defaults, call `setup()` once in your config. This example sets the centered width to 120 columns, enables the default keymaps (`<Leader>np` toggles the plugin), and turns the plugin on when Neovim starts:
+
+```lua
+require("no-neck-pain").setup({
+    width = 120,
+    mappings = { enabled = true },
+    autocmds = { enableOnVimEnter = true },
+})
+```
 
 <!-- SECTION: CONFIGURATION -->
 ## ⚙ Configuration
 
-> **Note**:
-> Need some inspiration on customizing your experience? [Take a look at the showcase](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase)
+Every option is optional. The [Showcase](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase) has a screenshot for the common ones. Inside Neovim, `:h NoNeckPain.options` lists the plugin options and `:h NoNeckPain.bufferOptions` lists the side buffer options.
 
 <details>
-<summary>Click to unfold the full list of options with their default values</summary>
-
-> **Note**: The options are also available in Neovim by using:
-> - `:h NoNeckPain.options` to see the global plugin options.
-> - `:h NoNeckPain.bufferOptions` to see the side buffer options.
+<summary>All options with their default values</summary>
 
 ```lua
 require("no-neck-pain").setup({
@@ -368,33 +298,39 @@ require("no-neck-pain").setup({
         },
         -- @link https://github.com/nvim-neotest/neotest
         neotest = {
-            -- The position of the tree.
+            -- The position of the test panel.
             ---@type "right"
             position = "right",
         },
         -- @link https://github.com/rcarriga/nvim-dap-ui
         dap = {
-            -- The position of the tree.
+            -- The position of the debug panel.
             ---@type "none"
             position = "none",
         },
         -- @link https://github.com/hedyhli/outline.nvim
         outline = {
-            -- The position of the tree.
+            -- The position of the outline panel.
             ---@type "left"|"right"
             position = "right",
         },
         -- @link https://github.com/stevearc/aerial.nvim
         aerial = {
-            -- The position of the tree.
+            -- The position of the symbols panel.
             ---@type "left"|"right"
             position = "right",
         },
         -- @link https://github.com/stevearc/oil.nvim
         oil = {
-            -- The position of the tree.
+            -- The position of the file manager.
             ---@type "none"
             position = "none",
+        },
+        -- @link https://github.com/folke/snacks.nvim
+        snacks_picker = {
+            -- The position of the picker explorer.
+            ---@type "left"|"right"
+            position = "left",
         },
         -- this is a generic field to hint no-neck-pain that you use a dashboard plugin.
         -- the filetypes of natively supported dashboards are listed below in the `filetypes` field.
@@ -535,6 +471,7 @@ NoNeckPain.bufferOptionsColors = {
     ---@type string?
     background = nil,
     -- Brighten (positive) or darken (negative) the side buffers background color. Accepted values are [-1..1].
+    -- Only works when background is provided as well.
     ---@type integer
     blend = 0,
     -- Hexadecimal color code to override the current text color of the buffer. (e.g. #7480c2)
@@ -569,108 +506,40 @@ NoNeckPain.bufferOptions = {
 
 |   Command   |         Description        |
 |-------------|----------------------------|
-|`:NoNeckPain`| Toggles the plugin state, between enable and disable. |
-|`:NoNeckPainResize INT`| Updates the config `width` with the given `INT` value and resizes the no-neck-pain windows. |
-|`:NoNeckPainToggleLeftSide`| Toggles the left side buffer (open/close). |
-|`:NoNeckPainToggleRightSide`| Toggles the right side buffer (open/close). |
-|`:NoNeckPainWidthUp`| Increases the config `width` by 5 and resizes the no-neck-pain windows. |
-|`:NoNeckPainWidthDown`| Decreases the config `width` by 5 and resizes the no-neck-pain windows. |
-|`:NoNeckPainScratchPad`| Uses the side buffers as a persistent scratchpad so you can take notes easily. |
-|`:NoNeckPainDebug`| Toggles the debug mode. |
+|`:NoNeckPain`| Toggles the plugin on and off. |
+|`:NoNeckPainResize INT`| Sets `width` to `INT` and resizes the windows. |
+|`:NoNeckPainToggleLeftSide`| Opens or closes the left side buffer. |
+|`:NoNeckPainToggleRightSide`| Opens or closes the right side buffer. |
+|`:NoNeckPainWidthUp`| Increases `width` by 5 and resizes the windows. |
+|`:NoNeckPainWidthDown`| Decreases `width` by 5 and resizes the windows. |
+|`:NoNeckPainScratchPad`| Toggles the [scratch pad](https://github.com/shortcuts/no-neck-pain.nvim/wiki/Showcase#side-buffers-as-scratch-pads) in the side buffers. |
+|`:NoNeckPainDebug`| Toggles debug logs. |
 
 <!-- SECTION: BREAKING_CHANGES -->
-## 🏗 breaking changes
+## 🏗 Breaking changes
 
-### v1.0.0
+Each major release lists its breaking changes in its pull request:
 
-See [the release description](https://github.com/shortcuts/no-neck-pain.nvim/pull/201) for the full list of breaking changes.
-
-### v2.0.0
-
-See [the release description](https://github.com/shortcuts/no-neck-pain.nvim/pull/384) for the full list of breaking changes.
-
-### v3.0.0
-
-See [the release description](https://github.com/shortcuts/no-neck-pain.nvim/pull/513) for the full list of breaking changes.
-
-<!-- SECTION: AI_ASSISTANTS -->
-## 🤖 For AI Assistants
-
-This section provides structured information about the codebase to help AI assistants understand and work with the plugin effectively.
-
-### 📁 Codebase Structure
-
-**Core Modules** (`lua/no-neck-pain/`):
-- `init.lua` - Public API entry point, exports main commands (`toggle()`, `resize()`, etc.)
-- `main.lua` - Core plugin logic, orchestrates enable/disable/toggle operations
-- `state.lua` - Global state management (plugin enabled, tabs, windows)
-- `config.lua` - Configuration validation and defaults
-- `ui.lua` - Window/buffer creation and manipulation
-- `colors.lua` - Color/theme management for side buffers
-
-**Utilities** (`lua/no-neck-pain/util/`):
-- `api.lua` - Debouncing and API utilities
-- `helpers.lua` - Common helper functions and safe state/config access
-- `constants.lua` - Plugin constants (supported integrations, filetypes)
-- `log.lua` - Debug logging
-
-**Tests** (`tests/`):
-- `test_*.lua` - Feature-specific test suites
-- `helpers.lua` - Test utilities and fixtures
-
-### 🔑 Key Entry Points
-
-1. **Plugin initialization**: `lua/no-neck-pain/init.lua`
-   - Exports: `NoNeckPain.toggle()`, `NoNeckPain.resize()`, `NoNeckPain.toggle_scratch_pad()`
-
-2. **Core logic**: `lua/no-neck-pain/main.lua`
-   - Contains enable/disable/toggle implementations
-
-3. **State management**: `lua/no-neck-pain/state.lua`
-   - Global state accessible via `require("no-neck-pain.util.helpers")`
-
-### ⚙️ Configuration Structure
-
-The plugin uses a deeply nested configuration object, see `lua/no-neck-pain/config.lua`
-
-### 🔄 Common Patterns
-
-1. **State and Config Access**: Always use `require("no-neck-pain.util.helpers")` for state manipulation
-   - `get_config_field(key)` - Read config values
-   - `merge_config(partial)` - Update config
-   - `get_tab()` - Get current tab state
-
-2. **Event Handling**: Plugin responds to autocmds (VimEnter, TabEnter, ColorScheme, etc.)
-
-3. **Side Buffer Management**: Creates "padding" buffers on left/right sides
-   - Named `no-neck-pain-left` and `no-neck-pain-right` when `setNames = true`
-   - Filetype: `no-neck-pain` (or custom via `buffers.bo.filetype`)
-
-4. **Integration Support**: Detects file trees (NvimTree, neo-tree) and dashboards
-   - Adjusts width calculations to account for sidebar positions
-
-### 🧪 Testing
-
-- Test framework: `MiniTest`
-- Run tests: `make test`
-- Test pattern: Each feature has dedicated `test_*.lua` file
-- Helpers: `tests/helpers.lua` provides utilities for test setup/teardown
+- [v1.0.0](https://github.com/shortcuts/no-neck-pain.nvim/pull/201)
+- [v2.0.0](https://github.com/shortcuts/no-neck-pain.nvim/pull/384)
+- [v3.0.0](https://github.com/shortcuts/no-neck-pain.nvim/pull/513)
 
 <!-- SECTION: CONTRIBUTING -->
 ## ⌨ Contributing
 
-PRs and issues are always welcome. Make sure to provide as much context as possible when opening one.
+Pull requests and issues are welcome. Add as much context as you can, such as your config, Neovim version, and the plugins that open windows.
 
-See [Makefile](./Makefile) for the available commands
+Before you open a pull request, run:
 
-> It's recommended to use [Bob](https://github.com/MordechaiHadad/bob), a useful nvim version manager in order to run the test suite for every supported versions.
+```sh
+make deps           # clones the test dependencies into deps/
+make lint
+make test
+make documentation  # regenerates doc/no-neck-pain.txt
+```
 
-## 🗞 Wiki
-
-You can find guides and showcase of the plugin on [the Wiki](https://github.com/shortcuts/no-neck-pain.nvim/wiki)
+To run the tests on every supported Neovim version, install versions with [bob](https://github.com/MordechaiHadad/bob). `make test-nightly` runs the suite on nightly.
 
 ## 🎭 Motivations
 
-Although there's other (amazing!) alternatives that provide a zen-distraction-free-center mode, they usually make assumptions that might alter your workflow, or at least require some configuration to suit your needs.
-
-`no-neck-pain.nvim` aims at providing a seamless non-opinionated buffer centering experience, while being super customizable.
+Other zen and centering plugins exist. Most of them change your layout, hide UI elements, or need configuration before they fit your workflow. no-neck-pain.nvim only adds padding windows and leaves everything else as it was.
