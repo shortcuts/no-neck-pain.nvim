@@ -815,6 +815,10 @@ function state:determine_layout_action(ctx)
         return ctx.post_count > ctx.side_count + 1 and "reposition" or nil
     end
 
+    if (ctx.left_cleared and ctx.right_cleared) and ctx.event_name == "WinClosed" then
+        return "redraw"
+    end
+
     if (ctx.left_cleared or ctx.right_cleared) and ctx.event_name == "WinClosed" then
         return "disable"
     end
