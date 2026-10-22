@@ -176,6 +176,35 @@ T["SkipEnteringNoNeckPainBuffer: goes to new valid buffer when entering side"] =
     Helpers.expect.equality(child.api.nvim_get_current_win(), 1003)
 end
 
+T["SkipEnteringNoNeckPainBuffer: never reroutes focus to another tab"] = function()
+    child.lua(
+        [[ require('no-neck-pain').setup({width=50, autocmds = { skipEnteringNoNeckPainBuffer = true }}) ]]
+    )
+    child.nnp()
+
+    Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
+
+    child.cmd("tabnew")
+    child.wait()
+    child.cmd("tabprevious")
+    child.wait()
+
+    Helpers.expect.equality(child.api.nvim_get_current_tabpage(), 1)
+
+    -- the left side is first in the window list: a reroute walking backwards
+    -- wraps around, and must stay within the current tab
+    child.fn.win_gotoid(1001)
+    child.wait()
+    Helpers.expect.equality(child.api.nvim_get_current_tabpage(), 1)
+    Helpers.expect.equality(child.api.nvim_get_current_win(), 1000)
+
+    -- the right side is last: a reroute walking forwards wraps around
+    child.fn.win_gotoid(1002)
+    child.wait()
+    Helpers.expect.equality(child.api.nvim_get_current_tabpage(), 1)
+    Helpers.expect.equality(child.api.nvim_get_current_win(), 1000)
+end
+
 T["SkipEnteringNoNeckPainBuffer: handles ltr and rtl on many buffers"] = function()
     child.lua(
         [[ require('no-neck-pain').setup({width=50, autocmds = { skipEnteringNoNeckPainBuffer = true }}) ]]
