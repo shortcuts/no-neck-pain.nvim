@@ -207,7 +207,7 @@ function main._on_skip_entering(p)
     -- so we keep track of the encounter of prev,curr to determine
     -- the next valid window to focus
 
-    local wins = vim.api.nvim_list_wins()
+    local wins = vim.api.nvim_tabpage_list_wins(0)
     local idx
 
     for i = 1, #wins do
