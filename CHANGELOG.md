@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [3.0.5](https://github.com/shortcuts/no-neck-pain.nvim/compare/v3.0.4...v3.0.5) (2026-10-22)
+
+
+### Bug Fixes
+
+* unexpectedly jumping between tabs ([#527](https://github.com/shortcuts/no-neck-pain.nvim/issues/527)) ([b474043](https://github.com/shortcuts/no-neck-pain.nvim/commit/b4740435069ce380f93b9d445c882ad06dae1e52))
+
 ## [3.0.4](https://github.com/shortcuts/no-neck-pain.nvim/compare/v3.0.3...v3.0.4) (2026-09-26)
 
 
