@@ -540,6 +540,7 @@ function main.enable(scope)
                 end
 
                 main.init(p.event)
+                state:mark_tabs_for_resizing(p.event)
             end)
         end,
         group = augroup_name,
@@ -552,6 +553,12 @@ function main.enable(scope)
                 state:set_active_tab(api.get_current_tab())
 
                 log.debug(p.event, "tab %d entered", state.active_tab)
+
+                local resize_event = state:consume_resize()
+                if resize_event then
+                    main.init(resize_event)
+                    log.debug(resize_event, "tab %d resized", state.active_tab)
+                end
 
                 state:refresh_tabs(p.event)
             end)
