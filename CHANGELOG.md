@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [3.0.6](https://github.com/shortcuts/no-neck-pain.nvim/compare/v3.0.5...v3.0.6) (2026-11-02)
+
+
+### Bug Fixes
+
+* resize inactive tabs splits when entering them after a terminal resize ([928bf87](https://github.com/shortcuts/no-neck-pain.nvim/commit/928bf87cab5487de44787a323675931c1f3e8e7c))
+
 ## [3.0.5](https://github.com/shortcuts/no-neck-pain.nvim/compare/v3.0.4...v3.0.5) (2026-10-22)
 
 
