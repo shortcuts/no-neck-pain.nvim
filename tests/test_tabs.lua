@@ -857,4 +857,25 @@ T["tabnew/tabclose: closes terminal tab without affecting no-neck-pain on other 
     Helpers.expect.equality(child.lua_get("vim.api.nvim_list_tabpages()"), { 1 })
 end
 
+T["resize: inactive tab sides are resized when entering the tab"] = function()
+    child.set_size(10, 200)
+    child.lua([[require('no-neck-pain').setup({ width = 80 })]])
+    child.nnp()
+    child.cmd("tabnew")
+    child.wait()
+    child.nnp()
+    child.cmd("tabprevious")
+    child.wait()
+
+    child.set_size(10, 120)
+    child.wait(100)
+    child.cmd("tabnext")
+    child.wait(200)
+
+    local curr = child.lua_get("_G.NoNeckPain.state.tabs[2].wins.main.curr")
+    local width = child.lua_get("vim.api.nvim_win_get_width(" .. curr .. ")")
+    -- the active tab ends 2 columns short too: separators eat the difference
+    Helpers.expect.equality(math.abs(width - 80) <= 2, true)
+end
+
 return T
