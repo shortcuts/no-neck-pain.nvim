@@ -160,6 +160,20 @@ function state:refresh_tabs(scope, skip_id)
     return len
 end
 
+--- Iterates over the tabs in the state to mark all inactive ones up to resizing
+---
+---@param scope string: caller of the method.
+---@private
+function state:mark_tabs_for_resizing(scope)
+    log.debug(scope, "marking tabs that needs to be resized...")
+
+    for _, tab in pairs(self.tabs) do
+        if tab.id ~= self.active_tab then
+            tab.resize = scope
+        end
+    end
+end
+
 --- Register a new `tab` with the given `id` in the state.
 ---
 ---@param id number: the id of the tab.
@@ -171,6 +185,7 @@ function state:set_tab(id)
         id = id,
         scratchpad_enabled = false,
         redraw = false,
+        resize = nil,
         -- last observed total window count, nil until the first scan, see `get_window_count`.
         window_count = nil,
         wins = {
@@ -455,6 +470,22 @@ function state:consume_redraw()
     tab.redraw = false
 
     return redraw
+end
+
+--- Consumes the resize value in the active tab, in order to know if we should resize sides or not.
+---
+---@return string | nil: the resize event that marked the tab for resizing
+---@private
+function state:consume_resize()
+    local tab = self:get_tab()
+    if not tab then
+        return nil
+    end
+    local resize = tab.resize
+
+    tab.resize = nil
+
+    return resize
 end
 
 --- Increases the columns if the encountered window of the given table is not an integration, otherwise sets the integration.
