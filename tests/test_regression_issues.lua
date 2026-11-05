@@ -524,6 +524,57 @@ T["regression #521: `:q` on curr quits nvim when an unfocused float is open"] = 
     Helpers.expect.equality(pcall(child.lua_get, "1"), false)
 end
 
+T["regression #221 #350: `:q` on curr exits nvim with only curr still open on VimLeavePre"] = function()
+    child.set_size(10, 200)
+    child.lua([[require('no-neck-pain').setup({ width = 100 })]])
+
+    child.nnp()
+    child.wait()
+
+    -- session managers (e.g., vim-obsession) save the layout on VimLeavePre
+    local out = vim.fn.tempname()
+    child.lua(
+        [[
+        local out = ...
+        vim.bo.filetype = "text"
+        vim.api.nvim_create_autocmd("VimLeavePre", {
+            callback = function()
+                local fts = vim.tbl_map(function(win)
+                    return vim.bo[vim.api.nvim_win_get_buf(win)].filetype
+                end, vim.api.nvim_list_wins())
+                vim.fn.writefile({ table.concat(fts, ",") }, out)
+            end,
+        })
+    ]],
+        { out }
+    )
+
+    -- `:q` makes the child exit, which kills the RPC channel mid-request
+    pcall(child.cmd, "q")
+    vim.uv.sleep(200)
+
+    Helpers.expect.equality(pcall(child.lua_get, "1"), false)
+    Helpers.expect.equality(vim.fn.readfile(out), { "text" })
+end
+
+T["regression #221 #350: an aborted `:q` on curr restores the sides"] = function()
+    child.set_size(10, 200)
+    child.lua([[require('no-neck-pain').setup({ width = 100 })]])
+    -- a second file in the arglist aborts `:q` with E173
+    child.cmd("args README.md CHANGELOG.md")
+
+    child.nnp()
+    child.wait()
+
+    Helpers.expect.equality(pcall(child.cmd, "q"), false)
+    child.wait(100)
+
+    local main = child.lua_get("_G.NoNeckPain.state.tabs[1].wins.main")
+    Helpers.expect.equality(child.get_wins_in_tab(), { main.left, main.curr, main.right })
+    Helpers.expect.equality(child.lua_get("vim.api.nvim_get_current_win()"), main.curr)
+    Helpers.assert_width_invariant(child)
+end
+
 T["regression #515: every `:q` with a modified buffer shows the error"] = function()
     child.set_size(10, 200)
     child.lua([[require('no-neck-pain').setup({ width = 100 })]])

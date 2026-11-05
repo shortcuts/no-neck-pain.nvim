@@ -369,12 +369,76 @@ function main._on_win_change(p)
     end)
 end
 
+--- On `:quit` of the last ordinary window, closes the side windows before Neovim decides whether
+--- it closes the window or exits, so `:quit` exits Neovim like it would without the plugin.
+---
+--- Otherwise, the window closes first and the plugin calls `:quitall!` afterwards, so the
+--- `VimLeavePre` autocmds, e.g., session managers, run on a layout with only the side windows left.
+---
+---@param p table: QuitPre autocmd callback params.
+---@return boolean: whether the side windows have been closed.
+---@private
+function main._close_sides_before_quit(p)
+    -- Do not close if multiple tabs exist.
+    if #vim.api.nvim_list_tabpages() > 1 or not state:is_active_tab_registered() then
+        return false
+    end
+
+    -- Do not close if current window has NOT the quitting buf.
+    local curr = vim.api.nvim_get_current_win()
+    if p.buf ~= vim.api.nvim_win_get_buf(curr) then
+        return false
+    end
+
+    local wins = vim.tbl_filter(function(win)
+        return win ~= state:get_side_id("left")
+            and win ~= state:get_side_id("right")
+            and not api.is_relative_window(win)
+    end, vim.api.nvim_tabpage_list_wins(state.active_tab))
+
+    -- Do not close if other windows exist.
+    if #wins ~= 1 or wins[1] ~= curr then
+        return false
+    end
+
+    -- Do not close if there are unsaved changes.
+    -- Unsaved changes abort the quit, the deferred handler reports them and restores the layout.
+    for _, modified in pairs(api.get_opened_buffers()) do
+        if modified then
+            return false
+        end
+    end
+
+    log.debug(p.event, "quitting the last window %d, closing sides first", curr)
+
+    main.disable(p.event)
+
+    -- `:quit` can still be aborted, e.g., with more files to edit (E173), restore the sides then.
+    vim.schedule(function()
+        if vim.v.exiting ~= vim.NIL or not vim.api.nvim_win_is_valid(curr) then
+            return
+        end
+
+        vim.api.nvim_set_current_win(curr)
+        main.enable(string.format("%s:aborted", p.event))
+    end)
+
+    return true
+end
+
 --- Autocmd handler: reacts to QuitPre/BufDelete to maintain layout or disable.
 ---@param p table: autocmd callback params.
 ---@private
 function main._on_buf_delete(p)
     if event.session_loading() then
         return
+    end
+
+    -- If we are quitting the last window, shut down the panels.
+    if p.event == "QuitPre" then
+        if main._close_sides_before_quit(p) then
+            return
+        end
     end
 
     -- checked before scheduling: once the window is closed, focus can land on a
