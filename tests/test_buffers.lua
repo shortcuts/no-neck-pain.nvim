@@ -236,7 +236,8 @@ T["Curr: closing curr window without any other window quits Neovim"] = function(
     Helpers.expect.equality(child.get_wins_in_tab(), { 1001, 1000, 1002 })
     Helpers.expect.state(child, "tabs[1].wins.main.curr", 1000)
 
-    child.cmd("q")
+    -- pcall, because `:quit` makes the child exit, which kills the RPC channel mid-request
+    pcall(child.cmd, "q")
 
     Helpers.expect.error(function()
         child.get_wins_in_tab()
