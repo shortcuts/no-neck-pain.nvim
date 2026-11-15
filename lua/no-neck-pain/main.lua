@@ -418,8 +418,6 @@ function main._close_sides_before_quit(p)
         if vim.v.exiting ~= vim.NIL or not vim.api.nvim_win_is_valid(curr) then
             return
         end
-
-        vim.api.nvim_set_current_win(curr)
         main.enable(string.format("%s:aborted", p.event))
     end)
 
