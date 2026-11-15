@@ -1,4 +1,11 @@
 <a name="0.2.3"></a>
+## [3.0.7](https://github.com/shortcuts/no-neck-pain.nvim/compare/v3.0.6...v3.0.7) (2026-11-15)
+
+
+### Bug Fixes
+
+* **QuitPre:** close the sides before quitting the last window ([#531](https://github.com/shortcuts/no-neck-pain.nvim/issues/531)) ([d726e36](https://github.com/shortcuts/no-neck-pain.nvim/commit/d726e36be1bb10f1cfd844bf3f6b8609b9f58305))
+
 ## [3.0.6](https://github.com/shortcuts/no-neck-pain.nvim/compare/v3.0.5...v3.0.6) (2026-11-02)
 
 
