@@ -82,7 +82,8 @@ T["fallbackOnBufferDelete: still allows nvim to quit"] = function()
     Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1000, left = 1001, right = 1002 })
 
     child.cmd("badd 1")
-    child.cmd("q")
+    -- pcall, because `:quit` makes the child exit, which kills the RPC channel mid-request
+    pcall(child.cmd, "q")
 
     Helpers.expect.error(function()
         Helpers.expect.state(child, "tabs[1].wins.main", { curr = 1003, left = 1004, right = 1005 })

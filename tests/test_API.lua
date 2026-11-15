@@ -555,7 +555,8 @@ T["Disable: relative window doesn't prevent quitting nvim"] = function()
     Helpers.expect.equality(child.get_wins_in_tab(), { 1003, 1000, 1004, 1002 })
     vim.fn.win_gotoid(1000)
 
-    child.cmd("quit")
+    -- pcall, because `:quit` makes the child exit, which kills the RPC channel mid-request
+    pcall(child.cmd, "quit")
 
     Helpers.expect.error(function()
         -- error because instance is closed
